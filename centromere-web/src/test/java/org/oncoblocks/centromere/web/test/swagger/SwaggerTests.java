@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 		ControllerIntegrationTestConfig.class, TestSwaggerConfig.class})
 @WebAppConfiguration
 public class SwaggerTests {
-
+	
 	private MockMvc mockMvc;
 	@Autowired private WebApplicationContext webApplicationContext;
 	

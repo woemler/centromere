@@ -16,6 +16,7 @@
 
 package org.oncoblocks.centromere.web.controller;
 
+import io.swagger.annotations.ApiParam;
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.repository.RepositoryOperations;
 import org.oncoblocks.centromere.web.exceptions.RequestFailureException;
@@ -65,7 +66,9 @@ public class CrudApiController<T extends Model<ID>, ID extends Serializable>
 			produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE})
-	public HttpEntity<?> create(@RequestBody T entity, HttpServletRequest request) {
+	public HttpEntity<?> create(
+			@RequestBody T entity, 
+			HttpServletRequest request) {
 		T created = getRepository().insert(entity);
 		if (created == null) throw new RequestFailureException(40003, "There was a problem creating the record.", "", "");
 		if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))){
@@ -89,7 +92,10 @@ public class CrudApiController<T extends Model<ID>, ID extends Serializable>
 			produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE})
-	public HttpEntity<?> update(@RequestBody T entity, @PathVariable ID id, HttpServletRequest request) {
+	public HttpEntity<?> update(
+			@RequestBody T entity,
+			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable ID id, 
+			HttpServletRequest request) {
 		if (!getRepository().exists(id)) throw new ResourceNotFoundException();
 		T updated = getRepository().update(entity);
 		if (updated == null) throw new RequestFailureException(40004, "There was a problem updating the record.", "", "");
@@ -109,7 +115,9 @@ public class CrudApiController<T extends Model<ID>, ID extends Serializable>
 	 * @return {@link HttpStatus} indicating success or failure.
 	 */
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-	public HttpEntity<?> delete(@PathVariable ID id, HttpServletRequest request) {
+	public HttpEntity<?> delete(
+			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable ID id, 
+			HttpServletRequest request) {
 		getRepository().delete(id);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

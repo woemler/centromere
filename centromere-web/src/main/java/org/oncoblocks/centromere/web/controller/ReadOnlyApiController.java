@@ -16,6 +16,7 @@
 
 package org.oncoblocks.centromere.web.controller;
 
+import io.swagger.annotations.ApiParam;
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.repository.RepositoryOperations;
 import org.oncoblocks.centromere.web.exceptions.MethodNotAllowedException;
@@ -62,7 +63,9 @@ public class ReadOnlyApiController<T extends Model<ID>, ID extends Serializable>
 			produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE})
-	public HttpEntity<?> create(@RequestBody T entity, HttpServletRequest request) {
+	public HttpEntity<?> create(
+			@RequestBody T entity, 
+			HttpServletRequest request) {
 		throw new MethodNotAllowedException();
 	}
 
@@ -77,7 +80,10 @@ public class ReadOnlyApiController<T extends Model<ID>, ID extends Serializable>
 			produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE})
-	public HttpEntity<?> update(@RequestBody T entity, @PathVariable ID id, HttpServletRequest request) {
+	public HttpEntity<?> update(
+			@RequestBody T entity,
+			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable ID id, 
+			HttpServletRequest request) {
 		throw new MethodNotAllowedException();
 	}
 
@@ -88,7 +94,9 @@ public class ReadOnlyApiController<T extends Model<ID>, ID extends Serializable>
 	 * @return {@link org.springframework.http.HttpStatus} indicating success or failure.
 	 */
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-	public HttpEntity<?> delete(@PathVariable ID id, HttpServletRequest request) {
+	public HttpEntity<?> delete(
+			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable ID id, 
+			HttpServletRequest request) {
 		throw new MethodNotAllowedException();
 	}
 	

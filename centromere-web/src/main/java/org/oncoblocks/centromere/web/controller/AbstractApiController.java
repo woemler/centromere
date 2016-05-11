@@ -17,6 +17,9 @@
 package org.oncoblocks.centromere.web.controller;
 
 import com.google.common.reflect.TypeToken;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiParam;
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.repository.QueryCriteria;
 import org.oncoblocks.centromere.core.repository.RepositoryOperations;
@@ -97,7 +100,7 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE, 
 					MediaType.TEXT_PLAIN_VALUE })
 	public HttpEntity<?> findById(
-			@PathVariable ID id,
+			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable ID id,
 			HttpServletRequest request
 	) {
 		Set<String> fields = RequestUtils.getFilteredFieldsFromRequest(request);
@@ -155,6 +158,11 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 	 * @param request {@link HttpServletRequest}
 	 * @return
 	 */
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "page", value = "Page number.", defaultValue = "0", dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "size", value = "Number of records per page.", defaultValue = "1000", dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "sort", value = "Sort order field and direction.", dataType = "string", paramType = "query", example = "name,asc")
+	})
 	@RequestMapping(value = "", method = RequestMethod.GET,
 			produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,

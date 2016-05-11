@@ -17,14 +17,20 @@
 package org.oncoblocks.centromere.web.config;
 
 import com.google.common.base.Predicate;
+import org.oncoblocks.centromere.web.documentation.ModelParameterBuilderPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger.common.SwaggerPluginSupport;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import static springfox.documentation.builders.PathSelectors.regex;
@@ -41,6 +47,12 @@ import static springfox.documentation.builders.PathSelectors.regex;
 public class SwaggerConfig {
 	
 	@Autowired private Environment env;
+
+	public static final Class<?>[] FILTERED_TYPES = {
+			Pageable.class,
+			PageRequest.class,
+			PagedResourcesAssembler.class
+	};
 	
 	@Bean
 	public Docket api(){
@@ -50,7 +62,7 @@ public class SwaggerConfig {
 				.paths(apiPaths())
 				.build()
 				.apiInfo(apiInfo())
-				.enableUrlTemplating(true);
+				.ignoredParameterTypes(FILTERED_TYPES);
 	}
 
 	private ApiInfo apiInfo(){
@@ -67,6 +79,12 @@ public class SwaggerConfig {
 
 	private Predicate<String> apiPaths(){
 		return regex(env.getRequiredProperty("centromere.api.regex-url"));
+	}
+	
+	@Bean
+	@Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER)
+	public ModelParameterBuilderPlugin modelParameterBuilderPlugin(){
+		return new ModelParameterBuilderPlugin();
 	}
 	
 }
