@@ -39,7 +39,6 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -95,11 +94,17 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 	 * @param id primary ID for the target record.
 	 * @return {@code T} instance
 	 */
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "fields", value = "List of fields to be included in response objects", 
+					dataType = "string", paramType = "query"),
+			@ApiImplicitParam(name = "exclude", value = "List of fields to be excluded from response objects", 
+					dataType = "string", paramType = "query")
+	})
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET,
 			produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE, 
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE, 
 					MediaType.TEXT_PLAIN_VALUE })
-	public HttpEntity<?> findById(
+	public ResponseEntity<ResponseEnvelope<T>> findById(
 			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable ID id,
 			HttpServletRequest request
 	) {
@@ -107,12 +112,12 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 		Set<String> exclude = RequestUtils.getExcludedFieldsFromRequest(request);
 		T entity = repository.findOne(id);
 		if (entity == null) throw new ResourceNotFoundException();
-		ResponseEnvelope envelope = null;
+		ResponseEnvelope<T> envelope = null;
 		if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))){
 			FilterableResource resource = assembler.toResource(entity);
-			envelope = new ResponseEnvelope(resource, fields, exclude);
+			envelope = new ResponseEnvelope<>(resource, fields, exclude);
 		} else {
-			envelope = new ResponseEnvelope(entity, fields, exclude);
+			envelope = new ResponseEnvelope<>(entity, fields, exclude);
 		}
 		return new ResponseEntity<>(envelope, HttpStatus.OK);
 	}
@@ -124,27 +129,27 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 	 * 
 	 * @param field Name of the model attribute to retrieve unique values of.
 	 * @param request {@link HttpServletRequest}
-	 * @return
+	 * @return List of distinct field values.
 	 */
 	@RequestMapping(value = "/distinct", method = RequestMethod.GET,
 			produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE })
-	public HttpEntity<?> findDistinct(
-			@RequestParam String field, 
+	public ResponseEntity<ResponseEnvelope<Object>> findDistinct(
+			@ApiParam(name = "field", value = "Model field name.") @RequestParam String field, 
 			HttpServletRequest request)
 	{
 		List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromRequest(model, request);
 		List<Object> distinct = (List<Object>) repository.distinct(field, queryCriterias);
-		ResponseEnvelope envelope = null;
+		ResponseEnvelope<Object> envelope = null;
 		if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))){
 			Link selfLink = new Link(linkTo(this.getClass()).slash("distinct").toString() + 
 					(request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
-			Resources resources = new Resources(distinct);
+			Resources<Object> resources = new Resources<>(distinct);
 			resources.add(selfLink);
-			envelope = new ResponseEnvelope(resources);
+			envelope = new ResponseEnvelope<>(resources);
 		} else {
-			envelope = new ResponseEnvelope(distinct);
+			envelope = new ResponseEnvelope<>(distinct);
 		}
 		return new ResponseEntity<>(envelope, HttpStatus.OK);
 	}
@@ -156,23 +161,30 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 	 * 
 	 * @param pagedResourcesAssembler {@link PagedResourcesAssembler}
 	 * @param request {@link HttpServletRequest}
-	 * @return
+	 * @return a {@link List} of {@link Model} objects.
 	 */
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "page", value = "Page number.", defaultValue = "0", dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "size", value = "Number of records per page.", defaultValue = "1000", dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "sort", value = "Sort order field and direction.", dataType = "string", paramType = "query", example = "name,asc")
+			@ApiImplicitParam(name = "page", value = "Page number.", defaultValue = "0", dataType = "int", 
+					paramType = "query"),
+			@ApiImplicitParam(name = "size", value = "Number of records per page.", defaultValue = "1000", 
+					dataType = "int", paramType = "query"),
+			@ApiImplicitParam(name = "sort", value = "Sort order field and direction.", dataType = "string", 
+					paramType = "query", example = "name,asc"),
+			@ApiImplicitParam(name = "fields", value = "List of fields to be included in response objects", 
+					dataType = "string", paramType = "query"),
+			@ApiImplicitParam(name = "exclude", value = "List of fields to be excluded from response objects", 
+					dataType = "string", paramType = "query")
 	})
 	@RequestMapping(value = "", method = RequestMethod.GET,
 			produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE})
-	public HttpEntity<?> find(
+	public ResponseEntity<ResponseEnvelope<T>> find(
 			@PageableDefault(size = 1000) Pageable pageable,
 			PagedResourcesAssembler<T> pagedResourcesAssembler, 
 			HttpServletRequest request)
 	{
-		ResponseEnvelope envelope;
+		ResponseEnvelope<T> envelope;
 		Set<String> fields = RequestUtils.getFilteredFieldsFromRequest(request);
 		Set<String> exclude = RequestUtils.getExcludedFieldsFromRequest(request);
 		pageable = RequestUtils.remapPageable(pageable, model);
@@ -186,9 +198,9 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 			if (ApiMediaTypes.isHalMediaType(mediaType)){
 				PagedResources<FilterableResource> pagedResources
 						= pagedResourcesAssembler.toResource(page, assembler, selfLink);
-				envelope = new ResponseEnvelope(pagedResources, fields, exclude);
+				envelope = new ResponseEnvelope<>(pagedResources, fields, exclude);
 			} else {
-				envelope = new ResponseEnvelope(page, fields, exclude);
+				envelope = new ResponseEnvelope<>(page, fields, exclude);
 			}
 		} else {
 			Sort sort = pageable.getSort();
@@ -202,9 +214,9 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 				List<FilterableResource> resourceList = assembler.toResources(entities);
 				Resources<FilterableResource> resources = new Resources<>(resourceList);
 				resources.add(selfLink);
-				envelope = new ResponseEnvelope(resources, fields, exclude);
+				envelope = new ResponseEnvelope<>(resources, fields, exclude);
 			} else {
-				envelope = new ResponseEnvelope(entities, fields, exclude);
+				envelope = new ResponseEnvelope<>(entities, fields, exclude);
 			}
 		}
 		return new ResponseEntity<>(envelope, HttpStatus.OK);
@@ -214,10 +226,10 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 	 * {@code HEAD /**}
 	 * Performs a test on the resource endpoints availability.
 	 *
-	 * @return
+	 * @return headers only.
 	 */
 	@RequestMapping(value = { "", "/**" }, method = RequestMethod.HEAD)
-	public HttpEntity<?> head(HttpServletRequest request){
+	public ResponseEntity<?> head(HttpServletRequest request){
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
@@ -226,10 +238,10 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 	 * Returns an information about the endpoint and available parameters.
 	 * TODO
 	 *
-	 * @return
+	 * @return TBD
 	 */
 	@RequestMapping(method = RequestMethod.OPTIONS)
-	public HttpEntity<?> options(HttpServletRequest request) {
+	public ResponseEntity<?> options(HttpServletRequest request) {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
@@ -246,8 +258,7 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 	}
 
 	@Autowired 
-	public void setApplicationContext(
-			ApplicationContext applicationContext) {
+	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
 	}
 }

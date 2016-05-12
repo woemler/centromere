@@ -44,6 +44,7 @@ import java.util.Map;
  *   documentation.
  * 
  * @author woemler
+ * @since 0.4.1
  */
 public class ModelParameterBuilderPlugin implements OperationBuilderPlugin {
 	

@@ -27,7 +27,7 @@ import java.util.Set;
  * 
  * @author woemler 
  */
-public class ResponseEnvelope {
+public class ResponseEnvelope<T> {
 
 	private Set<String> fieldSet;
 	private Set<String> exclude;

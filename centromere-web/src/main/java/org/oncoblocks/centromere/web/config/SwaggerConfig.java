@@ -16,7 +16,9 @@
 
 package org.oncoblocks.centromere.web.config;
 
+import com.fasterxml.classmate.TypeResolver;
 import com.google.common.base.Predicate;
+import org.oncoblocks.centromere.web.controller.ResponseEnvelope;
 import org.oncoblocks.centromere.web.documentation.ModelParameterBuilderPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +28,10 @@ import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.http.ResponseEntity;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.schema.AlternateTypeRules;
+import springfox.documentation.schema.WildcardType;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -47,6 +52,7 @@ import static springfox.documentation.builders.PathSelectors.regex;
 public class SwaggerConfig {
 	
 	@Autowired private Environment env;
+	@Autowired private TypeResolver typeResolver;
 
 	public static final Class<?>[] FILTERED_TYPES = {
 			Pageable.class,
@@ -62,7 +68,13 @@ public class SwaggerConfig {
 				.paths(apiPaths())
 				.build()
 				.apiInfo(apiInfo())
-				.ignoredParameterTypes(FILTERED_TYPES);
+				.ignoredParameterTypes(FILTERED_TYPES)
+				.alternateTypeRules(
+						AlternateTypeRules.newRule(
+								typeResolver.resolve(ResponseEntity.class, 
+										typeResolver.resolve(ResponseEnvelope.class, WildcardType.class)), 
+								typeResolver.resolve(WildcardType.class))
+				);
 	}
 
 	private ApiInfo apiInfo(){
@@ -86,5 +98,11 @@ public class SwaggerConfig {
 	public ModelParameterBuilderPlugin modelParameterBuilderPlugin(){
 		return new ModelParameterBuilderPlugin();
 	}
+//
+//	@Bean
+//	@Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER)
+//	public OperationModelPlugin operationModelPlugin(){
+//		return new OperationModelPlugin();
+//	}
 	
 }

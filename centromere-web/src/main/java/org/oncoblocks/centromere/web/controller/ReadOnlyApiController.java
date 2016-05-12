@@ -17,14 +17,16 @@
 package org.oncoblocks.centromere.web.controller;
 
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.repository.RepositoryOperations;
 import org.oncoblocks.centromere.web.exceptions.MethodNotAllowedException;
 import org.oncoblocks.centromere.web.util.ApiMediaTypes;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,12 +61,13 @@ public class ReadOnlyApiController<T extends Model<ID>, ID extends Serializable>
 	 *
 	 * @return updated representation of the submitted entity
 	 */
+	@ApiResponses({ @ApiResponse(code	= 405, message = "This method is not allowed.")})
 	@RequestMapping(value = "" , method = RequestMethod.POST,
 			produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE})
-	public HttpEntity<?> create(
-			@RequestBody T entity, 
+	public ResponseEntity<?> create(
+			@ApiParam(name = "entity", value = "Model record entity.") @RequestBody T entity, 
 			HttpServletRequest request) {
 		throw new MethodNotAllowedException();
 	}
@@ -76,12 +79,13 @@ public class ReadOnlyApiController<T extends Model<ID>, ID extends Serializable>
 	 *
 	 * @return updated representation of the submitted entity.
 	 */
+	@ApiResponses({ @ApiResponse(code	= 405, message = "This method is not allowed.")})
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT,
 			produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE})
-	public HttpEntity<?> update(
-			@RequestBody T entity,
+	public ResponseEntity<?> update(
+			@ApiParam(name = "entity", value = "Model record entity.") @RequestBody T entity,
 			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable ID id, 
 			HttpServletRequest request) {
 		throw new MethodNotAllowedException();
@@ -93,8 +97,9 @@ public class ReadOnlyApiController<T extends Model<ID>, ID extends Serializable>
 	 *
 	 * @return {@link org.springframework.http.HttpStatus} indicating success or failure.
 	 */
+	@ApiResponses({ @ApiResponse(code	= 405, message = "This method is not allowed.")})
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-	public HttpEntity<?> delete(
+	public ResponseEntity<?> delete(
 			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable ID id, 
 			HttpServletRequest request) {
 		throw new MethodNotAllowedException();
