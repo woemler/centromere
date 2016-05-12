@@ -17,13 +17,13 @@
 package org.oncoblocks.centromere.web.controller;
 
 import com.google.common.reflect.TypeToken;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.repository.QueryCriteria;
 import org.oncoblocks.centromere.core.repository.RepositoryOperations;
+import org.oncoblocks.centromere.web.exceptions.InvalidParameterException;
 import org.oncoblocks.centromere.web.exceptions.ResourceNotFoundException;
+import org.oncoblocks.centromere.web.exceptions.RestError;
 import org.oncoblocks.centromere.web.util.ApiMediaTypes;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,7 +100,15 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 			@ApiImplicitParam(name = "exclude", value = "List of fields to be excluded from response objects", 
 					dataType = "string", paramType = "query")
 	})
-	@RequestMapping(value = "/{id}", method = RequestMethod.GET,
+	@ApiResponses({
+			@ApiResponse(code = 200, message = "OK"),
+			@ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
+			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
+			@ApiResponse(code = 404, message = "Record not found.", response = RestError.class)
+	})
+	@RequestMapping(
+			value = "/{id}", 
+			method = RequestMethod.GET,
 			produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE, 
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE, 
 					MediaType.TEXT_PLAIN_VALUE })
@@ -108,6 +116,9 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable ID id,
 			HttpServletRequest request
 	) {
+		if (RequestUtils.requestContainsNonDefaultParameters(RequestUtils.findOneParameters(), request.getParameterMap())){
+			throw new InvalidParameterException("Request contains invalid query string parameters.");
+		}
 		Set<String> fields = RequestUtils.getFilteredFieldsFromRequest(request);
 		Set<String> exclude = RequestUtils.getExcludedFieldsFromRequest(request);
 		T entity = repository.findOne(id);
@@ -131,7 +142,14 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 	 * @param request {@link HttpServletRequest}
 	 * @return List of distinct field values.
 	 */
-	@RequestMapping(value = "/distinct", method = RequestMethod.GET,
+	@ApiResponses({
+			@ApiResponse(code = 200, message = "OK"),
+			@ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
+			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class)
+	})
+	@RequestMapping(
+			value = "/distinct", 
+			method = RequestMethod.GET,
 			produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE })
@@ -139,7 +157,7 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 			@ApiParam(name = "field", value = "Model field name.") @RequestParam String field, 
 			HttpServletRequest request)
 	{
-		List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromRequest(model, request);
+		List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromFindDistinctRequest(model, request);
 		List<Object> distinct = (List<Object>) repository.distinct(field, queryCriterias);
 		ResponseEnvelope<Object> envelope = null;
 		if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))){
@@ -175,7 +193,15 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 			@ApiImplicitParam(name = "exclude", value = "List of fields to be excluded from response objects", 
 					dataType = "string", paramType = "query")
 	})
-	@RequestMapping(value = "", method = RequestMethod.GET,
+	@ApiResponses({
+			@ApiResponse(code = 200, message = "OK"),
+			@ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
+			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
+			@ApiResponse(code = 404, message = "Record not found.", response = RestError.class)
+	})
+	@RequestMapping(
+			value = "", 
+			method = RequestMethod.GET,
 			produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE})
@@ -189,7 +215,7 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 		Set<String> exclude = RequestUtils.getExcludedFieldsFromRequest(request);
 		pageable = RequestUtils.remapPageable(pageable, model);
 		Map<String,String[]> parameterMap = request.getParameterMap();
-		List<QueryCriteria> criterias = RequestUtils.getQueryCriteriaFromRequest(model, request);
+		List<QueryCriteria> criterias = RequestUtils.getQueryCriteriaFromFindRequest(model, request);
 		String mediaType = request.getHeader("Accept");
 		Link selfLink = new Link(linkTo(this.getClass()).slash("").toString() +
 				(request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
@@ -228,6 +254,7 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 	 *
 	 * @return headers only.
 	 */
+	@ApiResponses({@ApiResponse(code = 200, message = "OK")})
 	@RequestMapping(value = { "", "/**" }, method = RequestMethod.HEAD)
 	public ResponseEntity<?> head(HttpServletRequest request){
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -240,6 +267,7 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 	 *
 	 * @return TBD
 	 */
+	@ApiResponses({@ApiResponse(code = 200, message = "OK")})
 	@RequestMapping(method = RequestMethod.OPTIONS)
 	public ResponseEntity<?> options(HttpServletRequest request) {
 		return new ResponseEntity<>(HttpStatus.OK);

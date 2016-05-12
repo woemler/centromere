@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiResponses;
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.repository.RepositoryOperations;
 import org.oncoblocks.centromere.web.exceptions.MethodNotAllowedException;
+import org.oncoblocks.centromere.web.exceptions.RestError;
 import org.oncoblocks.centromere.web.util.ApiMediaTypes;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
@@ -61,7 +62,9 @@ public class ReadOnlyApiController<T extends Model<ID>, ID extends Serializable>
 	 *
 	 * @return updated representation of the submitted entity
 	 */
-	@ApiResponses({ @ApiResponse(code	= 405, message = "This method is not allowed.")})
+	@ApiResponses({ 
+			@ApiResponse(code	= 405, message = "This method is not allowed.", response = RestError.class)
+	})
 	@RequestMapping(value = "" , method = RequestMethod.POST,
 			produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
@@ -79,7 +82,9 @@ public class ReadOnlyApiController<T extends Model<ID>, ID extends Serializable>
 	 *
 	 * @return updated representation of the submitted entity.
 	 */
-	@ApiResponses({ @ApiResponse(code	= 405, message = "This method is not allowed.")})
+	@ApiResponses({ 
+			@ApiResponse(code	= 405, message = "This method is not allowed.", response = RestError.class)
+	})
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT,
 			produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
@@ -97,7 +102,9 @@ public class ReadOnlyApiController<T extends Model<ID>, ID extends Serializable>
 	 *
 	 * @return {@link org.springframework.http.HttpStatus} indicating success or failure.
 	 */
-	@ApiResponses({ @ApiResponse(code	= 405, message = "This method is not allowed.")})
+	@ApiResponses({ 
+			@ApiResponse(code	= 405, message = "This method is not allowed.", response = RestError.class)
+	})
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<?> delete(
 			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable ID id, 

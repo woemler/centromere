@@ -16,6 +16,7 @@
 
 package org.oncoblocks.centromere.web.exceptions;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
 
@@ -25,6 +26,7 @@ import org.springframework.util.Assert;
  * 
  * @author woemler 
  */
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class RestError {
 
 	private final HttpStatus status;
@@ -32,6 +34,14 @@ public class RestError {
 	private final String message;
 	private final String developerMessage;
 	private final String moreInfoUrl;
+
+	public RestError(HttpStatus status, Integer code, String message) {
+		this(status, code, message, null, null);
+	}
+	
+	public RestError(HttpStatus status, Integer code, String message, String developerMessage) {
+		this(status, code, message, developerMessage, null);
+	}
 
 	public RestError(HttpStatus status, Integer code, String message, String developerMessage,
 			String moreInfoUrl) {

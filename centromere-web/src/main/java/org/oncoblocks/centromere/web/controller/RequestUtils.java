@@ -21,6 +21,7 @@ import org.oncoblocks.centromere.core.repository.Evaluation;
 import org.oncoblocks.centromere.core.repository.QueryCriteria;
 import org.oncoblocks.centromere.core.repository.QueryParameterDescriptor;
 import org.oncoblocks.centromere.web.exceptions.InvalidParameterException;
+import org.oncoblocks.centromere.web.exceptions.ParameterMappingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.ConversionFailedException;
@@ -43,8 +44,81 @@ import java.util.*;
 public class RequestUtils {
 
 	private static final Logger logger = LoggerFactory.getLogger(RequestUtils.class);
-	private static final List<String> excludedParameters = Arrays.asList("fields", "exclude", "page", "size", "sort", "field");
+	private static final List<String> FIELD_FILTER_PARAMETERS = Arrays.asList("fields", "exclude");
+	private static final List<String> DISTINCT_PARAMETERS = Arrays.asList("field");
+	private static final List<String> PAGINATION_PARAMETERS = Arrays.asList("page", "size", "sort");
 
+	/**
+	 * Returns a list of the default query string parameters used by {@link }.
+	 *
+	 * @return
+	 */
+	public static List<String> findAllParameters(){
+		List<String> params = new ArrayList<>();
+		params.addAll(FIELD_FILTER_PARAMETERS);
+		params.addAll(PAGINATION_PARAMETERS);
+		return params;
+	}
+
+	public static List<String> findOneParameters(){
+		List<String> params = new ArrayList<>();
+		params.addAll(FIELD_FILTER_PARAMETERS);
+		return params;
+	}
+
+	public static List<String> findDistinctParameters(){
+		List<String> params = new ArrayList<>();
+		params.addAll(FIELD_FILTER_PARAMETERS);
+		params.addAll(DISTINCT_PARAMETERS);
+		return params;
+	}
+	
+	public static List<QueryCriteria> getQueryCriteriaFromFindRequest(Class<? extends Model<?>> model, 
+			HttpServletRequest request
+	){
+		logger.info(String.format("Generating QueryCriteria for 'find' request parameters: model=%s params=%s",
+				model.getName(), request.getQueryString()));
+		List<String> defaultParameters = findAllParameters();
+		Map<String, QueryParameterDescriptor> paramMap = getAvailableQueryParameters(model);
+		List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(paramMap, defaultParameters, request);
+		logger.info(String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
+		return criteriaList;
+	}
+
+	public static List<QueryCriteria> getQueryCriteriaFromFindOneRequest(Class<? extends Model<?>> model,
+			HttpServletRequest request
+	){
+		logger.info(String.format("Generating QueryCriteria for 'findOne' request parameters: model=%s params=%s",
+				model.getName(), request.getQueryString()));
+		List<String> defaultParameters = findOneParameters();
+		Map<String, QueryParameterDescriptor> paramMap = getAvailableQueryParameters(model);
+		List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(paramMap, defaultParameters, request);
+		logger.info(String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
+		return criteriaList;
+	}
+
+	public static List<QueryCriteria> getQueryCriteriaFromFindDistinctRequest(Class<? extends Model<?>> model,
+			HttpServletRequest request
+	){
+		logger.info(String.format("Generating QueryCriteria for 'findDistinct' request parameters: model=%s params=%s",
+				model.getName(), request.getQueryString()));
+		List<String> defaultParameters = findDistinctParameters();
+		Map<String, QueryParameterDescriptor> paramMap = getAvailableQueryParameters(model);
+		List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(paramMap, defaultParameters, request);
+		logger.info(String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
+		return criteriaList;
+	}
+	
+	public static boolean requestContainsNonDefaultParameters(Collection<String> defaultParameters, 
+			Map<String, String[]> requestParams){
+		for (String param: requestParams.keySet()){
+			if (!defaultParameters.contains(param)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * Extracts request parameters and matches them to available database query parameters, as defined
 	 *   in the {@code model} class definition.
@@ -53,30 +127,28 @@ public class RequestUtils {
 	 * @return
 	 */
 	public static List<QueryCriteria> getQueryCriteriaFromRequest(
-			Class<? extends Model<?>> model, HttpServletRequest request
+			Map<String, QueryParameterDescriptor> paramMap, 
+			List<String> defaultParameters,
+			HttpServletRequest request
 	){
-		logger.info(String.format("Generating QueryCriteria for request parameters: model=%s params=%s",
-				model.getName(), request.getQueryString()));
 		List<QueryCriteria> criteriaList = new ArrayList<>();
-		Map<String, QueryParameterDescriptor> paramMap = getAvailableQueryParameters(model);
 		for (Map.Entry entry: request.getParameterMap().entrySet()){
 			String paramName = (String) entry.getKey();
 			String[] paramValue = ((String[]) entry.getValue())[0].split(",");
-			if (!excludedParameters.contains(paramName)) {
+			if (!defaultParameters.contains(paramName)) {
 				if (paramMap.containsKey(paramName)) {
 					QueryParameterDescriptor descriptor = paramMap.get(paramName);
 					QueryCriteria criteria = createCriteriaFromRequestParameter(descriptor.getFieldName(),
 							paramValue, descriptor.getType(), descriptor.getEvaluation());
 					criteriaList.add(criteria);
 				} else {
-					logger.warn(String
-							.format("Unable to map request parameter to available model parameters: %s",
+					logger.warn(
+							String.format("Unable to map request parameter to available model parameters: %s",
 									paramName));
 					throw new InvalidParameterException("Invalid request parameter: " + paramName);
 				}
 			}
 		}
-		logger.info(String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
 		return criteriaList;
 	}
 
@@ -207,7 +279,7 @@ public class RequestUtils {
 				return conversionService.convert(param, type);
 			} catch (ConversionFailedException e){
 				e.printStackTrace();
-				throw new InvalidParameterException("Unable to convert String to " + type.getName());
+				throw new ParameterMappingException("Unable to convert parameter string to " + type.getName());
 			}
 		} else {
 			return param;

@@ -24,7 +24,7 @@ import org.springframework.http.HttpStatus;
  * @author woemler 
  */
 public class MalformedEntityException extends RestException {
-	public MalformedEntityException(Integer code, String message, String developerMessage, String moreInfoUrl) {
-		super(HttpStatus.NOT_ACCEPTABLE, code, message, developerMessage, moreInfoUrl);
+	public MalformedEntityException(String message) {
+		super(HttpStatus.NOT_ACCEPTABLE, 40601, message);
 	}
 }

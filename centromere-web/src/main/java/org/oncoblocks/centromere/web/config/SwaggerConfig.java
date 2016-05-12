@@ -74,7 +74,7 @@ public class SwaggerConfig {
 								typeResolver.resolve(ResponseEntity.class, 
 										typeResolver.resolve(ResponseEnvelope.class, WildcardType.class)), 
 								typeResolver.resolve(WildcardType.class))
-				);
+				).useDefaultResponseMessages(false);
 	}
 
 	private ApiInfo apiInfo(){

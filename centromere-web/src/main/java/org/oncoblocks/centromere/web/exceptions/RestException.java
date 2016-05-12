@@ -33,6 +33,14 @@ public class RestException extends RuntimeException {
 	private String developerMessage;
 	private String moreInfoUrl;
 
+	public RestException(HttpStatus status, Integer code, String message){
+		this(status, code, message, null, null);
+	}
+	
+	public RestException(HttpStatus status, Integer code, String message, String developerMessage){
+		this(status, code, message, developerMessage, null);
+	}
+	
 	public RestException(HttpStatus status, Integer code, String message, String developerMessage, String moreInfoUrl){
 		Assert.notNull(status,"HttpStatus argument cannot be null.");
 		this.status = status;

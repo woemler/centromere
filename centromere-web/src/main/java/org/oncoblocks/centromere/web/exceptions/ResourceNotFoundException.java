@@ -26,6 +26,6 @@ import org.springframework.http.HttpStatus;
 public class ResourceNotFoundException extends
 		org.oncoblocks.centromere.web.exceptions.RestException {
 	public ResourceNotFoundException(){
-		super(HttpStatus.NOT_FOUND, 40401, "The requested resource could not be found.", "", "");
+		super(HttpStatus.NOT_FOUND, 40401, "The requested resource could not be found.");
 	}
 }

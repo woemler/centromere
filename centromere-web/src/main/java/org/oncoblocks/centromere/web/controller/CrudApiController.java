@@ -17,10 +17,13 @@
 package org.oncoblocks.centromere.web.controller;
 
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.repository.RepositoryOperations;
 import org.oncoblocks.centromere.web.exceptions.RequestFailureException;
 import org.oncoblocks.centromere.web.exceptions.ResourceNotFoundException;
+import org.oncoblocks.centromere.web.exceptions.RestError;
 import org.oncoblocks.centromere.web.util.ApiMediaTypes;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
@@ -61,13 +64,21 @@ public class CrudApiController<T extends Model<ID>, ID extends Serializable>
 	 * @param entity entity representation to be persisted
 	 * @return updated representation of the submitted entity
 	 */
-	@RequestMapping(value = "", method = RequestMethod.POST, 
+	@ApiResponses({
+			@ApiResponse(code = 201, message = "Created"),
+			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
+			@ApiResponse(code = 406, message = "Malformed entity", response = RestError.class)
+	})
+	@RequestMapping(
+			value = "", 
+			method = RequestMethod.POST, 
 			produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE})
 	public ResponseEntity<?> create(
 			@ApiParam(name = "entity", value = "Model record entity.") @RequestBody T entity, 
-			HttpServletRequest request) {
+			HttpServletRequest request
+	) {
 		T created = getRepository().insert(entity);
 		if (created == null) throw new RequestFailureException(40003, "There was a problem creating the record.", "", "");
 		if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))){
@@ -87,7 +98,15 @@ public class CrudApiController<T extends Model<ID>, ID extends Serializable>
 	 * @param id primary ID of the target entity
 	 * @return updated representation of the submitted entity.
 	 */
-	@RequestMapping(value = "/{id}", method = RequestMethod.PUT,
+	@ApiResponses({
+			@ApiResponse(code = 201, message = "Created"),
+			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
+			@ApiResponse(code	= 404, message = "Record not found", response = RestError.class),
+			@ApiResponse(code = 406, message = "Malformed entity", response = RestError.class)
+	})
+	@RequestMapping(
+			value = "/{id}", 
+			method = RequestMethod.PUT,
 			produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE})
@@ -113,7 +132,14 @@ public class CrudApiController<T extends Model<ID>, ID extends Serializable>
 	 * @param id primary ID of the target record.
 	 * @return {@link HttpStatus} indicating success or failure.
 	 */
-	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	@ApiResponses({
+			@ApiResponse(code = 200, message = "OK"),
+			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
+			@ApiResponse(code	= 404, message = "Record not found", response = RestError.class)
+	})
+	@RequestMapping(
+			value = "/{id}", 
+			method = RequestMethod.DELETE)
 	public ResponseEntity<?> delete(
 			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable ID id, 
 			HttpServletRequest request) {
