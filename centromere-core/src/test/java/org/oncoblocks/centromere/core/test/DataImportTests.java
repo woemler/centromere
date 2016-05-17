@@ -16,15 +16,11 @@
 
 package org.oncoblocks.centromere.core.test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oncoblocks.centromere.core.dataimport.RepositoryRecordUpdater;
-import org.oncoblocks.centromere.core.dataimport.RepositoryRecordWriter;
-import org.oncoblocks.centromere.core.dataimport.BasicImportOptions;
+import org.oncoblocks.centromere.core.dataimport.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
@@ -47,12 +43,9 @@ public class DataImportTests {
 	
 	@Autowired private Validator validator;
 	private final String geneInfoPath = ClassLoader.getSystemClassLoader().getResource("Homo_sapiens.gene_info").getPath();
-	private final String importJobJsonFilePath = ClassLoader.getSystemClassLoader().getResource("example_import.json").getPath();
 	@Autowired private GeneInfoProcessor processor;
 	@Autowired private TestRepository testRepository;
-	@Autowired private ApplicationContext applicationContext;
 	@Autowired private BasicImportOptions defaultImportOptions;
-	private static final ObjectMapper mapper = new ObjectMapper();
 
 	@Before
 	public void setup() throws Exception{
@@ -62,8 +55,21 @@ public class DataImportTests {
 
 	@Test
 	public void geneInfoReaderTest() throws Exception{
+		
 		GeneInfoReader reader = new GeneInfoReader();
 		List<EntrezGene> genes = new ArrayList<>();
+		
+		Exception exception = null;
+		try {
+			reader.open("bad_file.txt");	
+		} catch (Exception e){
+			exception = e;
+		} finally {
+			reader.close();
+		}
+		Assert.notNull(exception);
+		Assert.isTrue(exception instanceof DataImportException);
+		
 		try {
 			reader.open(geneInfoPath);
 			EntrezGene gene = reader.readRecord();
@@ -98,9 +104,11 @@ public class DataImportTests {
 		testRepository.deleteAll();
 		Assert.isTrue(testRepository.count() == 0);
 		RepositoryRecordWriter<EntrezGene> writer = new RepositoryRecordWriter<>(testRepository);
+		writer.doBefore("");
 		for (EntrezGene gene: EntrezGene.createDummyData()){
 			writer.writeRecord(gene);
 		}
+		writer.doAfter();
 		Assert.isTrue(testRepository.count() == 5);
 	}
 	
@@ -110,7 +118,9 @@ public class DataImportTests {
 		EntrezGene gene = testRepository.findOne(1L);
 		Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
 		gene.setPrimaryGeneSymbol("GeneX");
+		updater.doBefore("");
 		updater.writeRecord(gene);
+		updater.doAfter();
 		gene = testRepository.findOne(1L);
 		Assert.isTrue("GeneX".equals(gene.getPrimaryGeneSymbol()));
 	}
@@ -121,13 +131,24 @@ public class DataImportTests {
 		System.out.println(String.format("There are %d records in the test repository.", testRepository.count()));
 		Assert.isTrue(testRepository.count() == 0);
 		processor.setImportOptions(defaultImportOptions);
+		processor.doBefore();
 		processor.run(geneInfoPath);
+		processor.doAfter();
 		Assert.isTrue(testRepository.count() == 5);
 		EntrezGene gene = testRepository.findOne(1L);
 		Assert.notNull(gene);
 		Assert.isTrue(gene.getId() == 1L);
 		System.out.println(String.format("There are %d records in the test repository.", testRepository.count()));
 		System.out.println(gene.toString());
+	}
+	
+	@Test
+	public void recordCollectionReaderTest() throws Exception {
+		RecordCollectionReader<EntrezGene> reader = new RecordCollectionReader<>(EntrezGene.createDummyData().subList(0, 1));
+		EntrezGene gene = reader.readRecord();
+		Assert.notNull(gene);
+		gene = reader.readRecord();
+		Assert.isNull(gene);
 	}
 	
 	

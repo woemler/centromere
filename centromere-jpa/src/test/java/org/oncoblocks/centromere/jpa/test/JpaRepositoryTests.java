@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oncoblocks.centromere.core.repository.Evaluation;
 import org.oncoblocks.centromere.core.repository.QueryCriteria;
+import org.oncoblocks.centromere.core.repository.QueryCriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +37,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -50,20 +52,24 @@ public class JpaRepositoryTests {
 	@Autowired private EntrezGeneRepository geneRepository;
 	@Autowired private EntityManager entityManager;
 	
-	private static boolean isConfigured = false;
-	
 	@Before
-	@Transactional
 	public void setup(){
-		if (isConfigured) return;
+		deleteAll();
+		insertData(EntrezGene.createDummyData());
+	}
+	
+	@Transactional
+	private void deleteAll(){
 		geneRepository.deleteAll();
-		for (EntrezGene gene: EntrezGene.createDummyData()){
-			geneRepository.save(gene);
-		}
-		isConfigured = true;
+	}
+	
+	@Transactional
+	private void insertData(Collection<EntrezGene> data){
+		geneRepository.insert(data);
 	}
 
 	@Test
+	@Transactional
 	public void findByIdTest(){
 		
 		EntrezGene gene = geneRepository.findOne(1L);
@@ -77,6 +83,7 @@ public class JpaRepositoryTests {
 	}
 
 	@Test
+	@Transactional
 	public void findAllTest(){
 		
 		List<EntrezGene> genes = (List<EntrezGene>) geneRepository.findAll();
@@ -94,17 +101,38 @@ public class JpaRepositoryTests {
 		System.out.println(gene.toString());
 
 	}
-
+	
 	@Test
-	public void countTest(){
-
-		long count = geneRepository.count();
-		Assert.notNull(count);
-		Assert.isTrue(count == 5L);
-
+	@Transactional
+	public void findAndSortTest(){
+		List<QueryCriteria> criterias = QueryCriteriaBuilder.where("geneType").is("protein-coding").build();
+		Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "entrezGeneId"));
+		List<EntrezGene> genes = (List<EntrezGene>) geneRepository.find(criterias, sort);
+		Assert.notNull(genes);
+		Assert.notEmpty(genes);
+		Assert.isTrue(genes.size() == 3);
+		Assert.isTrue(genes.get(0).getEntrezGeneId().equals(4L));
 	}
 
 	@Test
+	@Transactional
+	public void countTest(){
+		long count = geneRepository.count();
+		Assert.notNull(count);
+		Assert.isTrue(count == 5L);
+	}
+	
+	@Test
+	@Transactional
+	public void filteredCountTest(){
+		List<QueryCriteria> criterias = QueryCriteriaBuilder.where("geneType").is("protein-coding").build();
+		long count = geneRepository.count(criterias);
+		Assert.notNull(count);
+		Assert.isTrue(count == 3L);
+	}
+
+	@Test
+	@Transactional
 	public void findBySimpleCriteriaTest(){
 
 		List<QueryCriteria> searchCriterias = new ArrayList<>();
@@ -122,6 +150,7 @@ public class JpaRepositoryTests {
 	}
 
 	@Test
+	@Transactional
 	public void findByMultipleCriteriaTest(){
 
 		List<QueryCriteria> searchCriterias = new ArrayList<>();
@@ -140,6 +169,7 @@ public class JpaRepositoryTests {
 	}
 
 	@Test
+	@Transactional
 	public void findByNestedArrayCriteriaTest(){
 
 		List<QueryCriteria> searchCriterias = new ArrayList<>();
@@ -158,6 +188,7 @@ public class JpaRepositoryTests {
 	}
 
 	@Test
+	@Transactional
 	public void findByNestedObjectCriteriaTest(){
 
 		List<QueryCriteria> searchCriterias = new ArrayList<>();
@@ -179,6 +210,7 @@ public class JpaRepositoryTests {
 	}
 
 	@Test
+	@Transactional
 	public void findSortedTest(){
 
 		Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "primaryGeneSymbol"));
@@ -195,6 +227,7 @@ public class JpaRepositoryTests {
 	}
 
 	@Test
+	@Transactional
 	public void findPagedTest(){
 
 		PageRequest pageRequest = new PageRequest(1, 2);
@@ -215,6 +248,7 @@ public class JpaRepositoryTests {
 	}
 
 	@Test
+	@Transactional
 	public void findByCriteriaPagedTest(){
 
 		List<QueryCriteria> searchCriterias = new ArrayList<>();
@@ -257,6 +291,36 @@ public class JpaRepositoryTests {
 		geneRepository.delete(100L);
 
 	}
+	
+	@Test
+	@Transactional
+	public void insertMultipleTest(){
+		List<EntrezGene> genes = new ArrayList<>();
+		EntrezGene gene1 = new EntrezGene();
+		gene1.setEntrezGeneId(100L);
+		gene1.setPrimaryGeneSymbol("TEST");
+		gene1.setTaxId(9606);
+		gene1.setChromosome("1");
+		gene1.setChromosomeLocation("1");
+		gene1.setDescription("Test gene");
+		gene1.setGeneType("protein-coding");
+		genes.add(gene1);
+		EntrezGene gene2 = new EntrezGene();
+		gene2.setEntrezGeneId(101L);
+		gene2.setPrimaryGeneSymbol("TEST2");
+		gene2.setTaxId(9606);
+		gene2.setChromosome("12");
+		gene2.setChromosomeLocation("12");
+		gene2.setDescription("Test gene 2");
+		gene2.setGeneType("pseudo");
+		genes.add(gene2);
+		geneRepository.insert(genes);
+		EntrezGene gene = geneRepository.findOne(100L);
+		Assert.notNull(gene);
+		gene = geneRepository.findOne(101L);
+		Assert.notNull(gene);
+		Assert.isTrue(geneRepository.count() == 7L);
+	}
 
 	@Test
 	@Transactional
@@ -281,8 +345,46 @@ public class JpaRepositoryTests {
 		Assert.isTrue("TEST_TEST".equals(updated.getPrimaryGeneSymbol()));
 		Assert.isTrue("pseudogene".equals(updated.getGeneType()));
 
-		geneRepository.delete(100L);
+	}
 
+	@Test
+	@Transactional
+	public void updateMultipleTest(){
+		List<EntrezGene> genes = new ArrayList<>();
+		EntrezGene gene1 = new EntrezGene();
+		gene1.setEntrezGeneId(100L);
+		gene1.setPrimaryGeneSymbol("TEST");
+		gene1.setTaxId(9606);
+		gene1.setChromosome("1");
+		gene1.setChromosomeLocation("1");
+		gene1.setDescription("Test gene");
+		gene1.setGeneType("protein-coding");
+		genes.add(gene1);
+		EntrezGene gene2 = new EntrezGene();
+		gene2.setEntrezGeneId(101L);
+		gene2.setPrimaryGeneSymbol("TEST2");
+		gene2.setTaxId(9606);
+		gene2.setChromosome("12");
+		gene2.setChromosomeLocation("12");
+		gene2.setDescription("Test gene 2");
+		gene2.setGeneType("pseudo");
+		genes.add(gene2);
+		geneRepository.insert(genes);
+		Assert.isTrue(geneRepository.count() == 7L);
+		
+		genes = new ArrayList<>();
+		gene1.setGeneType("TEST");
+		gene2.setGeneType("TEST");
+		genes.add(gene1);
+		genes.add(gene2);
+		geneRepository.update(genes);
+		
+		EntrezGene gene = geneRepository.findOne(100L);
+		Assert.notNull(gene);
+		Assert.isTrue("TEST".equals(gene.getGeneType()));
+		gene = geneRepository.findOne(101L);
+		Assert.notNull(gene);
+		Assert.isTrue("TEST".equals(gene.getGeneType()));
 	}
 
 	@Test
@@ -310,6 +412,7 @@ public class JpaRepositoryTests {
 	}
 	
 	@Test
+	@Transactional
 	public void distinctTest(){
 		List<Object> geneSymbols = (List<Object>) geneRepository.distinct("primaryGeneSymbol");
 		Assert.notNull(geneSymbols);
@@ -321,6 +424,7 @@ public class JpaRepositoryTests {
 	}
 	
 	@Test
+	@Transactional
 	public void distinctQueryTest(){
 		
 		List<QueryCriteria> criterias = new ArrayList<>();
@@ -338,6 +442,7 @@ public class JpaRepositoryTests {
 	/* EntrezGene repository-specific tests */
 
 	@Test
+	@Transactional
 	public void findByPrimaryIdTest() throws Exception {
 		
 		List<EntrezGene> genes = geneRepository.findByEntrezGeneId(1L);
@@ -349,6 +454,7 @@ public class JpaRepositoryTests {
 	}
 	
 	@Test
+	@Transactional
 	public void findByPrimaryGeneSymbolTest() throws Exception {
 		
 		List<EntrezGene> genes = geneRepository.findByPrimaryGeneSymbol("GeneA");
@@ -361,6 +467,7 @@ public class JpaRepositoryTests {
 	}
 
 	@Test
+	@Transactional
 	public void findByAliasTest() throws Exception {
 
 		List<EntrezGene> genes = geneRepository.findByAliases("ABC");
@@ -373,6 +480,7 @@ public class JpaRepositoryTests {
 	}
 	
 	@Test
+	@Transactional
 	public void guessGeneTest() throws Exception {
 		
 		List<EntrezGene> genes = geneRepository.guessGene("GeneA");
@@ -397,6 +505,7 @@ public class JpaRepositoryTests {
 	/* Query operation tests */
 	
 	@Test
+	@Transactional
 	public void findInTest() throws Exception {
 		List<QueryCriteria> criterias = new ArrayList<>();
 		criterias.add(new QueryCriteria("primaryGeneSymbol", Arrays.asList(new String[]{ "GeneA", "GeneB" }), Evaluation.IN));
@@ -408,6 +517,7 @@ public class JpaRepositoryTests {
 	}
 
 	@Test
+	@Transactional
 	public void findByGreaterThanTest() throws Exception {
 		List<QueryCriteria> criterias = new ArrayList<>();
 		criterias.add(new QueryCriteria("entrezGeneId", 4L, Evaluation.GREATER_THAN));
@@ -419,6 +529,7 @@ public class JpaRepositoryTests {
 	}
 
 	@Test
+	@Transactional
 	public void findByLessThanTest() throws Exception {
 		List<QueryCriteria> criterias = new ArrayList<>();
 		criterias.add(new QueryCriteria("entrezGeneId", 4L, Evaluation.LESS_THAN));
@@ -430,6 +541,7 @@ public class JpaRepositoryTests {
 	}
 
 	@Test
+	@Transactional
 	public void findByGreaterThanEqualsTest() throws Exception {
 		List<QueryCriteria> criterias = new ArrayList<>();
 		criterias.add(new QueryCriteria("entrezGeneId", 4L, Evaluation.GREATER_THAN_EQUALS));
@@ -441,6 +553,7 @@ public class JpaRepositoryTests {
 	}
 
 	@Test
+	@Transactional
 	public void findByLessThanEqualsTest() throws Exception {
 		List<QueryCriteria> criterias = new ArrayList<>();
 		criterias.add(new QueryCriteria("entrezGeneId", 4L, Evaluation.LESS_THAN_EQUALS));
@@ -452,6 +565,7 @@ public class JpaRepositoryTests {
 	}
 	
 	@Test
+	@Transactional
 	public void findByBetweenTest() throws Exception {
 		List<QueryCriteria> criterias = new ArrayList<>();
 		criterias.add(new QueryCriteria("entrezGeneId", new ArrayList<>(Arrays.asList(2L, 4L)),
@@ -464,6 +578,7 @@ public class JpaRepositoryTests {
 	}
 
 	@Test
+	@Transactional
 	public void findByTypeAndBetweenTest() throws Exception {
 
 		List<QueryCriteria> criterias = new ArrayList<>();
@@ -479,6 +594,7 @@ public class JpaRepositoryTests {
 	}
 
 	@Test
+	@Transactional
 	public void findByOutsideTest() throws Exception {
 		List<QueryCriteria> criterias = new ArrayList<>();
 		criterias.add(new QueryCriteria("entrezGeneId", new ArrayList<>(Arrays.asList(2L, 4L)),
@@ -491,6 +607,7 @@ public class JpaRepositoryTests {
 	}
 
 	@Test
+	@Transactional
 	public void findByTypeAndOutsideTest() throws Exception {
 		
 		List<QueryCriteria> criterias = new ArrayList<>();
@@ -506,6 +623,7 @@ public class JpaRepositoryTests {
 	}
 	
 	@Test
+	@Transactional
 	public void findByLikeTest() throws Exception {
 		List<QueryCriteria> criterias = new ArrayList<>();
 		criterias.add(new QueryCriteria("primaryGeneSymbol", "eC", Evaluation.LIKE));
@@ -518,6 +636,7 @@ public class JpaRepositoryTests {
 	}
 
 	@Test
+	@Transactional
 	public void findByStartsWithTest() throws Exception {
 		List<QueryCriteria> criterias = new ArrayList<>();
 		criterias.add(new QueryCriteria("geneType", "protein", Evaluation.STARTS_WITH));
@@ -530,6 +649,7 @@ public class JpaRepositoryTests {
 	}
 
 	@Test
+	@Transactional
 	public void findByEndsWithTest() throws Exception {
 		List<QueryCriteria> criterias = new ArrayList<>();
 		criterias.add(new QueryCriteria("primaryGeneSymbol", "neD", Evaluation.ENDS_WITH));
@@ -542,6 +662,7 @@ public class JpaRepositoryTests {
 	}
 	
 	@Test
+	@Transactional
 	public void joinTest() throws Exception {
 		Specification<EntrezGene> specification = new Specification<EntrezGene>() {
 			@Override public Predicate toPredicate(Root<EntrezGene> root, CriteriaQuery<?> criteriaQuery,

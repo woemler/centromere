@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class RecordCollectionReader<T extends Model<?>> implements RecordReader<T> {
 	
-	List<T> records = new ArrayList<>();
+	private final List<T> records = new ArrayList<>();
 
 	public RecordCollectionReader(List<T> records) {
 		this.records.addAll(records);

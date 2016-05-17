@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oncoblocks.centromere.core.repository.Evaluation;
 import org.oncoblocks.centromere.core.repository.QueryCriteria;
+import org.oncoblocks.centromere.core.repository.QueryCriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -45,16 +46,12 @@ public class GenericMongoRepositoryTests {
 		
 	@Autowired private EntrezGeneRepository geneRepository;
 	
-	private static boolean isConfigured = false;
-	
 	@Before
 	public void setup(){
-		if (isConfigured) return;
 		geneRepository.deleteAll();
 		for (EntrezGene gene: EntrezGene.createDummyData()){
 			geneRepository.insert(gene);
 		}
-		isConfigured = true;
 	}
 
 	@Test
@@ -90,12 +87,29 @@ public class GenericMongoRepositoryTests {
 	}
 
 	@Test
-	public void countTest(){
+	public void findAndSortTest(){
+		List<QueryCriteria> criterias = QueryCriteriaBuilder.where("geneType").is("protein-coding").build();
+		Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "entrezGeneId"));
+		List<EntrezGene> genes = geneRepository.find(criterias, sort);
+		Assert.notNull(genes);
+		Assert.notEmpty(genes);
+		Assert.isTrue(genes.size() == 3);
+		Assert.isTrue(genes.get(0).getEntrezGeneId().equals(4L));
+	}
 
+	@Test
+	public void countTest(){
 		long count = geneRepository.count();
 		Assert.notNull(count);
 		Assert.isTrue(count == 5L);
+	}
 
+	@Test
+	public void filteredCountTest(){
+		List<QueryCriteria> criterias = QueryCriteriaBuilder.where("geneType").is("protein-coding").build();
+		long count = geneRepository.count(criterias);
+		Assert.notNull(count);
+		Assert.isTrue(count == 3L);
 	}
 
 	@Test
@@ -229,6 +243,35 @@ public class GenericMongoRepositoryTests {
 	}
 
 	@Test
+	public void insertMultipleTest(){
+		List<EntrezGene> genes = new ArrayList<>();
+		EntrezGene gene1 = new EntrezGene();
+		gene1.setEntrezGeneId(100L);
+		gene1.setPrimaryGeneSymbol("TEST");
+		gene1.setTaxId(9606);
+		gene1.setChromosome("1");
+		gene1.setChromosomeLocation("1");
+		gene1.setDescription("Test gene");
+		gene1.setGeneType("protein-coding");
+		genes.add(gene1);
+		EntrezGene gene2 = new EntrezGene();
+		gene2.setEntrezGeneId(101L);
+		gene2.setPrimaryGeneSymbol("TEST2");
+		gene2.setTaxId(9606);
+		gene2.setChromosome("12");
+		gene2.setChromosomeLocation("12");
+		gene2.setDescription("Test gene 2");
+		gene2.setGeneType("pseudo");
+		genes.add(gene2);
+		geneRepository.insert(genes);
+		EntrezGene gene = geneRepository.findOne(100L);
+		Assert.notNull(gene);
+		gene = geneRepository.findOne(101L);
+		Assert.notNull(gene);
+		Assert.isTrue(geneRepository.count() == 7L);
+	}
+
+	@Test
 	public void updateTest(){
 
 		EntrezGene
@@ -246,6 +289,45 @@ public class GenericMongoRepositoryTests {
 
 		geneRepository.delete(100L);
 
+	}
+
+	@Test
+	public void updateMultipleTest(){
+		List<EntrezGene> genes = new ArrayList<>();
+		EntrezGene gene1 = new EntrezGene();
+		gene1.setEntrezGeneId(100L);
+		gene1.setPrimaryGeneSymbol("TEST");
+		gene1.setTaxId(9606);
+		gene1.setChromosome("1");
+		gene1.setChromosomeLocation("1");
+		gene1.setDescription("Test gene");
+		gene1.setGeneType("protein-coding");
+		genes.add(gene1);
+		EntrezGene gene2 = new EntrezGene();
+		gene2.setEntrezGeneId(101L);
+		gene2.setPrimaryGeneSymbol("TEST2");
+		gene2.setTaxId(9606);
+		gene2.setChromosome("12");
+		gene2.setChromosomeLocation("12");
+		gene2.setDescription("Test gene 2");
+		gene2.setGeneType("pseudo");
+		genes.add(gene2);
+		geneRepository.insert(genes);
+		Assert.isTrue(geneRepository.count() == 7L);
+
+		genes = new ArrayList<>();
+		gene1.setGeneType("TEST");
+		gene2.setGeneType("TEST");
+		genes.add(gene1);
+		genes.add(gene2);
+		geneRepository.update(genes);
+
+		EntrezGene gene = geneRepository.findOne(100L);
+		Assert.notNull(gene);
+		Assert.isTrue("TEST".equals(gene.getGeneType()));
+		gene = geneRepository.findOne(101L);
+		Assert.notNull(gene);
+		Assert.isTrue("TEST".equals(gene.getGeneType()));
 	}
 
 	@Test
