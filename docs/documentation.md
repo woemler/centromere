@@ -1,21 +1,21 @@
 # Centromere documentation
 
-#### [Introduction](#introduction)
+#### [Introduction](#introduction-1)
 - [About](#about)
 - [Demo](#demo)
 - [License](#license)
 - [Requirements](#requirements)
 - [Maven Artifacts](#maven-artifacts)
 
-#### [Getting Started](#getting-started)
+#### [Getting Started](#getting-started-1)
 - [Data Models](#data-models)
 - [Repositories](#repositories)
 - [Data Import](#data-import)
 - [Web Service Controllers](#web-service-controllers)
 
-#### [REST API](#rest-api)
+#### [REST API](#rest-api-1)
 
-#### [Modules](#modules)
+#### [Modules](#modules-1)
 - [Centromere Core](#centromere-core)
   - [Customizing Model Classes](#customizing-model-classes)
 - [Centromere MongoDB](#centromere-mongodb)
@@ -23,14 +23,13 @@
 - [Centromere SQL](#centromere-sql)
   - [SQL Repositories](#sql-repositories)
 - [Centromere JPA](#centromere-jpa)
-  - [JPA Repositories](#jpa-repositores)
+  - [JPA Repositories](#jpa-repositories)
 - [Centromere Data Import CLI](#centromere-data-import-cli)
   - [Import Configuration](#import-configuration)
   - [Running the Import](#running-the-import)
 - [Centromere Web](#centromere-web)
   - [Web Service Configuration](#web-service-configuration)
 
-#### [Getting Started](#getting-started)
 
 # Introduction
 
@@ -766,6 +765,7 @@ public class GeneRepository extends GenericMongoRepository<Gene, String> {
     }
 
 }
+```
 
 
 ## Centromere Data Import CLI
