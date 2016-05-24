@@ -62,7 +62,7 @@ public class SampleDataProcessor extends GenericRecordProcessor<SampleData> {
 	
 	private DataSet getDataSet(DataSetMetadata dataSetMetadata){
 		DataSet dataSet = null;
-		List<DataSet> dataSets = dataSetRepository.getByLabel(dataSetMetadata.getLabel());
+		List<DataSet> dataSets = dataSetRepository.findByLabel(dataSetMetadata.getLabel());
 		if (dataSets == null || dataSets.isEmpty()){
 			dataSet = new DataSet();
 			dataSet.setLabel(dataSetMetadata.getLabel());
@@ -77,7 +77,7 @@ public class SampleDataProcessor extends GenericRecordProcessor<SampleData> {
 	
 	private DataFile getDataFile(DataFileMetadata dataFileMetadata, DataSet dataSet){
 		DataFile dataFile = null;
-		List<DataFile> dataFiles = dataFileRepository.getByFilePath(dataFileMetadata.getFilePath());
+		List<DataFile> dataFiles = dataFileRepository.findByFilePath(dataFileMetadata.getFilePath());
 		if (dataFiles == null || dataFiles.isEmpty()){
 			dataFile = new DataFile();
 			dataFile.setFilePath(dataFileMetadata.getFilePath());

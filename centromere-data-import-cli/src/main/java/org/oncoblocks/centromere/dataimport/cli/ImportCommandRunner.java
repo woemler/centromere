@@ -83,7 +83,7 @@ public class ImportCommandRunner {
 			((ImportOptionsAware) processor).setImportOptions(options);
 		}
 		if (processor instanceof DataFileAware){
-			if (Iterables.size(manager.getDataFileRepository().getByFilePath(inputFilePath)) == 0){
+			if (Iterables.size(manager.getDataFileRepository().findByFilePath(inputFilePath)) == 0){
 				BasicDataFileMetadata df = new BasicDataFileMetadata();
 				df.setFilePath(inputFilePath);
 				df.setDataType(arguments.getDataType());

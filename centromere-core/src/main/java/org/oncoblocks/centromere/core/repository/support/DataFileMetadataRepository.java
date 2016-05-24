@@ -26,6 +26,6 @@ import java.io.Serializable;
  */
 public interface DataFileMetadataRepository<T extends DataFileMetadata<ID>, ID extends Serializable> 
 		extends RepositoryOperations<T, ID> {
-	Iterable<T> getByDataType(String dataType);
-	Iterable<T> getByFilePath(String filePath);
+	Iterable<T> findByDataType(String dataType);
+	Iterable<T> findByFilePath(String filePath);
 }

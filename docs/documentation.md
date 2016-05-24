@@ -1,4 +1,4 @@
-# Centromere documentation
+# Centromere Documentation
 
 #### [Introduction](#introduction-1)
 - [About](#about)

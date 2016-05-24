@@ -38,15 +38,15 @@ public class DataSetRepository extends GenericMongoRepository<DataSet, String>
 		super(mongoTemplate, DataSet.class);
 	}
 
-	public List<DataSet> getByLabel(String label) {
+	public List<DataSet> findByLabel(String label) {
 		return this.getMongoOperations().find(new Query(Criteria.where("label").is(label)), DataSet.class);
 	}
 
-	public List<DataSet> getByName(String name) {
+	public List<DataSet> findByName(String name) {
 		return this.getMongoOperations().find(new Query(Criteria.where("name").is(name)), DataSet.class);
 	}
 
-	public List<DataSet> getBySource(String source) {
+	public List<DataSet> findBySource(String source) {
 		return this.getMongoOperations().find(new Query(Criteria.where("source").is(source)), DataSet.class);
 	}
 }

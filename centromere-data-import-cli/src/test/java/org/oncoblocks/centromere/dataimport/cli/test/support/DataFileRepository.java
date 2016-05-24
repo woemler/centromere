@@ -38,11 +38,11 @@ public class DataFileRepository extends GenericMongoRepository<DataFile, String>
 		super(mongoTemplate, DataFile.class);
 	}
 
-	public List<DataFile> getByDataType(String dataType) {
+	public List<DataFile> findByDataType(String dataType) {
 		return this.getMongoOperations().find(new Query(Criteria.where("dataType").is(dataType)), DataFile.class);
 	}
 
-	public List<DataFile> getByFilePath(String filePath) {
+	public List<DataFile> findByFilePath(String filePath) {
 		return this.getMongoOperations().find(new Query(Criteria.where("filePath").is(filePath)), DataFile.class);
 	}
 }

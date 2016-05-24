@@ -47,12 +47,18 @@ import java.io.Serializable;
 public class CrudApiController<T extends Model<ID>, ID extends Serializable> 
 		extends AbstractApiController<T, ID> {
 	
-	public CrudApiController(RepositoryOperations<T, ID> repository, Class<T> model,
-			ResourceAssemblerSupport<T, FilterableResource> assembler) {
+	public CrudApiController(
+			RepositoryOperations<T, ID> repository, 
+			Class<T> model,
+			ResourceAssemblerSupport<T, FilterableResource> assembler
+	) {
 		super(repository, model, assembler);
 	}
 
-	public CrudApiController(RepositoryOperations<T, ID> repository, EntityLinks entityLinks) {
+	public CrudApiController(
+			RepositoryOperations<T, ID> repository, 
+			EntityLinks entityLinks
+	) {
 		super(repository, entityLinks);
 	}
 

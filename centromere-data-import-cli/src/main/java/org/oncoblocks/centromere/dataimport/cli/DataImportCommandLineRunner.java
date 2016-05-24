@@ -20,6 +20,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.MissingCommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.util.Assert;
 
 import java.util.Arrays;
@@ -32,26 +33,24 @@ import java.util.concurrent.TimeUnit;
  * 
  * @author woemler
  */
-public class CommandLineRunner {
+public class DataImportCommandLineRunner implements CommandLineRunner {
 	
 	private AddCommandRunner addCommandRunner;
 	private ImportCommandRunner importCommandRunner;
 	
-	public static final Logger logger = LoggerFactory.getLogger(CommandLineRunner.class);
+	public static final Logger logger = LoggerFactory.getLogger(DataImportCommandLineRunner.class);
 	private static final List<String> acceptableCommands = Arrays.asList("add", "import");
 
-	public CommandLineRunner() { }
+	public DataImportCommandLineRunner() { }
 
-	public CommandLineRunner(AddCommandRunner addCommandRunner,
+	public DataImportCommandLineRunner(AddCommandRunner addCommandRunner,
 			ImportCommandRunner importCommandRunner) {
 		this.addCommandRunner = addCommandRunner;
 		this.importCommandRunner = importCommandRunner;
 	}
 
 	/**
-	 * Inspects and parses the command line arguments and then passes the results on to the appropriate 
-	 *   task runner, based upon the {@code command} argument.  Prints command line usage if the 
-	 *   {@code command} is not recognized.
+	 * Logs the command line execution and passes arguments to the appropriate runners.
 	 * 
 	 * @param args Array of strings representing command line arguments.
 	 * @throws Exception
@@ -59,6 +58,28 @@ public class CommandLineRunner {
 	public void run(String[] args) throws Exception {
 		Date start = new Date();
 		logger.debug("[CENTROMERE] Starting CommandLineRunner.");
+		int code = 1;
+		try {
+			code = processArguments(args);
+		} finally {
+			Date end = new Date();
+			if (code > 0){
+				logger.info(String.format("[CENTROMERE] Exited with errors.  Elapsed time: %s", formatInterval(end.getTime() - start.getTime())));
+			} else {
+				logger.info(String.format("[CENTROMERE] Finished.  Elapsed time: %s", formatInterval(end.getTime() - start.getTime())));
+			}
+		}
+	}
+
+	/**
+	 * Inspects and parses the command line arguments and then passes the results on to the appropriate 
+	 *   task runner, based upon the {@code command} argument.  Prints command line usage if the 
+	 *   {@code command} is not recognized.
+	 *
+	 * @param args Array of strings representing command line arguments.
+	 * @throws Exception
+	 */
+	private int processArguments(String[] args) throws Exception {
 		Assert.notNull(addCommandRunner, "AddCommandRunner must not be null!");
 		Assert.notNull(importCommandRunner, "ImportCommandRunner must not be null!");
 		ImportCommandArguments importArguments = new ImportCommandArguments();
@@ -68,33 +89,33 @@ public class CommandLineRunner {
 		jc.addCommand("add", addArguments);
 		try {
 			jc.parse(args);
-		} catch (MissingCommandException e){
-			logger.debug(String.format("[CENTROMERE] Invalid arguments: add=%s import=%s", 
+		} catch (MissingCommandException e) {
+			logger.debug(String.format("[CENTROMERE] Invalid arguments: add=%s import=%s",
 					addArguments.toString(), importArguments.toString()));
-			jc.usage();
+			jc.usage("add");
+			jc.usage("import");
+			return 1;
 		}
 		String command = jc.getParsedCommand() != null ? jc.getParsedCommand() : "null";
-		logger.debug(String.format("[CENTROMERE] Successfully parsed arguments: add=%s import=%s", 
+		logger.debug(String.format("[CENTROMERE] Successfully parsed arguments: add=%s import=%s",
 				addArguments.toString(), importArguments.toString()));
 		switch (command) {
 			case "import":
 				logger.info(String.format("[CENTROMERE] Running 'import' command with arguments: %s",
 						importArguments.toString()));
 				importCommandRunner.run(importArguments);
-				break;
+				return 0;
 			case "add":
 				logger.info(String.format("[CENTROMERE] Running 'add' command with arguments: %s",
 						addArguments.toString()));
 				addCommandRunner.run(addArguments);
-				break;
+				return 0;
 			default:
 				logger.warn(String.format("[CENTROMERE] Invalid command: %s", command));
 				jc.usage("add");
 				jc.usage("import");
+				return 0;
 		}
-		Date end = new Date();
-		logger.info(String.format("[CENTROMERE] Finished.  Elapsed time: %s", formatInterval(end.getTime() - start.getTime())));
-		
 	}
 
 	/**

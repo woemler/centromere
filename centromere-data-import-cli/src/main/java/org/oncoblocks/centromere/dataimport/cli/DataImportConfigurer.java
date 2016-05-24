@@ -72,8 +72,8 @@ public abstract class DataImportConfigurer {
 	}
 	
 	@Bean 
-	public CommandLineRunner commandLineRunner(){
-		return new CommandLineRunner(addCommandRunner(), importCommandRunner());
+	public DataImportCommandLineRunner commandLineRunner(){
+		return new DataImportCommandLineRunner(addCommandRunner(), importCommandRunner());
 	}
 	
 	@Bean

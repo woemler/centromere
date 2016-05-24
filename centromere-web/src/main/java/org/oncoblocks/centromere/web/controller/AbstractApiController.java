@@ -74,13 +74,17 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 	public AbstractApiController(
 			RepositoryOperations<T, ID> repository,
 			Class<T> model,
-			ResourceAssemblerSupport<T, FilterableResource> assembler) {
+			ResourceAssemblerSupport<T, FilterableResource> assembler
+	) {
 		this.repository = repository;
 		this.model = model;
 		this.assembler = assembler;
 	}
 
-	public AbstractApiController(RepositoryOperations<T, ID> repository, EntityLinks entityLinks) {
+	public AbstractApiController(
+			RepositoryOperations<T, ID> repository, 
+			EntityLinks entityLinks
+	) {
 		this.repository = repository;
 		TypeToken<T> typeToken = new TypeToken<T>(getClass()) {};
 		this.model = (Class<T>) typeToken.getRawType();

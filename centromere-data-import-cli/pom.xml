@@ -80,6 +80,11 @@
             <version>${centromere.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
+
         <!-- Testing -->
 
         <dependency>
