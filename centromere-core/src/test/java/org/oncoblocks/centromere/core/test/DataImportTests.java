@@ -140,6 +140,8 @@ public class DataImportTests {
 		Assert.isTrue(gene.getId() == 1L);
 		System.out.println(String.format("There are %d records in the test repository.", testRepository.count()));
 		System.out.println(gene.toString());
+		Assert.notNull(processor.getModel());
+		Assert.isTrue(EntrezGene.class.equals(processor.getModel()));
 	}
 	
 	@Test

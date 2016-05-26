@@ -16,19 +16,17 @@
 
 package org.oncoblocks.centromere.core.model;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * Marks a {@link Model} field as ignored when mapping query string parameters from HTTP requests
- *   and when documenting web services.
+ * Ensures that component classes that support {@link Model} classes have accessible type definitions.
  * 
  * @author woemler
+ * @since 0.4.1
  */
-
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-public @interface Ignored {
+public interface ModelSupport<T extends Model<?>> {
+	/**
+	 * Returns the model class reference.
+	 * 
+	 * @return
+	 */
+	Class<T> getModel();
 }

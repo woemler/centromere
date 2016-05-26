@@ -673,4 +673,10 @@ public class JpaRepositoryTests {
 		};
 	}
 	
+	@Test
+	public void modelSupportTest(){
+		Assert.notNull(geneRepository.getModel());
+		Assert.isTrue(EntrezGene.class.equals(geneRepository.getModel()));
+	}
+	
 }

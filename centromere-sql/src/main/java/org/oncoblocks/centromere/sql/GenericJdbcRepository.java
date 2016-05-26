@@ -16,6 +16,7 @@
 
 package org.oncoblocks.centromere.sql;
 
+import com.google.common.reflect.TypeToken;
 import com.nurkiewicz.jdbcrepository.MissingRowUnmapper;
 import com.nurkiewicz.jdbcrepository.RowUnmapper;
 import org.oncoblocks.centromere.core.model.Model;
@@ -60,6 +61,7 @@ public class GenericJdbcRepository<T extends Model<ID>, ID extends Serializable>
 	private ComplexTableDescription tableDescription;
 	private RowMapper<T> rowMapper;
 	private RowUnmapper<T> rowUnmapper;
+	private final Class<T> model;
 
 	/**
 	 * Creates a new repository instance using a {@link DataSource} to generate a new 
@@ -77,17 +79,34 @@ public class GenericJdbcRepository<T extends Model<ID>, ID extends Serializable>
 	public GenericJdbcRepository(DataSource dataSource,
 			ComplexTableDescription tableDescription, RowMapper<T> rowMapper,
 			RowUnmapper<T> rowUnmapper) {
-		
+
 		Assert.notNull(dataSource);
 		Assert.notNull(tableDescription);
 		Assert.notNull(rowMapper);
 		Assert.notNull(rowUnmapper);
-		
+
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		this.tableDescription = tableDescription;
 		this.rowMapper = rowMapper;
 		this.rowUnmapper = rowUnmapper;
-		
+		this.model = (Class<T>) new TypeToken<T>(getClass()){}.getRawType();
+	}
+
+	public GenericJdbcRepository(DataSource dataSource,
+			ComplexTableDescription tableDescription, RowMapper<T> rowMapper,
+			RowUnmapper<T> rowUnmapper, Class<T> model) {
+
+		Assert.notNull(dataSource);
+		Assert.notNull(tableDescription);
+		Assert.notNull(rowMapper);
+		Assert.notNull(rowUnmapper);
+
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.tableDescription = tableDescription;
+		this.rowMapper = rowMapper;
+		this.rowUnmapper = rowUnmapper;
+		this.model = model;
+
 	}
 
 	/**
@@ -466,5 +485,14 @@ public class GenericJdbcRepository<T extends Model<ID>, ID extends Serializable>
 
 	public RowUnmapper<T> getRowUnmapper() {
 		return rowUnmapper;
+	}
+
+	/**
+	 * Returns the model class reference.
+	 *
+	 * @return
+	 */
+	public Class<T> getModel() {
+		return model;
 	}
 }

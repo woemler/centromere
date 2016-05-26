@@ -17,6 +17,7 @@
 package org.oncoblocks.centromere.core.dataimport;
 
 import org.oncoblocks.centromere.core.model.Model;
+import org.oncoblocks.centromere.core.model.ModelSupport;
 import org.springframework.validation.Validator;
 
 /**
@@ -25,7 +26,7 @@ import org.springframework.validation.Validator;
  * 
  * @author woemler
  */
-public interface RecordProcessor<T extends Model<?>> {
+public interface RecordProcessor<T extends Model<?>> extends ModelSupport<T> {
 
 	/**
 	 * Executes before the {@code run} method.  Can be configured to handle tasks, such as data set 
@@ -63,9 +64,6 @@ public interface RecordProcessor<T extends Model<?>> {
 	
 	RecordImporter getImporter();
 	
-	void setModel(Class<T> model);
-	
-	Class<T> getModel();
 	
 //	void setImportOptions(ImportOptions importOptions);
 //	

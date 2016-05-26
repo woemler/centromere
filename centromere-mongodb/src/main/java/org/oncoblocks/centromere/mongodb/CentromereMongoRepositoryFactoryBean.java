@@ -55,7 +55,7 @@ public class CentromereMongoRepositoryFactoryBean<R extends MongoRepository<T, I
 		@Override 
 		protected Object getTargetRepository(RepositoryInformation information) {
 			MongoEntityInformation entityInformation = getEntityInformation(information.getDomainType());
-			return new CentromereMongoRepository<>(entityInformation, mongoOperations);
+			return new CentromereMongoRepository<>(entityInformation, mongoOperations, entityInformation.getJavaType());
 		}
 
 		@Override 

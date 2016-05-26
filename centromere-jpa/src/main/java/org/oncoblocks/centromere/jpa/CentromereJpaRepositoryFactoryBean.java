@@ -51,7 +51,7 @@ public class CentromereJpaRepositoryFactoryBean<R extends JpaRepository<T, ID>, 
 		@Override 
 		protected Object getTargetRepository(RepositoryInformation information) {
 			JpaEntityInformation entityInformation = getEntityInformation(information.getDomainType());
-			return new CentromereJpaRepository<>(entityInformation, entityManager);
+			return new CentromereJpaRepository<>(entityInformation, entityManager, entityInformation.getJavaType());
 		}
 
 		@Override 

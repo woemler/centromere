@@ -30,12 +30,9 @@ import java.io.Serializable;
  */
 public class RepositoryRecordUpdater<T extends Model<ID>, ID extends Serializable> implements RecordWriter<T> {
 	
-	private RepositoryOperations<T, ID> repository;
+	private final RepositoryOperations<T, ID> repository;
 
-	public RepositoryRecordUpdater() { }
-
-	public RepositoryRecordUpdater(
-			RepositoryOperations<T, ID> repository) {
+	public RepositoryRecordUpdater(RepositoryOperations<T, ID> repository) {
 		this.repository = repository;
 	}
 
@@ -50,11 +47,6 @@ public class RepositoryRecordUpdater<T extends Model<ID>, ID extends Serializabl
 
 	public RepositoryOperations<T, ID> getRepository() {
 		return repository;
-	}
-
-	public void setRepository(
-			RepositoryOperations<T, ID> repository) {
-		this.repository = repository;
 	}
 
 	/**

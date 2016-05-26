@@ -16,6 +16,7 @@
 
 package org.oncoblocks.centromere.mongodb;
 
+import com.google.common.reflect.TypeToken;
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.repository.QueryCriteria;
 import org.oncoblocks.centromere.core.repository.RepositoryOperations;
@@ -47,11 +48,22 @@ public class CentromereMongoRepository<T extends Model<ID>, ID extends Serializa
 
 	private final MongoOperations mongoOperations;
 	private final MongoEntityInformation<T, ID> metadata;
+	private final Class<T> model;
 	
-	public CentromereMongoRepository(MongoEntityInformation<T, ID> metadata, MongoOperations mongoOperations) {
+	public CentromereMongoRepository(MongoEntityInformation<T, ID> metadata, 
+			MongoOperations mongoOperations) {
 		super(metadata, mongoOperations);
 		this.mongoOperations = mongoOperations;
 		this.metadata = metadata;
+		this.model = (Class<T>) new TypeToken<T>(getClass()){}.getRawType();
+	}
+
+	public CentromereMongoRepository(MongoEntityInformation<T, ID> metadata, 
+			MongoOperations mongoOperations, Class<T> model) {
+		super(metadata, mongoOperations);
+		this.mongoOperations = mongoOperations;
+		this.metadata = metadata;
+		this.model = model;
 	}
 
 	/**
@@ -180,5 +192,13 @@ public class CentromereMongoRepository<T extends Model<ID>, ID extends Serializa
 		}
 		return list;
 	}
-	
+
+	/**
+	 * Returns the model class reference.
+	 *
+	 * @return
+	 */
+	public Class<T> getModel() {
+		return model;
+	}
 }

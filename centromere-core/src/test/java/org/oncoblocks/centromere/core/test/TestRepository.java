@@ -170,4 +170,8 @@ public class TestRepository implements RepositoryOperations<EntrezGene, Long> {
 	public void deleteAll() {
 		geneMap = new HashMap<>();
 	}
+
+	@Override public Class<EntrezGene> getModel() {
+		return EntrezGene.class;
+	}
 }

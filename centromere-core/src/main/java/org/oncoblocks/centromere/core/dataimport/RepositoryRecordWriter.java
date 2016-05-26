@@ -27,12 +27,9 @@ import org.oncoblocks.centromere.core.repository.RepositoryOperations;
  */
 public class RepositoryRecordWriter<T extends Model<?>> implements RecordWriter<T> {
 	
-	private RepositoryOperations<T, ?> repository;
+	private final RepositoryOperations<T, ?> repository;
 
-	public RepositoryRecordWriter() { }
-
-	public RepositoryRecordWriter(
-			RepositoryOperations<T, ?> repository) {
+	public RepositoryRecordWriter(RepositoryOperations<T, ?> repository) {
 		this.repository = repository;
 	}
 
@@ -47,11 +44,6 @@ public class RepositoryRecordWriter<T extends Model<?>> implements RecordWriter<
 
 	public RepositoryOperations<T, ?> getRepository() {
 		return repository;
-	}
-
-	public void setRepository(
-			RepositoryOperations<T, ?> repository) {
-		this.repository = repository;
 	}
 
 	/**

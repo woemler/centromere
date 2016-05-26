@@ -18,6 +18,7 @@ package org.oncoblocks.centromere.core.repository;
 
 
 import org.oncoblocks.centromere.core.model.Model;
+import org.oncoblocks.centromere.core.model.ModelSupport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -35,7 +36,7 @@ import java.io.Serializable;
  */
 @NoRepositoryBean
 public interface RepositoryOperations<T extends Model<ID>, ID extends Serializable>
-		extends PagingAndSortingRepository<T, ID> {
+		extends PagingAndSortingRepository<T, ID>, ModelSupport<T> {
 
 	/**
 	 * Searches for all records that satisfy the requested criteria.

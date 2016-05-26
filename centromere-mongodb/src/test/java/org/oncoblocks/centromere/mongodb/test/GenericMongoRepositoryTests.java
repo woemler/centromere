@@ -533,5 +533,11 @@ public class GenericMongoRepositoryTests {
 		EntrezGene gene = genes.get(0);
 		Assert.isTrue("GeneD".equals(gene.getPrimaryGeneSymbol()));
 	}
+
+	@Test
+	public void modelSupportTest(){
+		Assert.notNull(geneRepository.getModel());
+		Assert.isTrue(EntrezGene.class.equals(geneRepository.getModel()));
+	}
 	
 }

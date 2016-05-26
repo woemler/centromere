@@ -16,6 +16,7 @@
 
 package org.oncoblocks.centromere.jpa;
 
+import com.google.common.reflect.TypeToken;
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.repository.QueryCriteria;
 import org.oncoblocks.centromere.core.repository.RepositoryOperations;
@@ -45,6 +46,16 @@ public class CentromereJpaRepository<T extends Model<ID>, ID extends Serializabl
 	private final JpaEntityInformation<T, ID> metadata;
 	private final EntityManager entityManager;
 	private final JpaQueryBuilder<T> queryBuilder;
+	private final Class<T> model;
+
+	public CentromereJpaRepository(JpaEntityInformation<T, ID> entityInformation,
+			EntityManager entityManager, Class<T> model) {
+		super(entityInformation, entityManager);
+		this.metadata = entityInformation;
+		this.entityManager = entityManager;
+		this.queryBuilder = new JpaQueryBuilder<>(entityManager);
+		this.model = model;
+	}
 
 	public CentromereJpaRepository(JpaEntityInformation<T, ID> entityInformation,
 			EntityManager entityManager) {
@@ -52,6 +63,7 @@ public class CentromereJpaRepository<T extends Model<ID>, ID extends Serializabl
 		this.metadata = entityInformation;
 		this.entityManager = entityManager;
 		this.queryBuilder = new JpaQueryBuilder<>(entityManager);
+		this.model = (Class<T>) new TypeToken<T>(getClass()){}.getRawType();
 	}
 
 	/**
@@ -186,5 +198,13 @@ public class CentromereJpaRepository<T extends Model<ID>, ID extends Serializabl
 		}
 		return updated;
 	}
-	
+
+	/**
+	 * Returns the model class reference.
+	 *
+	 * @return
+	 */
+	public Class<T> getModel() {
+		return model;
+	}
 }

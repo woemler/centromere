@@ -17,6 +17,7 @@
 package org.oncoblocks.centromere.web.controller;
 
 import org.oncoblocks.centromere.core.model.Model;
+import org.oncoblocks.centromere.core.model.ModelSupport;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.HttpEntity;
@@ -29,7 +30,8 @@ import java.io.Serializable;
  * 
  * @author woemler
  */
-public interface WebServicesController<T extends Model<ID>, ID extends Serializable> {
+public interface WebServicesController<T extends Model<ID>, ID extends Serializable> 
+		extends ModelSupport<T> {
 
 	/**
 	 * {@code  GET  /{id} } - Fetches a single record by its primary ID.
