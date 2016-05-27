@@ -22,7 +22,7 @@ package org.oncoblocks.centromere.core.dataimport;
  * 
  * @author woemler
  */
-public interface RecordImporter {
+public interface RecordImporter extends DataImportComponent {
 
 	/**
 	 * Runs the data import on the specified temp file.

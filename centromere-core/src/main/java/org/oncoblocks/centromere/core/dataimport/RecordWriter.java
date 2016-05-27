@@ -24,7 +24,7 @@ import org.oncoblocks.centromere.core.model.Model;
  * 
  * @author woemler
  */
-public interface RecordWriter<T extends Model<?>> {
+public interface RecordWriter<T extends Model<?>> extends DataImportComponent {
 
 	/**
 	 * Writes a single {@link Model} entity to the target destination.
@@ -34,20 +34,4 @@ public interface RecordWriter<T extends Model<?>> {
 	 */
 	void writeRecord(T record) throws DataImportException;
 
-	/**
-	 * Executes before the first {@code writeRecord} method call.  Can be configured to perform tasks,
-	 *   such as opening an output file object.
-	 * 
-	 * @param destination
-	 * @throws DataImportException
-	 */
-	void doBefore(String destination) throws DataImportException;
-
-	/**
-	 * Executes after the last {@code writeRecord} call.  Can be configured to perform tasks, such as 
-	 *   closing output file objects.
-	 * 
-	 * @throws DataImportException
-	 */
-	void doAfter() throws DataImportException;
 }

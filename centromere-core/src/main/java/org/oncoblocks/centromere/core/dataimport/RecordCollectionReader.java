@@ -40,11 +40,11 @@ public class RecordCollectionReader<T extends Model<?>> implements RecordReader<
 		return null;
 	}
 
-	public void doBefore(String input) throws DataImportException {
+	public void doBefore(Object... args) throws DataImportException {
 
 	}
 
-	public void doAfter() throws DataImportException {
+	public void doAfter(Object... args) throws DataImportException {
 
 	}
 	

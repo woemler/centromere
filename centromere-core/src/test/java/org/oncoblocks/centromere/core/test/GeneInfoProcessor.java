@@ -37,11 +37,13 @@ public class GeneInfoProcessor extends GenericRecordProcessor<EntrezGene> {
 		this.testRepository = testRepository;
 	}
 
-	@Override public void doBefore() {
+	@Override 
+	public void doBefore(Object... args) {
 		testRepository.deleteAll();
 	}
 
-	@Override public void doAfter() {
+	@Override 
+	public void doAfter(Object... args) {
 		return;
 	}
 }

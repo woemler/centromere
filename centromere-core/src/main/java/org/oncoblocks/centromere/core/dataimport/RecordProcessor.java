@@ -26,27 +26,15 @@ import org.springframework.validation.Validator;
  * 
  * @author woemler
  */
-public interface RecordProcessor<T extends Model<?>> extends ModelSupport<T> {
-
-	/**
-	 * Executes before the {@code run} method.  Can be configured to handle tasks, such as data set 
-	 *   pre-processing.
-	 */
-	void doBefore();
-
-	/**
-	 * Executes after the {@code run} method.  Can be configured to handle tasks, such as record
-	 *   post-processing.
-	 */
-	void doAfter();
+public interface RecordProcessor<T extends Model<?>> extends DataImportComponent, ModelSupport<T> {
 
 	/**
 	 * Executes the pipeline and processes the input through the individual components.
 	 * 
-	 * @param path
+	 * @param args
 	 * @throws DataImportException
 	 */
-	void run(String path) throws DataImportException;
+	void run(Object... args) throws DataImportException;
 	
 	void setReader(RecordReader<T> reader);
 	
@@ -64,9 +52,5 @@ public interface RecordProcessor<T extends Model<?>> extends ModelSupport<T> {
 	
 	RecordImporter getImporter();
 	
-	
-//	void setImportOptions(ImportOptions importOptions);
-//	
-//	ImportOptions getImportOptions();
 	
 }

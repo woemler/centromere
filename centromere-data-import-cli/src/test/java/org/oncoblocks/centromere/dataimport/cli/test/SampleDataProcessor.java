@@ -52,12 +52,12 @@ public class SampleDataProcessor extends GenericRecordProcessor<SampleData> {
 	}
 
 	@Override 
-	public void doBefore() {
+	public void doBefore(Object... args) throws DataImportException {
 		BasicDataSetMetadata dataSetMetadata = (BasicDataSetMetadata) this.getDataSet();
 		BasicDataFileMetadata dataFileMetadata = (BasicDataFileMetadata) this.getDataFile();
 		DataSet dataSet = this.getDataSet(dataSetMetadata);
 		this.setDataFileMetadata(this.getDataFile(dataFileMetadata, dataSet));
-		super.doBefore();
+		super.doBefore(args);
 	}
 	
 	private DataSet getDataSet(DataSetMetadata dataSetMetadata){

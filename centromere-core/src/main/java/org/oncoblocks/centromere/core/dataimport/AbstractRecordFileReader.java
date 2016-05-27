@@ -19,6 +19,7 @@ package org.oncoblocks.centromere.core.dataimport;
 import org.oncoblocks.centromere.core.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,18 +40,27 @@ public abstract class AbstractRecordFileReader<T extends Model<?>> implements Re
 	/**
 	 * Closes any open readers and opens the new target file.
 	 * 
-	 * @param input
+	 * @param args
 	 * @throws DataImportException
 	 */
-	public void doBefore(String input) throws DataImportException{
+	@Override
+	public void doBefore(Object... args) throws DataImportException{
 		this.close();
-		this.open(input);
+		try {
+			Assert.notEmpty(args, "One or more arguments is required.");
+			Assert.isTrue(args[0] instanceof String, "The first argument must be a String.");
+		} catch (IllegalArgumentException e){
+			e.printStackTrace();
+			throw new DataImportException(e.getMessage());
+		}
+		this.open((String) args[0]);
 	}
 
 	/**
 	 * Calls the close method on the reader.
 	 */
-	public void doAfter() {
+	@Override
+	public void doAfter(Object... args) {
 		this.close();
 	}
 

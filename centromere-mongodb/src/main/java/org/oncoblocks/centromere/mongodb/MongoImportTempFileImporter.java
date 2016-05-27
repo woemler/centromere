@@ -146,5 +146,28 @@ public class MongoImportTempFileImporter implements RecordImporter {
 		this.dropCollection = dropCollection;
 		return this;
 	}
-	
+
+	/**
+	 * To be executed before the main component method is first called.  Can be configured to handle
+	 * a variety of tasks using flexible input parameters.
+	 *
+	 * @param args an array of objects of any type.
+	 * @throws DataImportException
+	 */
+	@Override 
+	public void doBefore(Object... args) throws DataImportException {
+		
+	}
+
+	/**
+	 * To be executed after the main component method is called for the last time.  Can be configured
+	 * to handle a variety of tasks using flexible input parameters.
+	 *
+	 * @param args an array of objects of any type.
+	 * @throws DataImportException
+	 */
+	@Override 
+	public void doAfter(Object... args) throws DataImportException {
+
+	}
 }

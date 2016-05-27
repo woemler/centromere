@@ -22,6 +22,7 @@ import org.oncoblocks.centromere.core.model.support.DataFileMetadata;
 import org.oncoblocks.centromere.core.model.support.DataSetMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Validator;
 
@@ -92,9 +93,14 @@ public class GenericRecordProcessor<T extends Model<?>>
 	}
 
 	/**
-	 * {@link RecordProcessor#doBefore()}
+	 * To be executed before the main component method is first called.  Can be configured to handle
+	 * a variety of tasks using flexible input parameters.
+	 *
+	 * @param args an array of objects of any type.
+	 * @throws DataImportException
 	 */
-	public void doBefore() {
+	@Override 
+	public void doBefore(Object... args) throws DataImportException {
 		this.configureComponents();
 	}
 
@@ -133,18 +139,31 @@ public class GenericRecordProcessor<T extends Model<?>>
 	}
 
 	/**
-	 * {@link RecordProcessor#doAfter()}
+	 * To be executed after the main component method is called for the last time.  Can be configured
+	 * to handle a variety of tasks using flexible input parameters.
+	 *
+	 * @param args an array of objects of any type.
+	 * @throws DataImportException
 	 */
-	public void doAfter() {
+	@Override 
+	public void doAfter(Object... args) throws DataImportException {
 		
 	}
 
 	/**
-	 * {@link RecordProcessor#run(String)}
-	 * @param inputFilePath
+	 * {@link RecordProcessor#run(Object...)}
+	 * @param args
 	 * @throws DataImportException
 	 */
-	public void run(String inputFilePath) throws DataImportException {
+	public void run(Object... args) throws DataImportException {
+		try {
+			Assert.notEmpty(args, "One or more arguments required.");
+			Assert.isTrue(args[0] instanceof String, "The first argument must be a String.");
+		} catch (IllegalArgumentException e){
+			e.printStackTrace();
+			throw new DataImportException(e.getMessage());
+		}
+		String inputFilePath = (String) args[0];
 		reader.doBefore(inputFilePath);
 		writer.doBefore(this.getTempFilePath(inputFilePath));
 		T record = reader.readRecord();

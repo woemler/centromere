@@ -114,5 +114,11 @@ public class MySqlImportTempFileImporter implements RecordImporter {
 		return this;
 	}
 
+	public void doBefore(Object... args) throws DataImportException {
+		
+	}
 
+	public void doAfter(Object... args) throws DataImportException {
+
+	}
 }

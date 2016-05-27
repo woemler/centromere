@@ -19,6 +19,7 @@ package org.oncoblocks.centromere.core.dataimport;
 import org.oncoblocks.centromere.core.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -37,19 +38,29 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>> implements Re
 	/**
 	 * Opens a new output file for writing.
 	 * 
- 	 * @param destination
+ 	 * @param args
 	 * @throws DataImportException
 	 */
-	public void doBefore(String destination) throws DataImportException {
-		this.open(destination);
+	@Override
+	public void doBefore(Object... args) throws DataImportException {
+		try {
+			Assert.notEmpty(args, "One or more arguments is required.");
+			Assert.isTrue(args[0] instanceof String, "The first argument must be a String.");
+		} catch (IllegalArgumentException e){
+			e.printStackTrace();
+			throw new DataImportException(e.getMessage());
+		}
+		this.open((String) args[0]);
 	}
 
 	/**
 	 * Closes the open file writer.
 	 * 
+	 * @param args
  	 * @throws DataImportException
 	 */
-	public void doAfter() throws DataImportException {
+	@Override
+	public void doAfter(Object... args) throws DataImportException {
 		this.close();
 	}
 

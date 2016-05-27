@@ -47,21 +47,26 @@ public class RepositoryRecordWriter<T extends Model<?>> implements RecordWriter<
 	}
 
 	/**
-	 * Performs no action.
-	 * 
-	 * @param destination
+	 * To be executed before the main component method is first called.  Can be configured to handle
+	 * a variety of tasks using flexible input parameters.
+	 *
+	 * @param args an array of objects of any type.
 	 * @throws DataImportException
 	 */
-	public void doBefore(String destination) throws DataImportException {
-		return;
+	@Override 
+	public void doBefore(Object... args) throws DataImportException {
+		
 	}
 
 	/**
-	 * Performs no action.
-	 * 
+	 * To be executed after the main component method is called for the last time.  Can be configured
+	 * to handle a variety of tasks using flexible input parameters.
+	 *
+	 * @param args an array of objects of any type.
 	 * @throws DataImportException
 	 */
-	public void doAfter() throws DataImportException {
-		return;
+	@Override 
+	public void doAfter(Object... args) throws DataImportException {
+
 	}
 }
