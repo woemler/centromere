@@ -33,6 +33,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
+import java.util.Map;
+
 /**
  * @author woemler
  */
@@ -61,7 +63,8 @@ public class ImportCommandTests {
 		JCommander commander = new JCommander();
 		commander.addCommand("import", arguments);
 		String[] args = { "import", "-t", "sample_data", "-i", "test.txt", "--skip-invalid-records", "-d", 
-				"{\"label\": \"test\", \"name\": \"Test data\", \"source\": \"internal\"}" };
+				"{\"label\": \"test\", \"name\": \"Test data\", \"source\": \"internal\"}", "-Dparam1=test", 
+				"-Dparam2=TEST" };
 		commander.parse(args);
 		Assert.isTrue("import".equals(commander.getParsedCommand()));
 		Assert.isTrue("sample_data".equals(arguments.getDataType()));
@@ -72,6 +75,13 @@ public class ImportCommandTests {
 		Assert.notNull(metadata);
 		Assert.isTrue("internal".equals(metadata.getSource()));
 		Assert.isTrue("test".equals(metadata.getLabel()));
+		Map<String, String> params = arguments.getParameters();
+		Assert.notNull(params);
+		Assert.notEmpty(params);
+		Assert.isTrue(params.containsKey("param1"));
+		Assert.isTrue("test".equals(params.get("param1")));
+		Assert.isTrue(params.containsKey("param2"));
+		Assert.isTrue("TEST".equals(params.get("param2")));
 	}
 	
 	@Test

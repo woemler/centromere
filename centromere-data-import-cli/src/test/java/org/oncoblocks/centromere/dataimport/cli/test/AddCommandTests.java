@@ -59,7 +59,8 @@ public class AddCommandTests {
 		AddCommandArguments addCommandArguments = new AddCommandArguments();
 		JCommander jCommander = new JCommander();
 		jCommander.addCommand("add", addCommandArguments);
-		String[] args = { "add", "data_set", "test", "\"{ \"source\": \"internal\", \"name\": \"Test Data Set\", \"notes\": \"This is a test data set\" }\"" };
+		String[] args = { "add", "data_set", "test", "\"{ \"source\": \"internal\", \"name\": \"Test Data Set\", \"notes\": \"This is a test data set\" }\"",
+				"-Dparam1=test", "-Dparam2=TEST"};
 		jCommander.parse(args);
 		Assert.isTrue("add".equals(jCommander.getParsedCommand()));
 		Assert.isTrue(addCommandArguments.getArgs().size() == 3);
@@ -76,6 +77,13 @@ public class AddCommandTests {
 		Assert.notNull(dataSetMetadata);
 		Assert.isTrue("internal".equals(dataSetMetadata.getSource()));
 		Assert.isTrue("Test Data Set".equals(dataSetMetadata.getName()));
+		Map<String, String> params = addCommandArguments.getParameters();
+		Assert.notNull(params);
+		Assert.notEmpty(params);
+		Assert.isTrue(params.containsKey("param1"));
+		Assert.isTrue("test".equals(params.get("param1")));
+		Assert.isTrue(params.containsKey("param2"));
+		Assert.isTrue("TEST".equals(params.get("param2")));
 	}
 
 	@Test

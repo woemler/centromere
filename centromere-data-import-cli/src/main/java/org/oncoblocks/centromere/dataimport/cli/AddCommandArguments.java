@@ -16,6 +16,7 @@
 
 package org.oncoblocks.centromere.dataimport.cli;
 
+import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.Parameter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.oncoblocks.centromere.core.model.support.BasicDataSetMetadata;
@@ -23,7 +24,9 @@ import org.oncoblocks.centromere.core.model.support.DataSetMetadata;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Command line argument configuration for the {@code add} command.  The {@code add} command expects
@@ -38,6 +41,9 @@ public class AddCommandArguments {
 	
 	@Parameter(description = "Positional argument format example: java -jar import.jar category label body")
 	private List<String> args = new ArrayList<>();
+
+	@DynamicParameter(names = "-D", description = "Dynamic key-value parameters. eg -Dname=Joe")
+	private Map<String, String> parameters = new HashMap<>();
 
 	public List<String> getArgs() {
 		return args;
@@ -57,6 +63,14 @@ public class AddCommandArguments {
 
 	public String getBody() {
 		return args.size() > 2 ? args.get(2) : null;
+	}
+
+	public Map<String, String> getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(Map<String, String> parameters) {
+		this.parameters = parameters;
 	}
 
 	/**

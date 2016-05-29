@@ -16,6 +16,7 @@
 
 package org.oncoblocks.centromere.dataimport.cli;
 
+import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.Parameter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.oncoblocks.centromere.core.dataimport.BasicImportOptions;
@@ -23,6 +24,8 @@ import org.oncoblocks.centromere.core.model.support.BasicDataSetMetadata;
 import org.oncoblocks.centromere.core.model.support.DataSetMetadata;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Command line arguments for the {@code import} command.  Includes arguments for specifying the
@@ -32,7 +35,7 @@ import java.io.IOException;
  */
 public class ImportCommandArguments {
 	
-	@Parameter(names = { "-i", "--input" }, required = true, description = "File to be imported.  Required.")
+	@Parameter(names = { "-i", "--input" }, required = true, description = "Data source to be imported.  Required.")
 	private String inputFilePath;
 	
 	@Parameter(names = { "-t", "--data-type" }, required = true, description = "Data type label for the target file.  Required.")
@@ -43,7 +46,10 @@ public class ImportCommandArguments {
 	
 	@Parameter(names = { "-T", "--temp-dir" }, description = "Directory to write temporary files to.  Defaults to '/tmp'.")
 	private String tempFilePath = "/tmp";
-	
+
+	@DynamicParameter(names = "-D", description = "Dynamic key-value parameters. eg -Dname=Joe")
+	private Map<String, String> parameters = new HashMap<>();
+
 	@Parameter(names = {"--skip-invalid-records"}, description = "When true, records that fail validation will be skipped, rather than throwing an exception.")
 	private boolean skipInvalidRecords = false;
 
@@ -78,6 +84,14 @@ public class ImportCommandArguments {
 
 	public void setDataSet(String dataSet) {
 		this.dataSet = dataSet;
+	}
+
+	public Map<String, String> getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(Map<String, String> parameters) {
+		this.parameters = parameters;
 	}
 
 	public String getTempFilePath() {

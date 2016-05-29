@@ -17,19 +17,14 @@
 package org.oncoblocks.centromere.dataimport.cli;
 
 import com.google.common.collect.Iterables;
-import org.oncoblocks.centromere.core.dataimport.DataImportException;
-import org.oncoblocks.centromere.core.dataimport.RecordProcessor;
-import org.oncoblocks.centromere.core.dataimport.BasicImportOptions;
-import org.oncoblocks.centromere.core.dataimport.DataFileAware;
-import org.oncoblocks.centromere.core.dataimport.DataSetAware;
-import org.oncoblocks.centromere.core.dataimport.ImportOptionsAware;
+import org.oncoblocks.centromere.core.dataimport.*;
 import org.oncoblocks.centromere.core.model.support.BasicDataFileMetadata;
 import org.oncoblocks.centromere.core.model.support.DataFileMetadata;
 import org.oncoblocks.centromere.core.model.support.DataSetMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.util.Map;
 
 /**
  * Handles execution of the {@code import} command arguments.  This command attempts to process
@@ -64,11 +59,8 @@ public class ImportCommandRunner {
 		logger.debug(String.format("[CENTROMERE] Running import with options: %s", options.toString()));
 		DataSetMetadata dataSetMetadata = null;
 		DataFileMetadata dataFileMetadata = null;
-		String inputFilePath = arguments.getInputFilePath();
-		File inputFile = new File(inputFilePath);
-		if (!inputFile.exists() || !inputFile.isFile() || !inputFile.canRead()){
-			throw new CommandLineRunnerException(String.format("Input file is not valid: %s", inputFilePath));
-		}
+		String input = arguments.getInputFilePath();
+		Map<String, String> params = arguments.getParameters();
 		if (processor instanceof DataSetAware){
 			dataSetMetadata = this.getDataSetMetadata(arguments);
 			if (dataSetMetadata != null) {
@@ -83,9 +75,9 @@ public class ImportCommandRunner {
 			((ImportOptionsAware) processor).setImportOptions(options);
 		}
 		if (processor instanceof DataFileAware){
-			if (Iterables.size(manager.getDataFileRepository().findByFilePath(inputFilePath)) == 0){
+			if (Iterables.size(manager.getDataFileRepository().findByFilePath(input)) == 0){
 				BasicDataFileMetadata df = new BasicDataFileMetadata();
-				df.setFilePath(inputFilePath);
+				df.setFilePath(input);
 				df.setDataType(arguments.getDataType());
 				df.setDataSet(dataSetMetadata);
 				dataFileMetadata = df;
@@ -101,9 +93,9 @@ public class ImportCommandRunner {
 			}
 			((DataFileAware) processor).setDataFileMetadata(dataFileMetadata);
 		}
-		processor.doBefore();
-		processor.run(inputFile.getCanonicalPath());
-		processor.doAfter();
+		processor.doBefore(params);
+		processor.run(input, params);
+		processor.doAfter(params);
 		logger.debug("[CENTROMERE] Import task complete.");
 	}
 
