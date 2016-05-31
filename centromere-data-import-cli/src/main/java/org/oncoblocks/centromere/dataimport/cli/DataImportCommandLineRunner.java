@@ -23,9 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.util.Assert;
 
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,7 +37,6 @@ public class DataImportCommandLineRunner implements CommandLineRunner {
 	private ImportCommandRunner importCommandRunner;
 	
 	public static final Logger logger = LoggerFactory.getLogger(DataImportCommandLineRunner.class);
-	private static final List<String> acceptableCommands = Arrays.asList("add", "import");
 
 	public DataImportCommandLineRunner() { }
 

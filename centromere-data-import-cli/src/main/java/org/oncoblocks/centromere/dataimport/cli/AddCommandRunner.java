@@ -17,7 +17,6 @@
 package org.oncoblocks.centromere.dataimport.cli;
 
 import org.oncoblocks.centromere.core.dataimport.DataImportException;
-import org.oncoblocks.centromere.core.model.support.DataSetMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -55,13 +54,7 @@ public class AddCommandRunner {
 				this.addDataType(arguments.getLabel(), arguments.getBody());
 				break;
 			case "data_set":
-				DataSetMetadata dataSetMetadata = arguments.getDataSetMetadata();
-				if (dataSetMetadata != null){
-					logger.debug(String.format("[CENTROMERE] Adding data set: %s", dataSetMetadata.toString()));
-					this.addDataSet(dataSetMetadata);
-				} else {
-					throw new CommandLineRunnerException("Could not parse DataSetMetadata from input: " + arguments.getBody());
-				}
+				// TODO
 				break;
 			default:
 				throw new CommandLineRunnerException(String.format("Invalid add mode category: %s", arguments.getCategory()));
@@ -78,15 +71,6 @@ public class AddCommandRunner {
 	 */
 	private void addDataType(String dataType, String processorRef) throws DataImportException{
 		manager.addDataTypeMapping(dataType, processorRef);
-	}
-
-	/**
-	 * Registers a new data set mapping with the {@link DataImportManager}.
-	 * 
-	 * @param dataSetMetadata
-	 */
-	private void addDataSet(DataSetMetadata dataSetMetadata){
-		manager.addDataSetMapping(dataSetMetadata);
 	}
 
 }

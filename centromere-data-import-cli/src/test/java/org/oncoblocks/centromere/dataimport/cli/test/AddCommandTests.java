@@ -23,7 +23,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oncoblocks.centromere.core.dataimport.RecordProcessor;
-import org.oncoblocks.centromere.core.model.support.BasicDataSetMetadata;
 import org.oncoblocks.centromere.dataimport.cli.*;
 import org.oncoblocks.centromere.dataimport.cli.test.support.DataFileRepository;
 import org.oncoblocks.centromere.dataimport.cli.test.support.DataSetRepository;
@@ -51,7 +50,7 @@ public class AddCommandTests {
 	public void setup() throws Exception {
 		dataFileRepository.deleteAll();
 		dataSetRepository.deleteAll();
-		manager = new DataImportManager(context, dataSetRepository, dataFileRepository);
+		manager = new DataImportManager(context);
 	}
 	
 	@Test
@@ -73,10 +72,6 @@ public class AddCommandTests {
 		Assert.isTrue("data_set".equals(category));
 		Assert.isTrue("test".equals(label));
 		ObjectMapper objectMapper = new ObjectMapper();
-		BasicDataSetMetadata dataSetMetadata = (BasicDataSetMetadata) addCommandArguments.getDataSetMetadata();
-		Assert.notNull(dataSetMetadata);
-		Assert.isTrue("internal".equals(dataSetMetadata.getSource()));
-		Assert.isTrue("Test Data Set".equals(dataSetMetadata.getName()));
 		Map<String, String> params = addCommandArguments.getParameters();
 		Assert.notNull(params);
 		Assert.notEmpty(params);
@@ -111,28 +106,11 @@ public class AddCommandTests {
 	
 	@Test
 	public void dataImportManagerConfigTest() throws Exception {
-		Assert.isTrue(manager.getDataSetMap().isEmpty());
 		Map<String, RecordProcessor> dataTypeMap = manager.getDataTypeMap();
 		Assert.notNull(dataTypeMap);
 		Assert.notEmpty(dataTypeMap);
 		Assert.isTrue(dataTypeMap.containsKey("sample_data"));
 		Assert.isTrue(dataTypeMap.get("sample_data") instanceof SampleDataProcessor);
-	}
-	
-	@Test
-	public void addDataSetTest() throws Exception {
-		AddCommandArguments addCommandArguments = new AddCommandArguments();
-		JCommander jCommander = new JCommander();
-		jCommander.addCommand("add", addCommandArguments);
-		String[] args = { "add", "data_set", "test", "\"{ \"source\": \"internal\", \"name\": \"Test Data Set\", \"notes\": \"This is a test data set\" }\"" };
-		jCommander.parse(args);
-		BasicDataSetMetadata dataSetMetadata = (BasicDataSetMetadata) addCommandArguments.getDataSetMetadata();
-		Assert.notNull(dataSetMetadata);
-		manager.addDataSetMapping(dataSetMetadata);
-		Assert.isTrue(!manager.getDataSetMap().isEmpty());
-		BasicDataSetMetadata metadata = (BasicDataSetMetadata) manager.getDataSet("test");
-		Assert.notNull(metadata);
-		Assert.isTrue("internal".equals(metadata.getSource()));
 	}
 	
 	@Test
@@ -159,10 +137,7 @@ public class AddCommandTests {
 		AddCommandRunner runner = new AddCommandRunner(manager);
 		String[] args = { "add", "data_set", "test", "\"{ \"source\": \"internal\", \"name\": \"Test Data Set\", \"notes\": \"This is a test data set\" }\"" };
 		commander.parse(args);
-		Assert.isTrue(manager.getDataSetMap().isEmpty());
 		runner.run(arguments);
-		Assert.isTrue(manager.getDataSetMap().size() == 1);
-		Assert.state(manager.getDataSetMap().containsKey("test"));
 	}
 	
 	@Test
@@ -223,24 +198,6 @@ public class AddCommandTests {
 		commander.addCommand("add", addCommandArguments);
 		AddCommandRunner addCommandRunner = new AddCommandRunner(manager);
 		String[] args = {"add", "data_type", "bad", "org.oncoblocks.fake.Processor"};
-		commander.parse(args);
-		Exception exception = null;
-		try {
-			addCommandRunner.run(addCommandArguments);
-		} catch (Exception e){
-			exception = e;
-		}
-		Assert.notNull(exception);
-		Assert.isTrue(exception instanceof CommandLineRunnerException);
-	}
-
-	@Test
-	public void invalidDataSetMetadataTest() throws Exception {
-		JCommander commander = new JCommander();
-		AddCommandArguments addCommandArguments = new AddCommandArguments();
-		commander.addCommand("add", addCommandArguments);
-		AddCommandRunner addCommandRunner = new AddCommandRunner(manager);
-		String[] args = {"add", "data_set", "bad", "{\"bad\": \"invalid\"}"};
 		commander.parse(args);
 		Exception exception = null;
 		try {

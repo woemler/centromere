@@ -18,11 +18,7 @@ package org.oncoblocks.centromere.dataimport.cli;
 
 import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.Parameter;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.oncoblocks.centromere.core.model.support.BasicDataSetMetadata;
-import org.oncoblocks.centromere.core.model.support.DataSetMetadata;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,24 +67,6 @@ public class AddCommandArguments {
 
 	public void setParameters(Map<String, String> parameters) {
 		this.parameters = parameters;
-	}
-
-	/**
-	 * Converts the {@code body} argument into a {@link DataSetMetadata} instance.  By default, this is
-	 *   done by converting the body from JSON, using Jackson's {@link ObjectMapper}.
-	 * 
-	 * @return
-	 */
-	public DataSetMetadata getDataSetMetadata(){
-		ObjectMapper mapper = new ObjectMapper();
-		BasicDataSetMetadata metadata = null;
-		try {
-			metadata = mapper.readValue(this.getBody(), BasicDataSetMetadata.class);
-			metadata.setLabel(this.getLabel());
-		} catch (IOException e){
-			e.printStackTrace();
-		}
-		return metadata;
 	}
 
 	@Override 

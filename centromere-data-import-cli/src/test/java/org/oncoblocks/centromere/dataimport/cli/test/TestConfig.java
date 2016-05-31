@@ -19,8 +19,6 @@ package org.oncoblocks.centromere.dataimport.cli.test;
 import org.oncoblocks.centromere.dataimport.cli.AddCommandRunner;
 import org.oncoblocks.centromere.dataimport.cli.DataImportManager;
 import org.oncoblocks.centromere.dataimport.cli.ImportCommandRunner;
-import org.oncoblocks.centromere.dataimport.cli.test.support.DataFileRepository;
-import org.oncoblocks.centromere.dataimport.cli.test.support.DataSetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -35,12 +33,10 @@ import org.springframework.context.annotation.Configuration;
 public class TestConfig {
 	
 	@Autowired private ApplicationContext applicationContext;
-	@Autowired private DataSetRepository dataSetRepository;
-	@Autowired private DataFileRepository dataFileRepository;
 	
 	@Bean
 	public DataImportManager dataImportManager(){
-		return new DataImportManager(applicationContext, dataSetRepository, dataFileRepository);
+		return new DataImportManager(applicationContext);
 	}
 	
 	@Bean

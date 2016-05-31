@@ -23,6 +23,7 @@ import java.io.Serializable;
 /**
  * @author woemler
  */
+@Deprecated
 public interface DataFileMetadata<ID extends Serializable> extends Model<ID> {
 	String getDataType();
 	String getFilePath();

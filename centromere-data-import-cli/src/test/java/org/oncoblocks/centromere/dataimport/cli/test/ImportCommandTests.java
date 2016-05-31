@@ -20,13 +20,10 @@ import com.beust.jcommander.JCommander;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oncoblocks.centromere.core.model.support.BasicDataSetMetadata;
 import org.oncoblocks.centromere.dataimport.cli.DataImportManager;
 import org.oncoblocks.centromere.dataimport.cli.ImportCommandArguments;
 import org.oncoblocks.centromere.dataimport.cli.ImportCommandRunner;
-import org.oncoblocks.centromere.dataimport.cli.test.support.DataFileRepository;
-import org.oncoblocks.centromere.dataimport.cli.test.support.DataSetRepository;
-import org.oncoblocks.centromere.dataimport.cli.test.support.SampleDataRepository;
+import org.oncoblocks.centromere.dataimport.cli.test.support.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -54,7 +51,7 @@ public class ImportCommandTests {
 		dataFileRepository.deleteAll();
 		dataSetRepository.deleteAll();
 		sampleDataRepository.deleteAll();
-		manager = new DataImportManager(context, dataSetRepository, dataFileRepository);
+		manager = new DataImportManager(context);
 	}
 	
 	@Test
@@ -71,10 +68,6 @@ public class ImportCommandTests {
 		Assert.isTrue("test.txt".equals(arguments.getInputFilePath()));
 		Assert.isTrue(arguments.isSkipInvalidRecords());
 		Assert.isTrue(!arguments.isSkipInvalidDataSets());
-		BasicDataSetMetadata metadata = (BasicDataSetMetadata) arguments.getDataSetMetadata();
-		Assert.notNull(metadata);
-		Assert.isTrue("internal".equals(metadata.getSource()));
-		Assert.isTrue("test".equals(metadata.getLabel()));
 		Map<String, String> params = arguments.getParameters();
 		Assert.notNull(params);
 		Assert.notEmpty(params);
@@ -90,7 +83,8 @@ public class ImportCommandTests {
 		Assert.isTrue(dataFileRepository.count() == 0);
 		Assert.isTrue(dataSetRepository.count() == 0);
 		String[] args = { "import", "-t", "sample_data", "-i", ClassLoader.getSystemResource("placeholder.txt").getPath(), 
-				"--skip-invalid-records", "-d", "{\"label\": \"test\", \"name\": \"Test data\", \"source\": \"internal\"}" };
+				"--skip-invalid-records", "-DdataSetLabel=test", "-DdataSetName=\"Test data\"", "-DdataSetSource=internal",
+				"-DdataFilePath=test"};
 		ImportCommandArguments arguments = new ImportCommandArguments();
 		JCommander commander = new JCommander();
 		commander.addCommand("import", arguments);
@@ -99,6 +93,15 @@ public class ImportCommandTests {
 		runner.run(arguments);
 		Assert.isTrue(sampleDataRepository.count() == 5);
 		Assert.isTrue(dataFileRepository.count() == 1);
+		DataSet dataSet = dataSetRepository.findAll().get(0);
+		Assert.notNull(dataSet);
+		Assert.isTrue("test".equals(dataSet.getLabel()));
+		Assert.isTrue("internal".equals(dataSet.getSource()));
+		DataFile dataFile = dataFileRepository.findAll().get(0);
+		Assert.notNull(dataFile);
+		Assert.isTrue("sample_data".equals(dataFile.getDataType()));
+		Assert.isTrue("test".equals(dataFile.getFilePath()));
+		Assert.isTrue(dataFile.getDataSetId().equals(dataSet.getId()));
 		Assert.isTrue(dataSetRepository.count() == 1);
 	}
 	

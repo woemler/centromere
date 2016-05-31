@@ -17,7 +17,6 @@
 package org.oncoblocks.centromere.dataimport.cli;
 
 import org.oncoblocks.centromere.core.dataimport.RecordProcessor;
-import org.oncoblocks.centromere.core.model.support.DataSetMetadata;
 import org.oncoblocks.centromere.core.repository.support.DataFileMetadataRepository;
 import org.oncoblocks.centromere.core.repository.support.DataSetMetadataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,28 +37,15 @@ import java.util.Map;
 public abstract class DataImportConfigurer {
 	
 	@Autowired private ApplicationContext applicationContext;
-	@Autowired private DataSetMetadataRepository dataSetMetadataRepository;
-	@Autowired private DataFileMetadataRepository dataFileMetadataRepository;
 	
 	@Bean
 	@Autowired
 	public DataImportManager dataImportManager() {
-		DataImportManager manager = new DataImportManager(applicationContext, dataSetMetadataRepository, 
-				dataFileMetadataRepository);
-		manager.setDataSetMap(this.configureDataSetMappings(manager.getDataSetMap()));
+		DataImportManager manager = new DataImportManager(applicationContext);
 		manager.setDataTypeMap(this.configureDataTypeMappings(manager.getDataTypeMap()));
 		return manager;
 	}
 
-	/**
-	 * Allows overriding of the default data set mapping to allow custom behavior.
-	 *
-	 * @param dataSetMap
-	 * @return
-	 */
-	public Map<String, DataSetMetadata> configureDataSetMappings(Map<String, DataSetMetadata> dataSetMap){
-		return dataSetMap;
-	}
 
 	/**
 	 * Allows overriding the {@code dataTypeMap} initialization or custom additions to the mappings.

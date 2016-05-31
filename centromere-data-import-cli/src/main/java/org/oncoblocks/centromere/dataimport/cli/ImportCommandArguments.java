@@ -18,12 +18,8 @@ package org.oncoblocks.centromere.dataimport.cli;
 
 import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.Parameter;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.oncoblocks.centromere.core.dataimport.BasicImportOptions;
-import org.oncoblocks.centromere.core.model.support.BasicDataSetMetadata;
-import org.oncoblocks.centromere.core.model.support.DataSetMetadata;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -149,24 +145,6 @@ public class ImportCommandArguments {
 		options.setSkipInvalidSamples(this.skipInvalidSamples);
 		options.setTempDirectoryPath(this.tempFilePath);
 		return options;
-	}
-
-	/**
-	 * Attempts to parse the inputted data set argument into a {@link DataSetMetadata} object.
-	 * 
-	 * @return
-	 */
-	public DataSetMetadata getDataSetMetadata(){
-		ObjectMapper mapper = new ObjectMapper();
-		DataSetMetadata metadata = null;
-		if (this.dataSet != null && !"".equals(this.dataSet)){
-			try {
-				metadata = mapper.readValue(this.dataSet, BasicDataSetMetadata.class);
-			} catch (IOException e){
-				e.printStackTrace();
-			}
-		}
-		return metadata;
 	}
 
 	@Override 

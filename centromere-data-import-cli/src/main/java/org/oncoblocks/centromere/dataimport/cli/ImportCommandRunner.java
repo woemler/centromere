@@ -16,11 +16,10 @@
 
 package org.oncoblocks.centromere.dataimport.cli;
 
-import com.google.common.collect.Iterables;
-import org.oncoblocks.centromere.core.dataimport.*;
-import org.oncoblocks.centromere.core.model.support.BasicDataFileMetadata;
-import org.oncoblocks.centromere.core.model.support.DataFileMetadata;
-import org.oncoblocks.centromere.core.model.support.DataSetMetadata;
+import org.oncoblocks.centromere.core.dataimport.BasicImportOptions;
+import org.oncoblocks.centromere.core.dataimport.DataImportException;
+import org.oncoblocks.centromere.core.dataimport.ImportOptionsAware;
+import org.oncoblocks.centromere.core.dataimport.RecordProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,41 +56,10 @@ public class ImportCommandRunner {
 				processor.getClass().getName(), arguments.getDataType()));
 		BasicImportOptions options = arguments.getImportOptions();
 		logger.debug(String.format("[CENTROMERE] Running import with options: %s", options.toString()));
-		DataSetMetadata dataSetMetadata = null;
-		DataFileMetadata dataFileMetadata = null;
 		String input = arguments.getInputFilePath();
 		Map<String, String> params = arguments.getParameters();
-		if (processor instanceof DataSetAware){
-			dataSetMetadata = this.getDataSetMetadata(arguments);
-			if (dataSetMetadata != null) {
-				logger.debug(
-						String.format("[CENTROMERE] Using DataSetMetadata: %s", dataSetMetadata.toString()));
-				((DataSetAware) processor).setDataSetMetadata(dataSetMetadata);
-			} else {
-				logger.warn("[CENTROMERE] Data set metadata is null.");
-			}
-		}
 		if (processor instanceof ImportOptionsAware){
 			((ImportOptionsAware) processor).setImportOptions(options);
-		}
-		if (processor instanceof DataFileAware){
-			if (Iterables.size(manager.getDataFileRepository().findByFilePath(input)) == 0){
-				BasicDataFileMetadata df = new BasicDataFileMetadata();
-				df.setFilePath(input);
-				df.setDataType(arguments.getDataType());
-				df.setDataSet(dataSetMetadata);
-				dataFileMetadata = df;
-				logger.debug(String.format("[CENTROMERE] Using DataFileMetadata: %s", dataFileMetadata.toString()));
-			} else {
-				if (options.isSkipExistingFiles()){
-					logger.info(String.format("[CENTROMERE] Skipping existing data file: %s", arguments.getInputFilePath()));
-					return;
-				} else {
-					logger.warn(String.format("Data file already exists: %s", arguments.getInputFilePath()));
-					throw new CommandLineRunnerException(String.format("Data file already exists: %s", arguments.getInputFilePath()));
-				}
-			}
-			((DataFileAware) processor).setDataFileMetadata(dataFileMetadata);
 		}
 		processor.doBefore(params);
 		processor.run(input, params);
@@ -115,32 +83,5 @@ public class ImportCommandRunner {
 		}
 		return manager.getDataTypeProcessor(dataType);
 	}
-
-	/**
-	 * Returns the {@link DataSetMetadata} object passed as a command line argument, or reference to
-	 *   an existing object that has been registered with the {@link DataImportManager}.  Throws an
-	 *   exception if no metadata can be resolved.
-	 * 
-	 * @param args {@link ImportCommandArguments} instance, parsed from command line args.
-	 * @return {@link DataSetMetadata} object instance.
-	 * @throws DataImportException
-	 */
-	private DataSetMetadata getDataSetMetadata(ImportCommandArguments args) throws DataImportException {
-		DataSetMetadata dataSet = args.getDataSetMetadata();
-		if (dataSet == null) {
-			if (args.getDataSet() != null){
-				dataSet = manager.getDataSet(args.getDataSet());
-				if (dataSet == null) {
-					throw new DataImportException(String.format("DataSet for label does not exist: %s", args.getDataSet()));
-				} else if (dataSet.getId() == null) {
-					throw new CommandLineRunnerException(
-							String.format("DataSet record does not have ID, and may not have "
-									+ "been persisted to the database: %s", dataSet.getLabel()));
-				}
-			}
-		}
-		return dataSet;
-	}
-	
 
 }

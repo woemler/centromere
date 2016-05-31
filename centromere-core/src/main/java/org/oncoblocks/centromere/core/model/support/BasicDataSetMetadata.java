@@ -24,6 +24,7 @@ package org.oncoblocks.centromere.core.model.support;
  * 
  * @author woemler
  */
+@Deprecated
 public class BasicDataSetMetadata implements DataSetMetadata<String> {
 
 	private String id;

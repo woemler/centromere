@@ -19,6 +19,7 @@ package org.oncoblocks.centromere.core.model.support;
 /**
  * @author woemler
  */
+@Deprecated
 public class BasicDataFileMetadata implements DataFileMetadata<String> {
 	
 	private String id;

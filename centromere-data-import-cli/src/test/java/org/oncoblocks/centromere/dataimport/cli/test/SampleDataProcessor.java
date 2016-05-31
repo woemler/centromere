@@ -17,18 +17,17 @@
 package org.oncoblocks.centromere.dataimport.cli.test;
 
 import org.oncoblocks.centromere.core.dataimport.*;
-import org.oncoblocks.centromere.core.model.support.BasicDataFileMetadata;
-import org.oncoblocks.centromere.core.model.support.BasicDataSetMetadata;
-import org.oncoblocks.centromere.core.model.support.DataFileMetadata;
-import org.oncoblocks.centromere.core.model.support.DataSetMetadata;
 import org.oncoblocks.centromere.dataimport.cli.test.support.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author woemler
@@ -39,35 +38,34 @@ public class SampleDataProcessor extends GenericRecordProcessor<SampleData> {
 	
 	private final DataFileRepository dataFileRepository;
 	private final DataSetRepository dataSetRepository;
-	private final SampleDataRepository sampleDataRepository;
 
 	@Autowired
 	public SampleDataProcessor(SampleDataRepository repository, DataFileRepository dataFileRepository,
 			DataSetRepository dataSetRepository) {
 		super(SampleData.class, new SampleDataReader(), new SampleDataValidator(), 
 				new RepositoryRecordWriter<>(repository));
-		this.sampleDataRepository = repository;
 		this.dataFileRepository = dataFileRepository;
 		this.dataSetRepository = dataSetRepository;
 	}
 
 	@Override 
 	public void doBefore(Object... args) throws DataImportException {
-		BasicDataSetMetadata dataSetMetadata = (BasicDataSetMetadata) this.getDataSet();
-		BasicDataFileMetadata dataFileMetadata = (BasicDataFileMetadata) this.getDataFile();
-		DataSet dataSet = this.getDataSet(dataSetMetadata);
-		this.setDataFileMetadata(this.getDataFile(dataFileMetadata, dataSet));
+		Assert.isTrue(args[0] instanceof HashMap);
+		Map<String,String> params = (Map<String, String>) args[0];
+		DataSet dataSet = this.getDataSet(params);
+		DataFile dataFile = this.getDataFile(params, dataSet);
+		((SampleDataReader) this.getReader()).setDataFile(dataFile);
 		super.doBefore(args);
 	}
 	
-	private DataSet getDataSet(DataSetMetadata dataSetMetadata){
+	private DataSet getDataSet(Map<String,String> params){
 		DataSet dataSet = null;
-		List<DataSet> dataSets = dataSetRepository.findByLabel(dataSetMetadata.getLabel());
+		List<DataSet> dataSets = dataSetRepository.findByLabel(params.get("dataSetLabel"));
 		if (dataSets == null || dataSets.isEmpty()){
 			dataSet = new DataSet();
-			dataSet.setLabel(dataSetMetadata.getLabel());
-			dataSet.setSource(dataSetMetadata.getSource());
-			dataSet.setName(dataSetMetadata.getName());
+			dataSet.setLabel(params.get("dataSetLabel"));
+			dataSet.setSource(params.get("dataSetSource"));
+			dataSet.setName(params.get("dataSetName"));
 			dataSet = dataSetRepository.insert(dataSet);
 		} else {
 			dataSet = dataSets.get(0);
@@ -75,13 +73,13 @@ public class SampleDataProcessor extends GenericRecordProcessor<SampleData> {
 		return dataSet;
 	}
 	
-	private DataFile getDataFile(DataFileMetadata dataFileMetadata, DataSet dataSet){
+	private DataFile getDataFile(Map<String, String> params, DataSet dataSet){
 		DataFile dataFile = null;
-		List<DataFile> dataFiles = dataFileRepository.findByFilePath(dataFileMetadata.getFilePath());
+		List<DataFile> dataFiles = dataFileRepository.findByFilePath(params.get("dataFilePath"));
 		if (dataFiles == null || dataFiles.isEmpty()){
 			dataFile = new DataFile();
-			dataFile.setFilePath(dataFileMetadata.getFilePath());
-			dataFile.setDataType(dataFileMetadata.getDataType());
+			dataFile.setFilePath(params.get("dataFilePath"));
+			dataFile.setDataType("sample_data");
 			dataFile.setDataSetId(dataSet.getId());
 			dataFile = dataFileRepository.insert(dataFile);
 		} else {
@@ -91,8 +89,7 @@ public class SampleDataProcessor extends GenericRecordProcessor<SampleData> {
 	}
 
 	// Reader
-	public static class SampleDataReader extends RecordCollectionReader<SampleData> 
-			implements DataFileAware {
+	public static class SampleDataReader extends RecordCollectionReader<SampleData>  {
 		
 		private DataFile dataFile;
 		
@@ -109,8 +106,8 @@ public class SampleDataProcessor extends GenericRecordProcessor<SampleData> {
 			return data;
 		}
 
-		public void setDataFileMetadata(DataFileMetadata dataFile) {
-			this.dataFile = (DataFile) dataFile;
+		public void setDataFile(DataFile dataFile) {
+			this.dataFile = dataFile;
 		}
 	}
 	

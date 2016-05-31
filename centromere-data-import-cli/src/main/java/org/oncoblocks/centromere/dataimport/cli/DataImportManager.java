@@ -19,13 +19,10 @@ package org.oncoblocks.centromere.dataimport.cli;
 import org.oncoblocks.centromere.core.dataimport.DataTypes;
 import org.oncoblocks.centromere.core.dataimport.RecordProcessor;
 import org.oncoblocks.centromere.core.model.support.DataSetMetadata;
-import org.oncoblocks.centromere.core.repository.support.DataFileMetadataRepository;
-import org.oncoblocks.centromere.core.repository.support.DataSetMetadataRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.util.Assert;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,67 +37,14 @@ import java.util.Map;
 public class DataImportManager {
 	
 	private ApplicationContext applicationContext;
-	private DataSetMetadataRepository dataSetRepository;
-	private DataFileMetadataRepository dataFileRepository;
 	
 	private Map<String, RecordProcessor> dataTypeMap = new HashMap<>(); 
-	private Map<String, DataSetMetadata> dataSetMap = new HashMap<>();
 	
 	private static final Logger logger = LoggerFactory.getLogger(DataImportManager.class);
 	
-	public DataImportManager(ApplicationContext applicationContext,
-			DataSetMetadataRepository dataSetRepository, 
-			DataFileMetadataRepository dataFileRepository){
+	public DataImportManager(ApplicationContext applicationContext){
 		this.applicationContext = applicationContext;
-		this.dataSetRepository = dataSetRepository;
-		this.dataFileRepository = dataFileRepository;
 		dataTypeMap = initializeDataTypeMap();
-		dataSetMap = initializeDataSetMap();
-	}
-	
-	/* Data Set and File Management */
-	
-	/**
-	 * Builds the {@code dataSetMap} that associates data set labels and their corresponding metadata 
-	 *   and database IDs, by pulling the records from the database.
-	 * 
-	 * @return
-	 */
-	private Map<String, DataSetMetadata> initializeDataSetMap(){
-		logger.debug("[CENTROMERE] Initializaing DataImportManager data set mappings.");
-		Map<String, DataSetMetadata> map = new HashMap<>(); 
-		for (DataSetMetadata metadata: (Iterable<DataSetMetadata>) dataSetRepository.findAll()){
-			map.put(metadata.getLabel(), metadata);
-		}
-		logger.debug(String.format("[CENTROMERE] Data set map initialized: %s", map.toString()));
-		return map;
-	}
-
-
-	/**
-	 * Adds or overwrites a {@link DataSetMetadata} record to the internal map.
-	 *
-	 * @param dataSet
-	 */
-	public void addDataSetMapping(DataSetMetadata dataSet){
-		Assert.notNull(dataSet);
-		Assert.notNull(dataSet.getLabel());
-		dataSetMap.put(dataSet.getLabel(), dataSet);
-		logger.debug(String.format("[CENTROMERE] Adding data set mapping: %s", dataSet.toString()));
-	}
-
-	/**
-	 * Retireves a {@link DataSetMetadata} record by name, as stored in the internal map.
-	 *
-	 * @param label
-	 * @return
-	 */
-	public DataSetMetadata getDataSet(String label){
-		DataSetMetadata dataSet = null;
-		if (dataSetMap.containsKey(label)){
-			dataSet = dataSetMap.get(label);
-		}
-		return dataSet;
 	}
 	
 	/* Data Type Management */
@@ -188,21 +132,5 @@ public class DataImportManager {
 			Map<String, RecordProcessor> dataTypeMap) {
 		this.dataTypeMap = dataTypeMap;
 	}
-
-	public Map<String, DataSetMetadata> getDataSetMap() {
-		return dataSetMap;
-	}
-
-	public void setDataSetMap(
-			Map<String, DataSetMetadata> dataSetMap) {
-		this.dataSetMap = dataSetMap;
-	}
-
-	public DataSetMetadataRepository getDataSetRepository() {
-		return dataSetRepository;
-	}
-
-	public DataFileMetadataRepository getDataFileRepository() {
-		return dataFileRepository;
-	}
+	
 }

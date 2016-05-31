@@ -28,6 +28,7 @@ import java.io.Serializable;
  * 
  * @author woemler
  */
+@Deprecated
 public interface DataSetMetadata<ID extends Serializable> extends Model<ID> {
 	String getLabel();
 	String getName();
