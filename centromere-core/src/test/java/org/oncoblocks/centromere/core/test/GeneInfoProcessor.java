@@ -17,6 +17,7 @@
 package org.oncoblocks.centromere.core.test;
 
 import org.oncoblocks.centromere.core.dataimport.BasicImportOptions;
+import org.oncoblocks.centromere.core.dataimport.DataTypes;
 import org.oncoblocks.centromere.core.dataimport.GenericRecordProcessor;
 import org.oncoblocks.centromere.core.dataimport.RepositoryRecordWriter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import org.springframework.validation.Validator;
  * @author woemler
  */
 @Component
+@DataTypes({ "gene_info" })
 public class GeneInfoProcessor extends GenericRecordProcessor<EntrezGene> {
 	
 	private final TestRepository testRepository;

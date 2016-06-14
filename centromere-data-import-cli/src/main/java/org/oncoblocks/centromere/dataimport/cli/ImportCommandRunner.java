@@ -20,8 +20,10 @@ import org.oncoblocks.centromere.core.dataimport.BasicImportOptions;
 import org.oncoblocks.centromere.core.dataimport.DataImportException;
 import org.oncoblocks.centromere.core.dataimport.ImportOptionsAware;
 import org.oncoblocks.centromere.core.dataimport.RecordProcessor;
+import org.oncoblocks.centromere.core.util.DataTypeProcessorRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
@@ -33,12 +35,15 @@ import java.util.Map;
  */
 public class ImportCommandRunner {
 	
-	private final DataImportManager manager;
+	private DataTypeProcessorRegistry registry;
 	
 	private static final Logger logger = LoggerFactory.getLogger(ImportCommandRunner.class);
 
-	public ImportCommandRunner(DataImportManager manager) {
-		this.manager = manager;
+	public ImportCommandRunner() {
+	}
+
+	public ImportCommandRunner(DataTypeProcessorRegistry registry) {
+		this.registry = registry;
 	}
 
 	/**
@@ -69,19 +74,26 @@ public class ImportCommandRunner {
 
 	/**
 	 * Returns reference to a {@link RecordProcessor} instance, assuming it has been registered with
-	 *   the {@link DataImportManager} instance.  Throws an exception if no mapping exists.
+	 *   the {@link org.oncoblocks.centromere.core.util.DataTypeProcessorRegistry} instance.  Throws 
+	 *   an exception if no mapping exists.
 	 * 
 	 * @param dataType String label associated with a particular {@link RecordProcessor}
 	 * @return {@link RecordProcessor}
 	 * @throws DataImportException
 	 */
 	private RecordProcessor getProcessorByDataType(String dataType) throws DataImportException{
-		if (!manager.isSupportedDataType(dataType)){
+		if (!registry.exists(dataType)){
 			throw new DataImportException(String.format("Unable to identify appropriate RecordProcessor "
 					+ "for data type: %s.  This data type may not be registered, or there may not be a bean "
 					+ "for the required processor instantiated.", dataType));
 		}
-		return manager.getDataTypeProcessor(dataType);
+		return registry.find(dataType);
 	}
+
+	@Autowired
+	public void setRegistry(DataTypeProcessorRegistry registry) {
+		this.registry = registry;
+	}
+
 
 }

@@ -20,7 +20,6 @@ import com.beust.jcommander.JCommander;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oncoblocks.centromere.dataimport.cli.DataImportManager;
 import org.oncoblocks.centromere.dataimport.cli.ImportCommandArguments;
 import org.oncoblocks.centromere.dataimport.cli.ImportCommandRunner;
 import org.oncoblocks.centromere.dataimport.cli.test.support.*;
@@ -40,18 +39,17 @@ import java.util.Map;
 @ContextConfiguration(classes = { TestConfig.class, TestMongoConfig.class })
 public class ImportCommandTests {
 
-	private DataImportManager manager;
 	@Autowired private ApplicationContext context;
 	@Autowired private DataSetRepository dataSetRepository;
 	@Autowired private DataFileRepository dataFileRepository;
 	@Autowired private SampleDataRepository sampleDataRepository;
+	@Autowired private ImportCommandRunner runner;
 
 	@Before
 	public void setup() throws Exception {
 		dataFileRepository.deleteAll();
 		dataSetRepository.deleteAll();
 		sampleDataRepository.deleteAll();
-		manager = new DataImportManager(context);
 	}
 	
 	@Test
@@ -89,7 +87,6 @@ public class ImportCommandTests {
 		JCommander commander = new JCommander();
 		commander.addCommand("import", arguments);
 		commander.parse(args);
-		ImportCommandRunner runner = new ImportCommandRunner(manager);
 		runner.run(arguments);
 		Assert.isTrue(sampleDataRepository.count() == 5);
 		Assert.isTrue(dataFileRepository.count() == 1);

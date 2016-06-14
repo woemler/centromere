@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.dataimport.cli.test;
+package org.oncoblocks.centromere.core.util;
 
-import org.oncoblocks.centromere.core.util.ModelScan;
-import org.oncoblocks.centromere.dataimport.cli.DataImportConfigurer;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import java.util.Map;
 
 /**
+ * API for a bean object that allows registering and looking-up beans with String aliases.  
+ *   Registered objects are stored in a {@link Map}.
+ * 
  * @author woemler
+ * @since 0.4.1
  */
-@Configuration
-@ComponentScan(basePackages = { "org.oncoblocks.centromere.dataimport.cli.test" })
-@ModelScan({"org.oncoblocks.centromere.dataimport.cli.test.support"})
-public class TestConfig extends DataImportConfigurer {
-	
+public interface ComponentRegistry<T> {
+	T find(String keyword);
+	boolean exists(String keyword);
+	boolean exists(T object);
+	void add(T object);
+	void add(String keyword, T object);
+	Map<String, T> getRegistry();
+	Iterable<T> getRegisteredComponents();
+	void setRegistry(Map<String, T> registry);
 }

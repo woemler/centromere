@@ -26,10 +26,11 @@ import java.util.Map;
 
 /**
  * Command line argument configuration for the {@code add} command.  The {@code add} command expects
- *   three arguments: a category, label, and object body.  The category refers to the type of 
- *   record to be added.  The label is a unique string identifier that will be shorthand reference
- *   to the added record, used in the {@link DataImportManager}.  The body can be a complete JSON
- *   representation of the added object, a reference to a bean or class. 
+ *   two arguments: {@link org.oncoblocks.centromere.core.model.Model} class name and model object 
+ *   representation.  The model class is identified using a full class name or shorthand alias, which
+ *   is registered by a {@link org.oncoblocks.centromere.core.util.ModelRegistry} instance.  The 
+ *   body can be a complete JSON representation of the target class, or represented as key-value
+ *   pairs using dynamic parameter arguments. 
  * 
  * @author woemler
  */
@@ -49,16 +50,12 @@ public class AddCommandArguments {
 		this.args = args;
 	}
 
-	public String getCategory() {
+	public String getType() {
 		return args.size() > 0 ? args.get(0) : null;
 	}
 
-	public String getLabel() {
-		return args.size() > 1 ? args.get(1) : null;
-	}
-
 	public String getBody() {
-		return args.size() > 2 ? args.get(2) : null;
+		return args.size() > 1 ? args.get(1) : null;
 	}
 
 	public Map<String, String> getParameters() {
@@ -73,8 +70,7 @@ public class AddCommandArguments {
 	public String toString() {
 		return "AddCommandArguments{" +
 				"args=" + args +
-				", category='" + (this.getCategory() != null ? this.getCategory() : "") + '\'' +
-				", label='" + (this.getLabel() != null ? this.getLabel() : "") + '\'' +
+				", type='" + (this.getType() != null ? this.getType() : "") + '\'' +
 				", body='" + (this.getBody() != null ? this.getBody() : "") + '\'' +
 				'}';
 	}

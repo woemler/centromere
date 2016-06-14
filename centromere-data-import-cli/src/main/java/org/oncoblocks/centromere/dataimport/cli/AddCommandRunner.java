@@ -16,10 +16,23 @@
 
 package org.oncoblocks.centromere.dataimport.cli;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.oncoblocks.centromere.core.dataimport.DataImportException;
+import org.oncoblocks.centromere.core.model.Model;
+import org.oncoblocks.centromere.core.repository.RepositoryOperations;
+import org.oncoblocks.centromere.core.util.JsonModelConverter;
+import org.oncoblocks.centromere.core.util.KeyValueMapModelConverter;
+import org.oncoblocks.centromere.core.util.ModelRegistry;
+import org.oncoblocks.centromere.core.util.ModelRepositoryRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.Validator;
+
+import java.util.List;
 
 /**
  * Executes the {@code add} command, based upon input arguments.  The {@code category} argument will
@@ -29,13 +42,12 @@ import org.springframework.util.Assert;
  */
 public class AddCommandRunner {
 	
-	private final DataImportManager manager;
+	private ModelRegistry modelRegistry;
+	private ModelRepositoryRegistry modelRepositoryRegistry;
+	private ObjectMapper objectMapper = new ObjectMapper();
+	private Validator validator;
 	
 	private static final Logger logger = LoggerFactory.getLogger(AddCommandRunner.class);
-
-	public AddCommandRunner(DataImportManager manager) {
-		this.manager = manager;
-	}
 
 	/**
 	 * Takes parsed {@link AddCommandArguments} and delegates the submitted arguments based upon the 
@@ -45,32 +57,101 @@ public class AddCommandRunner {
 	 * @param arguments
 	 * @throws Exception
 	 */
-	public void run(AddCommandArguments arguments) throws Exception {
+	public <S extends Model<?>> void run(AddCommandArguments arguments) throws Exception {
 		logger.debug(String.format("[CENTROMERE] Running AddCommandRunner with arguments: %s", arguments.toString()));
 		Assert.notNull(arguments, "AddCommandArguments must not be null!");
-		switch (arguments.getCategory().toLowerCase()){
-			case "data_type":
-				logger.debug(String.format("[CENTROMERE] Adding data type: %s", arguments.getLabel()));
-				this.addDataType(arguments.getLabel(), arguments.getBody());
-				break;
-			case "data_set":
-				// TODO
-				break;
-			default:
-				throw new CommandLineRunnerException(String.format("Invalid add mode category: %s", arguments.getCategory()));
+		Class<S> model = (Class<S>) getModelFromTypeName(arguments.getType());
+		if (model == null){
+			throw new DataImportException(String.format("Unable to identify model type: %s", arguments.getType()));
 		}
+		S entity = (S) convertInputToModel(arguments, model);
+		if (entity == null){
+			throw new DataImportException(String.format("Unable to convert input to %s model object.", model.getName()));
+		}
+		if (validator != null && validator.supports(model)){
+			BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(entity, entity.getClass().getName());
+			validator.validate(entity, bindingResult);
+			if (bindingResult.hasErrors()){
+				throw new DataImportException(String.format("Model object is invalid and has errors: %s", bindingResult.getAllErrors().toString()));
+			}
+		}
+		RepositoryOperations<S, ?> repository = (RepositoryOperations<S, ?>) getModelRepository(model);
+		if (repository == null){
+			throw new DataImportException("No repository available for model class " + model.getName());
+		}
+		repository.insert(entity);
 		logger.debug("[CENTROMERE] Add task complete.");
+	}
+	
+	private RepositoryOperations<?, ?> getModelRepository(Class<? extends Model> model) throws DataImportException {
+		RepositoryOperations repository = null;
+		if (modelRepositoryRegistry.exists(model)){
+			List<RepositoryOperations> repositories = modelRepositoryRegistry.findByModel(model);
+			if (repositories.size() > 1){
+				throw new DataImportException(String.format("More than one repository available for model " 
+						+ "class %s.  Cannot determine appropriate repository to use.", model.getName()));
+			}
+			repository = repositories.get(0);
+		} 
+		return repository;
 	}
 
 	/**
-	 * Registers a new data type mapping with the {@link DataImportManager}.
+	 * Checks to see if the submitted model reference refers to a registered model class or is a
+	 *   direct reference to a Java class.
 	 * 
-	 * @param dataType
-	 * @param processorRef
-	 * @throws DataImportException
+	 * @param name
+	 * @return
 	 */
-	private void addDataType(String dataType, String processorRef) throws DataImportException{
-		manager.addDataTypeMapping(dataType, processorRef);
+	private Class<? extends Model> getModelFromTypeName(String name){
+		Class<? extends Model> model = null;
+		if (modelRegistry.exists(name)){
+			model = modelRegistry.find(name);
+		} else {
+			try {
+				model = (Class<? extends Model>) Class.forName(name);
+			} catch (ClassNotFoundException e) {
+				logger.warn(String.format("Input type %s is not a valid class.", name));
+			}
+		}
+		return model;
 	}
 
+	/**
+	 * Attempts to convert the input arguments into a model object.
+	 * 
+	 * @param arguments
+	 * @param model
+	 * @return
+	 */
+	private Object convertInputToModel(AddCommandArguments arguments, Class<? extends Model> model){
+		Object entity = null;
+		Converter converter = null;
+		if (arguments.getBody() != null){
+			converter = new JsonModelConverter(objectMapper, model);
+			entity = converter.convert(arguments.getBody());
+		} else if (arguments.getParameters() != null){
+			converter = new KeyValueMapModelConverter(objectMapper, model);
+			entity = converter.convert(arguments.getParameters());
+		}
+		return entity;
+	}
+
+	@Autowired
+	public void setModelRegistry(ModelRegistry modelRegistry) {
+		this.modelRegistry = modelRegistry;
+	}
+
+	public void setObjectMapper(ObjectMapper objectMapper) {
+		this.objectMapper = objectMapper;
+	}
+
+	public void setValidator(Validator validator) {
+		this.validator = validator;
+	}
+
+	@Autowired
+	public void setModelRepositoryRegistry(ModelRepositoryRegistry modelRepositoryRegistry) {
+		this.modelRepositoryRegistry = modelRepositoryRegistry;
+	}
 }

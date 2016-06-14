@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.dataimport.cli.test;
+package org.oncoblocks.centromere.core.util;
 
-import org.oncoblocks.centromere.core.util.ModelScan;
-import org.oncoblocks.centromere.dataimport.cli.DataImportConfigurer;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import java.lang.annotation.*;
 
 /**
  * @author woemler
+ * @since 0.4.1
  */
-@Configuration
-@ComponentScan(basePackages = { "org.oncoblocks.centromere.dataimport.cli.test" })
-@ModelScan({"org.oncoblocks.centromere.dataimport.cli.test.support"})
-public class TestConfig extends DataImportConfigurer {
-	
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+@Target(ElementType.TYPE)
+public @interface ModelScan {
+	String[] value() default {};
+	String[] basePackages() default {};
+	Class<?>[] basePackageClasses() default {};
 }

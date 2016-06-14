@@ -18,16 +18,24 @@ package org.oncoblocks.centromere.dataimport.cli.test;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.MissingCommandException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.oncoblocks.centromere.core.dataimport.DataImportException;
 import org.oncoblocks.centromere.core.dataimport.RecordProcessor;
-import org.oncoblocks.centromere.dataimport.cli.*;
+import org.oncoblocks.centromere.core.model.Model;
+import org.oncoblocks.centromere.core.util.DataTypeProcessorRegistry;
+import org.oncoblocks.centromere.dataimport.cli.AddCommandArguments;
+import org.oncoblocks.centromere.dataimport.cli.AddCommandRunner;
+import org.oncoblocks.centromere.dataimport.cli.ImportCommandArguments;
 import org.oncoblocks.centromere.dataimport.cli.test.support.DataFileRepository;
+import org.oncoblocks.centromere.dataimport.cli.test.support.DataSet;
 import org.oncoblocks.centromere.dataimport.cli.test.support.DataSetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
@@ -41,16 +49,18 @@ import java.util.Map;
 @ContextConfiguration(classes = { TestConfig.class, TestMongoConfig.class })
 public class AddCommandTests {
 	
-	private DataImportManager manager;
 	@Autowired private ApplicationContext context;
 	@Autowired private DataSetRepository dataSetRepository;
 	@Autowired private DataFileRepository dataFileRepository;
+	private DataTypeProcessorRegistry dataTypeProcessorRegistry;
+	@Autowired private AddCommandRunner addCommandRunner;
 	
 	@Before
 	public void setup() throws Exception {
 		dataFileRepository.deleteAll();
 		dataSetRepository.deleteAll();
-		manager = new DataImportManager(context);
+		dataTypeProcessorRegistry = new DataTypeProcessorRegistry(context);
+		dataTypeProcessorRegistry.configure();
 	}
 	
 	@Test
@@ -58,20 +68,16 @@ public class AddCommandTests {
 		AddCommandArguments addCommandArguments = new AddCommandArguments();
 		JCommander jCommander = new JCommander();
 		jCommander.addCommand("add", addCommandArguments);
-		String[] args = { "add", "data_set", "test", "\"{ \"source\": \"internal\", \"name\": \"Test Data Set\", \"notes\": \"This is a test data set\" }\"",
+		String[] args = { "add", "DataSet", "\"{ \"source\": \"internal\", \"name\": \"Test Data Set\", \"notes\": \"This is a test data set\" }\"",
 				"-Dparam1=test", "-Dparam2=TEST"};
 		jCommander.parse(args);
 		Assert.isTrue("add".equals(jCommander.getParsedCommand()));
-		Assert.isTrue(addCommandArguments.getArgs().size() == 3);
-		String label = addCommandArguments.getLabel();
-		String category = addCommandArguments.getCategory();
+		Assert.isTrue(addCommandArguments.getArgs().size() == 2);
+		String type = addCommandArguments.getType();
 		String body = addCommandArguments.getBody();
-		Assert.notNull(label);
-		Assert.notNull(category);
+		Assert.notNull(type);
 		Assert.notNull(body);
-		Assert.isTrue("data_set".equals(category));
-		Assert.isTrue("test".equals(label));
-		ObjectMapper objectMapper = new ObjectMapper();
+		Assert.isTrue("DataSet".equals(type));
 		Map<String, String> params = addCommandArguments.getParameters();
 		Assert.notNull(params);
 		Assert.notEmpty(params);
@@ -80,33 +86,10 @@ public class AddCommandTests {
 		Assert.isTrue(params.containsKey("param2"));
 		Assert.isTrue("TEST".equals(params.get("param2")));
 	}
-
-	@Test
-	public void addDataTypeArgumentsTest() throws Exception {
-		AddCommandArguments addCommandArguments = new AddCommandArguments();
-		JCommander jCommander = new JCommander();
-		jCommander.addCommand("add", addCommandArguments);
-		String[] args = { "add", "data_type", "data", 
-				"org.oncoblocks.centromere.dataimport.cli.test.SampleDataProcessor" };
-		jCommander.parse(args);
-		Assert.isTrue("add".equals(jCommander.getParsedCommand()));
-		Assert.isTrue(addCommandArguments.getArgs().size() == 3);
-		String label = addCommandArguments.getLabel();
-		String category = addCommandArguments.getCategory();
-		String body = addCommandArguments.getBody();
-		Assert.notNull(label);
-		Assert.notNull(category);
-		Assert.notNull(body);
-		Assert.isTrue("data_type".equals(category));
-		Assert.isTrue("data".equals(label));
-		RecordProcessor processor = (RecordProcessor) context.getBean(Class.forName(body));
-		Assert.notNull(processor);
-		Assert.isTrue(processor instanceof SampleDataProcessor);
-	}
 	
 	@Test
-	public void dataImportManagerConfigTest() throws Exception {
-		Map<String, RecordProcessor> dataTypeMap = manager.getDataTypeMap();
+	public void dataTypeMappingTest() throws Exception {
+		Map<String, RecordProcessor> dataTypeMap = dataTypeProcessorRegistry.getRegistry();
 		Assert.notNull(dataTypeMap);
 		Assert.notEmpty(dataTypeMap);
 		Assert.isTrue(dataTypeMap.containsKey("sample_data"));
@@ -114,45 +97,38 @@ public class AddCommandTests {
 	}
 	
 	@Test
-	public void addDataTypeTest() throws Exception {
-		Assert.isTrue(manager.getDataTypeMap().size() == 1);
-		AddCommandArguments addCommandArguments = new AddCommandArguments();
-		JCommander jCommander = new JCommander();
-		jCommander.addCommand("add", addCommandArguments);
-		String[] args = { "add", "data_type", "data",
-				"org.oncoblocks.centromere.dataimport.cli.test.SampleDataProcessor" };
-		jCommander.parse(args);
-		manager.addDataTypeMapping(addCommandArguments.getLabel(), addCommandArguments.getBody());
-		Assert.isTrue(manager.getDataTypeMap().size() == 2);
-		Assert.isTrue(manager.getDataTypeMap().containsKey("data"));
-		Assert.notNull(manager.getDataTypeProcessor("data"));
-		Assert.isTrue(manager.getDataTypeProcessor("data") instanceof SampleDataProcessor);
-	}
-	
-	@Test
 	public void addDataSetRunnerTest() throws Exception {
+		Assert.isTrue(dataSetRepository.count() == 0);
 		JCommander commander = new JCommander();
 		AddCommandArguments arguments = new AddCommandArguments();
 		commander.addCommand("add", arguments);
-		AddCommandRunner runner = new AddCommandRunner(manager);
-		String[] args = { "add", "data_set", "test", "\"{ \"source\": \"internal\", \"name\": \"Test Data Set\", \"notes\": \"This is a test data set\" }\"" };
+		String[] args = { "add", "DataSet", "\"{ \"source\": \"internal\", \"name\": \"Test Data Set\" }\"" };
 		commander.parse(args);
-		runner.run(arguments);
+		addCommandRunner.run(arguments);
+		Assert.isTrue(dataSetRepository.count() == 1);
+		DataSet dataSet = dataSetRepository.findAll().get(0);
+		Assert.notNull(dataSet);
+		Assert.notNull(dataSet.getId());
+		Assert.isTrue("internal".equals(dataSet.getSource()));
+		Assert.isTrue("Test Data Set".equals(dataSet.getName()));
 	}
-	
+
 	@Test
-	public void addDataTypeRunnerTest() throws Exception {
+	public void badModelAttributesTest() throws Exception {
+		Assert.isTrue(dataSetRepository.count() == 0);
 		JCommander commander = new JCommander();
 		AddCommandArguments arguments = new AddCommandArguments();
 		commander.addCommand("add", arguments);
-		String[] args = { "add", "data_type", "data",
-				"org.oncoblocks.centromere.dataimport.cli.test.SampleDataProcessor" };
-		AddCommandRunner runner = new AddCommandRunner(manager);
-		Assert.isTrue(manager.getDataTypeMap().size() == 1);
+		String[] args = { "add", "DataSet", "\"{ \"source\": \"internal\", \"name\": \"Test Data Set\", \"notes\": \"This is a test data set\" }\"" };
 		commander.parse(args);
-		runner.run(arguments);
-		Assert.isTrue(manager.getDataTypeMap().size() == 2);
-		Assert.isTrue(manager.getDataTypeMap().containsKey("data"));
+		Exception exception = null;
+		try {
+			addCommandRunner.run(arguments);
+		} catch (Exception e){
+			exception = e;
+		}
+		Assert.notNull(exception);
+		Assert.isTrue(exception instanceof DataImportException);
 	}
 	
 	@Test
@@ -174,39 +150,31 @@ public class AddCommandTests {
 	}
 
 	@Test
-	public void badAddCategoryTest() throws Exception {
+	public void badModelTest() throws Exception {
 		JCommander commander = new JCommander();
 		AddCommandArguments addCommandArguments = new AddCommandArguments();
 		commander.addCommand("add", addCommandArguments);
-		AddCommandRunner addCommandRunner = new AddCommandRunner(manager);
-		String[] args = {"add", "bad"};
+		String[] args = {"add", "bad", "{}"};
 		commander.parse(args);
 		Exception exception = null;
 		try {
 			addCommandRunner.run(addCommandArguments);
 		} catch (Exception e){
 			exception = e;
+			e.printStackTrace();
 		}
 		Assert.notNull(exception);
-		Assert.isTrue(exception instanceof CommandLineRunnerException);
+		Assert.isTrue(exception instanceof DataImportException);
 	}
 	
 	@Test
-	public void invalidDataTypeProcessorTest() throws Exception {
-		JCommander commander = new JCommander();
-		AddCommandArguments addCommandArguments = new AddCommandArguments();
-		commander.addCommand("add", addCommandArguments);
-		AddCommandRunner addCommandRunner = new AddCommandRunner(manager);
-		String[] args = {"add", "data_type", "bad", "org.oncoblocks.fake.Processor"};
-		commander.parse(args);
-		Exception exception = null;
-		try {
-			addCommandRunner.run(addCommandArguments);
-		} catch (Exception e){
-			exception = e;
+	public void modelScanningTest() throws Exception {
+		ClassPathScanningCandidateComponentProvider provider
+				= new ClassPathScanningCandidateComponentProvider(false);
+		provider.addIncludeFilter(new AssignableTypeFilter(Model.class));
+		for (BeanDefinition beanDef : provider.findCandidateComponents("org.oncoblocks.centromere.dataimport.cli.test.support")) {
+			System.out.println(beanDef.getBeanClassName());
 		}
-		Assert.notNull(exception);
-		Assert.isTrue(exception instanceof CommandLineRunnerException);
 	}
 	
 }

@@ -17,8 +17,13 @@
 package org.oncoblocks.centromere.dataimport.cli;
 
 import org.oncoblocks.centromere.core.dataimport.RecordProcessor;
+import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.repository.support.DataFileMetadataRepository;
 import org.oncoblocks.centromere.core.repository.support.DataSetMetadataRepository;
+import org.oncoblocks.centromere.core.util.DataTypeProcessorRegistry;
+import org.oncoblocks.centromere.core.util.ModelRegistry;
+import org.oncoblocks.centromere.core.util.ModelRepositoryRegistry;
+import org.oncoblocks.centromere.core.util.ModelScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -39,13 +44,47 @@ public abstract class DataImportConfigurer {
 	@Autowired private ApplicationContext applicationContext;
 	
 	@Bean
-	@Autowired
-	public DataImportManager dataImportManager() {
-		DataImportManager manager = new DataImportManager(applicationContext);
-		manager.setDataTypeMap(this.configureDataTypeMappings(manager.getDataTypeMap()));
-		return manager;
+	public ModelRepositoryRegistry modelRepositoryRegistry(){
+		ModelRepositoryRegistry repositoryRegistry = new ModelRepositoryRegistry(applicationContext);
+		repositoryRegistry.configure();
+		return configureModelRepositoryRegistry(repositoryRegistry);
+	}
+	
+	@Bean
+	public DataTypeProcessorRegistry dataTypeProcessorRegistry() {
+		DataTypeProcessorRegistry registry = new DataTypeProcessorRegistry(applicationContext);
+		registry.configure();
+		registry.setRegistry(this.configureDataTypeMappings(registry.getRegistry()));
+		return registry;
 	}
 
+	@Bean
+	public ModelRegistry modelRegistry() throws Exception{
+		ModelRegistry modelRegistry;
+		if (this.getClass().isAnnotationPresent(ModelScan.class)){
+			ModelScan modelScan = this.getClass().getAnnotation(ModelScan.class);
+			modelRegistry = ModelRegistry.fromModelScan(modelScan);
+		} else {
+			modelRegistry = new ModelRegistry();
+		}
+		modelRegistry.setRegistry(configureModelMappings(modelRegistry.getRegistry()));
+		return modelRegistry;
+	}
+
+	@Bean
+	public DataImportCommandLineRunner commandLineRunner(){
+		return new DataImportCommandLineRunner(addCommandRunner(), importCommandRunner());
+	}
+
+	@Bean
+	public ImportCommandRunner importCommandRunner(){
+		return new ImportCommandRunner(dataTypeProcessorRegistry());
+	}
+
+	@Bean
+	public AddCommandRunner addCommandRunner(){
+		return new AddCommandRunner();
+	}
 
 	/**
 	 * Allows overriding the {@code dataTypeMap} initialization or custom additions to the mappings.
@@ -57,19 +96,24 @@ public abstract class DataImportConfigurer {
 		return dataTypeMap;
 	}
 	
-	@Bean 
-	public DataImportCommandLineRunner commandLineRunner(){
-		return new DataImportCommandLineRunner(addCommandRunner(), importCommandRunner());
+	/**
+	 * Allows overriding for custom configuration of the {@link ModelRegistry} bean.
+	 * 
+	 * @param modelRegistry
+	 * @return
+	 */
+	protected Map<String, Class<? extends Model>> configureModelMappings(Map<String, Class<? extends Model>> modelRegistry){
+		return modelRegistry;
 	}
-	
-	@Bean
-	public ImportCommandRunner importCommandRunner(){
-		return new ImportCommandRunner(dataImportManager());
-	}
-	
-	@Bean
-	public AddCommandRunner addCommandRunner(){
-		return new AddCommandRunner(dataImportManager());
+
+	/**
+	 * Allows overriding of default repository mapping.
+	 * 
+	 * @param registry
+	 * @return
+	 */
+	protected ModelRepositoryRegistry configureModelRepositoryRegistry(ModelRepositoryRegistry registry){
+		return registry;
 	}
 	
 }
