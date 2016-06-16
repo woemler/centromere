@@ -69,7 +69,15 @@ public class ModelRegistry extends AbstractComponentRegistry<Class<? extends Mod
 		}
 		return models;
 	}
-	
+
+	/**
+	 * Creates a ModelRegistry instance, using a {@link ModelScan} annotation to supply {@link Model}
+	 *   classes or classpath locations to be registered.
+	 * 
+	 * @param modelScan annotation instance from a configuration class.
+	 * @return new instance of {@link ModelRegistry}, with scanned models.
+	 * @throws ClassNotFoundException
+	 */
 	public static ModelRegistry fromModelScan(ModelScan modelScan) throws ClassNotFoundException {
 		ModelRegistry registry = new ModelRegistry();
 		if (modelScan.value().length > 0){

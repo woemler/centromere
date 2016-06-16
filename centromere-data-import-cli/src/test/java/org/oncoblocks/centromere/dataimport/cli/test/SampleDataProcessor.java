@@ -42,16 +42,18 @@ public class SampleDataProcessor extends GenericRecordProcessor<SampleData> {
 	@Autowired
 	public SampleDataProcessor(SampleDataRepository repository, DataFileRepository dataFileRepository,
 			DataSetRepository dataSetRepository) {
-		super(SampleData.class, new SampleDataReader(), new SampleDataValidator(), 
-				new RepositoryRecordWriter<>(repository));
+		this.setReader(new SampleDataReader());
+		this.setValidator(new SampleDataValidator());
+		this.setWriter(new RepositoryRecordWriter<>(repository));
 		this.dataFileRepository = dataFileRepository;
 		this.dataSetRepository = dataSetRepository;
 	}
 
 	@Override 
 	public void doBefore(Object... args) throws DataImportException {
-		Assert.isTrue(args[0] instanceof HashMap);
-		Map<String,String> params = (Map<String, String>) args[0];
+		Assert.isTrue(args[0] instanceof String);
+		Assert.isTrue(args[1] instanceof HashMap);
+		Map<String,String> params = (Map<String, String>) args[1];
 		DataSet dataSet = this.getDataSet(params);
 		DataFile dataFile = this.getDataFile(params, dataSet);
 		((SampleDataReader) this.getReader()).setDataFile(dataFile);

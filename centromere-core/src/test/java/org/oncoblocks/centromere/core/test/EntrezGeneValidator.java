@@ -16,6 +16,7 @@
 
 package org.oncoblocks.centromere.core.test;
 
+import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
@@ -23,7 +24,7 @@ import org.springframework.validation.Validator;
 /**
  * @author woemler
  */
-
+@Component
 public class EntrezGeneValidator implements Validator {
 
 	@Override 

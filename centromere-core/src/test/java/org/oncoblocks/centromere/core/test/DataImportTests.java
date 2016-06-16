@@ -153,6 +153,24 @@ public class DataImportTests {
 		Assert.isNull(gene);
 	}
 	
+	@Test
+	public void recordProcessorConfigurationTest() throws Exception {
+		Assert.notNull(processor);
+		Assert.notNull(processor.getModel());
+		Assert.isTrue(EntrezGene.class.equals(processor.getModel()));
+		Assert.notNull(processor.getReader());
+		Assert.isTrue(processor.getReader() instanceof GeneInfoReader);
+		Assert.notNull(processor.getValidator());
+		Assert.isTrue(processor.getValidator() instanceof EntrezGeneValidator);
+		Assert.notNull(processor.getWriter());
+		Assert.isTrue(processor.getWriter() instanceof RepositoryRecordWriter);
+		Assert.isNull(processor.getImporter());
+		Assert.notNull(processor.getImportOptions());
+		Assert.isTrue(processor.getImportOptions() instanceof BasicImportOptions);
+		Assert.notNull(processor.getSupportedDataTypes());
+		Assert.isTrue(processor.isSupportedDataType("gene_info"));
+	}
+	
 	
 	
 }

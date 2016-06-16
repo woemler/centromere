@@ -29,7 +29,15 @@ import java.util.Map;
 
 /**
  * Handles execution of the {@code import} command arguments.  This command attempts to process
- *   data from a referenced input file and load it into the data warehouse.
+ *   data from a referenced input source and load it into the data warehouse.  The ImportCommandRunner
+ *   handles the import by taking and instance of {@link ImportCommandArguments}, generated from 
+ *   parsing command line input, and using the submitted parameters to determine how the referenced
+ *   data source will be processed.
+ *   
+ *   By default, a {@link DataTypeProcessorRegistry} will map user inputted data type labels to
+ *   existing {@link RecordProcessor} beans, which are expected to be capable of 
+ *   handling the referenced data source.  Before the data source is processed, processor instances
+ *   are updated with user input parameters, configured, and executed upon the input data source.
  * 
  * @author woemler
  */
@@ -66,9 +74,10 @@ public class ImportCommandRunner {
 		if (processor instanceof ImportOptionsAware){
 			((ImportOptionsAware) processor).setImportOptions(options);
 		}
-		processor.doBefore(params);
+		processor.configureComponents();
+		processor.doBefore(input, params);
 		processor.run(input, params);
-		processor.doAfter(params);
+		processor.doAfter(input, params);
 		logger.debug("[CENTROMERE] Import task complete.");
 	}
 

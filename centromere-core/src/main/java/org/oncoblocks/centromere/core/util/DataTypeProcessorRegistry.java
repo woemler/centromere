@@ -16,6 +16,7 @@
 
 package org.oncoblocks.centromere.core.util;
 
+import org.oncoblocks.centromere.core.dataimport.DataTypeSupport;
 import org.oncoblocks.centromere.core.dataimport.DataTypes;
 import org.oncoblocks.centromere.core.dataimport.RecordProcessor;
 import org.slf4j.Logger;
@@ -63,13 +64,18 @@ public class DataTypeProcessorRegistry extends AbstractComponentRegistry<RecordP
 
 	/**
 	 * Adds a new data type processor mapping, if the submitted processor has a {@link DataTypes} 
-	 *   annotation.
+	 *   annotation or implements the {@link DataTypeSupport} interface.
 	 * 
 	 * @param processor
 	 */
 	@Override 
 	public void add(RecordProcessor processor) {
-		if (processor.getClass().isAnnotationPresent(DataTypes.class)){
+		if (processor instanceof DataTypeSupport){
+			for (String dataType: ((DataTypeSupport) processor).getSupportedDataTypes()){
+				this.add(dataType, processor);
+			}
+		}
+		else if (processor.getClass().isAnnotationPresent(DataTypes.class)){
 			DataTypes dataTypes = processor.getClass().getAnnotation(DataTypes.class);
 			for (String dataType: dataTypes.value()){
 				this.add(dataType, processor);

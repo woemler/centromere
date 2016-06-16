@@ -29,6 +29,12 @@ import org.springframework.validation.Validator;
 public interface RecordProcessor<T extends Model<?>> extends DataImportComponent, ModelSupport<T> {
 
 	/**
+	 * Performs any necessary component configuration steps before the processor executes the 
+	 *   {@code run} method.
+	 */
+	void configureComponents();
+	
+	/**
 	 * Executes the pipeline and processes the input through the individual components.
 	 * 
 	 * @param args
@@ -36,20 +42,14 @@ public interface RecordProcessor<T extends Model<?>> extends DataImportComponent
 	 */
 	void run(Object... args) throws DataImportException;
 	
+	/* Getters and Setters */
 	void setReader(RecordReader<T> reader);
-	
 	RecordReader<T> getReader();
-	
 	void setValidator(Validator validator);
-	
 	Validator getValidator();
-	
 	void setWriter(RecordWriter<T> writer);
-	
 	RecordWriter<T> getWriter();
-	
 	void setImporter(RecordImporter importer);
-	
 	RecordImporter getImporter();
 	
 	

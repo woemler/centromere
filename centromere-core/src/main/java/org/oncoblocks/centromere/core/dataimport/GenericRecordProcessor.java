@@ -21,10 +21,15 @@ import org.oncoblocks.centromere.core.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
-import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.DataBinder;
 import org.springframework.validation.Validator;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Basic {@link RecordProcessor} implementation, which can be used to handle most file import jobs.
@@ -36,57 +41,17 @@ import java.io.File;
  * @author woemler
  */
 public class GenericRecordProcessor<T extends Model<?>> 
-		implements RecordProcessor<T>, ImportOptionsAware {
+		implements RecordProcessor<T>, ImportOptionsAware, DataTypeSupport {
 
-	private Class<T> model;
+	private Class<T> model = (Class<T>) new TypeToken<T>(getClass()) {}.getRawType();
 	private RecordReader<T> reader;
 	private Validator validator;
 	private RecordWriter<T> writer;
 	private RecordImporter importer;
-	private BasicImportOptions options;
+	private BasicImportOptions options = new BasicImportOptions();
+	private List<String> supportedDataTypes = new ArrayList<>();
+	private boolean isConfigured = false;
 	private static final Logger logger = LoggerFactory.getLogger(GenericRecordProcessor.class);
-
-	public GenericRecordProcessor() { }
-	
-	public GenericRecordProcessor(RecordReader<T> reader, Validator validator, RecordWriter<T> writer){
-		this(reader, validator, writer, null, null);
-	}
-
-	public GenericRecordProcessor(RecordReader<T> reader, Validator validator, RecordWriter<T> writer,
-			RecordImporter importer){
-		this(reader, validator, writer, importer, null);
-	}
-	
-	public GenericRecordProcessor(RecordReader<T> reader,  Validator validator, RecordWriter writer,
-			RecordImporter importer, BasicImportOptions options){
-		this.model = (Class<T>) new TypeToken<T>(getClass()) {}.getRawType();
-		this.reader = reader;
-		this.validator = validator;
-		this.writer = writer;
-		this.importer = importer;
-		this.options = options;
-	}
-
-	public GenericRecordProcessor(Class<T> model, RecordReader<T> reader, Validator validator, 
-			RecordWriter<T> writer) {
-		this(model, reader, validator, writer, null, null);
-	}
-
-	public GenericRecordProcessor(Class<T> model, RecordReader<T> reader, Validator validator,
-			RecordWriter<T> writer,
-			RecordImporter importer) {
-		this(model, reader, validator, writer, importer, null);
-	}
-
-	public GenericRecordProcessor(Class<T> model, RecordReader<T> reader, Validator validator,
-			RecordWriter<T> writer, RecordImporter importer, BasicImportOptions options) {
-		this.model = model;
-		this.reader = reader;
-		this.validator = validator;
-		this.writer = writer;
-		this.importer = importer;
-		this.options = options;
-	}
 
 	/**
 	 * To be executed before the main component method is first called.  Can be configured to handle
@@ -97,14 +62,27 @@ public class GenericRecordProcessor<T extends Model<?>>
 	 */
 	@Override 
 	public void doBefore(Object... args) throws DataImportException {
-		this.configureComponents();
+	}
+
+	/**
+	 * Performs configuration steps after bean creation.
+	 */
+	@PostConstruct
+	public void configure(){
+		if (this.getClass().isAnnotationPresent(DataTypes.class)){
+			DataTypes dataTypes = this.getClass().getAnnotation(DataTypes.class);
+			if (dataTypes.value() != null && dataTypes.value().length > 0){
+				this.supportedDataTypes = Arrays.asList(dataTypes.value());
+			}
+		}
+		isConfigured = true;
 	}
 
 	/**
 	 * Assigns options and metadata objects to the individual processing components that are expecting
 	 *   them.  Should run in the {@code doBefore()} method.
 	 */
-	protected void configureComponents(){
+	public void configureComponents() {
 		if (writer != null && writer instanceof ImportOptionsAware) {
 			((ImportOptionsAware) writer).setImportOptions(options);
 		}
@@ -134,6 +112,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 	 * @throws DataImportException
 	 */
 	public void run(Object... args) throws DataImportException {
+		if (!isConfigured) logger.warn("Processor configuration method has not run!");
 		try {
 			Assert.notEmpty(args, "One or more arguments required.");
 			Assert.isTrue(args[0] instanceof String, "The first argument must be a String.");
@@ -147,9 +126,10 @@ public class GenericRecordProcessor<T extends Model<?>>
 		T record = reader.readRecord();
 		while (record != null) {
 			if (validator != null) {
-				BeanPropertyBindingResult bindingResult
-						= new BeanPropertyBindingResult(record, record.getClass().getName());
-				validator.validate(record, bindingResult);
+				DataBinder dataBinder = new DataBinder(record);
+				dataBinder.setValidator(validator);
+				dataBinder.validate();
+				BindingResult bindingResult = dataBinder.getBindingResult();
 				if (bindingResult.hasErrors()){
 					logger.warn(String.format("Record failed validation: %s", record.toString()));
 					if (!options.isSkipInvalidRecords()){
@@ -180,6 +160,22 @@ public class GenericRecordProcessor<T extends Model<?>>
 		String fileName = new File(inputFilePath).getName() + ".tmp";
 		File tempFile = new File(tempDir, fileName);
 		return tempFile.getPath();
+	}
+
+	public boolean isSupportedDataType(String dataType) {
+		return supportedDataTypes.contains(dataType);
+	}
+
+	public void setSupportedDataTypes(Iterable<String> dataTypes) {
+		List<String> types = new ArrayList<>();
+		for (String type: dataTypes){
+			types.add(type);
+		}
+		this.supportedDataTypes = types;
+	}
+
+	public List<String> getSupportedDataTypes() {
+		return supportedDataTypes;
 	}
 
 	public Class<T> getModel() {

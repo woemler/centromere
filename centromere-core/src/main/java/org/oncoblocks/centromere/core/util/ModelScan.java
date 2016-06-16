@@ -19,6 +19,11 @@ package org.oncoblocks.centromere.core.util;
 import java.lang.annotation.*;
 
 /**
+ * Annotation intended to be used in configuration classes to identify individual {@link org.oncoblocks.centromere.core.model.Model}
+ *   classes, or classpath locations of model classes, that will be used to generate a {@link ModelRegistry}
+ *   instance that identifies and maps valid persisted models in the current context.  Is used
+ *   similarly to Spring's {@link org.springframework.context.annotation.ComponentScan}.
+ * 
  * @author woemler
  * @since 0.4.1
  */
@@ -26,7 +31,25 @@ import java.lang.annotation.*;
 @Inherited
 @Target(ElementType.TYPE)
 public @interface ModelScan {
+
+	/**
+	 * Array of classpath locations.  Overrides the {@code basePackages}.
+	 * 
+	 * @return an array of package locations.
+	 */
 	String[] value() default {};
+
+	/**
+	 * Array of classpath locations.  Will be ignored if {@code value} is not null or empty.
+	 *
+	 * @return an array of package locations.
+	 */
 	String[] basePackages() default {};
+
+	/**
+	 * An array of individual classes to be registered as models in the context.  
+	 * 
+	 * @return an array of model classes.
+	 */
 	Class<?>[] basePackageClasses() default {};
 }

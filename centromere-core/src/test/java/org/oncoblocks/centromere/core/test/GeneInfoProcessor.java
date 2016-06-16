@@ -22,7 +22,6 @@ import org.oncoblocks.centromere.core.dataimport.GenericRecordProcessor;
 import org.oncoblocks.centromere.core.dataimport.RepositoryRecordWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.Validator;
 
 /**
  * @author woemler
@@ -34,8 +33,12 @@ public class GeneInfoProcessor extends GenericRecordProcessor<EntrezGene> {
 	private final TestRepository testRepository;
 
 	@Autowired
-	public GeneInfoProcessor(Validator validator, TestRepository testRepository, BasicImportOptions importOptions) {
-		super(new GeneInfoReader(), validator, new RepositoryRecordWriter<>(testRepository), null, importOptions);
+	public GeneInfoProcessor(TestRepository testRepository, BasicImportOptions importOptions) {
+		this.setReader(new GeneInfoReader());
+		this.setValidator(new EntrezGeneValidator());
+		this.setWriter(new RepositoryRecordWriter<>(testRepository));
+		this.setImportOptions(importOptions);
+		this.setModel(EntrezGene.class);
 		this.testRepository = testRepository;
 	}
 
@@ -44,8 +47,4 @@ public class GeneInfoProcessor extends GenericRecordProcessor<EntrezGene> {
 		testRepository.deleteAll();
 	}
 
-	@Override 
-	public void doAfter(Object... args) {
-		return;
-	}
 }
