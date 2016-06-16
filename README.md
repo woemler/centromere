@@ -43,31 +43,37 @@ The web module contains all components of the REST web services, including secur
 <dependency>
     <groupId>org.oncoblocks.centromere</groupId>
     <artifactId>centromere-core</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
 </dependency>
 
 <dependency>
     <groupId>org.oncoblocks.centromere</groupId>
     <artifactId>centromere-data-import-cli</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
 </dependency>
 
 <dependency>
     <groupId>org.oncoblocks.centromere</groupId>
     <artifactId>centromere-mongodb</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
+</dependency>
+
+<dependency>
+    <groupId>org.oncoblocks.centromere</groupId>
+    <artifactId>centromere-jpa</artifactId>
+    <version>0.4.1</version>
 </dependency>
 
 <dependency>
     <groupId>org.oncoblocks.centromere</groupId>
     <artifactId>centromere-sql</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
 </dependency>
 
 <dependency>
     <groupId>org.oncoblocks.centromere</groupId>
     <artifactId>centromere-web</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
 </dependency>
 ```
 

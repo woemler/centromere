@@ -23,6 +23,7 @@ coverage:
     - centromere-core/src/main/java/org/oncoblocks/centromere/core/repository/*
     - centromere-web/src/main/java/org/oncoblocks/centromere/web/config/*
     - centromere-web/src/main/java/org/oncoblocks/centromere/web/util/*
+    - centromere-web/src/main/java/org/oncoblocks/centromere/web/documentation/*
 
 comment:
   layout: "header, diff, changes, sunburst, uncovered"
