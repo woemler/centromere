@@ -18,6 +18,9 @@ What Centromere is _**not**_:
 - An analysis platform.
 - An end-user GUI application.
 
+## Documentation
+Detailed documentation for Centromere and its modules can be **[found in the wiki](https://github.com/blueprintmedicines/centromere/wiki)**.  
+
 ## Modules
 
 #### Centromere Core
@@ -37,7 +40,7 @@ Database-specific implementations of the core repository interfaces and data imp
 The web module contains all components of the REST web services, including security and API documentation tools.
 
 ## Quick Start
-**Detailed documentation for Centromere and its modules can be [found here](https://github.com/blueprintmedicines/centromere/blob/master/docs/documentation.md)**.  Artifacts for Centromere release builds are available from the Maven Central Repository:
+Artifacts for Centromere release builds are available from the Maven Central Repository:
 
 ```xml
 <dependency>

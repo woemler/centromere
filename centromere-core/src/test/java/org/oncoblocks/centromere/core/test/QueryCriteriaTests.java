@@ -76,9 +76,13 @@ public class QueryCriteriaTests {
 	public void modelToDescriptorTest(){
 		Map<String,QueryParameterDescriptor> descriptorMap 
 				= QueryParameterUtil.getAvailableQueryParameters(EntrezGene.class);
+		for (Map.Entry entry: descriptorMap.entrySet()){
+			System.out.println(String.format("param: %s   descriptor: %s", (String) entry.getKey(),
+					((QueryParameterDescriptor) entry.getValue()).toString()));
+		}
 		Assert.notNull(descriptorMap);
 		Assert.notEmpty(descriptorMap);
-		Assert.isTrue(descriptorMap.size() == 9);
+		Assert.isTrue(descriptorMap.size() == 9, String.format("Size is actually %s", descriptorMap.size()));
 		Assert.isTrue(descriptorMap.containsKey("isKinase"));
 		Assert.isTrue(!descriptorMap.containsKey("attributes"));
 		QueryParameterDescriptor descriptor = descriptorMap.get("entrezGeneId");
@@ -89,10 +93,6 @@ public class QueryCriteriaTests {
 		Assert.isTrue("symbol".equals(descriptor.getParamName()));
 		Assert.isTrue("primaryGeneSymbol".equals(descriptor.getFieldName()));
 		Assert.isTrue(Evaluation.EQUALS.equals(descriptor.getEvaluation()));
-		for (Map.Entry entry: descriptorMap.entrySet()){
-			System.out.println(String.format("param: %s   descriptor: %s", (String) entry.getKey(), 
-					((QueryParameterDescriptor) entry.getValue()).toString()));
-		}
 	}
 	
 }

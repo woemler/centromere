@@ -107,13 +107,18 @@ public class QueryParameterUtil {
 
 	/**
 	 * Returns all valid query parameter descriptors from a given field, as defined by the default
-	 *   field name and available {@link Alias} and {@link Aliases} annotations.
+	 *   field name and available {@link Alias} and {@link Aliases} annotations.  Ignores synthetic
+	 *   fields.  Fields annotated with {@link Ignored} will not have the default parameter created,
+	 *   but may have alias parameters created.
 	 * 
 	 * @param field
 	 * @return
 	 */
 	public static List<QueryParameterDescriptor> getFieldDescriptors(Field field){
 		List<QueryParameterDescriptor> descriptors = new ArrayList<>();
+		if (field.isSynthetic()){
+			return descriptors;
+		}
 		if (!field.isAnnotationPresent(Ignored.class)) {
 			descriptors.add(new QueryParameterDescriptor(field.getName(), field.getName(),
 					getQueryableFieldType(field), Evaluation.EQUALS));
