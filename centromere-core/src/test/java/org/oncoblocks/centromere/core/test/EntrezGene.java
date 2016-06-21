@@ -16,6 +16,8 @@
 
 package org.oncoblocks.centromere.core.test;
 
+import org.oncoblocks.centromere.core.model.Alias;
+import org.oncoblocks.centromere.core.model.Ignored;
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.model.support.Attribute;
 
@@ -28,16 +30,16 @@ import java.util.*;
 public class EntrezGene implements Model<Long> {
 
 	private Long entrezGeneId;
-	@NotNull private String primaryGeneSymbol;
+	@Alias("symbol") @NotNull private String primaryGeneSymbol;
 	private Integer taxId;
-	private String locusTag;
+	@Ignored private String locusTag;
 	private String chromosome;
-	private String chromosomeLocation;
-	private String description;
+	@Ignored private String chromosomeLocation;
+	@Ignored private String description;
 	private String geneType;
-	private List<Attribute> attributes;
-	private Map<String, Object> dbXrefs;
-	private Set<String> aliases;
+	@Alias(value = "isKinase", fieldName = "attributes.isKinase") @Ignored private List<Attribute> attributes;
+	@Ignored private Map<String, Object> dbXrefs;
+	@Alias("alias") private Set<String> aliases;
 
 	public EntrezGene() { }
 

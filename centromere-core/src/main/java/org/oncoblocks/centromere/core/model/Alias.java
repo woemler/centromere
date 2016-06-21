@@ -54,4 +54,11 @@ public @interface Alias {
 	 * @return
 	 */
 	String fieldName() default "";
+
+	/**
+	 * Java type that the submitted parameter argument will be attempted to be converted to.
+	 * 
+	 * @return
+	 */
+	Class<?> type() default Object.class;
 }

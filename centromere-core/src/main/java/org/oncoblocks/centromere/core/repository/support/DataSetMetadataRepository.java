@@ -24,6 +24,7 @@ import java.io.Serializable;
 /**
  * @author woemler
  */
+@Deprecated
 public interface DataSetMetadataRepository<T extends DataSetMetadata<ID>, ID extends Serializable> 
 		extends RepositoryOperations<T, ID> {
 	Iterable<T> findByLabel(String label);

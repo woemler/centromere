@@ -24,6 +24,7 @@ import java.io.Serializable;
 /**
  * @author woemler
  */
+@Deprecated
 public interface DataFileMetadataRepository<T extends DataFileMetadata<ID>, ID extends Serializable> 
 		extends RepositoryOperations<T, ID> {
 	Iterable<T> findByDataType(String dataType);
