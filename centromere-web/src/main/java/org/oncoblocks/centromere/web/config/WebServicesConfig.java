@@ -133,19 +133,28 @@ public class WebServicesConfig extends WebMvcConfigurerAdapter {
 	@Override 
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
-		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+		if (!registry.hasMappingForPattern("/webjars/**")){
+			registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+		} else {
+			logger.info("[CENTROMERE] WebJar location already configured.");
+		}
 		if ("true".equals(env.getRequiredProperty("centromere.web.enable-static-content").toLowerCase())){
-			registry.addResourceHandler("/static/**").addResourceLocations("/static/");
-			if (env.getRequiredProperty("centromere.web.home-page") != null 
-					&& !"".equals(env.getRequiredProperty("centromere.web.home-page"))
-					&& env.getRequiredProperty("centromere.web.home-page-location") != null
-					&& !"".equals(env.getRequiredProperty("centromere.web.home-page"))){
-				registry.addResourceHandler(env.getRequiredProperty("centromere.web.home-page"))
-						.addResourceLocations(env.getRequiredProperty("centromere.web.home-page-location"));
-				logger.info(String.format("[CENTROMERE] Static home page configured at URL: /%s", 
-						env.getRequiredProperty("centromere.web.home-page")));
+			if (!registry.hasMappingForPattern("/static/**")){
+				registry.addResourceHandler("/static/**").addResourceLocations(
+						env.getRequiredProperty("centromere.web.static-content-location"));
+				if (env.getRequiredProperty("centromere.web.home-page") != null
+						&& !"".equals(env.getRequiredProperty("centromere.web.home-page"))
+						&& env.getRequiredProperty("centromere.web.home-page-location") != null
+						&& !"".equals(env.getRequiredProperty("centromere.web.home-page"))){
+					registry.addResourceHandler(env.getRequiredProperty("centromere.web.home-page"))
+							.addResourceLocations(env.getRequiredProperty("centromere.web.home-page-location"));
+					logger.info(String.format("[CENTROMERE] Static home page configured at URL: /%s",
+							env.getRequiredProperty("centromere.web.home-page")));
+				} else {
+					logger.warn("[CENTROMERE] Static home page location not properly configured.");
+				}
 			} else {
-				logger.warn("[CENTROMERE] Static home page location not properly configured.");
+				logger.info("[CENTROMERE] Static content already configured.");	
 			}
 		}
 	}

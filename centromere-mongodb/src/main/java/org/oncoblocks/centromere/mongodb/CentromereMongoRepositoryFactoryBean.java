@@ -42,6 +42,8 @@ public class CentromereMongoRepositoryFactoryBean<R extends MongoRepository<T, I
 		return new CentromereMongoRepositoryFactory<>(operations);
 	}
 	
+	
+	
 	private static class CentromereMongoRepositoryFactory<T, ID extends Serializable> 
 			extends MongoRepositoryFactory {
 
@@ -57,6 +59,8 @@ public class CentromereMongoRepositoryFactoryBean<R extends MongoRepository<T, I
 			MongoEntityInformation entityInformation = getEntityInformation(information.getDomainType());
 			return new CentromereMongoRepository<>(entityInformation, mongoOperations, entityInformation.getJavaType());
 		}
+		
+		
 
 		@Override 
 		protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
