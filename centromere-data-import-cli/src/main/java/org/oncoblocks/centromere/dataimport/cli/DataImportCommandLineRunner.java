@@ -84,6 +84,7 @@ public class DataImportCommandLineRunner implements CommandLineRunner {
 		JCommander jc = new JCommander();
 		jc.addCommand("import", importArguments);
 		jc.addCommand("add", addArguments);
+		jc.setAcceptUnknownOptions(true);
 		try {
 			jc.parse(args);
 		} catch (MissingCommandException e) {
