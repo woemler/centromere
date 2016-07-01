@@ -71,6 +71,7 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>> implements Re
 	 * @throws DataImportException
 	 */
 	public void open(String outputFilePath) throws DataImportException{
+		outputFilePath = cleanFilePath(outputFilePath);
 		this.close();
 		try {
 			writer = new FileWriter(outputFilePath);
@@ -94,5 +95,9 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>> implements Re
 
 	protected FileWriter getWriter() {
 		return writer;
+	}
+	
+	protected String cleanFilePath(String path){
+		return path.replaceAll("\\s+", "_");
 	}
 }

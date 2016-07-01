@@ -21,25 +21,44 @@ import org.oncoblocks.centromere.core.repository.RepositoryOperations;
 
 /**
  * Simple implementation of {@link RecordWriter}, that writes all records directly to the database
- *   using a {@link RepositoryOperations} implementation.
+ *   using a {@link RepositoryOperations} implementation.  Can be configured to write using an
+ *   insert, update, or upsert (save) operation.
  * 
  * @author woemler
  */
 public class RepositoryRecordWriter<T extends Model<?>> implements RecordWriter<T> {
 	
+	public enum WriteMode { INSERT, UPDATE, UPSERT }
+	
 	private final RepositoryOperations<T, ?> repository;
+	private WriteMode writeMode = WriteMode.INSERT;
 
 	public RepositoryRecordWriter(RepositoryOperations<T, ?> repository) {
 		this.repository = repository;
 	}
 
+	public RepositoryRecordWriter(RepositoryOperations<T, ?> repository, WriteMode writeMode) {
+		this.repository = repository;
+		this.writeMode = writeMode;
+	}
+
 	/**
 	 * Writes the input {@link Model} record to the target {@link RepositoryOperations} implementation,
-	 *   using an insert operation.
+	 *   using the appropriate operation.
 	 * @param entity
 	 */ 
-	public void writeRecord(T entity) {
-		repository.insert(entity);	
+	@SuppressWarnings("unchecked")
+	public void writeRecord(T entity) throws DataImportException {
+		if (writeMode.equals(WriteMode.INSERT)){
+			repository.insert(entity);
+		} else if (writeMode.equals(WriteMode.UPDATE)){
+			repository.update(entity);
+		} else if (writeMode.equals(WriteMode.UPSERT)){
+			repository.save(entity);
+		} else {
+			throw new DataImportException("Invalid write mode selected: " + writeMode.toString());
+		}
+		
 	}
 
 	public RepositoryOperations<T, ?> getRepository() {

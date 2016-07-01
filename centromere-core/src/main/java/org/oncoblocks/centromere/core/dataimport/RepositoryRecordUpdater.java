@@ -28,6 +28,7 @@ import java.io.Serializable;
  * 
  * @author woemler
  */
+@Deprecated
 public class RepositoryRecordUpdater<T extends Model<ID>, ID extends Serializable> implements RecordWriter<T> {
 	
 	private final RepositoryOperations<T, ID> repository;
