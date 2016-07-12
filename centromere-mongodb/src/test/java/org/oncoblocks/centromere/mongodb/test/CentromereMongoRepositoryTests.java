@@ -23,10 +23,16 @@ import org.junit.runner.RunWith;
 import org.oncoblocks.centromere.core.repository.Evaluation;
 import org.oncoblocks.centromere.core.repository.QueryCriteria;
 import org.oncoblocks.centromere.core.repository.QueryCriteriaBuilder;
+import org.oncoblocks.centromere.mongodb.CentromereMongoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mapping.context.MappingContext;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.mapping.MongoPersistentEntity;
+import org.springframework.data.mongodb.core.mapping.MongoPersistentProperty;
+import org.springframework.data.mongodb.repository.support.MappingMongoEntityInformation;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
@@ -45,6 +51,7 @@ import java.util.List;
 public class CentromereMongoRepositoryTests {
 		
 	@Autowired private CentromereEntrezGeneRepository geneRepository;
+	@Autowired private MongoTemplate mongoTemplate;
 	
 	@Before
 	public void setup(){
@@ -539,6 +546,36 @@ public class CentromereMongoRepositoryTests {
 	public void modelSupportTest(){
 		Assert.notNull(geneRepository.getModel());
 		Assert.isTrue(EntrezGene.class.equals(geneRepository.getModel()), String.format("Expected EntrezGene.class, found %s", geneRepository.getModel().getName()));
+	}
+	
+	@Test
+	public void manualInstantiationTest(){
+		MappingContext<? extends MongoPersistentEntity<?>, MongoPersistentProperty> mappingContext = mongoTemplate.getConverter().getMappingContext();
+		MongoPersistentEntity<EntrezGene> entityInfo = (MongoPersistentEntity<EntrezGene>) mappingContext.getPersistentEntity(EntrezGene.class);
+		MappingMongoEntityInformation<EntrezGene, Long> info = new MappingMongoEntityInformation<>(entityInfo);
+		CentromereMongoRepository<EntrezGene, Long> repository = new CentromereMongoRepository<>(info, mongoTemplate);
+		Assert.notNull(repository);
+		Assert.notNull(repository.getModel());
+		Assert.isTrue(EntrezGene.class.equals(repository.getModel()));
+		Assert.isTrue(repository.count() > 0);
+		EntrezGene gene = repository.findOne(1L);
+		Assert.notNull(gene);
+		Assert.isTrue(gene.getEntrezGeneId().equals(1L));
+		Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
+		gene = new EntrezGene(100L, "TEST", 9606, null, "1", "1", "Test gene", "protein-coding", null, null, null);
+		repository.insert(gene);
+		EntrezGene created = repository.findOne(100L);
+		Assert.notNull(created);
+		Assert.isTrue(created.getId().equals(100L));
+		Assert.isTrue("TEST".equals(created.getPrimaryGeneSymbol()));
+		created.setPrimaryGeneSymbol("GeneX");
+		repository.update(created);
+		EntrezGene updated = repository.findOne(100L);
+		Assert.notNull(updated);
+		Assert.isTrue("GeneX".equals(updated.getPrimaryGeneSymbol()));
+		repository.delete(100L);
+		EntrezGene deleted = repository.findOne(100L);
+		Assert.isNull(deleted);
 	}
 	
 }

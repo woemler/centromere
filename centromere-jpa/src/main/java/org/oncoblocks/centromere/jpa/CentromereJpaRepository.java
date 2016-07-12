@@ -16,7 +16,6 @@
 
 package org.oncoblocks.centromere.jpa;
 
-import com.google.common.reflect.TypeToken;
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.repository.QueryCriteria;
 import org.oncoblocks.centromere.core.repository.RepositoryOperations;
@@ -63,7 +62,7 @@ public class CentromereJpaRepository<T extends Model<ID>, ID extends Serializabl
 		this.metadata = entityInformation;
 		this.entityManager = entityManager;
 		this.queryBuilder = new JpaQueryBuilder<>(entityManager);
-		this.model = (Class<T>) new TypeToken<T>(getClass()){}.getRawType();
+		this.model = entityInformation.getJavaType();
 	}
 
 	/**
@@ -116,6 +115,7 @@ public class CentromereJpaRepository<T extends Model<ID>, ID extends Serializabl
 	 * @param field Model field name.
 	 * @return Sorted list of distinct values of {@code field}.
 	 */
+	@SuppressWarnings("unchecked")
 	public Iterable<Object> distinct(String field) {
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<T> query = builder.createQuery(metadata.getJavaType());
@@ -132,6 +132,7 @@ public class CentromereJpaRepository<T extends Model<ID>, ID extends Serializabl
 	 * @param queryCriterias Query criteria to filter the field values by.
 	 * @return Sorted list of distinct values of {@code field}.
 	 */
+	@SuppressWarnings("unchecked")
 	public Iterable<Object> distinct(String field, Iterable<QueryCriteria> queryCriterias) {
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<T> query = builder.createQuery(metadata.getJavaType());

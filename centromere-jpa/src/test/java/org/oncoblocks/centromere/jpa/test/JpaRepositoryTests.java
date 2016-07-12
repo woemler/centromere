@@ -23,11 +23,14 @@ import org.junit.runner.RunWith;
 import org.oncoblocks.centromere.core.repository.Evaluation;
 import org.oncoblocks.centromere.core.repository.QueryCriteria;
 import org.oncoblocks.centromere.core.repository.QueryCriteriaBuilder;
+import org.oncoblocks.centromere.jpa.CentromereJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -677,6 +680,42 @@ public class JpaRepositoryTests {
 	public void modelSupportTest(){
 		Assert.notNull(geneRepository.getModel());
 		Assert.isTrue(EntrezGene.class.equals(geneRepository.getModel()));
+	}
+
+	@Test
+	@Transactional
+	public void manualInstantiationTest(){
+		JpaEntityInformation<EntrezGene, Long> info = (JpaEntityInformation<EntrezGene, Long>) JpaEntityInformationSupport.getEntityInformation(EntrezGene.class, entityManager);
+		CentromereJpaRepository<EntrezGene, Long> repository = new CentromereJpaRepository<>(info, entityManager);
+		Assert.notNull(repository);
+		Assert.notNull(repository.getModel());
+		Assert.isTrue(EntrezGene.class.equals(repository.getModel()));
+		Assert.isTrue(repository.count() > 0);
+		EntrezGene gene = repository.findOne(1L);
+		Assert.notNull(gene);
+		Assert.isTrue(gene.getEntrezGeneId().equals(1L));
+		Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
+		gene = new EntrezGene();
+		gene.setEntrezGeneId(100L);
+		gene.setPrimaryGeneSymbol("TEST");
+		gene.setTaxId(9606);
+		gene.setChromosome("1");
+		gene.setChromosomeLocation("1");
+		gene.setDescription("Test gene");
+		gene.setGeneType("protein-coding");
+		repository.insert(gene);
+		EntrezGene created = repository.findOne(100L);
+		Assert.notNull(created);
+		Assert.isTrue(created.getId().equals(100L));
+		Assert.isTrue("TEST".equals(created.getPrimaryGeneSymbol()));
+		created.setPrimaryGeneSymbol("GeneX");
+		repository.update(created);
+		EntrezGene updated = repository.findOne(100L);
+		Assert.notNull(updated);
+		Assert.isTrue("GeneX".equals(updated.getPrimaryGeneSymbol()));
+		repository.delete(100L);
+		EntrezGene deleted = repository.findOne(100L);
+		Assert.isNull(deleted);
 	}
 	
 }

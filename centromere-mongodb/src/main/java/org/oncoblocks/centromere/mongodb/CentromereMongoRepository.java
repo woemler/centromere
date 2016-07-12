@@ -16,7 +16,6 @@
 
 package org.oncoblocks.centromere.mongodb;
 
-import com.google.common.reflect.TypeToken;
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.repository.QueryCriteria;
 import org.oncoblocks.centromere.core.repository.RepositoryOperations;
@@ -55,7 +54,7 @@ public class CentromereMongoRepository<T extends Model<ID>, ID extends Serializa
 		super(metadata, mongoOperations);
 		this.mongoOperations = mongoOperations;
 		this.metadata = metadata;
-		this.model = (Class<T>) new TypeToken<T>(getClass()){}.getRawType();
+		this.model = metadata.getJavaType();
 	}
 
 	public CentromereMongoRepository(MongoEntityInformation<T, ID> metadata, 
@@ -119,6 +118,7 @@ public class CentromereMongoRepository<T extends Model<ID>, ID extends Serializa
 	/**
 	 * {@link RepositoryOperations#distinct(String)}
 	 */
+	@SuppressWarnings("unchecked")
 	public List<Object> distinct(String field){
 		return mongoOperations
 				.getCollection(mongoOperations.getCollectionName(metadata.getJavaType()))
@@ -128,6 +128,7 @@ public class CentromereMongoRepository<T extends Model<ID>, ID extends Serializa
 	/**
 	 * {@link RepositoryOperations#distinct(String, Iterable)}
 	 */
+	@SuppressWarnings("unchecked")
 	public List<Object> distinct(String field, Iterable<QueryCriteria> queryCriterias){
 		Criteria criteria = MongoQueryUtils.getQueryFromQueryCriteria(queryCriterias);
 		Query query = new Query();
