@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 William Oemler, Blueprint Medicines
+ * Copyright 2016 William Oemler, Blueprint Medicines
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.mongodb.test;
+package org.oncoblocks.centromere.mongodb.test.config;
 
 import com.mongodb.Mongo;
 import cz.jirutka.spring.embedmongo.EmbeddedMongoBuilder;
@@ -34,7 +34,8 @@ import java.io.IOException;
 
 @Configuration
 @PropertySource({ "classpath:test-mongo-data-source.properties" })
-@ComponentScan(basePackages = { "org.oncoblocks.centromere.mongodb.test" })
+@ComponentScan(basePackages = { "org.oncoblocks.centromere.mongodb.test.basic",
+		"org.oncoblocks.centromere.mongodb.test.dataimport" })
 public class TestMongoConfig {
 
 	@Autowired private Environment env;

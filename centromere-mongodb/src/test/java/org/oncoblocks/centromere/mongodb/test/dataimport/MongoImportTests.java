@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.mongodb.test;
+package org.oncoblocks.centromere.mongodb.test.dataimport;
 
 import com.mongodb.Mongo;
 import org.junit.Before;
@@ -26,6 +26,9 @@ import org.oncoblocks.centromere.core.dataimport.RepositoryRecordWriter;
 import org.oncoblocks.centromere.mongodb.MongoCredentials;
 import org.oncoblocks.centromere.mongodb.MongoImportTempFileImporter;
 import org.oncoblocks.centromere.mongodb.MongoImportTempFileWriter;
+import org.oncoblocks.centromere.mongodb.test.EntrezGene;
+import org.oncoblocks.centromere.mongodb.test.config.TestMongoConfig;
+import org.oncoblocks.centromere.mongodb.test.basic.EntrezGeneRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -52,7 +55,8 @@ public class MongoImportTests {
 	@Autowired private Mongo mongo;
 	@Autowired private Environment env;
 	@Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
-	private final String geneInfoPath = ClassLoader.getSystemClassLoader().getResource("Homo_sapiens.gene_info").getPath();
+	private final String geneInfoPath = ClassLoader.getSystemClassLoader()
+			.getResource("Homo_sapiens.gene_info").getPath();
 	private File tempFile;
 	private List<EntrezGene> genes;
 	

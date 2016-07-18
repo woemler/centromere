@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.mongodb.test;
+package org.oncoblocks.centromere.mongodb.test.springdata;
+
+import org.oncoblocks.centromere.mongodb.test.EntrezGene;
 
 import java.util.List;
 
 /**
  * @author woemler
  */
-public interface CustomGeneRepository {
+public interface ExtendedGeneRepository {
 	List<EntrezGene> guessGene(String keyword);
 }

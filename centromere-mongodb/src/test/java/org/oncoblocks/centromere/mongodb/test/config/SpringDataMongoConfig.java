@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.mongodb.test;
+package org.oncoblocks.centromere.mongodb.test.config;
 
 import com.mongodb.Mongo;
 import cz.jirutka.spring.embedmongo.EmbeddedMongoBuilder;
 import org.oncoblocks.centromere.mongodb.CentromereMongoRepositoryFactoryBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
@@ -33,12 +30,9 @@ import java.io.IOException;
  * @author woemler
  */
 @Configuration
-@PropertySource({ "classpath:test-mongo-data-source.properties" })
-@EnableMongoRepositories(basePackages = {"org.oncoblocks.centromere.mongodb.test"},
+@EnableMongoRepositories(basePackages = {"org.oncoblocks.centromere.mongodb.test.springdata"},
 		repositoryFactoryBeanClass = CentromereMongoRepositoryFactoryBean.class)
-public class CentromereMongoConfig {
-
-	@Autowired private Environment env;
+public class SpringDataMongoConfig {
 
 	@Bean(destroyMethod = "close")
 	public Mongo mongo() throws IOException {
@@ -47,7 +41,7 @@ public class CentromereMongoConfig {
 
 	@Bean
 	public MongoTemplate mongoTemplate(Mongo mongo){
-		return new MongoTemplate(mongo, env.getRequiredProperty("mongo.name"));
+		return new MongoTemplate(mongo, "centromere-sd-test");
 	}
 	
 }

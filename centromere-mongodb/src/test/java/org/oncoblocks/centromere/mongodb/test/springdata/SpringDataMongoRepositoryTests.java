@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 William Oemler, Blueprint Medicines
+ * Copyright 2016 William Oemler, Blueprint Medicines
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.mongodb.test;
+package org.oncoblocks.centromere.mongodb.test.springdata;
 
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -23,10 +23,18 @@ import org.junit.runner.RunWith;
 import org.oncoblocks.centromere.core.repository.Evaluation;
 import org.oncoblocks.centromere.core.repository.QueryCriteria;
 import org.oncoblocks.centromere.core.repository.QueryCriteriaBuilder;
+import org.oncoblocks.centromere.mongodb.CentromereMongoRepository;
+import org.oncoblocks.centromere.mongodb.test.EntrezGene;
+import org.oncoblocks.centromere.mongodb.test.config.SpringDataMongoConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mapping.context.MappingContext;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.mapping.MongoPersistentEntity;
+import org.springframework.data.mongodb.core.mapping.MongoPersistentProperty;
+import org.springframework.data.mongodb.repository.support.MappingMongoEntityInformation;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
@@ -40,11 +48,12 @@ import java.util.List;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { TestMongoConfig.class })
+@ContextConfiguration(classes = { SpringDataMongoConfig.class })
 @FixMethodOrder
-public class GenericMongoRepositoryTests {
+public class SpringDataMongoRepositoryTests {
 		
-	@Autowired private EntrezGeneRepository geneRepository;
+	@Autowired private CentromereEntrezGeneRepository geneRepository;
+	@Autowired private MongoTemplate mongoTemplate;
 	
 	@Before
 	public void setup(){
@@ -70,7 +79,7 @@ public class GenericMongoRepositoryTests {
 	@Test
 	public void findAllTest(){
 		
-		List<EntrezGene> genes = geneRepository.findAll();
+		List<EntrezGene> genes = (List<EntrezGene>) geneRepository.findAll();
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
 		Assert.isTrue(genes.size() == 5);
@@ -90,7 +99,7 @@ public class GenericMongoRepositoryTests {
 	public void findAndSortTest(){
 		List<QueryCriteria> criterias = QueryCriteriaBuilder.where("geneType").is("protein-coding").build();
 		Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "entrezGeneId"));
-		List<EntrezGene> genes = geneRepository.find(criterias, sort);
+		List<EntrezGene> genes = (List<EntrezGene>) geneRepository.find(criterias, sort);
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
 		Assert.isTrue(genes.size() == 3);
@@ -117,7 +126,7 @@ public class GenericMongoRepositoryTests {
 
 		List<QueryCriteria> searchCriterias = new ArrayList<>();
 		searchCriterias.add(new QueryCriteria("primaryGeneSymbol", "GeneB"));
-		List<EntrezGene> genes = geneRepository.find(searchCriterias);
+		List<EntrezGene> genes = (List<EntrezGene>) geneRepository.find(searchCriterias);
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
 		Assert.isTrue(genes.size() == 1);
@@ -134,7 +143,7 @@ public class GenericMongoRepositoryTests {
 
 		List<QueryCriteria> searchCriterias = new ArrayList<>();
 		searchCriterias.add(new QueryCriteria("aliases", "DEF"));
-		List<EntrezGene> genes = geneRepository.find(searchCriterias);
+		List<EntrezGene> genes = (List<EntrezGene>) geneRepository.find(searchCriterias);
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
 		Assert.isTrue(genes.size() == 1);
@@ -153,7 +162,7 @@ public class GenericMongoRepositoryTests {
 		List<QueryCriteria> searchCriterias = new ArrayList<>();
 		searchCriterias.add(new QueryCriteria("attributes.name", "isKinase"));
 		searchCriterias.add(new QueryCriteria("attributes.value", "Y"));
-		List<EntrezGene> genes = geneRepository.find(searchCriterias);
+		List<EntrezGene> genes = (List<EntrezGene>) geneRepository.find(searchCriterias);
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
 		Assert.isTrue(genes.size() == 2);
@@ -172,7 +181,7 @@ public class GenericMongoRepositoryTests {
 	public void findSortedTest(){
 
 		Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "primaryGeneSymbol"));
-		List<EntrezGene> genes = geneRepository.findAll(sort);
+		List<EntrezGene> genes = (List<EntrezGene>) geneRepository.findAll(sort);
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
 		Assert.isTrue(genes.size() == 5);
@@ -349,8 +358,7 @@ public class GenericMongoRepositoryTests {
 	
 	@Test
 	public void distinctTest(){
-		
-		List<Object> geneSymbols = geneRepository.distinct("primaryGeneSymbol");
+		List<Object> geneSymbols = (List<Object>) geneRepository.distinct("primaryGeneSymbol");
 		Assert.notNull(geneSymbols);
 		Assert.notEmpty(geneSymbols);
 		Assert.isTrue(geneSymbols.size() == 5);
@@ -364,7 +372,7 @@ public class GenericMongoRepositoryTests {
 		
 		List<QueryCriteria> criterias = new ArrayList<>();
 		criterias.add(new QueryCriteria("geneType", "protein-coding"));
-		List<Object> geneSymbols = geneRepository.distinct("primaryGeneSymbol", criterias);
+		List<Object> geneSymbols = (List<Object>) geneRepository.distinct("primaryGeneSymbol", criterias);
 		Assert.notNull(geneSymbols);
 		Assert.notEmpty(geneSymbols);
 		Assert.isTrue(geneSymbols.size() == 3);
@@ -379,8 +387,10 @@ public class GenericMongoRepositoryTests {
 	@Test
 	public void findByPrimaryIdTest() throws Exception {
 		
-		EntrezGene gene = geneRepository.findByEntrezGeneId(1L);
-		Assert.notNull(gene);
+		List<EntrezGene> genes = geneRepository.findByEntrezGeneId(1L);
+		Assert.notNull(genes);
+		Assert.isTrue(genes.size() == 1);
+		EntrezGene gene = genes.get(0);
 		Assert.isTrue(gene.getEntrezGeneId().equals(1L));
 		
 	}
@@ -400,7 +410,7 @@ public class GenericMongoRepositoryTests {
 	@Test
 	public void findByAliasTest() throws Exception {
 
-		List<EntrezGene> genes = geneRepository.findByAlias("ABC");
+		List<EntrezGene> genes = geneRepository.findByAliases("ABC");
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
 		Assert.isTrue(genes.size() == 1);
@@ -437,7 +447,7 @@ public class GenericMongoRepositoryTests {
 	public void findInTest() throws Exception {
 		List<QueryCriteria> criterias = new ArrayList<>();
 		criterias.add(new QueryCriteria("primaryGeneSymbol", Arrays.asList(new String[]{ "GeneA", "GeneB" }), Evaluation.IN));
-		List<EntrezGene> genes = geneRepository.find(criterias);
+		List<EntrezGene> genes = (List<EntrezGene>) geneRepository.find(criterias);
 		System.out.println(genes);
 		Assert.notNull(genes);
 		Assert.isTrue(genes.size() == 2);
@@ -449,7 +459,7 @@ public class GenericMongoRepositoryTests {
 		List<QueryCriteria> criterias = new ArrayList<>();
 		criterias.add(new QueryCriteria("entrezGeneId", new ArrayList<Long>(Arrays.asList(new Long[]{2L, 4L})),
 				Evaluation.BETWEEN));
-		List<EntrezGene> genes = geneRepository.find(criterias);
+		List<EntrezGene> genes = (List<EntrezGene>) geneRepository.find(criterias);
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
 		Assert.isTrue(genes.size() == 1);
@@ -463,7 +473,7 @@ public class GenericMongoRepositoryTests {
 		criterias.add(new QueryCriteria("geneType", "pseudo"));
 		criterias.add(new QueryCriteria("entrezGeneId", new ArrayList<Long>(Arrays.asList(new Long[]{2L, 5L})),
 				Evaluation.BETWEEN));
-		List<EntrezGene> genes = geneRepository.find(criterias);
+		List<EntrezGene> genes = (List<EntrezGene>) geneRepository.find(criterias);
 
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
@@ -476,7 +486,7 @@ public class GenericMongoRepositoryTests {
 		List<QueryCriteria> criterias = new ArrayList<>();
 		criterias.add(new QueryCriteria("entrezGeneId", new ArrayList<Long>(Arrays.asList(new Long[]{2L, 4L})),
 				Evaluation.OUTSIDE));
-		List<EntrezGene> genes = geneRepository.find(criterias);
+		List<EntrezGene> genes = (List<EntrezGene>) geneRepository.find(criterias);
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
 		Assert.isTrue(genes.size() == 2);
@@ -490,7 +500,7 @@ public class GenericMongoRepositoryTests {
 		criterias.add(new QueryCriteria("geneType", "protein-coding"));
 		criterias.add(new QueryCriteria("entrezGeneId", new ArrayList<Long>(Arrays.asList(new Long[]{2L, 3L})),
 				Evaluation.OUTSIDE));
-		List<EntrezGene> genes = geneRepository.find(criterias);
+		List<EntrezGene> genes = (List<EntrezGene>) geneRepository.find(criterias);
 		
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
@@ -502,7 +512,7 @@ public class GenericMongoRepositoryTests {
 	public void findByLikeTest() throws Exception {
 		List<QueryCriteria> criterias = new ArrayList<>();
 		criterias.add(new QueryCriteria("primaryGeneSymbol", "eC", Evaluation.LIKE));
-		List<EntrezGene> genes = geneRepository.find(criterias);
+		List<EntrezGene> genes = (List<EntrezGene>) geneRepository.find(criterias);
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
 		Assert.isTrue(genes.size() == 1);
@@ -514,7 +524,7 @@ public class GenericMongoRepositoryTests {
 	public void findByStartsWithTest() throws Exception {
 		List<QueryCriteria> criterias = new ArrayList<>();
 		criterias.add(new QueryCriteria("geneType", "protein", Evaluation.STARTS_WITH));
-		List<EntrezGene> genes = geneRepository.find(criterias);
+		List<EntrezGene> genes = (List<EntrezGene>) geneRepository.find(criterias);
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
 		Assert.isTrue(genes.size() == 3);
@@ -526,7 +536,7 @@ public class GenericMongoRepositoryTests {
 	public void findByEndsWithTest() throws Exception {
 		List<QueryCriteria> criterias = new ArrayList<>();
 		criterias.add(new QueryCriteria("primaryGeneSymbol", "neD", Evaluation.ENDS_WITH));
-		List<EntrezGene> genes = geneRepository.find(criterias);
+		List<EntrezGene> genes = (List<EntrezGene>) geneRepository.find(criterias);
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
 		Assert.isTrue(genes.size() == 1);
@@ -537,7 +547,37 @@ public class GenericMongoRepositoryTests {
 	@Test
 	public void modelSupportTest(){
 		Assert.notNull(geneRepository.getModel());
-		Assert.isTrue(EntrezGene.class.equals(geneRepository.getModel()));
+		Assert.isTrue(EntrezGene.class.equals(geneRepository.getModel()), String.format("Expected EntrezGene.class, found %s", geneRepository.getModel().getName()));
+	}
+	
+	@Test
+	public void manualInstantiationTest(){
+		MappingContext<? extends MongoPersistentEntity<?>, MongoPersistentProperty> mappingContext = mongoTemplate.getConverter().getMappingContext();
+		MongoPersistentEntity<EntrezGene> entityInfo = (MongoPersistentEntity<EntrezGene>) mappingContext.getPersistentEntity(EntrezGene.class);
+		MappingMongoEntityInformation<EntrezGene, Long> info = new MappingMongoEntityInformation<>(entityInfo);
+		CentromereMongoRepository<EntrezGene, Long> repository = new CentromereMongoRepository<>(info, mongoTemplate);
+		Assert.notNull(repository);
+		Assert.notNull(repository.getModel());
+		Assert.isTrue(EntrezGene.class.equals(repository.getModel()));
+		Assert.isTrue(repository.count() > 0);
+		EntrezGene gene = repository.findOne(1L);
+		Assert.notNull(gene);
+		Assert.isTrue(gene.getEntrezGeneId().equals(1L));
+		Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
+		gene = new EntrezGene(100L, "TEST", 9606, null, "1", "1", "Test gene", "protein-coding", null, null, null);
+		repository.insert(gene);
+		EntrezGene created = repository.findOne(100L);
+		Assert.notNull(created);
+		Assert.isTrue(created.getId().equals(100L));
+		Assert.isTrue("TEST".equals(created.getPrimaryGeneSymbol()));
+		created.setPrimaryGeneSymbol("GeneX");
+		repository.update(created);
+		EntrezGene updated = repository.findOne(100L);
+		Assert.notNull(updated);
+		Assert.isTrue("GeneX".equals(updated.getPrimaryGeneSymbol()));
+		repository.delete(100L);
+		EntrezGene deleted = repository.findOne(100L);
+		Assert.isNull(deleted);
 	}
 	
 }

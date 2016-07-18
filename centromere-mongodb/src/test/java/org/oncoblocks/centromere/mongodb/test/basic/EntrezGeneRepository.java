@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.mongodb.test;
+package org.oncoblocks.centromere.mongodb.test.basic;
 
+import org.oncoblocks.centromere.core.repository.ModelRepository;
+import org.oncoblocks.centromere.mongodb.GenericMongoRepository;
+import org.oncoblocks.centromere.mongodb.test.EntrezGene;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
@@ -27,24 +30,38 @@ import java.util.List;
 /**
  * @author woemler
  */
-public class CentromereEntrezGeneRepositoryImpl implements CustomGeneRepository {
-	
-	private final MongoOperations mongoOperations;
 
+@ModelRepository(EntrezGene.class)
+public class EntrezGeneRepository extends GenericMongoRepository<EntrezGene, Long> {
+	
 	@Autowired
-	public CentromereEntrezGeneRepositoryImpl(MongoOperations mongoOperations) {
-		this.mongoOperations = mongoOperations;
+	public EntrezGeneRepository(MongoTemplate mongoTemplate) {
+		super(mongoTemplate);
+	}
+
+	public EntrezGene findByEntrezGeneId(Long entrezGeneId) {
+		Query query = new Query(Criteria.where("entrezGeneId").is(entrezGeneId));
+		return getMongoOperations().findOne(query, getModel());
+	}
+
+	public List<EntrezGene> findByPrimaryGeneSymbol(String primaryGeneSymbol) {
+		Query query = new Query(Criteria.where("primaryGeneSymbol").is(primaryGeneSymbol));
+		return getMongoOperations().find(query, getModel());
+	}
+
+	public List<EntrezGene> findByAlias(String alias) {
+		Query query = new Query(Criteria.where("aliases").is(alias));
+		return getMongoOperations().find(query, getModel());
 	}
 
 	public List<EntrezGene> guessGene(String keyword) {
 		Query query = new Query(Criteria.where("primaryGeneSymbol").is(keyword));
 		Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "entrezGeneId"));
-		List<EntrezGene> genes = mongoOperations.find(query.with(sort), EntrezGene.class);
+		List<EntrezGene> genes = getMongoOperations().find(query.with(sort), getModel());
 		if (genes != null && genes.size() > 0) return genes;
 		query = new Query(Criteria.where("aliases").is(keyword));
-		genes = mongoOperations.find(query.with(sort), EntrezGene.class);
+		genes = getMongoOperations().find(query.with(sort), getModel());
 		if (genes != null && genes.size() > 0) return genes;
 		return null;
 	}
-	
 }

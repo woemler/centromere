@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.mongodb.test;
+package org.oncoblocks.centromere.mongodb.test.custom;
 
 import org.oncoblocks.centromere.core.repository.RepositoryOperations;
+import org.oncoblocks.centromere.mongodb.test.EntrezGene;
+import org.springframework.data.repository.NoRepositoryBean;
 
 import java.util.List;
 
 /**
  * @author woemler
  */
-public interface CentromereEntrezGeneRepository extends CustomGeneRepository,
+@NoRepositoryBean
+public interface CustomEntrezGeneRepository extends CustomExtendedGeneRepository,
 		RepositoryOperations<EntrezGene, Long> {
 	List<EntrezGene> findByEntrezGeneId(Long entrezGeneId);
 	List<EntrezGene> findByPrimaryGeneSymbol(String primaryGeneSymbol);
