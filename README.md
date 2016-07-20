@@ -27,6 +27,10 @@ Detailed documentation for Centromere and its modules can be **[found in the wik
 
 The core module, containing common dependencies classes for creating data model, repository, and data import component classes.
 
+#### Centromere Commons
+
+Support for common bioinformatics data types and utilities.  Includes data model classes, custom repository implementations, and data import components.
+
 #### Centromere Data Import CLI
 
 Utility classes for creating command line import tools.  Builds on the data import components in the `centromere-core` module and adds some default behaviors for a command line interface.
@@ -46,37 +50,37 @@ Artifacts for Centromere release builds are available from the Maven Central Rep
 <dependency>
     <groupId>org.oncoblocks.centromere</groupId>
     <artifactId>centromere-core</artifactId>
-    <version>0.4.1</version>
+    <version>0.4.2</version>
 </dependency>
 
 <dependency>
     <groupId>org.oncoblocks.centromere</groupId>
     <artifactId>centromere-data-import-cli</artifactId>
-    <version>0.4.1</version>
+    <version>0.4.2</version>
 </dependency>
 
 <dependency>
     <groupId>org.oncoblocks.centromere</groupId>
     <artifactId>centromere-mongodb</artifactId>
-    <version>0.4.1</version>
+    <version>0.4.2</version>
 </dependency>
 
 <dependency>
     <groupId>org.oncoblocks.centromere</groupId>
     <artifactId>centromere-jpa</artifactId>
-    <version>0.4.1</version>
+    <version>0.4.2</version>
 </dependency>
 
 <dependency>
     <groupId>org.oncoblocks.centromere</groupId>
     <artifactId>centromere-sql</artifactId>
-    <version>0.4.1</version>
+    <version>0.4.2</version>
 </dependency>
 
 <dependency>
     <groupId>org.oncoblocks.centromere</groupId>
     <artifactId>centromere-web</artifactId>
-    <version>0.4.1</version>
+    <version>0.4.2</version>
 </dependency>
 ```
 

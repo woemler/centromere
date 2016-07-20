@@ -23,15 +23,16 @@
     
     <groupId>org.oncoblocks.centromere</groupId>
     <artifactId>centromere-parent</artifactId>
-    <version>0.4.2</version>
+    <version>0.4.3-SNAPSHOT</version>
     <name>Oncoblocks: Centromere Parent</name>
     <packaging>pom</packaging>
     
     <description>Genomic data warehouse and RESTful web services framework. Parent POM file.</description>
-    <url>https://github.com/oncoblocks/centromere</url>
+    <url>https://github.com/blueprintmedicines/centromere</url>
     
     <modules>
         <module>../centromere-core</module>
+        <module>../centromere-commons</module>
         <module>../centromere-data-import-cli</module>
         <module>../centromere-mongodb</module>
         <module>../centromere-jpa</module>
@@ -56,9 +57,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:oncoblocks/centromere.git</connection>
-        <developerConnection>scm:git:git@github.com:oncoblocks/centromere.git</developerConnection>
-        <url>git@github.com:oncoblocks/centromere.git</url>
+        <connection>scm:git:git@github.com:blueprintmedicines/centromere.git</connection>
+        <developerConnection>scm:git:git@github.com:blueprintmedicines/centromere.git</developerConnection>
+        <url>git@github.com:blueprintmedicines/centromere.git</url>
     </scm>
 
     <distributionManagement>

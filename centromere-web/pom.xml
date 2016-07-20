@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.oncoblocks.centromere</groupId>
         <artifactId>centromere-parent</artifactId>
-        <version>0.4.2</version>
+        <version>0.4.3-SNAPSHOT</version>
         <relativePath>../centromere-parent</relativePath>
     </parent>
 
@@ -34,7 +34,7 @@
     <packaging>jar</packaging>
 
     <description>Genomic data warehouse and RESTful web services framework.  Web services components.</description>
-    <url>https://github.com/oncoblocks/centromere</url>
+    <url>https://github.com/blueprintmedicines/centromere</url>
 
     <licenses>
         <license>
@@ -53,15 +53,15 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:oncoblocks/centromere.git</connection>
-        <developerConnection>scm:git:git@github.com:oncoblocks/centromere.git</developerConnection>
-        <url>git@github.com:oncoblocks/centromere.git</url>
+        <connection>scm:git:git@github.com:blueprintmedicines/centromere.git</connection>
+        <developerConnection>scm:git:git@github.com:blueprintmedicines/centromere.git</developerConnection>
+        <url>git@github.com:blueprintmedicines/centromere.git</url>
     </scm>
 
     <properties>
         <springfox.version>2.4.0</springfox.version>
         <json-path.version>1.2.0</json-path.version>
-        <centromere.version>0.4.2</centromere.version>
+        <centromere.version>0.4.3-SNAPSHOT</centromere.version>
     </properties>
 
     <distributionManagement>
