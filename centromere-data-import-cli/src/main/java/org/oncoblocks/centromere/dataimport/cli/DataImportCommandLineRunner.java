@@ -82,9 +82,10 @@ public class DataImportCommandLineRunner implements CommandLineRunner {
 		ImportCommandArguments importArguments = new ImportCommandArguments();
 		AddCommandArguments addArguments = new AddCommandArguments();
 		JCommander jc = new JCommander();
+		jc.setAcceptUnknownOptions(true);
 		jc.addCommand("import", importArguments);
 		jc.addCommand("add", addArguments);
-		jc.setAcceptUnknownOptions(true);
+		jc.setProgramName("Centromere Command Line Import");
 		try {
 			jc.parse(args);
 		} catch (MissingCommandException e) {

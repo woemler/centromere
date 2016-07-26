@@ -29,11 +29,11 @@
         <relativePath>../centromere-parent</relativePath>
     </parent>
 
-    <artifactId>centromere-commons</artifactId>
-    <name>Oncoblocks: Centromere Commons</name>
+    <artifactId>centromere-integration</artifactId>
+    <name>Oncoblocks: Centromere Integration</name>
     <packaging>jar</packaging>
 
-    <description>Genomic data warehouse and RESTful web services framework.  Support for common bioinformatics data types and utilities.</description>
+    <description>Genomic data warehouse and RESTful web services framework.  Integration utilities for common bioinformatics tools and services.</description>
     <url>https://github.com/blueprintmedicines/centromere</url>
 
     <licenses>
@@ -76,12 +76,20 @@
     <dependencies>
 
         <!-- Centromere -->
+        
         <dependency>
             <groupId>org.oncoblocks.centromere</groupId>
             <artifactId>centromere-core</artifactId>
             <version>${centromere.version}</version>
         </dependency>
+        
+        <!-- Spring -->
 
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+        
         <!-- Test -->
 
         <dependency>
