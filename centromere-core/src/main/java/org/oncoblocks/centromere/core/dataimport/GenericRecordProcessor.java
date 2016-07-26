@@ -51,6 +51,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 	private BasicImportOptions options = new BasicImportOptions();
 	private List<String> supportedDataTypes = new ArrayList<>();
 	private boolean isConfigured = false;
+	private boolean isInFailedState = false;
 	private static final Logger logger = LoggerFactory.getLogger(GenericRecordProcessor.class);
 
 	/**
@@ -113,6 +114,10 @@ public class GenericRecordProcessor<T extends Model<?>>
 	 */
 	public void run(Object... args) throws DataImportException {
 		if (!isConfigured) logger.warn("Processor configuration method has not run!");
+		if (isInFailedState) {
+			logger.warn("Record processor is in failed state and is aborting run.");
+			return;
+		}
 		try {
 			Assert.notEmpty(args, "One or more arguments required.");
 			Assert.isTrue(args[0] instanceof String, "The first argument must be a String.");
@@ -123,6 +128,10 @@ public class GenericRecordProcessor<T extends Model<?>>
 		String inputFilePath = (String) args[0];
 		reader.doBefore(inputFilePath);
 		writer.doBefore(this.getTempFilePath(inputFilePath));
+		if (isInFailedState) {
+			logger.warn("Record processor is in failed state and is aborting run.");
+			return;
+		}
 		T record = reader.readRecord();
 		while (record != null) {
 			if (validator != null) {
@@ -139,6 +148,10 @@ public class GenericRecordProcessor<T extends Model<?>>
 			}
 			writer.writeRecord(record);
 			record = reader.readRecord();
+		}
+		if (isInFailedState) {
+			logger.warn("Record processor is in failed state and is aborting run.");
+			return;
 		}
 		writer.doAfter();
 		reader.doAfter();
@@ -229,5 +242,12 @@ public class GenericRecordProcessor<T extends Model<?>>
 	public void setImportOptions(BasicImportOptions options){
 		this.options = options;
 	}
-	
+
+	public boolean isInFailedState() {
+		return isInFailedState;
+	}
+
+	public void setInFailedState(boolean inFailedState) {
+		isInFailedState = inFailedState;
+	}
 }
