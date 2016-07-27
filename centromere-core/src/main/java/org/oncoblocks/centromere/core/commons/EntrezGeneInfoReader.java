@@ -16,14 +16,11 @@
 
 package org.oncoblocks.centromere.core.commons;
 
-import com.google.common.reflect.TypeToken;
 import org.oncoblocks.centromere.core.dataimport.AbstractRecordFileReader;
 import org.oncoblocks.centromere.core.dataimport.DataImportException;
 import org.oncoblocks.centromere.core.model.ModelSupport;
-import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,16 +31,12 @@ import java.util.Map;
  * @author woemler
  */
 public class EntrezGeneInfoReader<T extends EntrezGene<?>> extends AbstractRecordFileReader<T>
-		implements InitializingBean, ModelSupport<T> {
+		implements ModelSupport<T> {
 
 	private Class<T> model;
-	
-	@PostConstruct
-	@SuppressWarnings("unchecked")
-	public void afterPropertiesSet() throws Exception {
-		if (model == null) {
-			model = (Class<T>) (new TypeToken<T>(getClass()){}).getRawType();
-		}
+
+	public EntrezGeneInfoReader(Class<T> model) {
+		this.model = model;
 	}
 
 	public T readRecord() throws DataImportException {
@@ -62,13 +55,20 @@ public class EntrezGeneInfoReader<T extends EntrezGene<?>> extends AbstractRecor
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected T getModelInstance(){
-		return (T) new BeanWrapperImpl(model).getWrappedInstance();
+	protected T getModelInstance() throws Exception{
+		Assert.notNull(model, "Model class type must not be null.");
+		return model.newInstance();
 	}
 
-	protected T getRecordFromLine(String line) {
+	protected T getRecordFromLine(String line) throws DataImportException {
 		String[] bits = line.split("\\t");
-		T gene = getModelInstance();
+		T gene;
+		try {
+			gene = getModelInstance();
+		} catch (Exception e){
+			e.printStackTrace();
+			throw new DataImportException(String.format("Cannot create instance of model class: %s", model.getName()));
+		}
 		gene.setTaxId(Integer.parseInt(bits[0]));
 		gene.setEntrezGeneId(Long.parseLong(bits[1]));
 		gene.setPrimaryGeneSymbol(bits[2]);
@@ -89,4 +89,5 @@ public class EntrezGeneInfoReader<T extends EntrezGene<?>> extends AbstractRecor
 	public Class<T> getModel() {
 		return model;
 	}
+
 }

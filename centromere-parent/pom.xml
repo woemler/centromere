@@ -74,7 +74,7 @@
     </distributionManagement>
 
     <properties>
-        <spring.platform.version>2.0.1.RELEASE</spring.platform.version>
+        <spring.platform.version>2.0.6.RELEASE</spring.platform.version>
     </properties>
 
     <dependencyManagement>
