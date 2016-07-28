@@ -32,7 +32,6 @@
     
     <modules>
         <module>../centromere-core</module>
-        <module>../centromere-integration</module>
         <module>../centromere-data-import-cli</module>
         <module>../centromere-mongodb</module>
         <module>../centromere-jpa</module>

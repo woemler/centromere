@@ -63,6 +63,7 @@ public class CentromereMongoRepositoryFactoryBean<R extends Repository<T, ID>, T
 		protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
 			return CentromereMongoRepository.class;
 		}
+		
 	}
 	
 }
