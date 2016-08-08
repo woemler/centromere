@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.jpa.test;
+package org.oncoblocks.centromere.jpa.test.springdata;
 
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -48,7 +48,7 @@ import java.util.List;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { JpaTestConfig.class })
+@ContextConfiguration(classes = { SpringDataJpaTestConfig.class })
 @FixMethodOrder
 public class JpaRepositoryTests {
 		

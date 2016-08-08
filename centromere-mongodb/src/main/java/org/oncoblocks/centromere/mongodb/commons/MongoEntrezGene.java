@@ -20,6 +20,11 @@ import org.oncoblocks.centromere.core.commons.EntrezGene;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author woemler
  */
@@ -27,6 +32,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class MongoEntrezGene extends EntrezGene<String> {
 	
 	@Id private String id;
+	private List<String> geneSymbolAliases;
+	private Map<String,String> databaseCrossReferences;
+	private Map<String,Object> attributes;
 
 	@Override public String getId() {
 		return id;
@@ -34,5 +42,54 @@ public class MongoEntrezGene extends EntrezGene<String> {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	@Override public List<String> getGeneSymbolAliases() {
+		return geneSymbolAliases;
+	}
+
+	public void setGeneSymbolAliases(List<String> geneSymbolAliases) {
+		this.geneSymbolAliases = geneSymbolAliases;
+	}
+
+	@Override public Map<String, String> getDatabaseCrossReferences() {
+		return databaseCrossReferences;
+	}
+
+	public void setDatabaseCrossReferences(
+			Map<String, String> databaseCrossReferences) {
+		this.databaseCrossReferences = databaseCrossReferences;
+	}
+
+	@Override public Map<String, Object> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(
+			Map<String, Object> attributes) {
+		this.attributes = attributes;
+	}
+
+	@Override public void addGeneSymbolAlias(String alias) {
+		if (geneSymbolAliases == null){
+			geneSymbolAliases = new ArrayList<>();
+		}
+		if (!geneSymbolAliases.contains(alias)){
+			geneSymbolAliases.add(alias);
+		}
+	}
+
+	@Override public void addDatabaseCrossReference(String name, String value) {
+		if (databaseCrossReferences == null){
+			databaseCrossReferences = new HashMap<>();
+		}
+		databaseCrossReferences.put(name, value);
+	}
+
+	@Override public void addAttribute(String name, Object value) {
+		if (attributes == null){
+			attributes = new HashMap<>();
+		}
+		attributes.put(name, value);
 	}
 }

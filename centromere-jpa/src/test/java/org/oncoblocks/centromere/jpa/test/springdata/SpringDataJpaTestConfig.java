@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.jpa.test;
+package org.oncoblocks.centromere.jpa.test.springdata;
 
 import org.oncoblocks.centromere.jpa.CentromereJpaRepositoryFactoryBean;
 import org.springframework.context.annotation.Bean;
@@ -37,11 +37,11 @@ import javax.sql.DataSource;
  */
 
 @Configuration
-@EnableJpaRepositories(basePackages = { "org.oncoblocks.centromere.jpa.test" }, 
+@EnableJpaRepositories(basePackages = { "org.oncoblocks.centromere.jpa.test.springdata" }, 
 		repositoryFactoryBeanClass = CentromereJpaRepositoryFactoryBean.class)
 @EnableTransactionManagement
-@ComponentScan(basePackages = "org.oncoblocks.centromere.jpa.test")
-public class JpaTestConfig {
+@ComponentScan(basePackages = "org.oncoblocks.centromere.jpa.test.springdata")
+public class SpringDataJpaTestConfig {
 
 	@Bean(destroyMethod = "shutdown")
 	public DataSource dataSource(){
@@ -57,7 +57,7 @@ public class JpaTestConfig {
 		vendorAdapter.setGenerateDdl(false);
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 		factory.setJpaVendorAdapter(vendorAdapter);
-		factory.setPackagesToScan("org.oncoblocks.centromere.jpa.test");
+		factory.setPackagesToScan("org.oncoblocks.centromere.jpa.test.springdata");
 		factory.setDataSource(dataSource());
 		factory.afterPropertiesSet();
 		return factory.getObject();

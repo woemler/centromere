@@ -18,26 +18,25 @@ package org.oncoblocks.centromere.core.commons;
 
 import org.oncoblocks.centromere.core.model.Model;
 
+import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author woemler
  */
+@MappedSuperclass
 public abstract class EntrezGene<ID extends Serializable> implements Model<ID> {
 	
 	private Long entrezGeneId;
 	private String primaryGeneSymbol;
-	private Set<String> geneSymbolAliases;
 	private Integer taxId;
 	private String locusTag;
 	private String chromosome;
 	private String chromosomeLocation;
 	private String geneType;
 	private String description;
-	private Map<String, String> databaseCrossReferences;
-	private Map<String, Object> attributes;
 
 	public Long getEntrezGeneId() {
 		return entrezGeneId;
@@ -55,13 +54,9 @@ public abstract class EntrezGene<ID extends Serializable> implements Model<ID> {
 		this.primaryGeneSymbol = primaryGeneSymbol;
 	}
 
-	public Set<String> getGeneSymbolAliases() {
-		return geneSymbolAliases;
-	}
-
-	public void setGeneSymbolAliases(Set<String> geneSymbolAliases) {
-		this.geneSymbolAliases = geneSymbolAliases;
-	}
+	public abstract Collection<String> getGeneSymbolAliases();
+	
+	public abstract void addGeneSymbolAlias(String alias);
 
 	public Integer getTaxId() {
 		return taxId;
@@ -111,20 +106,12 @@ public abstract class EntrezGene<ID extends Serializable> implements Model<ID> {
 		this.description = description;
 	}
 
-	public Map<String, String> getDatabaseCrossReferences() {
-		return databaseCrossReferences;
-	}
+	public abstract Map<String, String> getDatabaseCrossReferences();
+	
+	public abstract void addDatabaseCrossReference(String name, String value);
 
-	public void setDatabaseCrossReferences(
-			Map<String, String> databaseCrossReferences) {
-		this.databaseCrossReferences = databaseCrossReferences;
-	}
+	public abstract Map<String, Object> getAttributes();
+	
+	public abstract void addAttribute(String name, Object value);
 
-	public Map<String, Object> getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes(Map<String, Object> attributes) {
-		this.attributes = attributes;
-	}
 }

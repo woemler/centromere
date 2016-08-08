@@ -46,7 +46,7 @@ public class QueryCriteriaSpecification<T extends Model<?>> implements Specifica
 		Path path = null;
 		if (key.contains(".")){
 			String[] bits = key.split("\\.");
-			path = root.join(bits[0]).get(bits[1]);
+			path = root.join(bits[0], JoinType.LEFT).get(bits[1]);
 		} else {
 			path = root.get(key);
 		}

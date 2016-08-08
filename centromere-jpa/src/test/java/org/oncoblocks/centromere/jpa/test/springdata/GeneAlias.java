@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.jpa.test;
+package org.oncoblocks.centromere.jpa.test.springdata;
 
 import javax.persistence.*;
 import java.io.Serializable;

@@ -102,6 +102,11 @@
             <artifactId>guava</artifactId>
             <version>18.0</version>
         </dependency>
+        
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>javax.persistence</artifactId>
+        </dependency>
 
         <!-- Jackson -->
         

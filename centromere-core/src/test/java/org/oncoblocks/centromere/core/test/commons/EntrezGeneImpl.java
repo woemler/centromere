@@ -18,12 +18,17 @@ package org.oncoblocks.centromere.core.test.commons;
 
 import org.oncoblocks.centromere.core.commons.EntrezGene;
 
+import java.util.*;
+
 /**
  * @author woemler
  */
 public class EntrezGeneImpl extends EntrezGene<Long> {
 	
 	private Long id;
+	private List<String> geneSymbolAliases = new ArrayList<>();
+	private Map<String, String> databaseCrossReferences = new HashMap<>();
+	private Map<String, Object> attributes = new HashMap<>();
 
 	@Override public Long getId() {
 		return id;
@@ -31,5 +36,29 @@ public class EntrezGeneImpl extends EntrezGene<Long> {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	@Override public Collection<String> getGeneSymbolAliases() {
+		return geneSymbolAliases;
+	}
+
+	@Override public void addGeneSymbolAlias(String alias) {
+		geneSymbolAliases.add(alias);
+	}
+
+	@Override public Map<String, String> getDatabaseCrossReferences() {
+		return databaseCrossReferences;
+	}
+
+	@Override public void addDatabaseCrossReference(String name, String value) {
+		databaseCrossReferences.put(name, value);
+	}
+
+	@Override public Map<String, Object> getAttributes() {
+		return attributes;
+	}
+
+	@Override public void addAttribute(String name, Object value) {
+		attributes.put(name, value);
 	}
 }

@@ -26,7 +26,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -56,7 +55,7 @@ public class EntrezGeneMongoTests {
 		gene.setEntrezGeneId(0L);
 		gene.setPrimaryGeneSymbol("TEST");
 		gene.setTaxId(9606);
-		gene.setGeneSymbolAliases(Collections.singleton("alias"));
+		gene.addGeneSymbolAlias("alias");
 		entrezGeneRepository.insert(gene);
 		Assert.isTrue(entrezGeneRepository.count() == 1, 
 				String.format("Expected 1, found %d", entrezGeneRepository.count()));

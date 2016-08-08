@@ -36,7 +36,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Implementation of {@link RepositoryOperations} using Spring Data's repository bean factory for
+ *   instantiation.  All of the methods that are included in {@link org.springframework.data.repository.PagingAndSortingRepository}
+ *   are handled by {@link SimpleJpaRepository}, while the remainder are implemented here.
+ *
  * @author woemler
+ * @since 0.4.1
  */
 public class CentromereJpaRepository<T extends Model<ID>, ID extends Serializable> 
 		extends SimpleJpaRepository<T, ID>
@@ -149,7 +154,7 @@ public class CentromereJpaRepository<T extends Model<ID>, ID extends Serializabl
 	 * @return updated instance of the entity.
 	 */
 	public <S extends T> S insert(S entity) {
-		if (!this.exists(entity.getId())){
+		if (entity.getId() == null || !this.exists(entity.getId())){
 			this.save(entity);
 		} else {
 			throw new DuplicateKeyException(String.format("Record already exists: %s", entity.toString()));

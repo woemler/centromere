@@ -22,10 +22,6 @@ import org.oncoblocks.centromere.core.model.ModelSupport;
 import org.springframework.util.Assert;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 
 /**
  * @author woemler
@@ -72,13 +68,14 @@ public class EntrezGeneInfoReader<T extends EntrezGene<?>> extends AbstractRecor
 		gene.setTaxId(Integer.parseInt(bits[0]));
 		gene.setEntrezGeneId(Long.parseLong(bits[1]));
 		gene.setPrimaryGeneSymbol(bits[2]);
-		gene.setGeneSymbolAliases(new HashSet<>(Arrays.asList(bits[4].split("\\|"))));
-		Map<String, String> dbXrefs = new HashMap<>();
+		for (String alias: bits[4].split("\\|")){
+			gene.addGeneSymbolAlias(alias);
+		}
+		//Map<String, String> dbXrefs = new HashMap<>();
 		for (String ref : bits[5].split("\\|")) {
 			String[] r = ref.split(":");
-			dbXrefs.put(r[0], r[r.length - 1]);
+			gene.addDatabaseCrossReference(r[0], r[r.length - 1]);
 		}
-		gene.setDatabaseCrossReferences(dbXrefs);
 		gene.setChromosome(bits[6]);
 		gene.setChromosomeLocation(bits[7]);
 		gene.setDescription(bits[8]);
