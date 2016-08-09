@@ -17,6 +17,7 @@
 package org.oncoblocks.centromere.jpa.test.commons;
 
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oncoblocks.centromere.core.testing.EntrezGeneDataGenerator;
@@ -36,6 +37,7 @@ import java.util.List;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { JpaCommonsTestConfig.class })
+@FixMethodOrder
 public class JpaEntrezGeneRepositoryTests {
 	
 	@Autowired private JpaEntrezGeneRepository geneRepository;
