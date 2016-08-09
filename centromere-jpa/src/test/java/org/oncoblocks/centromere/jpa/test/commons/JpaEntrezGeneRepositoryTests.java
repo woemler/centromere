@@ -65,7 +65,7 @@ public class JpaEntrezGeneRepositoryTests {
 	}
 	
 	@Test
-	@Transactional(readOnly = true)
+	@Transactional
 	public void jpaGeneRepositoryTest() throws Exception {
 		Assert.notNull(geneRepository);
 		Assert.isTrue(geneRepository.count() == 5);
@@ -80,7 +80,7 @@ public class JpaEntrezGeneRepositoryTests {
 	}
 	
 	@Test
-	@Transactional(readOnly = true)
+	@Transactional
 	public void jpaRepositoryCustomSearchTest() throws Exception {
 		List<JpaEntrezGene> genes = geneRepository.findByPrimaryGeneSymbol("GeneA");
 		Assert.notNull(genes);
@@ -97,7 +97,7 @@ public class JpaEntrezGeneRepositoryTests {
 	}
 
 	@Test
-	@Transactional(readOnly = true)
+	@Transactional
 	public void jpaRepositoryInsertTest() throws Exception {
 		JpaEntrezGene gene = new JpaEntrezGene();
 		gene.setEntrezGeneId(0L);
@@ -108,11 +108,10 @@ public class JpaEntrezGeneRepositoryTests {
 		gene = insertRecord(gene);
 		Assert.notNull(gene);
 		Assert.notNull(gene.getId());
-
 	}
 
 	@Test
-	@Transactional(readOnly = true)
+	@Transactional
 	public void jpaRepositoryGuessGeneTest() throws Exception {
 		List<JpaEntrezGene> genes = (List<JpaEntrezGene>) geneRepository.findAll();
 		Assert.notNull(genes);
