@@ -54,10 +54,9 @@ public class JpaEntrezGeneRepositoryTests {
 		geneRepository.deleteAll();
 	}
 	
+	@Transactional
 	private void insertDummyData() throws Exception {
-		for (JpaEntrezGene gene: EntrezGeneDataGenerator.generateDummyData(JpaEntrezGene.class)){
-			insertRecord(gene);
-		}
+		geneRepository.insert(EntrezGeneDataGenerator.generateDummyData(JpaEntrezGene.class));
 	}
 	
 	@Transactional
