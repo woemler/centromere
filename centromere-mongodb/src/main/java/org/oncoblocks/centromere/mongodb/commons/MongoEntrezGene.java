@@ -17,6 +17,7 @@
 package org.oncoblocks.centromere.mongodb.commons;
 
 import org.oncoblocks.centromere.core.commons.EntrezGene;
+import org.oncoblocks.centromere.core.model.Alias;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -31,9 +32,15 @@ import java.util.Map;
 @Document(collection = "entrez_gene")
 public class MongoEntrezGene extends EntrezGene<String> {
 	
-	@Id private String id;
+	@Id 
+	@Alias("geneId")
+	private String id;
+	
+	@Alias("alias")
 	private List<String> geneSymbolAliases;
+	
 	private Map<String,String> databaseCrossReferences;
+	
 	private Map<String,Object> attributes;
 
 	@Override public String getId() {

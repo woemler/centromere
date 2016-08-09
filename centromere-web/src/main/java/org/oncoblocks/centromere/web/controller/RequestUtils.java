@@ -161,41 +161,50 @@ public class RequestUtils {
 	 */
 	public static Map<String,QueryParameterDescriptor> getAvailableQueryParameters(
 			Class<? extends Model<?>> model, boolean recursive){
+		Class<?> current = model;
 		Map<String,QueryParameterDescriptor> paramMap = new HashMap<>();
-		for (Field field: model.getDeclaredFields()){
-			String fieldName = field.getName();
-			Class<?> type = field.getType();
-			if (Collection.class.isAssignableFrom(field.getType())){
-				ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-				type = (Class<?>) parameterizedType.getActualTypeArguments()[0];
-			} 
-			if (field.isAnnotationPresent(Ignored.class)) {
-				continue;
-			} else {
-				paramMap.put(fieldName, new QueryParameterDescriptor(fieldName, fieldName, type, Evaluation.EQUALS));
-			}
-			if (field.isAnnotationPresent(ForeignKey.class)){
-				if (!recursive) continue;
-				ForeignKey foreignKey = field.getAnnotation(ForeignKey.class);
-				String relField = !"".equals(foreignKey.rel()) ? foreignKey.rel() : fieldName;
-				Map<String,QueryParameterDescriptor> foreignModelMap = getAvailableQueryParameters(foreignKey.model(), false);
-				for(QueryParameterDescriptor descriptor: foreignModelMap.values()){
-					String newParamName = relField + "." + descriptor.getParamName();
-					descriptor.setParamName(newParamName);
-					paramMap.put(newParamName, descriptor);
+		while (current.getSuperclass() != null) {
+			for (Field field : current.getDeclaredFields()) {
+				String fieldName = field.getName();
+				Class<?> type = field.getType();
+				if (Collection.class.isAssignableFrom(field.getType())) {
+					ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+					type = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+				}
+				if (field.isAnnotationPresent(Ignored.class)) {
+					continue;
+				} else {
+					paramMap.put(fieldName,
+							new QueryParameterDescriptor(fieldName, fieldName, type, Evaluation.EQUALS));
+				}
+				if (field.isAnnotationPresent(ForeignKey.class)) {
+					if (!recursive)
+						continue;
+					ForeignKey foreignKey = field.getAnnotation(ForeignKey.class);
+					String relField = !"".equals(foreignKey.rel()) ? foreignKey.rel() : fieldName;
+					Map<String, QueryParameterDescriptor> foreignModelMap =
+							getAvailableQueryParameters(foreignKey.model(), false);
+					for (QueryParameterDescriptor descriptor : foreignModelMap.values()) {
+						String newParamName = relField + "." + descriptor.getParamName();
+						descriptor.setParamName(newParamName);
+						paramMap.put(newParamName, descriptor);
+					}
+				}
+				if (field.isAnnotationPresent(Aliases.class)) {
+					Aliases aliases = field.getAnnotation(Aliases.class);
+					for (Alias alias : aliases.value()) {
+						paramMap.put(alias.value(), new QueryParameterDescriptor(alias.value(),
+								alias.fieldName().equals("") ? fieldName : alias.fieldName(), type,
+								alias.evaluation()));
+					}
+				} else if (field.isAnnotationPresent(Alias.class)) {
+					Alias alias = field.getAnnotation(Alias.class);
+					paramMap.put(alias.value(), new QueryParameterDescriptor(alias.value(),
+							alias.fieldName().equals("") ? fieldName : alias.fieldName(), type,
+							alias.evaluation()));
 				}
 			}
-			if (field.isAnnotationPresent(Aliases.class)){
-				Aliases aliases = field.getAnnotation(Aliases.class);
-				for (Alias alias: aliases.value()){
-					paramMap.put(alias.value(), new QueryParameterDescriptor(alias.value(), 
-							alias.fieldName().equals("") ? fieldName : alias.fieldName(), type, alias.evaluation()));
-				}
-			} else if (field.isAnnotationPresent(Alias.class)){
-				Alias alias = field.getAnnotation(Alias.class);
-				paramMap.put(alias.value(), new QueryParameterDescriptor(alias.value(), 
-						alias.fieldName().equals("") ? fieldName : alias.fieldName(), type, alias.evaluation()));
-			}
+			current = current.getSuperclass();
 		}
 		return paramMap;
 	}
