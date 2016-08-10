@@ -157,6 +157,16 @@ public class MongoEntrezGeneControllerTests {
 	}
 
 	@Test
+	public void findByKeyValueAttributes() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?attributes.isKinase=Y").accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(2)))
+				.andExpect(jsonPath("$[0]", hasKey("entrezGeneId")))
+				.andExpect(jsonPath("$[0].entrezGeneId", is(1)))
+				.andExpect(jsonPath("$[0]", not(hasKey("links"))));
+	}
+
+	@Test
 	public void findFieldFiltered() throws Exception {
 		mockMvc.perform(get(BASE_URL + "?fields=links,primaryGeneSymbol").accept(
 				ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))

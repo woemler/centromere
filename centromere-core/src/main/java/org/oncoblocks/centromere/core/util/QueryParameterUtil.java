@@ -121,7 +121,7 @@ public class QueryParameterUtil {
 		}
 		if (!field.isAnnotationPresent(Ignored.class)) {
 			descriptors.add(new QueryParameterDescriptor(field.getName(), field.getName(),
-					getQueryableFieldType(field), Evaluation.EQUALS));
+					getQueryableFieldType(field), Evaluation.EQUALS, false));
 		}
 		if (field.isAnnotationPresent(Aliases.class)){
 			descriptors.addAll(getDescriptorsFromAliases(field.getAnnotation(Aliases.class), field));

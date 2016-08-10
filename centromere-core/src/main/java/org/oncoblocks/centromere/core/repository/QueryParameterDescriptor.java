@@ -16,6 +16,8 @@
 
 package org.oncoblocks.centromere.core.repository;
 
+import java.util.regex.Pattern;
+
 /**
  * POJO that describes a model query parameter, used when reflecting {@link org.oncoblocks.centromere.core.model.Model}
  *   classes and mapping HTTP requests to {@link QueryCriteria}.
@@ -28,15 +30,17 @@ public class QueryParameterDescriptor {
 	private String fieldName;
 	private Class<?> type;
 	private Evaluation evaluation;
+	private boolean regexMatch = false;
 
 	public QueryParameterDescriptor() { }
 
 	public QueryParameterDescriptor(String paramName, String fieldName, Class<?> type,
-			Evaluation evaluation) {
+			Evaluation evaluation, boolean regexMatch) {
 		this.paramName = paramName;
 		this.fieldName = fieldName;
 		this.type = type;
 		this.evaluation = evaluation;
+		this.regexMatch = regexMatch;
 	}
 
 	public String getParamName() {
@@ -70,9 +74,51 @@ public class QueryParameterDescriptor {
 	public void setEvaluation(Evaluation evaluation) {
 		this.evaluation = evaluation;
 	}
-	
+
+	public boolean isRegexMatch() {
+		return regexMatch;
+	}
+
+	public void setRegexMatch(boolean regexMatch) {
+		this.regexMatch = regexMatch;
+	}
+
 	public QueryCriteria createQueryCriteria(Object value){
 		return new QueryCriteria(fieldName, value, evaluation);
+	}
+
+	/**
+	 * Tests whether the submitted parameter name matches that described by the object.  If regex is
+	 *   enabled, evalutation is performed by a regex match test.
+	 * 
+	 * @param p
+	 * @return
+	 */
+	public boolean parameterNameMatches(String p){
+		if (regexMatch){
+			return Pattern.compile(paramName).matcher(p).matches();
+		} else {
+			return this.paramName.equals(p);
+		}
+	}
+
+	/**
+	 * Given an input parameter name, determines what the name of the field to be queried in the 
+	 *   database layer is.  If regex is enabled, the supplied parameter name will be returned, as it 
+	 *   is expected to have matched against the predetermined regex pattern.  Otherwise, the actual
+	 *   field name is returned, if available.
+	 * 
+	 * @param p
+	 * @return
+	 */
+	public String getQueryableFieldName(String p){
+		if (regexMatch){
+			return p;
+		} else if (fieldName != null){
+			return fieldName;
+		} else {
+			return paramName;
+		}
 	}
 
 	@Override public String toString() {

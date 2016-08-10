@@ -72,7 +72,15 @@ public class RequestUtils {
 		params.addAll(DISTINCT_PARAMETERS);
 		return params;
 	}
-	
+
+	/**
+	 * Converts query string parameters in a {@link HttpServletRequest} to a list of {@link QueryCriteria},
+	 *   based upon the available model query parameters and the default {@code GET} method parameters.
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	public static List<QueryCriteria> getQueryCriteriaFromFindRequest(Class<? extends Model<?>> model, 
 			HttpServletRequest request
 	){
@@ -136,15 +144,21 @@ public class RequestUtils {
 			String paramName = (String) entry.getKey();
 			String[] paramValue = ((String[]) entry.getValue())[0].split(",");
 			if (!defaultParameters.contains(paramName)) {
-				if (paramMap.containsKey(paramName)) {
-					QueryParameterDescriptor descriptor = paramMap.get(paramName);
-					QueryCriteria criteria = createCriteriaFromRequestParameter(descriptor.getFieldName(),
-							paramValue, descriptor.getType(), descriptor.getEvaluation());
+				QueryCriteria criteria = null;
+				for (Map.Entry e: paramMap.entrySet()){
+					String p = (String) e.getKey();
+					QueryParameterDescriptor descriptor = (QueryParameterDescriptor) e.getValue();
+					if (descriptor.parameterNameMatches(paramName)){
+						criteria = createCriteriaFromRequestParameter(descriptor.getQueryableFieldName(paramName),
+								paramValue, descriptor.getType(), descriptor.getEvaluation());
+						break;
+					}
+				}
+				if (criteria != null){
 					criteriaList.add(criteria);
 				} else {
-					logger.warn(
-							String.format("Unable to map request parameter to available model parameters: %s",
-									paramName));
+					logger.warn(String.format("Unable to map request parameter to available model parameters: "
+							+ "%s", paramName));
 					throw new InvalidParameterException("Invalid request parameter: " + paramName);
 				}
 			}
@@ -175,7 +189,7 @@ public class RequestUtils {
 					continue;
 				} else {
 					paramMap.put(fieldName,
-							new QueryParameterDescriptor(fieldName, fieldName, type, Evaluation.EQUALS));
+							new QueryParameterDescriptor(fieldName, fieldName, type, Evaluation.EQUALS, false));
 				}
 				if (field.isAnnotationPresent(ForeignKey.class)) {
 					if (!recursive)
@@ -193,20 +207,26 @@ public class RequestUtils {
 				if (field.isAnnotationPresent(Aliases.class)) {
 					Aliases aliases = field.getAnnotation(Aliases.class);
 					for (Alias alias : aliases.value()) {
-						paramMap.put(alias.value(), new QueryParameterDescriptor(alias.value(),
-								alias.fieldName().equals("") ? fieldName : alias.fieldName(), type,
-								alias.evaluation()));
+						paramMap.put(alias.value(), getDescriptorFromAlias(alias, type, fieldName));
 					}
 				} else if (field.isAnnotationPresent(Alias.class)) {
 					Alias alias = field.getAnnotation(Alias.class);
-					paramMap.put(alias.value(), new QueryParameterDescriptor(alias.value(),
-							alias.fieldName().equals("") ? fieldName : alias.fieldName(), type,
-							alias.evaluation()));
+					paramMap.put(alias.value(), getDescriptorFromAlias(alias, type, fieldName));
 				}
 			}
 			current = current.getSuperclass();
 		}
 		return paramMap;
+	}
+	
+	public static QueryParameterDescriptor getDescriptorFromAlias(Alias alias, Class<?> type, String fieldName){
+		QueryParameterDescriptor descriptor = new QueryParameterDescriptor();
+		descriptor.setParamName(alias.value());
+		descriptor.setFieldName(alias.fieldName().equals("") ? fieldName : alias.fieldName());
+		descriptor.setRegexMatch(alias.regex());
+		descriptor.setType(type);
+		descriptor.setEvaluation(alias.evaluation());
+		return descriptor;
 	}
 
 	public static Map<String,QueryParameterDescriptor> getAvailableQueryParameters(Class<? extends Model<?>> model) {

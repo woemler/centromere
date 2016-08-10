@@ -61,4 +61,11 @@ public @interface Alias {
 	 * @return
 	 */
 	Class<?> type() default Object.class;
+
+	/**
+	 * Boolean switch, when true, treats the {@code value()} parameter as a regular expression string.
+	 * 
+	 * @return
+	 */
+	boolean regex() default false;
 }

@@ -41,6 +41,7 @@ public class MongoEntrezGene extends EntrezGene<String> {
 	
 	private Map<String,String> databaseCrossReferences;
 	
+	@Alias(value = "attributes.\\w+", regex = true)
 	private Map<String,Object> attributes;
 
 	@Override public String getId() {
