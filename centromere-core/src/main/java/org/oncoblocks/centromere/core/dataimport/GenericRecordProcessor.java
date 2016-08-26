@@ -43,7 +43,7 @@ import java.util.List;
 public class GenericRecordProcessor<T extends Model<?>> 
 		implements RecordProcessor<T>, ImportOptionsAware, DataTypeSupport {
 
-	private Class<T> model = (Class<T>) new TypeToken<T>(getClass()) {}.getRawType();
+	private Class<T> model;
 	private RecordReader<T> reader;
 	private Validator validator;
 	private RecordWriter<T> writer;
@@ -66,24 +66,22 @@ public class GenericRecordProcessor<T extends Model<?>>
 	}
 
 	/**
-	 * Performs configuration steps after bean creation.
+	 * Performs configuration steps after bean creation.  Assigns options and metadata objects to the 
+	 *   individual processing components that are expecting them.
 	 */
 	@PostConstruct
-	public void configure(){
+	@SuppressWarnings("unchecked")
+	@Override
+	public void afterPropertiesSet(){
 		if (this.getClass().isAnnotationPresent(DataTypes.class)){
 			DataTypes dataTypes = this.getClass().getAnnotation(DataTypes.class);
 			if (dataTypes.value() != null && dataTypes.value().length > 0){
 				this.supportedDataTypes = Arrays.asList(dataTypes.value());
 			}
 		}
-		isConfigured = true;
-	}
-
-	/**
-	 * Assigns options and metadata objects to the individual processing components that are expecting
-	 *   them.  Should run in the {@code doBefore()} method.
-	 */
-	public void configureComponents() {
+		if (model == null){
+			this.model = (Class<T>) new TypeToken<T>(getClass()) {}.getRawType();
+		}
 		if (writer != null && writer instanceof ImportOptionsAware) {
 			((ImportOptionsAware) writer).setImportOptions(options);
 		}
@@ -93,6 +91,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 		if (importer != null && importer instanceof ImportOptionsAware) {
 			((ImportOptionsAware) importer).setImportOptions(options);
 		}
+		isConfigured = true;
 	}
 
 	/**

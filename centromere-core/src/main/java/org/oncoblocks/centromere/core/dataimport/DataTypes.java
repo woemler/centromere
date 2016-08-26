@@ -25,5 +25,20 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface DataTypes {
+
+	/**
+	 * Specifies which data types the annotated processor class supports.
+	 * 
+	 * @return array of supported data types.
+	 */
 	String[] value();
+
+	/**
+	 * When true, will default the annotated processor to handling record processing for the 
+	 *   appropriate {@link org.oncoblocks.centromere.core.model.Model}, when a data type is not
+	 *   supplied.
+	 * 
+	 * @return
+	 */
+	boolean defaultForModel() default false;
 }

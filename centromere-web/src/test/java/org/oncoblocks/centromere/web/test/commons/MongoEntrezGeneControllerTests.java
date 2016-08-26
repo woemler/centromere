@@ -25,9 +25,9 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oncoblocks.centromere.core.repository.QueryParameterDescriptor;
-import org.oncoblocks.centromere.core.testing.EntrezGeneDataGenerator;
-import org.oncoblocks.centromere.mongodb.commons.MongoEntrezGene;
-import org.oncoblocks.centromere.mongodb.commons.MongoEntrezGeneRepository;
+import org.oncoblocks.centromere.core.commons.testing.EntrezGeneDataGenerator;
+import org.oncoblocks.centromere.mongodb.commons.models.MongoGene;
+import org.oncoblocks.centromere.mongodb.commons.repositories.MongoGeneRepository;
 import org.oncoblocks.centromere.web.controller.RequestUtils;
 import org.oncoblocks.centromere.web.test.config.TestWebConfig;
 import org.oncoblocks.centromere.web.util.ApiMediaTypes;
@@ -60,7 +60,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @FixMethodOrder
 public class MongoEntrezGeneControllerTests {
 
-	@Autowired private MongoEntrezGeneRepository geneRepository;
+	@Autowired private MongoGeneRepository geneRepository;
 	private MockMvc mockMvc;
 	@Autowired private WebApplicationContext webApplicationContext;
 	private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -71,14 +71,14 @@ public class MongoEntrezGeneControllerTests {
 	public void setup() throws Exception {
 		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 		geneRepository.deleteAll();
-		geneRepository.insert(EntrezGeneDataGenerator.generateDummyData(MongoEntrezGene.class));
+		geneRepository.insert(new EntrezGeneDataGenerator<MongoGene>().generateData(MongoGene.class));
 	}
 	
 	private String getGeneIdByEntrezGeneId(Long id){
-		List<MongoEntrezGene> genes = geneRepository.findByEntrezGeneId(id);
+		List<MongoGene> genes = geneRepository.findByPrimaryReferenceId(id.toString());
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
-		MongoEntrezGene gene = genes.get(0);
+		MongoGene gene = genes.get(0);
 		Assert.notNull(gene.getId());
 		return gene.getId();
 	}
@@ -86,7 +86,7 @@ public class MongoEntrezGeneControllerTests {
 	@Test
 	public void requestUtilTest() throws Exception {
 		Map<String, QueryParameterDescriptor>
-				params = RequestUtils.getAvailableQueryParameters(MongoEntrezGene.class);
+				params = RequestUtils.getAvailableQueryParameters(MongoGene.class);
 		Assert.notNull(params);
 		Assert.notEmpty(params);
 		for (Map.Entry entry: params.entrySet()){
@@ -96,7 +96,7 @@ public class MongoEntrezGeneControllerTests {
 		Assert.isTrue(params.containsKey("primaryGeneSymbol"));
 		Assert.isTrue(params.containsKey("alias"));
 		Assert.isTrue(params.containsKey("attributes"));
-		Assert.isTrue(params.containsKey("entrezGeneId"));
+		Assert.isTrue(params.containsKey("primaryReferenceId"));
 	}
 
 	@Test
@@ -111,7 +111,7 @@ public class MongoEntrezGeneControllerTests {
 		mockMvc.perform(get(BASE_URL + "/{id}", geneId)
 				.accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.entrezGeneId", is(1)))
+				.andExpect(jsonPath("$.primaryReferenceId", is("1")))
 				.andExpect(jsonPath("$.primaryGeneSymbol", is("GeneA")))
 				.andExpect(jsonPath("$.links", hasSize(1)))
 				.andExpect(jsonPath("$.links[0].rel", is("self")))
@@ -123,7 +123,7 @@ public class MongoEntrezGeneControllerTests {
 		String geneId = getGeneIdByEntrezGeneId(1L);
 		mockMvc.perform(get(BASE_URL + "/{id}?exclude=links,primaryGeneSymbol", geneId))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.entrezGeneId", is(1)))
+				.andExpect(jsonPath("$.primaryReferenceId", is("1")))
 				.andExpect(jsonPath("$", not(hasKey("primaryGeneSymbol"))))
 				.andExpect(jsonPath("$", not(hasKey("links"))));
 	}
@@ -134,8 +134,8 @@ public class MongoEntrezGeneControllerTests {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasKey("content")))
 				.andExpect(jsonPath("$.content", hasSize(5)))
-				.andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
-				.andExpect(jsonPath("$.content[0].entrezGeneId", is(1)))
+				.andExpect(jsonPath("$.content[0]", hasKey("primaryReferenceId")))
+				.andExpect(jsonPath("$.content[0].primaryReferenceId", is("1")))
 				.andExpect(jsonPath("$", hasKey("links")))
 				.andExpect(jsonPath("$.links", hasSize(1)))
 				.andExpect(jsonPath("$.links[0].rel", is("self")))
@@ -150,8 +150,8 @@ public class MongoEntrezGeneControllerTests {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasKey("content")))
 				.andExpect(jsonPath("$.content", hasSize(5)))
-				.andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
-				.andExpect(jsonPath("$.content[0].entrezGeneId", is(1)))
+				.andExpect(jsonPath("$.content[0]", hasKey("primaryReferenceId")))
+				.andExpect(jsonPath("$.content[0].primaryReferenceId", is("1")))
 				.andExpect(jsonPath("$.content[0]", not(hasKey("primaryGeneSymbol"))))
 				.andExpect(jsonPath("$.content[0]", not(hasKey("links"))));
 	}
@@ -161,8 +161,8 @@ public class MongoEntrezGeneControllerTests {
 		mockMvc.perform(get(BASE_URL + "?attributes.isKinase=Y").accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasSize(2)))
-				.andExpect(jsonPath("$[0]", hasKey("entrezGeneId")))
-				.andExpect(jsonPath("$[0].entrezGeneId", is(1)))
+				.andExpect(jsonPath("$[0]", hasKey("primaryReferenceId")))
+				.andExpect(jsonPath("$[0].primaryReferenceId", is("1")))
 				.andExpect(jsonPath("$[0]", not(hasKey("links"))));
 	}
 
@@ -173,7 +173,7 @@ public class MongoEntrezGeneControllerTests {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasKey("content")))
 				.andExpect(jsonPath("$.content", hasSize(5)))
-				.andExpect(jsonPath("$.content[0]", not(hasKey("entrezGeneId"))))
+				.andExpect(jsonPath("$.content[0]", not(hasKey("primaryReferenceId"))))
 				.andExpect(jsonPath("$.content[0]", hasKey("primaryGeneSymbol")))
 				.andExpect(jsonPath("$.content[0]", hasKey("links")));
 	}
@@ -184,8 +184,8 @@ public class MongoEntrezGeneControllerTests {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasKey("content")))
 				.andExpect(jsonPath("$.content", hasSize(2)))
-				.andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
-				.andExpect(jsonPath("$.content[0].entrezGeneId", is(3)))
+				.andExpect(jsonPath("$.content[0]", hasKey("primaryReferenceId")))
+				.andExpect(jsonPath("$.content[0].primaryReferenceId", is("3")))
 				.andExpect(jsonPath("$", hasKey("links")))
 				.andExpect(jsonPath("$.links", hasSize(1)))
 				.andExpect(jsonPath("$.links[0].rel", is("self")))
@@ -198,8 +198,8 @@ public class MongoEntrezGeneControllerTests {
 		mockMvc.perform(get(BASE_URL + "?alias=MNO").accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasSize(1)))
-				.andExpect(jsonPath("$[0]", hasKey("entrezGeneId")))
-				.andExpect(jsonPath("$[0].entrezGeneId", is(5)))
+				.andExpect(jsonPath("$[0]", hasKey("primaryReferenceId")))
+				.andExpect(jsonPath("$[0].primaryReferenceId", is("5")))
 				.andExpect(jsonPath("$[0]", not(hasKey("links"))));
 	}
 
@@ -209,8 +209,8 @@ public class MongoEntrezGeneControllerTests {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasKey("content")))
 				.andExpect(jsonPath("$.content", hasSize(2)))
-				.andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
-				.andExpect(jsonPath("$.content[0].entrezGeneId", is(4)))
+				.andExpect(jsonPath("$.content[0]", hasKey("primaryReferenceId")))
+				.andExpect(jsonPath("$.content[0].primaryReferenceId", is("4")))
 				.andExpect(jsonPath("$", hasKey("links")))
 				.andExpect(jsonPath("$.links", hasSize(4)))
 				.andExpect(jsonPath("$.links[0].rel", is("first")))
@@ -228,8 +228,8 @@ public class MongoEntrezGeneControllerTests {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasKey("content")))
 				.andExpect(jsonPath("$.content", hasSize(5)))
-				.andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
-				.andExpect(jsonPath("$.content[0].entrezGeneId", is(5)));
+				.andExpect(jsonPath("$.content[0]", hasKey("primaryReferenceId")))
+				.andExpect(jsonPath("$.content[0].primaryReferenceId", is("5")));
 	}
 	
 	@Test
@@ -250,8 +250,8 @@ public class MongoEntrezGeneControllerTests {
 	@Test
 	public void createTest() throws Exception {
 
-		MongoEntrezGene gene = new MongoEntrezGene(); 
-		gene.setEntrezGeneId(6L);
+		MongoGene gene = new MongoGene(); 
+		gene.setPrimaryReferenceId("6");
 		gene.setPrimaryGeneSymbol("GeneF");
 		gene.setTaxId(9606);
 		gene.setChromosome("10");
@@ -264,14 +264,14 @@ public class MongoEntrezGeneControllerTests {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsBytes(gene)))
 				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$", hasKey("entrezGeneId")))
-				.andExpect(jsonPath("$.entrezGeneId", is(6)));
+				.andExpect(jsonPath("$", hasKey("primaryReferenceId")))
+				.andExpect(jsonPath("$.primaryReferenceId", is("6")));
 
 		String geneId = getGeneIdByEntrezGeneId(6L);
 		
 		mockMvc.perform(get(BASE_URL + "/{id}", geneId))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.entrezGeneId", is(6)));
+				.andExpect(jsonPath("$.primaryReferenceId", is("6")));
 
 		geneRepository.delete(geneId);
 
@@ -280,8 +280,8 @@ public class MongoEntrezGeneControllerTests {
 	@Test
 	public void updateTest() throws Exception {
 
-		MongoEntrezGene gene = new MongoEntrezGene();
-		gene.setEntrezGeneId(7L);
+		MongoGene gene = new MongoGene();
+		gene.setPrimaryReferenceId("7");
 		gene.setPrimaryGeneSymbol("GeneG");
 		gene.setTaxId(9606);
 		gene.setChromosome("10");
@@ -295,20 +295,20 @@ public class MongoEntrezGeneControllerTests {
 				.content(objectMapper.writeValueAsBytes(gene)))
 				.andExpect(status().isCreated());
 	
-		gene = geneRepository.findByEntrezGeneId(7L).get(0);
+		gene = geneRepository.findByPrimaryReferenceId("7").get(0);
 		gene.setPrimaryGeneSymbol("TEST_GENE");
 		
 		mockMvc.perform(put(BASE_URL + "/{id}", gene.getId())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsBytes(gene)))
 				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$", hasKey("entrezGeneId")))
-				.andExpect(jsonPath("$.entrezGeneId", is(7)))
+				.andExpect(jsonPath("$", hasKey("primaryReferenceId")))
+				.andExpect(jsonPath("$.primaryReferenceId", is("7")))
 				.andExpect(jsonPath("$.primaryGeneSymbol", is("TEST_GENE")));
 
 		mockMvc.perform(get(BASE_URL + "/{id}", gene.getId()))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.entrezGeneId", is(7)))
+				.andExpect(jsonPath("$.primaryReferenceId", is("7")))
 				.andExpect(jsonPath("$.primaryGeneSymbol", is("TEST_GENE")));
 
 		geneRepository.delete(gene.getId());
@@ -318,8 +318,8 @@ public class MongoEntrezGeneControllerTests {
 	@Test
 	public void deleteTest() throws Exception {
 
-		MongoEntrezGene gene = new MongoEntrezGene();
-		gene.setEntrezGeneId(8L);
+		MongoGene gene = new MongoGene();
+		gene.setPrimaryReferenceId("8");
 		gene.setPrimaryGeneSymbol("GeneG");
 		gene.setTaxId(9606);
 		gene.setChromosome("10");

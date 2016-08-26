@@ -18,13 +18,13 @@ package org.oncoblocks.centromere.core.test;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.oncoblocks.centromere.core.config.DataTypeProcessorBeanRegistry;
+import org.oncoblocks.centromere.core.config.ModelRegistry;
+import org.oncoblocks.centromere.core.config.ModelRepositoryBeanRegistry;
+import org.oncoblocks.centromere.core.config.ModelScan;
 import org.oncoblocks.centromere.core.dataimport.RecordProcessor;
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.repository.RepositoryOperations;
-import org.oncoblocks.centromere.core.util.DataTypeProcessorRegistry;
-import org.oncoblocks.centromere.core.util.ModelRegistry;
-import org.oncoblocks.centromere.core.util.ModelRepositoryRegistry;
-import org.oncoblocks.centromere.core.util.ModelScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -32,7 +32,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author woemler
@@ -57,7 +56,7 @@ public class ComponentRegistryTests {
 	public void modelRegistryTest() throws Exception {
 		ModelRegistry modelRegistry = createModelRegistry();
 		Assert.notNull(modelRegistry);
-		Map<String, Class<? extends Model>> models = modelRegistry.getRegistry();
+		List<Class<? extends Model>> models = modelRegistry.getModels();
 		Assert.notNull(models);
 		Assert.notEmpty(models);
 		Assert.isTrue(models.size() > 0);
@@ -70,21 +69,24 @@ public class ComponentRegistryTests {
 			printModelScan(modelScan);
 			if (modelScan.value() != null && modelScan.value().length > 0) {
 				for (String path : modelScan.value()) {
-					modelRegistry.addClasspathModels(path);
+					modelRegistry.addClassPathModels(path);
 				}
 			} else if (modelScan.basePackages() != null && modelScan.basePackages().length > 0) {
 				for (String path : modelScan.basePackages()) {
-					modelRegistry.addClasspathModels(path);
+					modelRegistry.addClassPathModels(path);
 				}
 			}
 			if (modelScan.basePackageClasses() != null && modelScan.basePackageClasses().length > 0){
 				for (Class<?> clazz: modelScan.basePackageClasses()){
 					if (Model.class.isAssignableFrom(clazz)){
-						modelRegistry.add((Class<? extends Model>) clazz);
+						modelRegistry.addModel((Class<? extends Model>) clazz);
 					}
 				}
 			}
 		}
+		modelRegistry.setProcessorRegistry(new DataTypeProcessorBeanRegistry(context));
+		modelRegistry.setRepositoryRegistry(new ModelRepositoryBeanRegistry(context));
+		modelRegistry.afterPropertiesSet();
 		return modelRegistry;
 	}
 	
@@ -111,30 +113,23 @@ public class ComponentRegistryTests {
 	
 	@Test
 	public void dataTypeProcessorRegistryTest() throws Exception {
-		DataTypeProcessorRegistry registry = new DataTypeProcessorRegistry(context);
-		registry.configure();
+		ModelRegistry modelRegistry = createModelRegistry();
+		DataTypeProcessorBeanRegistry registry = (DataTypeProcessorBeanRegistry) modelRegistry.getProcessorRegistry();
+		modelRegistry.setProcessorRegistry(new DataTypeProcessorBeanRegistry(context));
 		Assert.notNull(registry);
-		Assert.notEmpty(registry.getRegistry());
-		Assert.isTrue(registry.getRegistry().size() == 1);
-		Assert.isTrue(registry.exists("gene_info"));
-		RecordProcessor processor = registry.find("gene_info");
+		Assert.isTrue(registry.isSupportedDataType("gene_info"));
+		RecordProcessor processor = registry.getByDataType("gene_info");
 		Assert.notNull(processor);
 		Assert.isTrue(processor instanceof GeneInfoProcessor);
 	}
 
 	@Test
 	public void modelRepositoryRegistryTest() throws Exception {
-		ModelRepositoryRegistry registry = new ModelRepositoryRegistry(context);
-		registry.configure();
+		ModelRepositoryBeanRegistry registry = (ModelRepositoryBeanRegistry) createModelRegistry().getRepositoryRegistry();
 		Assert.notNull(registry);
-		Assert.notEmpty(registry.getRegistry());
-		Assert.isTrue(registry.getRegistry().size() == 1);
-		Assert.isTrue(registry.exists(EntrezGene.class));
-		List<RepositoryOperations> repositories = registry.findByModel(EntrezGene.class);
-		Assert.notNull(repositories);
-		Assert.notEmpty(repositories);
-		Assert.isTrue(repositories.size() == 1);
-		RepositoryOperations repository = repositories.get(0);
+		Assert.isTrue(registry.isSupported(EntrezGene.class));
+		RepositoryOperations repository = registry.get(EntrezGene.class);
+		Assert.notNull(repository);
 		Assert.isTrue(repository instanceof TestRepository);
 	}
 	

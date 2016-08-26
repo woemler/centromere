@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oncoblocks.centromere.core.util.JsonModelConverter;
 import org.oncoblocks.centromere.core.util.KeyValueMapModelConverter;
-import org.oncoblocks.centromere.core.util.ModelScan;
+import org.oncoblocks.centromere.core.config.ModelScan;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;

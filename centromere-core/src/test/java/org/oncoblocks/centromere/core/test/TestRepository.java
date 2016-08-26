@@ -36,6 +36,7 @@ import java.util.*;
 public class TestRepository implements RepositoryOperations<EntrezGene, Long> {
 
 	private Map<Long, EntrezGene> geneMap;
+	private Class<EntrezGene> model = EntrezGene.class;
 
 	public TestRepository() {
 		geneMap = new HashMap<>();
@@ -172,6 +173,10 @@ public class TestRepository implements RepositoryOperations<EntrezGene, Long> {
 	}
 
 	@Override public Class<EntrezGene> getModel() {
-		return EntrezGene.class;
+		return model;
+	}
+
+	public void setModel(Class<EntrezGene> model) {
+		this.model = model;
 	}
 }

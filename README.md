@@ -86,7 +86,7 @@ Artifacts for Centromere release builds are available from the Maven Central Rep
 
 ## Demo
 
-A demo implementation of a Centromere data warehouse and web API is available as both a [live demo](https://centromere.herokuapp.com/index.html) and a [GitHub repository](https://github.com/blueprintmedicines/centromere-demo).  This demo utilizes a small data set of cancer genomic data from the TCGA to showcase the features of Centromere's web service and data import utilities.  A hosted instance of this demo is coming soon.
+A demo implementation of a Centromere data warehouse and web API is available as both a [live demo](https://centromere.herokuapp.com/index.html) and a [GitHub repository](https://github.com/blueprintmedicines/centromere-demo).  This demo utilizes a small data set of cancer genomic data from the TCGA to showcase the features of Centromere's web service and data import utilities.
 
 ## Contact
 

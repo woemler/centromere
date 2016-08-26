@@ -19,7 +19,7 @@ package org.oncoblocks.centromere.web.test.commons;
 import com.mongodb.Mongo;
 import cz.jirutka.spring.embedmongo.EmbeddedMongoBuilder;
 import org.oncoblocks.centromere.mongodb.CentromereMongoRepositoryFactoryBean;
-import org.oncoblocks.centromere.mongodb.commons.MongoEntrezGeneRepository;
+import org.oncoblocks.centromere.mongodb.commons.repositories.MongoGeneRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -31,7 +31,7 @@ import java.io.IOException;
  * @author woemler
  */
 @Configuration
-@EnableMongoRepositories(basePackageClasses = {MongoEntrezGeneRepository.class},
+@EnableMongoRepositories(basePackageClasses = {MongoGeneRepository.class},
 		repositoryFactoryBeanClass = CentromereMongoRepositoryFactoryBean.class )
 public class CommonsMongoDataSourceConfig {
 

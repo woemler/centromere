@@ -16,13 +16,15 @@
 
 package org.oncoblocks.centromere.core.model.support;
 
+import java.util.Map;
+
 /**
- * Interface for adding controller query methods to entity classes with key-value aliases.  
  * 
  * @author woemler
  */
 public interface SourcedAliases {
-	void setAliasName(String aliasName);
-	void setAliasSource(String aliasSource);
-	void setAlias(SourcedAlias alias);
+	void addAlias(String source, String value);
+	Map<String, String> getAliasMap();
+	boolean hasAlias(String source);
+	String getAlias(String source);
 }

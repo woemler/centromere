@@ -61,7 +61,7 @@ public class GenericJdbcRepository<T extends Model<ID>, ID extends Serializable>
 	private ComplexTableDescription tableDescription;
 	private RowMapper<T> rowMapper;
 	private RowUnmapper<T> rowUnmapper;
-	private final Class<T> model;
+	private Class<T> model;
 
 	/**
 	 * Creates a new repository instance using a {@link DataSource} to generate a new 
@@ -494,5 +494,9 @@ public class GenericJdbcRepository<T extends Model<ID>, ID extends Serializable>
 	 */
 	public Class<T> getModel() {
 		return model;
+	}
+
+	public void setModel(Class<T> model) {
+		this.model = model;
 	}
 }

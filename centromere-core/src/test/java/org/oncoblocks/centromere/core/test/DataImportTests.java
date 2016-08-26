@@ -114,7 +114,8 @@ public class DataImportTests {
 	
 	@Test
 	public void recordUpdaterTest() throws Exception {
-		RepositoryRecordUpdater<EntrezGene, Long> updater = new RepositoryRecordUpdater<>(testRepository);
+		RepositoryRecordWriter<EntrezGene> updater = new RepositoryRecordWriter<>(testRepository,
+				RepositoryRecordWriter.WriteMode.UPDATE);
 		EntrezGene gene = testRepository.findOne(1L);
 		Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
 		gene.setPrimaryGeneSymbol("GeneX");

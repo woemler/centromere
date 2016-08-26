@@ -213,6 +213,9 @@ public class CentromereJpaRepository<T extends Model<ID>, ID extends Serializabl
 	public Class<T> getModel() {
 		return model;
 	}
+	
+	public void setModel(Class<T> model){
+	}
 
 	/**
 	 * Returns the instance of the {@link EntityManager}.

@@ -17,7 +17,7 @@
 package org.oncoblocks.centromere.jpa.test.commons;
 
 import org.oncoblocks.centromere.jpa.CentromereJpaRepositoryFactoryBean;
-import org.oncoblocks.centromere.jpa.commons.JpaEntrezGeneRepository;
+import org.oncoblocks.centromere.jpa.commons.JpaGeneRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -38,7 +38,7 @@ import javax.sql.DataSource;
  */
 
 @Configuration
-@EnableJpaRepositories(basePackageClasses = { JpaEntrezGeneRepository.class }, 
+@EnableJpaRepositories(basePackageClasses = { JpaGeneRepository.class }, 
 		repositoryFactoryBeanClass = CentromereJpaRepositoryFactoryBean.class)
 @EnableTransactionManagement
 @ComponentScan(basePackages = "org.oncoblocks.centromere.jpa.test.commons")

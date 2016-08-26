@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.dataimport.cli.test;
 
-import org.oncoblocks.centromere.core.util.ModelScan;
+import org.oncoblocks.centromere.core.config.ModelScan;
 import org.oncoblocks.centromere.dataimport.cli.DataImportConfigurer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

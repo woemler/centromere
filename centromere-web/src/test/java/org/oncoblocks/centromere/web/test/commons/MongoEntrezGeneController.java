@@ -16,8 +16,8 @@
 
 package org.oncoblocks.centromere.web.test.commons;
 
-import org.oncoblocks.centromere.mongodb.commons.MongoEntrezGene;
-import org.oncoblocks.centromere.mongodb.commons.MongoEntrezGeneRepository;
+import org.oncoblocks.centromere.mongodb.commons.models.MongoGene;
+import org.oncoblocks.centromere.mongodb.commons.repositories.MongoGeneRepository;
 import org.oncoblocks.centromere.web.controller.CrudApiController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityLinks;
@@ -30,11 +30,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 @RequestMapping("/commons/mongo/entrezgene")
-@ExposesResourceFor(MongoEntrezGene.class)
-public class MongoEntrezGeneController extends CrudApiController<MongoEntrezGene, String> {
+@ExposesResourceFor(MongoGene.class)
+public class MongoEntrezGeneController extends CrudApiController<MongoGene, String> {
 
 	@Autowired
-	public MongoEntrezGeneController(MongoEntrezGeneRepository repository, EntityLinks entityLinks) {
+	public MongoEntrezGeneController(MongoGeneRepository repository, EntityLinks entityLinks) {
 		super(repository, entityLinks);
 	}
 	

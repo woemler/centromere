@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
 import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -66,6 +67,7 @@ import java.util.List;
 public class WebServicesConfig extends WebMvcConfigurerAdapter {
 	
 	@Autowired private Environment env;
+	@Autowired private ApplicationContext context;
 	private static final Logger logger = LoggerFactory.getLogger(WebServicesConfig.class);
 
 	@Override

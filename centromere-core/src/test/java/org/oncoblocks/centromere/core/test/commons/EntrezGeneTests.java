@@ -18,8 +18,8 @@ package org.oncoblocks.centromere.core.test.commons;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oncoblocks.centromere.core.commons.EntrezGene;
-import org.oncoblocks.centromere.core.commons.EntrezGeneInfoReader;
+import org.oncoblocks.centromere.core.commons.models.Gene;
+import org.oncoblocks.centromere.core.commons.readers.EntrezGeneInfoReader;
 import org.oncoblocks.centromere.core.test.TestConfig;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ContextConfiguration;
@@ -36,14 +36,14 @@ public class EntrezGeneTests {
 	@Test
 	public void geneInfoReaderTest() throws Exception {
 		ClassPathResource resource = new ClassPathResource("Homo_sapiens.gene_info");
-		EntrezGeneInfoReader<EntrezGeneImpl> reader = new EntrezGeneInfoReader<>(EntrezGeneImpl.class);
-		Assert.isTrue(EntrezGeneImpl.class.equals(reader.getModel()), String.format("Expected %s, got %s",
-				EntrezGeneImpl.class.getName(), reader.getModel().getName()));
+		EntrezGeneInfoReader<GeneImpl> reader = new EntrezGeneInfoReader<>(GeneImpl.class);
+		Assert.isTrue(GeneImpl.class.equals(reader.getModel()), String.format("Expected %s, got %s",
+				GeneImpl.class.getName(), reader.getModel().getName()));
 		try {
 			reader.doBefore(new String[] {resource.getPath()});
-			EntrezGene gene = reader.readRecord();
+			Gene gene = reader.readRecord();
 			Assert.notNull(gene);
-			Assert.isTrue(gene instanceof EntrezGeneImpl);
+			Assert.isTrue(gene instanceof GeneImpl);
 			Assert.isTrue("A1BG".equals(gene.getPrimaryGeneSymbol()));
 		} finally {
 			reader.doAfter();

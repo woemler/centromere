@@ -202,6 +202,9 @@ public class CentromereMongoRepository<T extends Model<ID>, ID extends Serializa
 	public Class<T> getModel() {
 		return model;
 	}
+	
+	public void setModel(Class<T> model){
+	}
 
 	/**
 	 * Returns the instance of {@link MongoOperations}.

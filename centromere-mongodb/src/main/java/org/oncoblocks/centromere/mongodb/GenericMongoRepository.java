@@ -354,4 +354,8 @@ public class GenericMongoRepository<T extends Model<ID>, ID extends Serializable
 	public Class<T> getModel() {
 		return model;
 	}
+	
+	public void setModel(Class<T> model){
+		
+	}
 }

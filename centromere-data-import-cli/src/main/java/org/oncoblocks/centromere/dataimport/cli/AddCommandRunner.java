@@ -17,13 +17,12 @@
 package org.oncoblocks.centromere.dataimport.cli;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.oncoblocks.centromere.core.config.ModelRegistry;
 import org.oncoblocks.centromere.core.dataimport.DataImportException;
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.repository.RepositoryOperations;
 import org.oncoblocks.centromere.core.util.JsonModelConverter;
 import org.oncoblocks.centromere.core.util.KeyValueMapModelConverter;
-import org.oncoblocks.centromere.core.util.ModelRegistry;
-import org.oncoblocks.centromere.core.util.ModelRepositoryRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +30,6 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.util.Assert;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Validator;
-
-import java.util.List;
 
 /**
  * Executes the {@code add} command, based upon input arguments.  The {@code category} argument will
@@ -43,7 +40,6 @@ import java.util.List;
 public class AddCommandRunner {
 	
 	private ModelRegistry modelRegistry;
-	private ModelRepositoryRegistry modelRepositoryRegistry;
 	private ObjectMapper objectMapper = new ObjectMapper();
 	private Validator validator;
 	
@@ -85,13 +81,12 @@ public class AddCommandRunner {
 	
 	private RepositoryOperations<?, ?> getModelRepository(Class<? extends Model> model) throws DataImportException {
 		RepositoryOperations repository = null;
-		if (modelRepositoryRegistry.exists(model)){
-			List<RepositoryOperations> repositories = modelRepositoryRegistry.findByModel(model);
-			if (repositories.size() > 1){
-				throw new DataImportException(String.format("More than one repository available for model " 
-						+ "class %s.  Cannot determine appropriate repository to use.", model.getName()));
+		if (modelRegistry.isSupported(model)){
+			repository = modelRegistry.getModelRepository(model);
+			if (repository == null){
+				throw new DataImportException(String.format("No registered repository found for model " 
+						+ "class %s.", model.getName()));
 			}
-			repository = repositories.get(0);
 		} 
 		return repository;
 	}
@@ -105,14 +100,10 @@ public class AddCommandRunner {
 	 */
 	private Class<? extends Model> getModelFromTypeName(String name){
 		Class<? extends Model> model = null;
-		if (modelRegistry.exists(name)){
-			model = modelRegistry.find(name);
+		if (modelRegistry.isSupported(name)){
+			model = modelRegistry.getModel(name);
 		} else {
-			try {
-				model = (Class<? extends Model>) Class.forName(name);
-			} catch (ClassNotFoundException e) {
-				logger.warn(String.format("Input type %s is not a valid class.", name));
-			}
+			logger.warn(String.format("Input type %s is not a valid class.", name));
 		}
 		return model;
 	}
@@ -150,8 +141,4 @@ public class AddCommandRunner {
 		this.validator = validator;
 	}
 
-	@Autowired
-	public void setModelRepositoryRegistry(ModelRepositoryRegistry modelRepositoryRegistry) {
-		this.modelRepositoryRegistry = modelRepositoryRegistry;
-	}
 }

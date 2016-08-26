@@ -67,7 +67,7 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 
 	private final RepositoryOperations<T, ID> repository;
 	private final ResourceAssemblerSupport<T, FilterableResource> assembler;
-	private final Class<T> model;
+	private Class<T> model;
 	private ApplicationContext applicationContext;
 	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(AbstractApiController.class);
 
@@ -287,6 +287,10 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 
 	public Class<T> getModel() {
 		return model;
+	}
+	
+	public void setModel(Class<T> model){
+		this.model = model;
 	}
 
 	@Autowired 

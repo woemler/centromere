@@ -23,10 +23,19 @@ package org.oncoblocks.centromere.core.model;
  * @since 0.4.1
  */
 public interface ModelSupport<T extends Model<?>> {
+	
 	/**
 	 * Returns the model class reference.
 	 * 
 	 * @return
 	 */
 	Class<T> getModel();
+
+	/**
+	 * Assigns the given model to target object.
+	 * 
+	 * @param model
+	 */
+	void setModel(Class<T> model);
+	
 }

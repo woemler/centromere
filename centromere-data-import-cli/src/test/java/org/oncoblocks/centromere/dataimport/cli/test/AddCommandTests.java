@@ -21,16 +21,13 @@ import com.beust.jcommander.MissingCommandException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.oncoblocks.centromere.core.config.DataTypeProcessorBeanRegistry;
 import org.oncoblocks.centromere.core.dataimport.DataImportException;
-import org.oncoblocks.centromere.core.dataimport.RecordProcessor;
 import org.oncoblocks.centromere.core.model.Model;
-import org.oncoblocks.centromere.core.util.DataTypeProcessorRegistry;
 import org.oncoblocks.centromere.dataimport.cli.AddCommandArguments;
 import org.oncoblocks.centromere.dataimport.cli.AddCommandRunner;
 import org.oncoblocks.centromere.dataimport.cli.ImportCommandArguments;
-import org.oncoblocks.centromere.dataimport.cli.test.support.DataFileRepository;
-import org.oncoblocks.centromere.dataimport.cli.test.support.DataSet;
-import org.oncoblocks.centromere.dataimport.cli.test.support.DataSetRepository;
+import org.oncoblocks.centromere.dataimport.cli.test.support.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContext;
@@ -40,6 +37,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -52,15 +50,16 @@ public class AddCommandTests {
 	@Autowired private ApplicationContext context;
 	@Autowired private DataSetRepository dataSetRepository;
 	@Autowired private DataFileRepository dataFileRepository;
-	private DataTypeProcessorRegistry dataTypeProcessorRegistry;
+	private DataTypeProcessorBeanRegistry dataTypeProcessorBeanRegistry;
 	@Autowired private AddCommandRunner addCommandRunner;
 	
 	@Before
 	public void setup() throws Exception {
 		dataFileRepository.deleteAll();
 		dataSetRepository.deleteAll();
-		dataTypeProcessorRegistry = new DataTypeProcessorRegistry(context);
-		dataTypeProcessorRegistry.configure();
+		dataTypeProcessorBeanRegistry = new DataTypeProcessorBeanRegistry(context);
+		dataTypeProcessorBeanRegistry.addModelBeans(Arrays.asList(DataFile.class, DataSet.class,
+				SampleData.class));
 	}
 	
 	@Test
@@ -89,11 +88,8 @@ public class AddCommandTests {
 	
 	@Test
 	public void dataTypeMappingTest() throws Exception {
-		Map<String, RecordProcessor> dataTypeMap = dataTypeProcessorRegistry.getRegistry();
-		Assert.notNull(dataTypeMap);
-		Assert.notEmpty(dataTypeMap);
-		Assert.isTrue(dataTypeMap.containsKey("sample_data"));
-		Assert.isTrue(dataTypeMap.get("sample_data") instanceof SampleDataProcessor);
+		Assert.isTrue(dataTypeProcessorBeanRegistry.isSupportedDataType("sample_data"));
+		Assert.isTrue(dataTypeProcessorBeanRegistry.getByDataType("sample_data") instanceof SampleDataProcessor);
 	}
 	
 	@Test

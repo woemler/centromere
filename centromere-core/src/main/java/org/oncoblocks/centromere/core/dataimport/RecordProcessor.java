@@ -18,6 +18,7 @@ package org.oncoblocks.centromere.core.dataimport;
 
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.model.ModelSupport;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.validation.Validator;
 
 /**
@@ -26,14 +27,9 @@ import org.springframework.validation.Validator;
  * 
  * @author woemler
  */
-public interface RecordProcessor<T extends Model<?>> extends DataImportComponent, ModelSupport<T> {
+public interface RecordProcessor<T extends Model<?>> 
+		extends DataImportComponent, ModelSupport<T>, InitializingBean {
 
-	/**
-	 * Performs any necessary component configuration steps before the processor executes the 
-	 *   {@code run} method.
-	 */
-	void configureComponents();
-	
 	/**
 	 * Executes the pipeline and processes the input through the individual components.
 	 * 
