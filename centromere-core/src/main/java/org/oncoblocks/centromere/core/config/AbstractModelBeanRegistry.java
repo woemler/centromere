@@ -20,19 +20,25 @@ import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.model.ModelSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.beans.Introspector;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
+ * Base implementation of {@link ModelBeanRegistry}, for registering beans that implement {@link ModelSupport}
+ *   and associating them with their appropriate {@link Model}.  Can be initialized and configured 
+ *   by {@link ModelRegistry}, or can pick up instatiated beans as a {@link BeanPostProcessor} as 
+ *   they are created.
+ * 
  * @author woemler
  * @since 0.4.3
  */
-public abstract class AbstractModelBeanRegistry<T extends ModelSupport> implements ModelBeanRegistry<T> {
+public abstract class AbstractModelBeanRegistry<T extends ModelSupport> 
+		implements ModelBeanRegistry<T>, BeanPostProcessor {
 
 	private final Map<Class<? extends Model>, T> map = new HashMap<>();
 	private boolean createIfNull = false;
@@ -49,6 +55,22 @@ public abstract class AbstractModelBeanRegistry<T extends ModelSupport> implemen
 	}
 
 	@Override 
+	public Object postProcessBeforeInitialization(Object bean, String beanName)
+			throws BeansException {
+		return bean;
+	}
+
+	@Override 
+	@SuppressWarnings("unchecked")
+	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		if (getBeanClass().isInstance(bean)){
+			T component = (T) bean;
+			this.registerBean(component.getModel(), component);
+		}
+		return bean;
+	}
+
+	@Override 
 	public T get(Class<? extends Model> model) {
 		return map.containsKey(model) ? map.get(model) : null;
 	}
@@ -61,6 +83,8 @@ public abstract class AbstractModelBeanRegistry<T extends ModelSupport> implemen
 	@Override 
 	public void registerBean(Class<? extends Model> model, T bean) {
 		map.put(model, bean);
+		logger.info(String.format("Registering %s bean %s for model %s", 
+				this.getBeanClass().getName(), bean.getClass().getName(), model.getName()));
 	}
 
 	@Override 
@@ -74,31 +98,43 @@ public abstract class AbstractModelBeanRegistry<T extends ModelSupport> implemen
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void addModelBeans(Collection<Class<? extends Model>> models) {
-		Map<Class<? extends Model>, T> foundBeans = new HashMap<>();
+		List<T> foundBeans = new ArrayList<>();
 		for (Map.Entry entry: applicationContext.getBeansOfType(getBeanClass(), false, false).entrySet()){
-			T repo = (T) entry.getValue();
-			if (repo != null && repo.getModel() != null){
-				foundBeans.put(repo.getModel(), repo);
+			T bean = (T) entry.getValue();
+			if (bean != null && bean.getModel() != null){
+				foundBeans.add(bean);
+				logger.info(String.format("Found %s bean %s with associated model %s", 
+						this.getBeanClass().getName(), bean.getClass().getName(), bean.getModel().getName()));
 			} else {
 				logger.warn(String.format("Found bean is null or has no set model: %s", entry.getKey()));
 			}
 		}
+		for (T bean: foundBeans) {
+			for (Class<? extends Model> model : models) {
+				if (bean.getModel().equals(model)) {
+					registerBean(model, bean);
+					logger.info(String.format("Registered %s bean %s for model %s",
+							getBeanClass().getName(), bean.getClass().getName(),
+							model.getName()));
+				}
+			}
+		}
 		for (Class<? extends Model> model: models){
-			if (foundBeans.containsKey(model)){
-				this.registerBean(model, foundBeans.get(model));
-				logger.info(String.format("Registered bean %s for model %s", 
-						foundBeans.get(model).getClass().getName(), model.getName()));
-			} else if (createIfNull) {
-				T bean = createBean(model);
-				((AnnotationConfigApplicationContext) applicationContext).getBeanFactory()
-						.registerSingleton(Introspector.decapitalize(model.getSimpleName()) 
-								+ getCreatedBeanNameSuffix(), bean);
-				this.registerBean(model, bean);
-				logger.info(String.format("Created and registered bean %s for model %s",
-						bean.getClass().getName(), model.getName()));
-			} else {
-				logger.warn(String.format("No beans found for model %s and no factory present.", model));
+			if (!this.isSupported(model)){
+				if (createIfNull) {
+					T bean = createBean(model);
+					((AnnotationConfigApplicationContext) applicationContext).getBeanFactory()
+							.registerSingleton(Introspector.decapitalize(model.getSimpleName())
+									+ getCreatedBeanNameSuffix(), bean);
+					registerBean(model, bean);
+					logger.info(String.format("Created and registered bean %s for model %s",
+							bean.getClass().getName(), model.getName()));
+				} else {
+					logger.warn(String.format("No %s beans found for model %s and no factory present.",
+							getBeanClass().getName(), model));
+				}
 			}
 		}
 	}

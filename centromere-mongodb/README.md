@@ -82,8 +82,8 @@ public class GeneRepository extends GenericMongoRepository<Gene, String> {
 
     /* Using `QueryCriteria` and the Centromere repository API */
 
-    public List<Gene> findByGeneSymbolAlias(String alias){
-        return this.find(new QueryCriteria("aliases", alias, Evaluation.EQUALS));
+    public List<Gene> findByGeneSymbolAlias(String name){
+        return this.find(new QueryCriteria("aliases", name, Evaluation.EQUALS));
     }
 
 }

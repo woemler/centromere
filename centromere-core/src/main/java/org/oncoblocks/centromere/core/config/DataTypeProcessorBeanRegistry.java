@@ -109,18 +109,26 @@ public class DataTypeProcessorBeanRegistry extends AbstractModelBeanRegistry<Rec
 			if (dataTypes.value().length > 0){
 				for (String dataType: dataTypes.value()){
 					dataTypeMap.put(dataType, component);
+					logger.info(String.format("Registering %s bean %s for data type %s for model %s",
+							this.getBeanClass().getName(), component.getClass().getName(), dataType, model.getName()));
 				}
+			} else {
+				logger.warn(String.format("RecordProcessor %s DataTypes annotation is empty.",
+						component.getClass().getName()));
 			}
+		} else {
+			logger.warn(String.format("RecordProcessor %s does not have DataTypes annotation.", 
+					component.getClass().getName()));
 		}
+	}
+
+	public boolean isSupportedDataType(String dataType){
+		return dataTypeMap.containsKey(dataType);
 	}
 
 	@Override 
 	public boolean isSupported(Class<? extends Model> model) {
 		return modelProcessorMap.containsKey(model);
-	}
-	
-	public boolean isSupportedDataType(String dataType){
-		return dataTypeMap.containsKey(dataType);
 	}
 
 	@Override 

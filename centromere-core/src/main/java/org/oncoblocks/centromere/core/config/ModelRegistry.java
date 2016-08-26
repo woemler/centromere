@@ -52,6 +52,7 @@ public class ModelRegistry implements InitializingBean {
 	
 	@PostConstruct
 	public void afterPropertiesSet(){
+		logger.info("Initializing post-construct model bean registration.");
 		Assert.notNull(repositoryRegistry, "RepositoryOperations registry must not be null.");
 		Assert.notEmpty(models, "No model classes have been registered.");
 		repositoryRegistry.addModelBeans(models);

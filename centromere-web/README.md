@@ -82,7 +82,7 @@ Centromere supports the following media types for `GET` requests: `application/j
 Centromere supports dynamic query operations using query string parameters.  The available query parameters for each resource are defined in the model class (see the documentation for the `centromere-core` module). You can perform queries using one or more entity attributes in the standard way:
 
 ```
-GET /genes?alias=akt,mtor,braf
+GET /genes?name=akt,mtor,braf
 GET /cnv?valueBetween=-0.5,0.5
 GET /samples?tissue=lung&type=cellLine
 ```

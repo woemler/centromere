@@ -184,7 +184,7 @@ public class Gene implements Model<String> {
 	@Ignored private String chromosomeLocation;
 	@Ignored private String description;
 	private String geneType;
-	@Alias("alias") private Set<String> aliases;
+	@Alias("name") private Set<String> aliases;
 	@Aliases({
 		@Alias(value = "isKinase", fieldName = "attributes.kinase"),
 		@Alias(value = "isCgcGene", fieldName = "attributes.cgcGene")

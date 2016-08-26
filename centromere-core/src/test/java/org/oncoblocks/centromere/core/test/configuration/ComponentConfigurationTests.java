@@ -18,7 +18,9 @@ package org.oncoblocks.centromere.core.test.configuration;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.oncoblocks.centromere.core.config.DataTypeProcessorBeanRegistry;
 import org.oncoblocks.centromere.core.config.ModelRegistry;
+import org.oncoblocks.centromere.core.config.ModelRepositoryBeanRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -33,14 +35,36 @@ import org.springframework.util.Assert;
 @ContextConfiguration(classes = { ConfigurationTestConfig.class })
 public class ComponentConfigurationTests {
 	
-	@Autowired private ModelRegistry registry;
+	@Autowired private ModelRegistry modelRegistry;
 	@Autowired private ApplicationContext context;
+	@Autowired private ModelRepositoryBeanRegistry repositoryBeanRegistry;
+	@Autowired private DataTypeProcessorBeanRegistry processorBeanRegistry;
 	
 	@Test
-	public void registryTest() throws Exception {
-		Assert.notNull(registry);
-		Assert.notNull(registry.getModels());
-		Assert.isTrue(ExampleModel.class.equals(registry.getModels().get(0)));
+	public void modelRegistryTest() throws Exception {
+		Assert.notNull(modelRegistry);
+		Assert.notNull(modelRegistry.getModels());
+		Assert.isTrue(ExampleModel.class.equals(modelRegistry.getModels().get(0)));
+		Assert.isTrue(modelRegistry.isSupported(ExampleModel.class));
+	}
+	
+	@Test
+	public void repositoryRegistryTest() throws Exception {
+		Assert.notNull(repositoryBeanRegistry);
+		Assert.isTrue(repositoryBeanRegistry.isSupported(ExampleModel.class));
+		Assert.notNull(repositoryBeanRegistry.get(ExampleModel.class));
+		Assert.isTrue(repositoryBeanRegistry.get(ExampleModel.class) instanceof ExampleRepository);
+	}
+	
+	@Test
+	public void processorRegistryTest() throws Exception {
+		Assert.notNull(processorBeanRegistry);
+		Assert.isTrue(processorBeanRegistry.isSupported(ExampleModel.class));
+		Assert.isTrue(processorBeanRegistry.isSupportedDataType("example_data"));
+		Assert.notNull(processorBeanRegistry.get(ExampleModel.class));
+		Assert.isTrue(processorBeanRegistry.get(ExampleModel.class) instanceof ExampleProcessor);
+		Assert.notNull(processorBeanRegistry.getByDataType("example_data"));
+		Assert.isTrue(processorBeanRegistry.getByDataType("example_data") instanceof ExampleProcessor);
 	}
 	
 }

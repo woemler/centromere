@@ -56,7 +56,7 @@ public abstract class ModelComponentRegistrationConfigurer {
 		}
 		modelRegistry.setRepositoryRegistry(modelRepositoryBeanRegistry());
 		modelRegistry.setProcessorRegistry(modelProcessorBeanRegistry());
-		modelRegistry.afterPropertiesSet();
+		//modelRegistry.afterPropertiesSet();
 		return modelRegistry;
 	}
 
