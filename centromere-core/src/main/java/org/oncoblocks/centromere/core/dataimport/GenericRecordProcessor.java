@@ -169,7 +169,8 @@ public class GenericRecordProcessor<T extends Model<?>>
 	 */
 	private String getTempFilePath(String inputFilePath){
 		File tempDir = new File(options.getTempDirectoryPath());
-		String fileName = new File(inputFilePath).getName() + ".tmp";
+		//String fileName = new File(inputFilePath).getName() + ".tmp";
+		String fileName = "centromere.import.tmp";
 		File tempFile = new File(tempDir, fileName);
 		return tempFile.getPath();
 	}

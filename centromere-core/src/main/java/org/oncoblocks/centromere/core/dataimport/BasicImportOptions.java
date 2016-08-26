@@ -33,7 +33,8 @@ public class BasicImportOptions implements ImportOptions {
 	private boolean skipInvalidMetadata = false;
 	private boolean skipInvalidRecords = false;
 	private boolean skipExistingFiles = false;
-	private String tempDirectoryPath = "/tmp";
+	private String tempDirectoryPath = System.getProperty("java.io.tmpdir") != null 
+			? System.getProperty("java.io.tmpdir") : "/tmp";
 	
 	public BasicImportOptions(){ }
 
