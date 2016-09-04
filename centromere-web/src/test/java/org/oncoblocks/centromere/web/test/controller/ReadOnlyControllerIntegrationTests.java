@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.oncoblocks.centromere.core.config.ModelComponentRegistrationConfigurer;
 import org.oncoblocks.centromere.web.test.config.TestMongoConfig;
 import org.oncoblocks.centromere.web.test.config.TestWebConfig;
 import org.oncoblocks.centromere.web.test.models.EntrezGene;
@@ -49,8 +50,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {TestMongoConfig.class, MongoRepositoryConfig.class,
-		ControllerIntegrationTestConfig.class, TestWebConfig.class})
+@ContextConfiguration(classes = {
+		TestMongoConfig.class, 
+		MongoRepositoryConfig.class,
+		ControllerIntegrationTestConfig.class, 
+		TestWebConfig.class,
+		ModelComponentRegistrationConfigurer.DefaultModelRegistryConfig.class
+})
 @WebAppConfiguration
 @FixMethodOrder
 public class ReadOnlyControllerIntegrationTests {

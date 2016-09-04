@@ -76,8 +76,13 @@ public abstract class AbstractModelBeanRegistry<T extends ModelSupport>
 	}
 
 	@Override 
-	public boolean isSupported(Class<? extends Model> model) {
+	public boolean isRegistered(Class<? extends Model> model) {
 		return map.containsKey(model);
+	}
+
+	@Override 
+	public boolean isRegistered(T bean) {
+		return map.containsValue(bean);
 	}
 
 	@Override 
@@ -105,8 +110,6 @@ public abstract class AbstractModelBeanRegistry<T extends ModelSupport>
 			T bean = (T) entry.getValue();
 			if (bean != null && bean.getModel() != null){
 				foundBeans.add(bean);
-				logger.info(String.format("Found %s bean %s with associated model %s", 
-						this.getBeanClass().getName(), bean.getClass().getName(), bean.getModel().getName()));
 			} else {
 				logger.warn(String.format("Found bean is null or has no set model: %s", entry.getKey()));
 			}
@@ -122,7 +125,7 @@ public abstract class AbstractModelBeanRegistry<T extends ModelSupport>
 			}
 		}
 		for (Class<? extends Model> model: models){
-			if (!this.isSupported(model)){
+			if (!this.isRegistered(model)){
 				if (createIfNull) {
 					T bean = createBean(model);
 					((AnnotationConfigApplicationContext) applicationContext).getBeanFactory()
@@ -139,6 +142,23 @@ public abstract class AbstractModelBeanRegistry<T extends ModelSupport>
 		}
 	}
 
+	@Override
+	@SuppressWarnings("unchecked")
+	public void addModelBeansFromContext() {
+		List<T> foundBeans = new ArrayList<>();
+		for (Map.Entry entry: applicationContext.getBeansOfType(getBeanClass(), false, false).entrySet()){
+			T bean = (T) entry.getValue();
+			if (bean != null && bean.getModel() != null){
+				registerBean(bean.getModel(), bean);
+				logger.info(String.format("Registered %s bean %s for model %s",
+						getBeanClass().getName(), bean.getClass().getName(),
+						bean.getModel().getName()));
+			} else {
+				logger.warn(String.format("Found bean is null or has no set model: %s", entry.getKey()));
+			}
+		}
+	}
+
 	public void setCreateIfNull(boolean createIfNull) {
 		this.createIfNull = createIfNull;
 	}
@@ -146,5 +166,15 @@ public abstract class AbstractModelBeanRegistry<T extends ModelSupport>
 	public void setModelComponentFactory(
 			ModelComponentFactory<T> modelComponentFactory) {
 		this.beanFactory = modelComponentFactory;
+	}
+
+	@Override 
+	public List<T> getRegisteredBeans() {
+		return new ArrayList<>(map.values());
+	}
+
+	@Override 
+	public List<Class<? extends Model>> getRegisteredBeanModels() {
+		return new ArrayList<>(map.keySet());
 	}
 }

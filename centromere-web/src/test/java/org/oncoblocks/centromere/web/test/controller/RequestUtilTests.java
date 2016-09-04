@@ -18,6 +18,7 @@ package org.oncoblocks.centromere.web.test.controller;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.oncoblocks.centromere.core.config.ModelComponentRegistrationConfigurer;
 import org.oncoblocks.centromere.core.repository.Evaluation;
 import org.oncoblocks.centromere.core.repository.QueryParameterDescriptor;
 import org.oncoblocks.centromere.web.controller.RequestUtils;
@@ -39,7 +40,12 @@ import java.util.Map;
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = {
-		TestMongoConfig.class, TestWebConfig.class, MongoRepositoryConfig.class, ControllerIntegrationTestConfig.class})
+		TestMongoConfig.class, 
+		TestWebConfig.class, 
+		MongoRepositoryConfig.class, 
+		ControllerIntegrationTestConfig.class,
+		ModelComponentRegistrationConfigurer.DefaultModelRegistryConfig.class
+})
 public class RequestUtilTests {
 	
 	@Test

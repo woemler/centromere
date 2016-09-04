@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.oncoblocks.centromere.core.config.ModelComponentRegistrationConfigurer;
 import org.oncoblocks.centromere.web.test.config.TestMongoConfig;
 import org.oncoblocks.centromere.web.test.config.TestSecurityConfig;
 import org.oncoblocks.centromere.web.test.config.TestWebConfig;
@@ -57,8 +58,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 // TODO: User @TestPropertySource(properties= {"readOnly = false", "other = foo"}) for testing different security levels
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {TestMongoConfig.class, TestWebConfig.class, ControllerIntegrationTestConfig.class,
-		TestSecurityConfig.class, SecurityContextConfig.class, MongoRepositoryConfig.class})
+@ContextConfiguration(classes = {
+		TestMongoConfig.class, 
+		TestWebConfig.class, 
+		ControllerIntegrationTestConfig.class,
+		TestSecurityConfig.class, 
+		SecurityContextConfig.class, 
+		MongoRepositoryConfig.class,
+		ModelComponentRegistrationConfigurer.DefaultModelRegistryConfig.class
+})
 @WebAppConfiguration
 @FixMethodOrder
 public class SecurityTests {

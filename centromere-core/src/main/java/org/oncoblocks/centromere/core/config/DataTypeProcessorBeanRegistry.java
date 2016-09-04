@@ -23,10 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implementation of {@link ModelBeanRegistry} for mapping input file data types to their appropriate
@@ -102,23 +99,28 @@ public class DataTypeProcessorBeanRegistry extends AbstractModelBeanRegistry<Rec
 		if (modelProcessorMap.containsKey(model)){
 			processors = modelProcessorMap.get(model);
 		}
-		processors.add(component);
-		modelProcessorMap.put(model, processors);
-		if (component.getClass().isAnnotationPresent(DataTypes.class)){
-			DataTypes dataTypes = component.getClass().getAnnotation(DataTypes.class);
-			if (dataTypes.value().length > 0){
-				for (String dataType: dataTypes.value()){
-					dataTypeMap.put(dataType, component);
-					logger.info(String.format("Registering %s bean %s for data type %s for model %s",
-							this.getBeanClass().getName(), component.getClass().getName(), dataType, model.getName()));
+		if (!processors.contains(component)) {
+			processors.add(component);
+			modelProcessorMap.put(model, processors);
+			if (component.getClass().isAnnotationPresent(DataTypes.class)) {
+				DataTypes dataTypes = component.getClass().getAnnotation(DataTypes.class);
+				if (dataTypes.value().length > 0) {
+					for (String dataType : dataTypes.value()) {
+						dataTypeMap.put(dataType, component);
+						logger.info(String.format("Registering %s bean %s for data type %s for model %s",
+								this.getBeanClass().getName(), component.getClass().getName(), dataType,
+								model.getName()));
+					}
+				} else {
+					logger.warn(String.format("RecordProcessor %s DataTypes annotation is empty.",
+							component.getClass().getName()));
 				}
 			} else {
-				logger.warn(String.format("RecordProcessor %s DataTypes annotation is empty.",
+				logger.warn(String.format("RecordProcessor %s does not have DataTypes annotation.",
 						component.getClass().getName()));
 			}
 		} else {
-			logger.warn(String.format("RecordProcessor %s does not have DataTypes annotation.", 
-					component.getClass().getName()));
+			logger.warn(String.format("RecordProcessor already registered: %s", component.getClass().getName()));
 		}
 	}
 
@@ -127,8 +129,19 @@ public class DataTypeProcessorBeanRegistry extends AbstractModelBeanRegistry<Rec
 	}
 
 	@Override 
-	public boolean isSupported(Class<? extends Model> model) {
+	public boolean isRegistered(Class<? extends Model> model) {
 		return modelProcessorMap.containsKey(model);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public boolean isRegistered(RecordProcessor bean) {
+		for (Map.Entry entry: modelProcessorMap.entrySet()){
+			if (((List<RecordProcessor>) entry.getValue()).contains(bean)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override 
@@ -139,5 +152,19 @@ public class DataTypeProcessorBeanRegistry extends AbstractModelBeanRegistry<Rec
 	@Override 
 	protected String getCreatedBeanNameSuffix() {
 		return "Processor";
+	}
+
+	@Override 
+	public List<RecordProcessor> getRegisteredBeans() {
+		Set<RecordProcessor> processors = new HashSet<>();
+		for (List<RecordProcessor> processor: modelProcessorMap.values()){
+			processors.addAll(processor);
+		}
+		return new ArrayList<>(processors);
+	}
+
+	@Override 
+	public List<Class<? extends Model>> getRegisteredBeanModels() {
+		return new ArrayList<>(modelProcessorMap.keySet());
 	}
 }

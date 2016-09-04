@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.oncoblocks.centromere.core.config.ModelComponentRegistrationConfigurer;
 import org.oncoblocks.centromere.core.repository.QueryParameterDescriptor;
 import org.oncoblocks.centromere.core.commons.testing.EntrezGeneDataGenerator;
 import org.oncoblocks.centromere.mongodb.commons.models.MongoGene;
@@ -56,7 +57,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = {
-		CommonsMongoDataSourceConfig.class, TestWebConfig.class, CommonsControllerConfig.class})
+		CommonsMongoDataSourceConfig.class, 
+		TestWebConfig.class, 
+		CommonsControllerConfig.class,
+		ModelComponentRegistrationConfigurer.DefaultModelRegistryConfig.class
+})
 @FixMethodOrder
 public class MongoEntrezGeneControllerTests {
 

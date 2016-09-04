@@ -24,24 +24,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Modifier;
+import java.util.*;
 
 /**
- * 
+ * Keeps class of classpath {@link Model} classes and their instantiated beans, and handles requests
+ *   from components mapping model functions.
  * 
  * @author woemler
  * @since 0.4.3
  */
-public class ModelRegistry implements InitializingBean {
+public class ModelRegistry implements InitializingBean, ApplicationListener<ContextRefreshedEvent> {
 	
 	private List<Class<? extends Model>> models = new ArrayList<>();
 	private Map<String, Class<? extends Model>> uriMap = new HashMap<>();
@@ -52,11 +53,8 @@ public class ModelRegistry implements InitializingBean {
 	
 	@PostConstruct
 	public void afterPropertiesSet(){
-		logger.info("Initializing post-construct model bean registration.");
 		Assert.notNull(repositoryRegistry, "RepositoryOperations registry must not be null.");
-		Assert.notEmpty(models, "No model classes have been registered.");
-		repositoryRegistry.addModelBeans(models);
-		processorRegistry.addModelBeans(models);
+		Assert.notNull(processorRegistry, "RecordProcessor registry must not be null.");
 	}
 	
 	/* Adding models */
@@ -72,6 +70,13 @@ public class ModelRegistry implements InitializingBean {
 				}
 			}
 			uriMap.put(uri, model);
+			logger.info(String.format("Registering model %s with URI %s", model.getName(), uri));
+		}
+	}
+	
+	public void addModels(Collection<Class<? extends Model>> models){
+		for (Class<? extends Model> model: models){
+			addModel(model);
 		}
 	}
 	
@@ -128,10 +133,20 @@ public class ModelRegistry implements InitializingBean {
 		return uriMap.containsKey(uri) ? uriMap.get(uri) : null;
 	}
 	
+	public String getModelUri(Class<? extends Model> model){
+		String uri = null;
+		for (Map.Entry entry: uriMap.entrySet()){
+			if (entry.getValue().equals(model)){
+				uri = (String) entry.getKey();
+			}
+		}
+		return uri;
+	}
+	
 	/* Repositories */
 	
 	public RepositoryOperations getModelRepository(Class<? extends Model> model){
-		return repositoryRegistry.isSupported(model) ? repositoryRegistry.get(model) : null;
+		return repositoryRegistry.isRegistered(model) ? repositoryRegistry.get(model) : null;
 	}
 
 	public ModelBeanRegistry<RepositoryOperations> getRepositoryRegistry() {
@@ -151,6 +166,25 @@ public class ModelRegistry implements InitializingBean {
 		this.processorRegistry = processorRegistry;
 	}
 	
+	/* Listener */
+
+	@Override 
+	public void onApplicationEvent(ContextRefreshedEvent event) {
+		logger.info("Initializing post-refresh model bean registration.");
+		repositoryRegistry.addModelBeansFromContext();
+		processorRegistry.addModelBeansFromContext();
+		if (!repositoryRegistry.getRegisteredBeanModels().isEmpty()){
+			addModels(repositoryRegistry.getRegisteredBeanModels());
+		}
+		if (!processorRegistry.getRegisteredBeanModels().isEmpty()){
+			addModels(processorRegistry.getRegisteredBeanModels());
+		}
+		if (models != null && !models.isEmpty()) {
+			repositoryRegistry.addModelBeans(models);
+			processorRegistry.addModelBeans(models);
+		}
+	}
+	
 	/* Static constructors */
 
 	@SuppressWarnings("unchecked")
@@ -167,7 +201,9 @@ public class ModelRegistry implements InitializingBean {
 		}
 		if (componentScan.basePackageClasses().length > 0){
 			for (Class<?> model: componentScan.basePackageClasses()){
-				if (Model.class.isAssignableFrom(model)) {
+				if (Model.class.isAssignableFrom(model) 
+						&& !Modifier.isAbstract(model.getModifiers())
+						&& !Modifier.isInterface(model.getModifiers())) {
 					registry.addModel((Class<? extends Model>) model);
 				} else {
 					logger.warn(String.format("Cannot register non-model class: %s", model.getName()));
@@ -191,7 +227,9 @@ public class ModelRegistry implements InitializingBean {
 		}
 		if (modelScan.basePackageClasses().length > 0){
 			for (Class<?> model: modelScan.basePackageClasses()){
-				if (Model.class.isAssignableFrom(model)) {
+				if (Model.class.isAssignableFrom(model) 
+						&& !Modifier.isAbstract(model.getModifiers()) 
+						&& !Modifier.isInterface(model.getModifiers())) {
 					registry.addModel((Class<? extends Model>) model);
 				} else {
 					logger.warn(String.format("Cannot register non-model class: %s", model.getName()));

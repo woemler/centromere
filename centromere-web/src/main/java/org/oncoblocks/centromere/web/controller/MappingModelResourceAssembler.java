@@ -19,9 +19,11 @@ package org.oncoblocks.centromere.web.controller;
 import org.oncoblocks.centromere.core.config.ModelRegistry;
 import org.oncoblocks.centromere.core.model.ForeignKey;
 import org.oncoblocks.centromere.core.model.Model;
-import org.oncoblocks.centromere.core.model.ModelAttributes;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -33,26 +35,23 @@ import java.util.*;
  * 
  * @author woemler
  */
+@Component
 public class MappingModelResourceAssembler 
 		extends ResourceAssemblerSupport<Model, FilterableResource> {
 
 	private final ModelRegistry registry;
-	private static final String ROOT_URL = "/api";
+
+	@Value("${centromere.api.root-url}")
+	private String rootUrl;
 	
-	public MappingModelResourceAssembler(ModelRegistry registry, Class<?> controllerClass){
-		super(controllerClass, FilterableResource.class);
+	@Autowired
+	public MappingModelResourceAssembler(ModelRegistry registry){
+		super(MappingCrudApiController.class, FilterableResource.class);
 		this.registry = registry;
 	}
 	
 	private String getModelUri(Class<? extends Model> model){
-		String uri = model.getName().toLowerCase();
-		if (model.isAnnotationPresent(ModelAttributes.class)){
-			ModelAttributes modelAttributes = model.getAnnotation(ModelAttributes.class);
-			if (!modelAttributes.uri().equals("")){
-				uri = modelAttributes.uri();
-			}
-		}
-		return ROOT_URL + "/" + uri;
+		return rootUrl + "/" + registry.getModelUri(model);
 	}
 	
 	/**
@@ -63,7 +62,7 @@ public class MappingModelResourceAssembler
 	 */
 	public FilterableResource toResource(Model t) {
 		FilterableResource<Model> resource = new FilterableResource<>(t);
-		resource.add(new Link(getModelUri(t.getClass()), "self"));
+		resource.add(new Link(getModelUri(t.getClass()) + "/" + t.getId(), "self"));
 		List<Link> links = addLinks(new ArrayList<>());
 		links.addAll(this.addForeignKeyLinks(t));
 		resource.add(links);
@@ -120,4 +119,5 @@ public class MappingModelResourceAssembler
 	private List<Link> addLinks(List<Link> links){
 		return links;
 	}
+	
 }

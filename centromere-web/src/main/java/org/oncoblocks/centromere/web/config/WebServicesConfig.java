@@ -18,6 +18,8 @@ package org.oncoblocks.centromere.web.config;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.oncoblocks.centromere.web.controller.MappingCrudApiController;
+import org.oncoblocks.centromere.web.controller.MappingModelResourceAssembler;
 import org.oncoblocks.centromere.web.exceptions.RestExceptionHandler;
 import org.oncoblocks.centromere.web.util.*;
 import org.slf4j.Logger;
@@ -27,9 +29,8 @@ import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomi
 import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.format.FormatterRegistry;
@@ -63,12 +64,25 @@ import java.util.List;
 @EnableSpringDataWebSupport
 @EnableHypermediaSupport(type = { EnableHypermediaSupport.HypermediaType.HAL })
 @EnableEntityLinks
-@ComponentScan(basePackageClasses = { RestExceptionHandler.class })
+@ComponentScan(basePackageClasses = { 
+		RestExceptionHandler.class, 
+		MappingModelResourceAssembler.class, 
+		MappingCrudApiController.class
+})
+@PropertySources(value = {
+		@PropertySource("classpath:centromere-defaults.properties"),
+		@PropertySource(value = "classpath:centromere.properties", ignoreResourceNotFound = true)
+})
 public class WebServicesConfig extends WebMvcConfigurerAdapter {
 	
 	@Autowired private Environment env;
 	@Autowired private ApplicationContext context;
 	private static final Logger logger = LoggerFactory.getLogger(WebServicesConfig.class);
+
+	@Bean
+	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer(){
+		return new PropertySourcesPlaceholderConfigurer();
+	}
 
 	@Override
 	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {

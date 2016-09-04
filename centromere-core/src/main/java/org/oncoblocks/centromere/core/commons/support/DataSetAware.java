@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.core.test.configuration;
+package org.oncoblocks.centromere.core.commons.support;
 
-import org.oncoblocks.centromere.core.config.ModelComponentRegistrationConfigurer;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.oncoblocks.centromere.core.commons.models.DataSet;
 
 /**
+ * Ensures that the implementing component can be aware of a data set record, used in annotating
+ *   data files or records.
+ * 
  * @author woemler
  */
-@Configuration
-@Import({ModelComponentRegistrationConfigurer.DefaultModelRegistryConfig.class})
-@ComponentScan(basePackages = { "org.oncoblocks.centromere.core.test.configuration" })
-public class ConfigurationTestConfig {
-
+public interface DataSetAware<T extends DataSet<?>> {
+	T getDataSet();
+	void setDataSet(T dataSet);
 }

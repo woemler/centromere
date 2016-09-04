@@ -16,23 +16,19 @@
 
 package org.oncoblocks.centromere.web.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
 import org.oncoblocks.centromere.core.config.ModelRegistry;
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.repository.QueryCriteria;
 import org.oncoblocks.centromere.core.repository.RepositoryOperations;
-import org.oncoblocks.centromere.web.exceptions.InvalidParameterException;
-import org.oncoblocks.centromere.web.exceptions.RequestFailureException;
-import org.oncoblocks.centromere.web.exceptions.ResourceNotFoundException;
-import org.oncoblocks.centromere.web.exceptions.RestError;
+import org.oncoblocks.centromere.web.exceptions.*;
 import org.oncoblocks.centromere.web.util.ApiMediaTypes;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.InitializingBean;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -45,10 +41,9 @@ import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.List;
@@ -61,25 +56,21 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
  * @author woemler
  * @since 0.4.3
  */
+@Controller
+//@RequestMapping("/api")
+@RequestMapping("${centromere.api.root-url}")
 @SuppressWarnings("unchecked")
-public class MappingCrudApiController implements ApplicationContextAware, InitializingBean {
+public class MappingCrudApiController implements ModelController {
 
-	private ModelRegistry registry;
-	private ResourceAssemblerSupport<Model, FilterableResource> assembler;
-	private ApplicationContext applicationContext;
-	private ConversionService conversionService;
-	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(MappingCrudApiController.class);
+	@Autowired private ModelRegistry registry;
+	@Autowired private MappingModelResourceAssembler assembler;
+	@Autowired private ConversionService conversionService;
+	@Autowired private ObjectMapper objectMapper;
 	
-	@PostConstruct
-	public void afterPropertiesSet(){
-		if (assembler == null){
-			Assert.notNull(registry, "ModelComponentRegistry must not be null!");
-			assembler = new MappingModelResourceAssembler(registry, MappingCrudApiController.class);
-		}
-		if (conversionService == null){
-			conversionService = new DefaultConversionService();
-		}
-	}
+	@Value("${centromere.api.root-url}")
+	private String rootUrl;
+	
+	private static final Logger logger = LoggerFactory.getLogger(MappingCrudApiController.class);
 
 	/**
 	 * {@code GET /{id}}
@@ -112,6 +103,7 @@ public class MappingCrudApiController implements ApplicationContextAware, Initia
 			HttpServletRequest request
 	) {
 		if (!registry.isSupportedUri(uri)){
+			logger.error(String.format("URI does not map to a registered model: %s", uri));
 			throw new ResourceNotFoundException();
 		}
 		Class<T> model = (Class<T>) registry.getModelFromUri(uri);
@@ -126,7 +118,7 @@ public class MappingCrudApiController implements ApplicationContextAware, Initia
 		if (entity == null) throw new ResourceNotFoundException();
 		ResponseEnvelope<T> envelope = null;
 		if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))){
-			FilterableResource resource = (FilterableResource) assembler.toResource(entity);
+			FilterableResource resource = assembler.toResource(entity);
 			envelope = new ResponseEnvelope<>(resource, fields, exclude);
 		} else {
 			envelope = new ResponseEnvelope<>(entity, fields, exclude);
@@ -161,6 +153,7 @@ public class MappingCrudApiController implements ApplicationContextAware, Initia
 			HttpServletRequest request)
 	{
 		if (!registry.isSupportedUri(uri)){
+			logger.error(String.format("URI does not map to a registered model: %s", uri));
 			throw new ResourceNotFoundException();
 		}
 		Class<T> model = (Class<T>) registry.getModelFromUri(uri);
@@ -220,6 +213,7 @@ public class MappingCrudApiController implements ApplicationContextAware, Initia
 			HttpServletRequest request)
 	{
 		if (!registry.isSupportedUri(uri)){
+			logger.error(String.format("URI does not map to a registered model: %s", uri));
 			throw new ResourceNotFoundException();
 		}
 		Class<T> model = (Class<T>) registry.getModelFromUri(uri);
@@ -231,7 +225,7 @@ public class MappingCrudApiController implements ApplicationContextAware, Initia
 		Map<String,String[]> parameterMap = request.getParameterMap();
 		List<QueryCriteria> criterias = RequestUtils.getQueryCriteriaFromFindRequest(model, request);
 		String mediaType = request.getHeader("Accept");
-		Link selfLink = new Link(linkTo(this.getClass()).slash("").toString() +
+		Link selfLink = new Link(rootUrl + "/" + uri + 
 				(request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
 		if (parameterMap.containsKey("page") || parameterMap.containsKey("size")){
 			Page<T> page = repository.find(criterias, pageable);
@@ -283,16 +277,18 @@ public class MappingCrudApiController implements ApplicationContextAware, Initia
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE})
 	public <T extends Model<ID>, ID extends Serializable> ResponseEntity<?> create(
-			@ApiParam(name = "entity", value = "Model record entity.") @RequestBody T entity,
+			@ApiParam(name = "entity", value = "Model record entity.") @RequestBody Object entity,
 			@PathVariable String uri,
 			HttpServletRequest request
 	) {
 		if (!registry.isSupportedUri(uri)){
+			logger.error(String.format("URI does not map to a registered model: %s", uri));
 			throw new ResourceNotFoundException();
 		}
 		Class<T> model = (Class<T>) registry.getModelFromUri(uri);
+		entity = convertObjectToModel(entity, model);
 		RepositoryOperations<T, ID> repository = (RepositoryOperations<T, ID>) registry.getModelRepository(model);
-		T created = repository.insert(entity);
+		T created = repository.insert((T) entity);
 		if (created == null) throw new RequestFailureException(40003, "There was a problem creating the record.", "", "");
 		if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))){
 			FilterableResource resource = getAssembler().toResource(created);
@@ -324,18 +320,22 @@ public class MappingCrudApiController implements ApplicationContextAware, Initia
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE})
 	public <T extends Model<ID>, ID extends Serializable> ResponseEntity<?> update(
-			@ApiParam(name = "entity", value = "Model record entity.") @RequestBody T entity,
+			@ApiParam(name = "entity", value = "Model record entity.") @RequestBody Object entity,
 			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable String id,
 			@PathVariable String uri,
 			HttpServletRequest request
 	) {
 		if (!registry.isSupportedUri(uri)){
+			logger.error(String.format("URI does not map to a registered model: %s", uri));
 			throw new ResourceNotFoundException();
 		}
 		Class<T> model = (Class<T>) registry.getModelFromUri(uri);
+		entity = convertObjectToModel(entity, model);
 		RepositoryOperations<T, ID> repository = (RepositoryOperations<T, ID>) registry.getModelRepository(model);
-		if (repository.exists((ID) convertModelIdParameter(id, model))) throw new ResourceNotFoundException();
-		T updated = repository.update(entity);
+		if (!repository.exists(convertModelIdParameter(id, model))) {
+			throw new ResourceNotFoundException();
+		}
+		T updated = repository.update((T) entity);
 		if (updated == null) throw new RequestFailureException(40004, "There was a problem updating the record.", "", "");
 		if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))){
 			FilterableResource resource = getAssembler().toResource(updated);
@@ -365,10 +365,11 @@ public class MappingCrudApiController implements ApplicationContextAware, Initia
 			@PathVariable String uri,
 			HttpServletRequest request) {
 		if (!registry.isSupportedUri(uri)){
+			logger.error(String.format("URI does not map to a registered model: %s", uri));
 			throw new ResourceNotFoundException();
 		}
-		Class<? extends Model> model = registry.getModelFromUri(uri);
-		RepositoryOperations repository = (RepositoryOperations) registry.getModelRepository(model);
+		Class<T> model = (Class<T>) registry.getModelFromUri(uri);
+		RepositoryOperations repository = registry.getModelRepository(model);
 		repository.delete(convertModelIdParameter(id, model));
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -386,6 +387,7 @@ public class MappingCrudApiController implements ApplicationContextAware, Initia
 	@RequestMapping(value = { "/{uri}", "/{uri}/**" }, method = RequestMethod.HEAD)
 	public ResponseEntity<?> head(HttpServletRequest request, @PathVariable String uri){
 		if (!registry.isSupportedUri(uri)){
+			logger.error(String.format("URI does not map to a registered model: %s", uri));
 			throw new ResourceNotFoundException();
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -405,6 +407,7 @@ public class MappingCrudApiController implements ApplicationContextAware, Initia
 	@RequestMapping(value = { "/{uri}", "/{uri}/**" }, method = RequestMethod.OPTIONS)
 	public ResponseEntity<?> options(HttpServletRequest request, @PathVariable String uri) {
 		if (!registry.isSupportedUri(uri)){
+			logger.error(String.format("URI does not map to a registered model: %s", uri));
 			throw new ResourceNotFoundException();
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -413,39 +416,41 @@ public class MappingCrudApiController implements ApplicationContextAware, Initia
 	/**
 	 * Converts a String query parameter to the appropriate model ID type.
 	 *
-	 * @param param
-	 * @param model
-	 * @return
+	 * @param param String value of ID parameter.
+	 * @param model Model type to interrogate to determine ID type.
+	 * @return converted ID object.
 	 */
-	private Object convertModelIdParameter(String param, Class<? extends Model> model){
+	protected <T extends Model<ID>, ID extends Serializable> ID convertModelIdParameter(String param, Class<T> model){
 		try {
-			Class<?> type = model.getMethod("getId").getReturnType();
+			Class<ID> type = (Class<ID>) model.getMethod("getId").getReturnType();
 			if (conversionService.canConvert(String.class, type)){
 				return conversionService.convert(param, type);
-			} else {
-				return param;
-			}
-		} catch (NoSuchMethodException e){
-			return param;
+			} 
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+		throw new MalformedEntityException(String.format("Cannot convert ID parameter to model ID type: %s", param));
+	}
+
+	/**
+	 * Attempts to convert a generic object, supplied in a HTTP request, to the target type. 
+	 * 
+	 * @param object object to be converted.
+	 * @param type class the object should be converted to.
+	 * @param <T>  generic type of the target class.
+	 * @return converted object.
+	 */
+	protected <T> T convertObjectToModel(Object object, Class<T> type){
+		try {
+			return objectMapper.convertValue(object, type);
+		} catch (Exception e){
+			throw new MalformedEntityException(String.format("Cannot convert object to model type %s: %s", 
+					type.getName(), object.toString()));
 		}
 	}
 	
 	public ResourceAssemblerSupport<Model, FilterableResource> getAssembler() {
 		return assembler;
 	}
-
-	@Autowired 
-	public void setApplicationContext(ApplicationContext applicationContext) {
-		this.applicationContext = applicationContext;
-	}
 	
-	@Autowired
-	public void setConversionService(ConversionService conversionService){
-		this.conversionService = conversionService;
-	}
-	
-	@Autowired
-	public void setModelRegistry(ModelRegistry registry){
-		this.registry = registry;
-	}
 }

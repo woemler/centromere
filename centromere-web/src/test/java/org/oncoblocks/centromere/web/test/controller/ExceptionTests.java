@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.oncoblocks.centromere.core.config.ModelComponentRegistrationConfigurer;
 import org.oncoblocks.centromere.web.exceptions.RestError;
 import org.oncoblocks.centromere.web.test.config.TestMongoConfig;
 import org.oncoblocks.centromere.web.test.config.TestWebConfig;
@@ -46,8 +47,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { TestWebConfig.class, TestMongoConfig.class,
-		MongoRepositoryConfig.class, ControllerIntegrationTestConfig.class})
+@ContextConfiguration(classes = { 
+		TestWebConfig.class, 
+		TestMongoConfig.class,
+		MongoRepositoryConfig.class, 
+		ControllerIntegrationTestConfig.class,
+		ModelComponentRegistrationConfigurer.DefaultModelRegistryConfig.class
+})
+
 @WebAppConfiguration
 public class ExceptionTests {
 

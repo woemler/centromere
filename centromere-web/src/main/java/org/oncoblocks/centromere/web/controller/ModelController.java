@@ -16,25 +16,13 @@
 
 package org.oncoblocks.centromere.web.controller;
 
-import org.oncoblocks.centromere.core.model.Model;
-import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Repository;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * Identifies the annotated class as a {@link Repository} and allows it to be referenced as the 
- *   primary interface for the provided {@link Model} instance.
+ * 
  * 
  * @author woemler
+ * @since 0.4.3
  */
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@Controller
-public @interface ModelController {
-	Class<? extends Model<?>> value();
+public interface ModelController {
+	
 }

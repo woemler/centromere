@@ -31,4 +31,5 @@ import java.lang.annotation.*;
 @Inherited
 @Import({WebServicesConfig.class, CentromereWebPropertiesConfig.class})
 public @interface AutoConfigureWebServices {
+	
 }

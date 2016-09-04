@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.core.test.configuration;
+package org.oncoblocks.centromere.core.commons.support;
 
-import org.oncoblocks.centromere.core.config.ModelComponentRegistrationConfigurer;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.oncoblocks.centromere.core.commons.models.Sample;
+
+import java.util.Collection;
 
 /**
  * @author woemler
  */
-@Configuration
-@Import({ModelComponentRegistrationConfigurer.DefaultModelRegistryConfig.class})
-@ComponentScan(basePackages = { "org.oncoblocks.centromere.core.test.configuration" })
-public class ConfigurationTestConfig {
-
+public interface SampleAware<T extends Sample<?>> {
+	Collection<T> getSamples();
+	//void setSamples(Collection<T> samples);
 }

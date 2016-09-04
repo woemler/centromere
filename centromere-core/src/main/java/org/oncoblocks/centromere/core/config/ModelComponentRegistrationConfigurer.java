@@ -24,13 +24,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.core.annotation.Order;
+import org.springframework.context.annotation.Configuration;
 
 /**
+ * Basic configuration for {@link ModelRegistry} and required {@link ModelBeanRegistry} instances 
+ *   for handling repository mapping, processor mapping, and web service URI mapping. 
+ * 
  * @author woemler
  * @since 0.4.3
  */
-@Order
 public abstract class ModelComponentRegistrationConfigurer {
 	
 	@Autowired private ApplicationContext applicationContext;
@@ -56,7 +58,6 @@ public abstract class ModelComponentRegistrationConfigurer {
 		}
 		modelRegistry.setRepositoryRegistry(modelRepositoryBeanRegistry());
 		modelRegistry.setProcessorRegistry(modelProcessorBeanRegistry());
-		//modelRegistry.afterPropertiesSet();
 		return modelRegistry;
 	}
 
@@ -76,6 +77,12 @@ public abstract class ModelComponentRegistrationConfigurer {
 	
 	protected ModelBeanRegistry<RecordProcessor> configureModelProcessorBeanRegistry(){
 		return new DataTypeProcessorBeanRegistry(applicationContext);
+	}
+	
+	@Configuration
+	@ModelScan(basePackages = { "org.oncoblocks.centromere.core.commons.models" })
+	public static class DefaultModelRegistryConfig extends ModelComponentRegistrationConfigurer {
+		
 	}
 	
 }

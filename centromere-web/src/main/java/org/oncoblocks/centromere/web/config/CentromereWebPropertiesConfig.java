@@ -17,8 +17,6 @@
 package org.oncoblocks.centromere.web.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
 
 /**
  * Sets default application parameters, as defined in {@code centromere-defaults.properties}.  These
@@ -28,10 +26,15 @@ import org.springframework.context.annotation.PropertySources;
  */
 
 @Configuration
-@PropertySources(value = {
-		@PropertySource("classpath:centromere-defaults.properties"),
-		@PropertySource(value = "classpath:centromere.properties", ignoreResourceNotFound = true)
-})
+//@PropertySources(value = {
+//		@PropertySource("classpath:centromere-defaults.properties"),
+//		@PropertySource(value = "classpath:centromere.properties", ignoreResourceNotFound = true)
+//})
 public class CentromereWebPropertiesConfig {
 
+//	@Bean
+//	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer(){
+//		return new PropertySourcesPlaceholderConfigurer();
+//	}
+	
 }

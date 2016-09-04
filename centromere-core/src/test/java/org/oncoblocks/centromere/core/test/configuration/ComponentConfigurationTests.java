@@ -51,7 +51,7 @@ public class ComponentConfigurationTests {
 	@Test
 	public void repositoryRegistryTest() throws Exception {
 		Assert.notNull(repositoryBeanRegistry);
-		Assert.isTrue(repositoryBeanRegistry.isSupported(ExampleModel.class));
+		Assert.isTrue(repositoryBeanRegistry.isRegistered(ExampleModel.class));
 		Assert.notNull(repositoryBeanRegistry.get(ExampleModel.class));
 		Assert.isTrue(repositoryBeanRegistry.get(ExampleModel.class) instanceof ExampleRepository);
 	}
@@ -59,7 +59,7 @@ public class ComponentConfigurationTests {
 	@Test
 	public void processorRegistryTest() throws Exception {
 		Assert.notNull(processorBeanRegistry);
-		Assert.isTrue(processorBeanRegistry.isSupported(ExampleModel.class));
+		Assert.isTrue(processorBeanRegistry.isRegistered(ExampleModel.class));
 		Assert.isTrue(processorBeanRegistry.isSupportedDataType("example_data"));
 		Assert.notNull(processorBeanRegistry.get(ExampleModel.class));
 		Assert.isTrue(processorBeanRegistry.get(ExampleModel.class) instanceof ExampleProcessor);

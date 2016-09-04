@@ -38,4 +38,5 @@ public class ModelRepositoryBeanRegistry extends AbstractModelBeanRegistry<Repos
 	protected String getCreatedBeanNameSuffix() {
 		return "Repository";
 	}
+
 }

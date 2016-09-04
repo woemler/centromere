@@ -23,8 +23,7 @@ import org.springframework.http.HttpStatus;
  * 
  * @author woemler 
  */
-public class RequestFailureException extends
-		org.oncoblocks.centromere.web.exceptions.RestException {
+public class RequestFailureException extends RestException {
 	public RequestFailureException(Integer code, String message, String developerMessage, String moreInfoUrl) {
 		super(HttpStatus.BAD_REQUEST, code, message, developerMessage, moreInfoUrl);
 	}

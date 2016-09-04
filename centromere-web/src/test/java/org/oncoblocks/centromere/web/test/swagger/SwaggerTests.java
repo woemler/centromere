@@ -19,11 +19,13 @@ package org.oncoblocks.centromere.web.test.swagger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.oncoblocks.centromere.core.config.ModelComponentRegistrationConfigurer;
 import org.oncoblocks.centromere.web.test.config.TestMongoConfig;
 import org.oncoblocks.centromere.web.test.config.TestWebConfig;
 import org.oncoblocks.centromere.web.test.controller.ControllerIntegrationTestConfig;
 import org.oncoblocks.centromere.web.test.repository.MongoRepositoryConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -41,13 +43,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
-		TestMongoConfig.class, TestWebConfig.class, MongoRepositoryConfig.class,
-		ControllerIntegrationTestConfig.class, TestSwaggerConfig.class})
+		TestMongoConfig.class, 
+		TestWebConfig.class, 
+		MongoRepositoryConfig.class,
+		ControllerIntegrationTestConfig.class, 
+		TestSwaggerConfig.class,
+		ModelComponentRegistrationConfigurer.DefaultModelRegistryConfig.class
+})
 @WebAppConfiguration
 public class SwaggerTests {
 	
 	private MockMvc mockMvc;
 	@Autowired private WebApplicationContext webApplicationContext;
+	@Autowired private Environment env;
 	
 	@Before
 	public void setup() {
@@ -56,7 +64,7 @@ public class SwaggerTests {
 
 	@Test
 	public void findTest() throws Exception {
-		mockMvc.perform(get("/swagger"))
+		mockMvc.perform(get("/api/swagger"))
 				.andExpect(status().isOk());
 	}
 	

@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.core.test.configuration;
+package org.oncoblocks.centromere.core.commons.support;
 
-import org.oncoblocks.centromere.core.config.ModelComponentRegistrationConfigurer;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.oncoblocks.centromere.core.commons.models.DataFile;
 
 /**
+ * Ensures that the implementing component is aware of its data file record, for use in annotating
+ *   processed records.
+ * 
  * @author woemler
  */
-@Configuration
-@Import({ModelComponentRegistrationConfigurer.DefaultModelRegistryConfig.class})
-@ComponentScan(basePackages = { "org.oncoblocks.centromere.core.test.configuration" })
-public class ConfigurationTestConfig {
-
+public interface DataFileAware<T extends DataFile<?>> {
+	T getDataFile();
+	void setDataFile(T dataFile);
 }

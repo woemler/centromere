@@ -16,9 +16,14 @@
 
 package org.oncoblocks.centromere.core.commons.readers;
 
-import org.oncoblocks.centromere.core.commons.models.*;
+import org.oncoblocks.centromere.core.commons.models.DataFile;
+import org.oncoblocks.centromere.core.commons.models.Gene;
+import org.oncoblocks.centromere.core.commons.models.GeneExpression;
+import org.oncoblocks.centromere.core.commons.models.Sample;
 import org.oncoblocks.centromere.core.commons.repositories.GeneRepository;
 import org.oncoblocks.centromere.core.commons.repositories.SampleRepository;
+import org.oncoblocks.centromere.core.commons.support.DataFileAware;
+import org.oncoblocks.centromere.core.commons.support.SampleAware;
 import org.oncoblocks.centromere.core.dataimport.*;
 import org.oncoblocks.centromere.core.model.ModelSupport;
 import org.slf4j.Logger;
@@ -34,14 +39,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Reads normalized RNA-Seq gene expression data from the TCGA files.
+ * Reads normalized gene expression data from GCT files (http://software.broadinstitute.org/cancer/software/genepattern/file-formats-guide#GCT).
  * 
  * @author woemler
  * @since 0.4.3
  */
-public class TcgaRnaSeqGeneExpressionReader<T extends GeneExpression<?>> 
+public class GctGeneExpressionFileReader<T extends GeneExpression<?>> 
 		extends MultiRecordLineFileReader<T> 
-		implements InitializingBean, ImportOptionsAware, ModelSupport<T> {
+		implements InitializingBean, ImportOptionsAware, ModelSupport<T>, DataFileAware, SampleAware {
 
 	private SampleRepository sampleRepository;
 	private GeneRepository geneRepository;
@@ -50,7 +55,7 @@ public class TcgaRnaSeqGeneExpressionReader<T extends GeneExpression<?>>
 	private Map<String, Sample> sampleMap;
 	private Class<T> model;
 	
-	private static final Logger logger = LoggerFactory.getLogger(TcgaRnaSeqGeneExpressionReader.class);
+	private static final Logger logger = LoggerFactory.getLogger(GctGeneExpressionFileReader.class);
 	
 	@PostConstruct
 	public void afterPropertiesSet(){
@@ -72,7 +77,7 @@ public class TcgaRnaSeqGeneExpressionReader<T extends GeneExpression<?>>
 		List<T> records = new ArrayList<>();
 		String[] bits = line.trim().split(this.getDelimiter());
 		if (bits.length > 1){
-			Gene gene = getGene(bits[0]);
+			Gene gene = getGene(line);
 			if (gene == null){
 				if (options.isSkipInvalidGenes()){
 					logger.warn(String.format("Skipping line due to invalid gene: %s", line));
@@ -81,7 +86,7 @@ public class TcgaRnaSeqGeneExpressionReader<T extends GeneExpression<?>>
 					throw new DataImportException(String.format("Invalid gene in line: %s", line));
 				}
 			}
-			for (int i = 1; i < bits.length; i++){
+			for (int i = 2; i < bits.length; i++){
 				T record;
 				try {
 					record = this.getModel().newInstance();
@@ -127,15 +132,15 @@ public class TcgaRnaSeqGeneExpressionReader<T extends GeneExpression<?>>
 		}
 		return records;
 	}
-	
-	private Gene getGene(String field){
+
+	private Gene getGene(String line){
 		Gene gene = null;
-		String[] b = field.trim().split("|");
+		String[] b = line.split(getDelimiter());
 		if (b.length > 1){
 			List<Gene> genes = null;
-			if (!b[0].equals("?")){
+			if (!b[0].equals("")){
 				genes = geneRepository.guessGene(b[0]);
-			} 
+			}
 			if (genes == null || genes.isEmpty()){
 				genes = geneRepository.guessGene(b[1]);
 			}
@@ -186,4 +191,10 @@ public class TcgaRnaSeqGeneExpressionReader<T extends GeneExpression<?>>
 	public void setModel(Class<T> model) {
 		this.model = model;
 	}
+
+	@Override 
+	public List<Sample> getSamples() {
+		return new ArrayList<>(sampleMap.values());
+	}
+
 }

@@ -31,7 +31,7 @@ import java.io.IOException;
  * @author woemler
  */
 @Configuration
-@EnableMongoRepositories(basePackageClasses = {MongoGeneRepository.class},
+@EnableMongoRepositories(basePackageClasses = { MongoGeneRepository.class },
 		repositoryFactoryBeanClass = CentromereMongoRepositoryFactoryBean.class )
 public class CommonsMongoDataSourceConfig {
 

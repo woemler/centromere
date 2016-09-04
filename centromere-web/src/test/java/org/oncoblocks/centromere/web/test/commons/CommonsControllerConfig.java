@@ -24,6 +24,6 @@ import org.springframework.context.annotation.Configuration;
  */
 
 @Configuration
-@ComponentScan(basePackages = { "org.oncoblocks.centromere.web.test.commons" })
+@ComponentScan(basePackageClasses = {MongoEntrezGeneController.class})
 public class CommonsControllerConfig {
 }

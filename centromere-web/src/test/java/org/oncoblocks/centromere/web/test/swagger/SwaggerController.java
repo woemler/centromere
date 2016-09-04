@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 
 @Controller
-@RequestMapping("/swagger")
+@RequestMapping("/api/swagger")
 public class SwaggerController extends CrudApiController<EntrezGene, Long> {
 	@Autowired
 	public SwaggerController(EntrezGeneRepository repository, EntityLinks entityLinks) {

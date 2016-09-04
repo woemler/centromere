@@ -29,6 +29,10 @@ public interface ModelBeanRegistry<T> {
 	T get(Class<? extends Model> model);
 	void registerBean(Class<? extends Model> model, T component);
 	T createBean(Class<? extends Model> model) throws BeansException;
-	boolean isSupported(Class<? extends Model> model);
+	boolean isRegistered(Class<? extends Model> model);
+	boolean isRegistered(T bean);
 	void addModelBeans(Collection<Class<? extends Model>> models);
+	void addModelBeansFromContext();
+	Collection<T> getRegisteredBeans();
+	Collection<Class<? extends Model>> getRegisteredBeanModels();
 }
