@@ -19,7 +19,7 @@ package org.oncoblocks.centromere.web.test.controller;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oncoblocks.centromere.core.config.ModelComponentRegistrationConfigurer;
+import org.oncoblocks.centromere.web.test.config.DefaultModelRegistryConfig;
 import org.oncoblocks.centromere.web.test.config.TestMongoConfig;
 import org.oncoblocks.centromere.web.test.config.TestWebConfig;
 import org.oncoblocks.centromere.web.test.models.CopyNumber;
@@ -49,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 		TestMongoConfig.class, 
 		MongoRepositoryConfig.class, 
 		ControllerIntegrationTestConfig.class,
-		ModelComponentRegistrationConfigurer.DefaultModelRegistryConfig.class
+		DefaultModelRegistryConfig.class
 })
 @WebAppConfiguration
 public class AbstractControllerIntegrationTests {

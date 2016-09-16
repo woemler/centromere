@@ -17,10 +17,12 @@
 package org.oncoblocks.centromere.core.test.configuration;
 
 import org.oncoblocks.centromere.core.model.Model;
+import org.oncoblocks.centromere.core.model.ModelAttributes;
 
 /**
  * @author woemler
  */
+@ModelAttributes(uri = "example")
 public class ExampleModel implements Model<String> {
 	
 	private String id;

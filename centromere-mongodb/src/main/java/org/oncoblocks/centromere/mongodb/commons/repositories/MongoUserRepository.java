@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.core.config;
+package org.oncoblocks.centromere.mongodb.commons.repositories;
 
-import org.oncoblocks.centromere.core.model.Model;
-
-import java.io.Serializable;
+import org.oncoblocks.centromere.core.commons.repositories.UserRepository;
+import org.oncoblocks.centromere.mongodb.commons.models.MongoUser;
+import org.springframework.data.mongodb.repository.Query;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
- * Creates an instance of a bean that supports {@link Model} classes, such as repositories or
- *   record processors.
- * 
  * @author woemler
- * @since 0.4.3
  */
-public interface ModelComponentFactory<T> {
-
-	/**
-	 * Creates and returns a bean instance of the target type, given a model class reference.  
-	 * 
-	 * @param model model class to create bean component for.
-	 * @return bean instance.
-	 */
-	<S extends Model<ID>, ID extends Serializable> T getComponent(Class<S> model);
+public interface MongoUserRepository extends UserRepository<MongoUser, String> {
+	@Override 
+	@Query("{ 'username': ?0 }")
+	UserDetails loadUserByUsername(String s)
+			throws UsernameNotFoundException;
 }

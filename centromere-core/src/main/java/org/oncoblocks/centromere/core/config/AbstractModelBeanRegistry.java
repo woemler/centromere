@@ -95,7 +95,7 @@ public abstract class AbstractModelBeanRegistry<T extends ModelSupport>
 	@Override 
 	public T createBean(Class<? extends Model> model) {
 		if (beanFactory != null){
-			return beanFactory.getComponent(model);
+			return (T) beanFactory.getComponent(model);
 		} else {
 			throw new ModelRegistryException(String.format("No model bean factory set for component class: %s.",
 					getBeanClass().getName()));
@@ -163,8 +163,7 @@ public abstract class AbstractModelBeanRegistry<T extends ModelSupport>
 		this.createIfNull = createIfNull;
 	}
 
-	public void setModelComponentFactory(
-			ModelComponentFactory<T> modelComponentFactory) {
+	public void setModelComponentFactory(ModelComponentFactory<T> modelComponentFactory) {
 		this.beanFactory = modelComponentFactory;
 	}
 

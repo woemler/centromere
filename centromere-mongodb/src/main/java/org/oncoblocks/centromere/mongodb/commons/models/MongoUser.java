@@ -14,26 +14,30 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.core.config;
+package org.oncoblocks.centromere.mongodb.commons.models;
 
-import org.oncoblocks.centromere.core.model.Model;
-
-import java.io.Serializable;
+import org.oncoblocks.centromere.core.commons.models.User;
+import org.oncoblocks.centromere.core.model.Alias;
+import org.oncoblocks.centromere.core.model.ModelAttributes;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * Creates an instance of a bean that supports {@link Model} classes, such as repositories or
- *   record processors.
- * 
  * @author woemler
- * @since 0.4.3
  */
-public interface ModelComponentFactory<T> {
+@ModelAttributes(uri = "users")
+@Document(collection = "api_users")
+public class MongoUser extends User<String> {
+	
+	@Id @Alias("userId")
+	private String id;
 
-	/**
-	 * Creates and returns a bean instance of the target type, given a model class reference.  
-	 * 
-	 * @param model model class to create bean component for.
-	 * @return bean instance.
-	 */
-	<S extends Model<ID>, ID extends Serializable> T getComponent(Class<S> model);
+	@Override 
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 }

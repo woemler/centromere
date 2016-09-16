@@ -14,26 +14,14 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.core.config;
-
-import org.oncoblocks.centromere.core.model.Model;
-
-import java.io.Serializable;
+package org.oncoblocks.centromere.web.config;
 
 /**
- * Creates an instance of a bean that supports {@link Model} classes, such as repositories or
- *   record processors.
- * 
  * @author woemler
- * @since 0.4.3
  */
-public interface ModelComponentFactory<T> {
-
-	/**
-	 * Creates and returns a bean instance of the target type, given a model class reference.  
-	 * 
-	 * @param model model class to create bean component for.
-	 * @return bean instance.
-	 */
-	<S extends Model<ID>, ID extends Serializable> T getComponent(Class<S> model);
+public class Profiles {
+	
+	public static final String CUSTOM = "custom";
+	public static final String MONGODB = "mongodb";
+	
 }

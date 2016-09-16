@@ -32,4 +32,6 @@ public @interface ModelAttributes {
 	
 	String uri() default "";
 	
+	String table() default "";
+	
 }

@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * TODO
  * 
- * QueryCriteriaBuilder.where("symbol").is("AKT1").and("signal").between(3.0, 1.2).build();
+ * QueryCriteriaBuilder.where("symbol").is("AKT1").and("signal").between(3.0, 1.datatables-buttons).build();
  * 
  * 
  * @author woemler

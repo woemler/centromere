@@ -20,8 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oncoblocks.centromere.core.config.ModelComponentRegistrationConfigurer;
 import org.oncoblocks.centromere.web.exceptions.RestError;
+import org.oncoblocks.centromere.web.test.config.DefaultModelRegistryConfig;
 import org.oncoblocks.centromere.web.test.config.TestMongoConfig;
 import org.oncoblocks.centromere.web.test.config.TestWebConfig;
 import org.oncoblocks.centromere.web.test.models.EntrezGene;
@@ -52,7 +52,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 		TestMongoConfig.class,
 		MongoRepositoryConfig.class, 
 		ControllerIntegrationTestConfig.class,
-		ModelComponentRegistrationConfigurer.DefaultModelRegistryConfig.class
+		DefaultModelRegistryConfig.class
 })
 
 @WebAppConfiguration

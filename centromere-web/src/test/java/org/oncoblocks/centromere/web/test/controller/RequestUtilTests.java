@@ -18,10 +18,10 @@ package org.oncoblocks.centromere.web.test.controller;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oncoblocks.centromere.core.config.ModelComponentRegistrationConfigurer;
 import org.oncoblocks.centromere.core.repository.Evaluation;
 import org.oncoblocks.centromere.core.repository.QueryParameterDescriptor;
 import org.oncoblocks.centromere.web.controller.RequestUtils;
+import org.oncoblocks.centromere.web.test.config.DefaultModelRegistryConfig;
 import org.oncoblocks.centromere.web.test.config.TestMongoConfig;
 import org.oncoblocks.centromere.web.test.config.TestWebConfig;
 import org.oncoblocks.centromere.web.test.models.CopyNumber;
@@ -44,7 +44,7 @@ import java.util.Map;
 		TestWebConfig.class, 
 		MongoRepositoryConfig.class, 
 		ControllerIntegrationTestConfig.class,
-		ModelComponentRegistrationConfigurer.DefaultModelRegistryConfig.class
+		DefaultModelRegistryConfig.class
 })
 public class RequestUtilTests {
 	

@@ -21,7 +21,7 @@ package org.oncoblocks.centromere.core.repository;
  *   execution.
  * 
  * @author woemler
- * @since 0.4.2
+ * @since 0.4.datatables-buttons
  */
 public class QueryParameterException extends RuntimeException {
 

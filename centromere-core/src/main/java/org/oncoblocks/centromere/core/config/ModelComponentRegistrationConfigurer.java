@@ -24,11 +24,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 /**
  * Basic configuration for {@link ModelRegistry} and required {@link ModelBeanRegistry} instances 
- *   for handling repository mapping, processor mapping, and web service URI mapping. 
+ *   for handling repository mapping, processor mapping, and web service URI mapping. Creates and 
+ *   configures the {@link ModelRegistry}.  By default, this registry will look for models
+ *   in a couple different places, and will move down this list until it discovers at least a 
+ *   single model class:
+ *
+ *   1. @ModelScan on superclass
+ *   2. @ComponentScan on superclass
+ *   3. Classpath supplied in property centromere.models.base-package
+ *   4. Other beans in context with @ModelScan
+ *   5. Other beans in context with @ComponentScan
+ *
+ *   If no models are found at initialization, the registry will check to see if {@link ModelBeanRegistry}
+ *   instances have picked up any component classes and register their respective 
+ *   {@link org.oncoblocks.centromere.core.model.Model} classes.
+ *   
+ *   The ModelBeanRegistry classes will attempt to locate already instantiated {@link ModelComponentFactory}
+ *   instances they can use to create beans, if required by the centromere.models.auto-create-components
+ *   property.
  * 
  * @author woemler
  * @since 0.4.3
@@ -36,38 +53,101 @@ import org.springframework.context.annotation.Configuration;
 public abstract class ModelComponentRegistrationConfigurer {
 	
 	@Autowired private ApplicationContext applicationContext;
-	private static final Logger logger = LoggerFactory.getLogger(ModelComponentRegistrationConfigurer.class);
+	@Autowired(required = false) private ModelComponentFactory<RepositoryOperations> modelRepositoryFactory;
+	@Autowired(required = false) private ModelComponentFactory<RecordProcessor> recordProcessorFactory;
+	@Autowired private Environment env;
 	
+	private static final Logger logger = LoggerFactory.getLogger(ModelComponentRegistrationConfigurer.class);
+
 	@Bean
 	public ModelRegistry modelRegistry(){
+		
 		ModelRegistry modelRegistry;
+		
+		// By default, check this class and superclass for ModelScan and ComponentScan annotations
 		if (this.getClass().isAnnotationPresent(ModelScan.class)) {
 			ModelScan modelScan = this.getClass().getAnnotation(ModelScan.class);
 			modelRegistry = ModelRegistry.fromModelScan(modelScan);
+			logger.debug(String.format("Creating ModelRegistry from ModelScan: %s", modelScan.toString()));
 		} else if (this.getClass().isAnnotationPresent(ComponentScan.class)) {
 			ComponentScan componentScan = this.getClass().getAnnotation(ComponentScan.class);
 			modelRegistry = ModelRegistry.fromComponentScan(componentScan);
+			logger.debug(String.format("Creating ModelRegistry from ComponentScan: %s", componentScan.toString()));
 		} else if (this.getClass().getSuperclass().isAnnotationPresent(ModelScan.class)) {
 			ModelScan modelScan = this.getClass().getSuperclass().getAnnotation(ModelScan.class);
 			modelRegistry = ModelRegistry.fromModelScan(modelScan);
+			logger.debug(String.format("Creating ModelRegistry from ModelScan: %s", modelScan.toString()));
 		} else if (this.getClass().getSuperclass().isAnnotationPresent(ComponentScan.class)) {
 			ComponentScan componentScan = this.getClass().getSuperclass().getAnnotation(ComponentScan.class);
 			modelRegistry = ModelRegistry.fromComponentScan(componentScan);
+			logger.debug(String.format("Creating ModelRegistry from ComponentScan: %s", componentScan.toString()));
 		} else {
 			modelRegistry = new ModelRegistry();
 		}
+		
+		// If no models have been found, check for property-defined model path
+		if (env.containsProperty("centromere.models.base-package") 
+				&& env.getProperty("centromere.models.base-package") != null
+				&& !env.getProperty("centromere.models.base-package").equals("")){
+			modelRegistry.addClassPathModels(env.getRequiredProperty("centromere.models.base-package"));
+		}
+		
+		// If no models have been found, check for config classes with ModelScan and ComponentScan annotations
+		if (modelRegistry.getModels().isEmpty()){
+			for (Object bean: applicationContext.getBeansWithAnnotation(ModelScan.class).values()){
+				ModelScan modelScan = bean.getClass().getAnnotation(ModelScan.class);
+				if (modelScan != null) {
+					modelRegistry.addModelScanModels(modelScan);
+				}
+			}
+		}
+		if (modelRegistry.getModels().isEmpty()){
+			for (Object bean: applicationContext.getBeansWithAnnotation(ComponentScan.class).values()){
+				ComponentScan componentScan = bean.getClass().getAnnotation(ComponentScan.class);
+				if (componentScan != null) {
+					modelRegistry.addComponentScanModels(componentScan);
+				}
+			}
+		}
+		
+		logger.info(String.format("ModelRegistry created with registered models: %s", 
+				modelRegistry.getModels().toString()));
+		
+		// Set component registries
 		modelRegistry.setRepositoryRegistry(modelRepositoryBeanRegistry());
 		modelRegistry.setProcessorRegistry(modelProcessorBeanRegistry());
+		
 		return modelRegistry;
+		
 	}
 
+	/**
+	 * Creates the {@link ModelBeanRegistry} instance for registering {@link RepositoryOperations}
+	 *   implementations.
+	 * 
+	 * @return
+	 */
 	@Bean
 	public ModelBeanRegistry<RepositoryOperations> modelRepositoryBeanRegistry(){
 		return configureModelRepositoryBeanRegistry();
 	}
 	
 	protected ModelBeanRegistry<RepositoryOperations> configureModelRepositoryBeanRegistry(){
-		return new ModelRepositoryBeanRegistry(applicationContext);
+		ModelRepositoryBeanRegistry repositoryRegistry 
+				= new ModelRepositoryBeanRegistry(applicationContext);
+		if (modelRepositoryFactory != null){
+			repositoryRegistry.setModelComponentFactory(modelRepositoryFactory);
+			if (env.containsProperty("centromere.models.auto-create-components")){
+				boolean flag = false;
+				try {
+					flag = Boolean.parseBoolean(env.getRequiredProperty("centromere.models.auto-create-components"));
+				} catch (Exception e){
+					logger.warn("Error parsing property for centromere.models.auto-create-components!");
+				}
+				repositoryRegistry.setCreateIfNull(flag);
+			}
+		}
+		return  repositoryRegistry;
 	}
 	
 	@Bean
@@ -76,13 +156,22 @@ public abstract class ModelComponentRegistrationConfigurer {
 	}
 	
 	protected ModelBeanRegistry<RecordProcessor> configureModelProcessorBeanRegistry(){
-		return new DataTypeProcessorBeanRegistry(applicationContext);
+		DataTypeProcessorBeanRegistry processorRegistry 
+				= new DataTypeProcessorBeanRegistry(applicationContext);
+		if (recordProcessorFactory != null){
+			processorRegistry.setModelComponentFactory(recordProcessorFactory);
+			if (env.containsProperty("centromere.models.auto-create-components")) {
+				boolean flag = false;
+				try {
+					flag = Boolean
+							.parseBoolean(env.getRequiredProperty("centromere.models.auto-create-components"));
+				} catch (Exception e) {
+					logger.warn("Error parsing property for centromere.models.auto-create-components!");
+				}
+				processorRegistry.setCreateIfNull(flag);
+			}
+		}
+		return processorRegistry;
 	}
-	
-	@Configuration
-	@ModelScan(basePackages = { "org.oncoblocks.centromere.core.commons.models" })
-	public static class DefaultModelRegistryConfig extends ModelComponentRegistrationConfigurer {
-		
-	}
-	
+
 }

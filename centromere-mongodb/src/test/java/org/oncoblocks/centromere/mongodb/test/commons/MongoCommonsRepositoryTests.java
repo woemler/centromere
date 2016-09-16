@@ -27,6 +27,7 @@ import org.oncoblocks.centromere.core.commons.testing.SubjectDataGenerator;
 import org.oncoblocks.centromere.mongodb.commons.models.*;
 import org.oncoblocks.centromere.mongodb.commons.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
@@ -48,10 +49,21 @@ public class MongoCommonsRepositoryTests {
 	@Autowired private SubjectRepository subjectRepository;
 	@Autowired private DataSetRepository dataSetRepository;
 	@Autowired private DataFileRepository dataFileRepository;
+	@Autowired private UserRepository userRepository;
+	@Autowired private UserDetailsService userDetailsService;
 	
 	@Before
 	public void setup(){
 		
+	}
+	
+	@Test
+	public void userDetailsRepositoryTest() throws Exception {
+		Assert.notNull(userRepository);
+		Assert.notNull(userDetailsService);
+		MongoUserRepository repo1 = (MongoUserRepository) userRepository;
+		MongoUserRepository repo2 = (MongoUserRepository) userDetailsService;
+		Assert.isTrue(repo1.equals(repo2));
 	}
 
 	@Test

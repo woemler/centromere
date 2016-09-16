@@ -14,26 +14,17 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.core.config;
+package org.oncoblocks.centromere.web.test.config;
 
-import org.oncoblocks.centromere.core.model.Model;
-
-import java.io.Serializable;
+import org.oncoblocks.centromere.core.config.ModelComponentRegistrationConfigurer;
+import org.oncoblocks.centromere.core.config.ModelScan;
+import org.springframework.context.annotation.Configuration;
 
 /**
- * Creates an instance of a bean that supports {@link Model} classes, such as repositories or
- *   record processors.
- * 
  * @author woemler
- * @since 0.4.3
  */
-public interface ModelComponentFactory<T> {
+@Configuration
+@ModelScan(basePackages = { "org.oncoblocks.centromere.core.commons.models" })
+public class DefaultModelRegistryConfig extends ModelComponentRegistrationConfigurer {
 
-	/**
-	 * Creates and returns a bean instance of the target type, given a model class reference.  
-	 * 
-	 * @param model model class to create bean component for.
-	 * @return bean instance.
-	 */
-	<S extends Model<ID>, ID extends Serializable> T getComponent(Class<S> model);
 }

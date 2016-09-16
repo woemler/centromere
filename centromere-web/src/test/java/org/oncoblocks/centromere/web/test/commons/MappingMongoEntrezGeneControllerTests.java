@@ -25,11 +25,11 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oncoblocks.centromere.core.commons.testing.EntrezGeneDataGenerator;
-import org.oncoblocks.centromere.core.config.ModelComponentRegistrationConfigurer;
 import org.oncoblocks.centromere.core.repository.QueryParameterDescriptor;
 import org.oncoblocks.centromere.mongodb.commons.models.MongoGene;
 import org.oncoblocks.centromere.mongodb.commons.repositories.MongoGeneRepository;
 import org.oncoblocks.centromere.web.controller.RequestUtils;
+import org.oncoblocks.centromere.web.test.config.DefaultModelRegistryConfig;
 import org.oncoblocks.centromere.web.test.config.TestWebConfig;
 import org.oncoblocks.centromere.web.util.ApiMediaTypes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {
 		CommonsMongoDataSourceConfig.class, 
 		TestWebConfig.class,
-		ModelComponentRegistrationConfigurer.DefaultModelRegistryConfig.class
+		DefaultModelRegistryConfig.class
 })
 @FixMethodOrder
 public class MappingMongoEntrezGeneControllerTests {

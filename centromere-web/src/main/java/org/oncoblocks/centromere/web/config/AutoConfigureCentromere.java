@@ -14,26 +14,27 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.core.config;
+package org.oncoblocks.centromere.web.config;
 
-import org.oncoblocks.centromere.core.model.Model;
+import org.springframework.context.annotation.Import;
 
-import java.io.Serializable;
+import java.lang.annotation.*;
 
 /**
- * Creates an instance of a bean that supports {@link Model} classes, such as repositories or
- *   record processors.
+ * Performs full, automatic configuration for model schema selection, database integration, and 
+ *   web services creation.  
  * 
  * @author woemler
  * @since 0.4.3
  */
-public interface ModelComponentFactory<T> {
-
-	/**
-	 * Creates and returns a bean instance of the target type, given a model class reference.  
-	 * 
-	 * @param model model class to create bean component for.
-	 * @return bean instance.
-	 */
-	<S extends Model<ID>, ID extends Serializable> T getComponent(Class<S> model);
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@Inherited
+@AutoConfigureWebServices
+@AutoConfigureApiDocumentation
+@AutoConfigureWebSecurity
+@Import({ 
+		ProfileConfiguration.class
+})
+public @interface AutoConfigureCentromere {
 }

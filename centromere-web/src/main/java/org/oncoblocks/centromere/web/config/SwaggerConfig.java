@@ -41,7 +41,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import static springfox.documentation.builders.PathSelectors.regex;
 
 /**
- * Performs configuration for Swagger spec 2.0 API documentation via SpringFox.  API documentation 
+ * Performs configuration for Swagger spec datatables-buttons.0 API documentation via SpringFox.  API documentation 
  *   parameters are set in the {@code centromere.properties} file.
  * 
  * @author woemler

@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.core.config;
+package org.oncoblocks.centromere.core.commons.repositories;
 
-import org.oncoblocks.centromere.core.model.Model;
+import org.oncoblocks.centromere.core.commons.models.User;
+import org.oncoblocks.centromere.core.repository.RepositoryOperations;
+import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.io.Serializable;
 
 /**
- * Creates an instance of a bean that supports {@link Model} classes, such as repositories or
- *   record processors.
- * 
  * @author woemler
- * @since 0.4.3
  */
-public interface ModelComponentFactory<T> {
-
-	/**
-	 * Creates and returns a bean instance of the target type, given a model class reference.  
-	 * 
-	 * @param model model class to create bean component for.
-	 * @return bean instance.
-	 */
-	<S extends Model<ID>, ID extends Serializable> T getComponent(Class<S> model);
+@NoRepositoryBean
+public interface UserRepository<T extends User<ID>, ID extends Serializable> 
+		extends RepositoryOperations<T, ID>, UserDetailsService {
 }

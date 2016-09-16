@@ -22,10 +22,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
+ * Performs basic configuration of the {@link ModelComponentRegistrationConfigurer}.
+ * 
  * @author woemler
  */
 @Configuration
-@Import({ModelComponentRegistrationConfigurer.DefaultModelRegistryConfig.class})
+@Import({DefaultModelRegistryConfig.class})
 @ComponentScan(basePackages = { "org.oncoblocks.centromere.core.test.configuration" })
 public class ConfigurationTestConfig {
 

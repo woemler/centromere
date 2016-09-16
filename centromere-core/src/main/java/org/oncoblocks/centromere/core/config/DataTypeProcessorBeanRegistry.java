@@ -167,4 +167,5 @@ public class DataTypeProcessorBeanRegistry extends AbstractModelBeanRegistry<Rec
 	public List<Class<? extends Model>> getRegisteredBeanModels() {
 		return new ArrayList<>(modelProcessorMap.keySet());
 	}
+
 }
