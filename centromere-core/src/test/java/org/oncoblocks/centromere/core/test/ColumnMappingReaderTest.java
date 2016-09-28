@@ -18,12 +18,19 @@ package org.oncoblocks.centromere.core.test;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.oncoblocks.centromere.core.dataimport.BasicColumnMappingRecordReader;
+import org.oncoblocks.centromere.core.model.Model;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author woemler
@@ -31,6 +38,46 @@ import org.springframework.util.Assert;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { TestConfig.class })
 public class ColumnMappingReaderTest {
+	
+	private Resource exampleFile = new ClassPathResource("samples/example_mapped_data.txt");
+	
+	@Test
+	public void mappedReaderTest() throws Exception {
+		BasicColumnMappingRecordReader<ExampleData> reader = new BasicColumnMappingRecordReader<>();
+		reader.setModel(ExampleData.class);
+		List<ExampleData> records = new ArrayList<>();
+		try {
+			reader.doBefore(exampleFile.getFile().getAbsolutePath());
+
+			ExampleData record = reader.readRecord();
+			while (record != null) {
+				records.add(record);
+				record = reader.readRecord();
+			}
+		} finally {
+			reader.doAfter();
+		}
+		Assert.notEmpty(records);
+		Assert.isTrue(records.size() == 5);
+		Assert.isTrue("Joe".equals(records.get(0).getColumnA()));
+		Assert.isTrue(records.get(0).getColumnB().equals(34));
+		Assert.isTrue(records.get(0).getColumnC().equals(3.123));
+		Assert.notNull(records.get(0).getColumnD());
+		Assert.notEmpty(records.get(0).getColumnD());
+		Assert.isTrue(records.get(0).getColumnD().size() == 2);
+		Assert.isTrue("bbb".equals(records.get(0).getColumnD().get(1)));
+		Assert.isTrue("Mary".equals(records.get(1).getColumnA()));
+		Assert.isTrue(records.get(1).getColumnB().equals(45));
+		Assert.isTrue(records.get(1).getColumnC().equals(4.0));
+		Assert.isNull(records.get(1).getColumnD());
+		Assert.isTrue("Henry".equals(records.get(2).getColumnA()));
+		Assert.isTrue(records.get(2).getColumnB().equals(12));
+		Assert.isNull(records.get(2).getColumnC());
+		Assert.notNull(records.get(2).getColumnD());
+		Assert.notEmpty(records.get(2).getColumnD());
+		Assert.isTrue(records.get(2).getColumnD().size() == 1);
+		Assert.isTrue("stuff".equals(records.get(2).getColumnD().get(0)));
+	}
 	
 	@Test
 	public void modelBeanWrapperTest() throws Exception {
@@ -115,6 +162,55 @@ public class ColumnMappingReaderTest {
 		System.out.println(gene.toString());
 
 		
+	}
+
+	public static class ExampleData implements Model<String> {
+
+		private String id;
+		private String columnA;
+		private Integer columnB;
+		private Double columnC;
+		private List<String> columnD;
+
+		@Override public String getId() {
+			return id;
+		}
+
+		public void setId(String id) {
+			this.id = id;
+		}
+
+		public String getColumnA() {
+			return columnA;
+		}
+
+		public void setColumnA(String columnA) {
+			this.columnA = columnA;
+		}
+
+		public Integer getColumnB() {
+			return columnB;
+		}
+
+		public void setColumnB(Integer columnB) {
+			this.columnB = columnB;
+		}
+
+		public Double getColumnC() {
+			return columnC;
+		}
+
+		public void setColumnC(Double columnC) {
+			this.columnC = columnC;
+		}
+
+		public List<String> getColumnD() {
+			return columnD;
+		}
+
+		public void setColumnD(List<String> columnD) {
+			this.columnD = columnD;
+		}
 	}
 	
 }

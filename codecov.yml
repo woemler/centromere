@@ -17,6 +17,7 @@ coverage:
         
   ignore:
     - centromere-core/src/main/java/org/oncoblocks/centromere/core/model/*
+    - centromere-core/src/main/java/org/oncoblocks/centromere/core/commons/models/*
     - centromere-core/src/main/java/org/oncoblocks/centromere/core/dataimport/AbstractRecordFileWriter.java
     - centromere-core/src/main/java/org/oncoblocks/centromere/core/dataimport/BasicImportOptions.java
     - centromere-core/src/main/java/org/oncoblocks/centromere/core/dataimport/DataImportException.java
@@ -24,6 +25,7 @@ coverage:
     - centromere-web/src/main/java/org/oncoblocks/centromere/web/config/*
     - centromere-web/src/main/java/org/oncoblocks/centromere/web/util/*
     - centromere-web/src/main/java/org/oncoblocks/centromere/web/documentation/*
+    - centromere-mongodb/src/main/java/org/oncoblocks/centromere/mongodb/commons/models/*
 
 comment:
   layout: "header, diff, changes, sunburst, uncovered"
