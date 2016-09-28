@@ -30,6 +30,7 @@ import org.oncoblocks.centromere.web.test.repository.EntrezGeneRepository;
 import org.oncoblocks.centromere.web.test.repository.MongoRepositoryConfig;
 import org.oncoblocks.centromere.web.test.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ContextConfiguration;
@@ -74,6 +75,7 @@ public class SecurityTests {
 	private MockMvc mockMvc;
 	@Autowired private WebApplicationContext webApplicationContext;
 	@Autowired private UserRepository userRepository;
+	@Autowired private Environment environment;
 
 	@Autowired
 	@SuppressWarnings("SpringJavaAutowiringInspection")
@@ -126,6 +128,7 @@ public class SecurityTests {
 
 	@Test
 	public void testSecuredUrl() throws Exception {
+		System.out.println("Secured URL: " + environment.getProperty("centromere.security.secure-url"));
 		mockMvc.perform(get("/secured/genes"))
 				.andExpect(status().isForbidden());
 	}

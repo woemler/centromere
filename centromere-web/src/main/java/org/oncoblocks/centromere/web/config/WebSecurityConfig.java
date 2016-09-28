@@ -16,6 +16,7 @@
 
 package org.oncoblocks.centromere.web.config;
 
+import org.oncoblocks.centromere.core.config.DefaultConfigurations;
 import org.oncoblocks.centromere.web.security.AuthenticationTokenProcessingFilter;
 import org.oncoblocks.centromere.web.security.BasicTokenUtils;
 import org.oncoblocks.centromere.web.security.TokenOperations;
@@ -24,6 +25,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
@@ -48,6 +51,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableWebMvcSecurity
+@Import({ DefaultConfigurations.DefaultCentromerePropertiesConfig.class })
+@PropertySource(value = "classpath:centromere.properties", ignoreResourceNotFound = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	private static Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
@@ -76,12 +81,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		public TokenOperations tokenUtils() {
 			BasicTokenUtils tokenUtils = new BasicTokenUtils(env.getRequiredProperty("centromere.security.token"));
 			try {
-				tokenUtils.setTokenLifespanHours(Long.parseLong(env.getRequiredProperty(
-						"centromere.security.token-lifespan-hours")));
+				tokenUtils.setTokenLifespanHours(Long.parseLong(env.getRequiredProperty("centromere.security.token-lifespan-hours")));
 			} catch (NumberFormatException e){
 				try {
-					tokenUtils.setTokenLifespanDays(Long.parseLong(env.getRequiredProperty(
-							"centromere.security.token-lifespan-days")));
+					tokenUtils.setTokenLifespanDays(Long.parseLong(env.getRequiredProperty("centromere.security.token-lifespan-days")));
 				} catch (NumberFormatException ex){
 					logger.warn("[CENTROMERE] Token lifespan not properly configured.  Reverting to default configuration");
 					tokenUtils.setTokenLifespanDays(1L);

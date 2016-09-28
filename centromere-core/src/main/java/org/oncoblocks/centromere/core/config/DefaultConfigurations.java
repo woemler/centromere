@@ -14,27 +14,19 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.web.config;
+package org.oncoblocks.centromere.core.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 /**
- * Sets default application parameters, as defined in {@code centromere-defaults.properties}.  These
- *   parameter values can be overridden in the client application with {@code centromere.properties}.
- * 
  * @author woemler
  */
-
-@Configuration
-//@PropertySources(value = {
-//		@PropertySource("classpath:centromere-defaults.properties"),
-//		@PropertySource(value = "classpath:centromere.properties", ignoreResourceNotFound = true)
-//})
-public class CentromereWebPropertiesConfig {
-
-//	@Bean
-//	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer(){
-//		return new PropertySourcesPlaceholderConfigurer();
-//	}
+public class DefaultConfigurations {
+	
+	@PropertySource({ "classpath:centromere-defaults.properties" })
+	@Configuration
+	public static class DefaultCentromerePropertiesConfig {
+	}
 	
 }

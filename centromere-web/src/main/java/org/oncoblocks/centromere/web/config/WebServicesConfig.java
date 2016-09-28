@@ -18,6 +18,7 @@ package org.oncoblocks.centromere.web.config;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.oncoblocks.centromere.core.config.DefaultConfigurations;
 import org.oncoblocks.centromere.web.controller.MappingCrudApiController;
 import org.oncoblocks.centromere.web.controller.MappingModelResourceAssembler;
 import org.oncoblocks.centromere.web.exceptions.RestExceptionHandler;
@@ -69,10 +70,8 @@ import java.util.List;
 		MappingModelResourceAssembler.class, 
 		MappingCrudApiController.class
 })
-@PropertySources(value = {
-		@PropertySource("classpath:centromere-defaults.properties"),
-		@PropertySource(value = "classpath:centromere.properties", ignoreResourceNotFound = true)
-})
+@Import({DefaultConfigurations.DefaultCentromerePropertiesConfig.class})
+@PropertySource(value = "classpath*:centromere.properties", ignoreResourceNotFound = true)
 public class WebServicesConfig extends WebMvcConfigurerAdapter {
 	
 	@Autowired private Environment env;

@@ -29,7 +29,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Inherited
-@Import({WebServicesConfig.class, CentromereWebPropertiesConfig.class})
+@Import({WebServicesConfig.class})
 public @interface AutoConfigureWebServices {
 	
 }
