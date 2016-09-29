@@ -31,16 +31,18 @@ public class QueryParameterDescriptor {
 	private Class<?> type;
 	private Evaluation evaluation;
 	private boolean regexMatch = false;
+	private boolean dynaimicParameters = true;
 
 	public QueryParameterDescriptor() { }
 
 	public QueryParameterDescriptor(String paramName, String fieldName, Class<?> type,
-			Evaluation evaluation, boolean regexMatch) {
+			Evaluation evaluation, boolean regexMatch, boolean dynamicParameters) {
 		this.paramName = paramName;
 		this.fieldName = fieldName;
 		this.type = type;
 		this.evaluation = evaluation;
 		this.regexMatch = regexMatch;
+		this.dynaimicParameters = dynamicParameters;
 	}
 
 	public String getParamName() {
@@ -83,23 +85,37 @@ public class QueryParameterDescriptor {
 		this.regexMatch = regexMatch;
 	}
 
+	public boolean isDynaimicParameters() {
+		return dynaimicParameters;
+	}
+
+	public void setDynaimicParameters(boolean dynaimicParameters) {
+		this.dynaimicParameters = dynaimicParameters;
+	}
+
 	public QueryCriteria createQueryCriteria(Object value){
 		return new QueryCriteria(fieldName, value, evaluation);
 	}
 
 	/**
 	 * Tests whether the submitted parameter name matches that described by the object.  If regex is
-	 *   enabled, evalutation is performed by a regex match test.
+	 *   enabled, evaluation is performed by a regex match test.  If dynamic parameters is enabled,
+	 *   the test will try to match the submitted string against all combinations of the defined 
+	 *   parameter name plus valid {@link Evaluation} suffixes.
 	 * 
-	 * @param p
-	 * @return
+	 * @param p submitted parameter string
+	 * @return true if valid parameter
 	 */
 	public boolean parameterNameMatches(String p){
-		if (regexMatch){
+		if (regexMatch) {
 			return Pattern.compile(paramName).matcher(p).matches();
-		} else {
-			return this.paramName.equals(p);
-		}
+		} else if (dynaimicParameters){
+			for (String suffix: Evaluation.SUFFIX_STRINGS){
+				if ((paramName + suffix).equals(p)) return true;
+			}
+		} 
+		return this.paramName.equals(p);
+		
 	}
 
 	/**
@@ -108,8 +124,8 @@ public class QueryParameterDescriptor {
 	 *   is expected to have matched against the predetermined regex pattern.  Otherwise, the actual
 	 *   field name is returned, if available.
 	 * 
-	 * @param p
-	 * @return
+	 * @param p submitted parameter string
+	 * @return field name corresponding to database field
 	 */
 	public String getQueryableFieldName(String p){
 		if (regexMatch){
@@ -121,12 +137,43 @@ public class QueryParameterDescriptor {
 		}
 	}
 
-	@Override public String toString() {
+	/**
+	 * Determines which {@link Evaluation} value should be returned.  If dynamic parameters are not 
+	 *   enabled or the submitted parameter name matches the default, the default evaluation value
+	 *   is returned.  Otherwise, the submitted parameter string is matched to the appropriate 
+	 *   evaluation suffix to determine which should be returned.  If no match is made, an 
+	 *   {@link QueryParameterException} will be thrown.
+	 * 
+	 * @param p
+	 * @return
+	 * @throws QueryParameterException
+	 */
+	public Evaluation getDynamicEvaluation(String p) throws QueryParameterException{
+		if (regexMatch || !dynaimicParameters) return evaluation; // dynamic parameters is not enabled
+		if (paramName.equals(p)) return evaluation; // submitted parameter is default
+		Evaluation eval = null;
+		for (String suffix: Evaluation.SUFFIX_STRINGS){
+			if (parameterNameMatches(p)){
+				eval = Evaluation.fromSuffix(suffix);
+			}
+		}
+		if (eval != null){
+			return eval;
+		} else {
+			throw new QueryParameterException(String.format("Not a valid dynamic parameter for defined " 
+					+ "parameter %s: %s", paramName, p));
+		}
+	}
+
+	@Override 
+	public String toString() {
 		return "QueryParameterDescriptor{" +
 				"paramName='" + paramName + '\'' +
 				", fieldName='" + fieldName + '\'' +
 				", type=" + type +
 				", evaluation=" + evaluation +
+				", regexMatch=" + regexMatch +
+				", dynaimicParameters=" + dynaimicParameters +
 				'}';
 	}
 }

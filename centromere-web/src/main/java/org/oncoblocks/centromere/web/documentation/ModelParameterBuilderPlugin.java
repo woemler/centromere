@@ -19,8 +19,8 @@ package org.oncoblocks.centromere.web.documentation;
 import com.fasterxml.classmate.TypeResolver;
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.repository.QueryParameterDescriptor;
+import org.oncoblocks.centromere.core.util.QueryParameterUtil;
 import org.oncoblocks.centromere.web.controller.AbstractApiController;
-import org.oncoblocks.centromere.web.controller.RequestUtils;
 import org.oncoblocks.centromere.web.exceptions.ApiDocumentationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +60,7 @@ public class ModelParameterBuilderPlugin implements OperationBuilderPlugin {
 		if (context.getHandlerMethod().getMethod().getDeclaringClass().equals(AbstractApiController.class) 
 				&& FIND_METHOD.equals(context.getHandlerMethod().getMethod().getName())){
 			Class<? extends Model<?>> model = ((AbstractApiController) controller).getModel();
-			Map<String, QueryParameterDescriptor> paramMap = RequestUtils.getAvailableQueryParameters(model);
+			Map<String, QueryParameterDescriptor> paramMap = QueryParameterUtil.getAvailableQueryParameters(model);
 			Operation operation = context.operationBuilder().build();
 			List<Parameter> parameters = operation.getParameters() != null ? operation.getParameters() : new ArrayList<>();
 			for (QueryParameterDescriptor descriptor: paramMap.values()){

@@ -57,7 +57,6 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
  * @since 0.4.3
  */
 @Controller
-//@RequestMapping("/api")
 @RequestMapping("${centromere.api.root-url}")
 @SuppressWarnings("unchecked")
 public class MappingCrudApiController implements ModelController {
@@ -113,8 +112,7 @@ public class MappingCrudApiController implements ModelController {
 		}
 		Set<String> fields = RequestUtils.getFilteredFieldsFromRequest(request);
 		Set<String> exclude = RequestUtils.getExcludedFieldsFromRequest(request);
-		
-		T entity = repository.findOne((ID) convertModelIdParameter(id, model));
+		T entity = repository.findOne(convertModelIdParameter(id, model));
 		if (entity == null) throw new ResourceNotFoundException();
 		ResponseEnvelope<T> envelope = null;
 		if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))){

@@ -19,177 +19,106 @@ package org.oncoblocks.centromere.core.util;
 import org.oncoblocks.centromere.core.model.*;
 import org.oncoblocks.centromere.core.repository.Evaluation;
 import org.oncoblocks.centromere.core.repository.QueryParameterDescriptor;
-import org.oncoblocks.centromere.core.repository.QueryParameterException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * TODO
+ * Utilities for working with {@link org.oncoblocks.centromere.core.repository.QueryCriteria} and for
+ *   generating {@link QueryParameterDescriptor} objects describing valid query parameters for 
+ *   {@link Model} classes.
+ * 
  * @author woemler
- * @since 0.4.datatables-buttons
+ * @since 0.4.3
  */
 public class QueryParameterUtil {
 
 	/**
-	 * Accepts an {@link Alias} annotation and a {@link Field} reference and returns a single 
-	 *   {@link QueryParameterDescriptor} instance describing an acceptable query parameter.
-	 * 
-	 * @param alias annotation instance.
-	 * @param field field reflection to which the annotation belongs.
-	 * @return single query parameter descriptor object.
+	 * Inspects a {@link Model} class and returns all of the available and acceptable query parameter
+	 *   definitions, as a map of parameter names and {@link QueryParameterDescriptor} objects.
+	 *
+	 * @param model model to inspect
+	 * @return map of parameter names and their descriptors
 	 */
-	public static QueryParameterDescriptor getDescriptorFromAlias(Alias alias, Field field){
-		QueryParameterDescriptor descriptor = new QueryParameterDescriptor();
-		String fieldName = null;
-		if (!alias.fieldName().equals("")){
-			fieldName = alias.fieldName();
-		} else if (field != null){
-			fieldName = field.getName();
-		} else {
-			throw new QueryParameterException(String.format("No applicable parameter field name declared " 
-					+ "for alias: %s", alias.toString()));
-		}
-		descriptor.setParamName(alias.value());
-		descriptor.setFieldName(fieldName);
-		descriptor.setType(alias.type() == Object.class ? getQueryableFieldType(field) : alias.type());
-		descriptor.setEvaluation(alias.evaluation());
-		return descriptor;
-	}
-
-	/**
-	 * Accepts an {@link Aliases} annotation and a {@link Field} reference and returns all of the 
-	 *   {@link QueryParameterDescriptor} instances associated with the embedded {@link Alias} 
-	 *   annotations.  
-	 * 
-	 * @param aliases
-	 * @param field
-	 * @return
-	 */
-	public static List<QueryParameterDescriptor> getDescriptorsFromAliases(Aliases aliases, Field field){
-		List<QueryParameterDescriptor> descriptors = new ArrayList<>();
-		for (Alias alias: aliases.value()){
-			QueryParameterDescriptor descriptor = getDescriptorFromAlias(alias, field);
-			if (descriptor != null) descriptors.add(descriptor);
-		}
-		return descriptors;
-	}
-
-	public static List<QueryParameterDescriptor> getDescriptorsFromAliases(Aliases aliases){
-		return getDescriptorsFromAliases(aliases, null);
-	}
-
-	/**
-	 * Returns a map of {@link QueryParameterDescriptor} instances for models related to the given
-	 *   {@link Model}, inferred by the presence of {@link ForeignKey} annotations.
-	 * 
-	 * @param model
-	 * @return
-	 */
-	public static Map<String, QueryParameterDescriptor> getForeignKeyModelParameters(
-			Class<? extends Model<?>> model){
-		Map<String, QueryParameterDescriptor> map = new HashMap<>();
-		for (Field field: model.getDeclaredFields()){
-			if (field.isAnnotationPresent(ForeignKey.class)){
-				ForeignKey foreignKey = field.getAnnotation(ForeignKey.class);
-				String relField = !"".equals(foreignKey.rel()) ? foreignKey.rel() : field.getName();
-				Map<String,QueryParameterDescriptor> foreignModelMap = getModelQueryParameters(foreignKey.model());
-				for(QueryParameterDescriptor descriptor: foreignModelMap.values()){
-					String newParamName = relField + "." + descriptor.getParamName();
-					descriptor.setParamName(newParamName);
-					map.put(newParamName, descriptor);
+	public static Map<String,QueryParameterDescriptor> getAvailableQueryParameters(
+			Class<? extends Model<?>> model, boolean recursive)
+	{
+		Class<?> current = model;
+		Map<String,QueryParameterDescriptor> paramMap = new HashMap<>();
+		while (current.getSuperclass() != null) {
+			for (Field field : current.getDeclaredFields()) {
+				String fieldName = field.getName();
+				Class<?> type = field.getType();
+				if (Collection.class.isAssignableFrom(field.getType())) {
+					ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+					type = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+				}
+				if (field.isSynthetic()) continue;
+				if (!field.isAnnotationPresent(Ignored.class)) {
+					paramMap.put(fieldName,
+							new QueryParameterDescriptor(fieldName, fieldName, type, Evaluation.EQUALS, false, true));
+				}
+				if (field.isAnnotationPresent(ForeignKey.class)) {
+					if (!recursive)
+						continue;
+					ForeignKey foreignKey = field.getAnnotation(ForeignKey.class);
+					String relField = !"".equals(foreignKey.rel()) ? foreignKey.rel() : fieldName;
+					Map<String, QueryParameterDescriptor> foreignModelMap =
+							getAvailableQueryParameters(foreignKey.model(), false);
+					for (QueryParameterDescriptor descriptor : foreignModelMap.values()) {
+						String newParamName = relField + "." + descriptor.getParamName();
+						descriptor.setParamName(newParamName);
+						paramMap.put(newParamName, descriptor);
+					}
+				}
+				if (field.isAnnotationPresent(Aliases.class)) {
+					Aliases aliases = field.getAnnotation(Aliases.class);
+					for (Alias alias : aliases.value()) {
+						paramMap.put(alias.value(), getDescriptorFromAlias(alias, type, fieldName));
+					}
+				} else if (field.isAnnotationPresent(Alias.class)) {
+					Alias alias = field.getAnnotation(Alias.class);
+					paramMap.put(alias.value(), getDescriptorFromAlias(alias, type, fieldName));
 				}
 			}
-		}
-		return map;
-	}
-
-	/**
-	 * Returns all valid query parameter descriptors from a given field, as defined by the default
-	 *   field name and available {@link Alias} and {@link Aliases} annotations.  Ignores synthetic
-	 *   fields.  Fields annotated with {@link Ignored} will not have the default parameter created,
-	 *   but may have alias parameters created.
-	 * 
-	 * @param field
-	 * @return
-	 */
-	public static List<QueryParameterDescriptor> getFieldDescriptors(Field field){
-		List<QueryParameterDescriptor> descriptors = new ArrayList<>();
-		if (field.isSynthetic()){
-			return descriptors;
-		}
-		if (!field.isAnnotationPresent(Ignored.class)) {
-			descriptors.add(new QueryParameterDescriptor(field.getName(), field.getName(),
-					getQueryableFieldType(field), Evaluation.EQUALS, false));
-		}
-		if (field.isAnnotationPresent(Aliases.class)){
-			descriptors.addAll(getDescriptorsFromAliases(field.getAnnotation(Aliases.class), field));
-		} else if (field.isAnnotationPresent(Alias.class)){
-			descriptors.add(getDescriptorFromAlias(field.getAnnotation(Alias.class), field));
-		}
-		return descriptors;
-	}
-
-	/**
-	 * Returns the type of the model field that the parameter argument will be converted to from a
-	 *   string.  If the model field is a collection, the parameterized type is used.
-	 * 
-	 * @param field
-	 * @return
-	 */
-	public static Class<?> getQueryableFieldType(Field field){
-		Class<?> type = field.getType();
-		if (Collection.class.isAssignableFrom(field.getType())){
-			ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-			type = (Class<?>) parameterizedType.getActualTypeArguments()[0];
-		}
-		return type;
-	}
-
-	/**
-	 * Returns a mapping of all of a given {@link Model} class's available query parameters.
-	 * 
-	 * @param model
-	 * @return
-	 */
-	public static Map<String, QueryParameterDescriptor> getModelQueryParameters(
-			Class<? extends Model<?>> model){
-		Map<String,QueryParameterDescriptor> paramMap = new HashMap<>();
-		if (model.getClass().isAnnotationPresent(Aliases.class)){
-			for (QueryParameterDescriptor descriptor: getDescriptorsFromAliases(model.getClass().getAnnotation(Aliases.class))){
-				paramMap.put(descriptor.getParamName(), descriptor);
-			}
-		}
-		for (Field field: model.getDeclaredFields()){
-			for (QueryParameterDescriptor descriptor: getFieldDescriptors(field)){
-				paramMap.put(descriptor.getParamName(), descriptor);
-			}
+			current = current.getSuperclass();
 		}
 		return paramMap;
 	}
 
 	/**
-	 * Returns all available query parameters for a given model, optionally including parameters of 
-	 *   any related models, as inferred by the presence of {@link ForeignKey} annotations.
-	 * 
-	 * @param model
-	 * @param useForeignKeyParams
-	 * @return
+	 * Inspects a {@link Model} class and returns all of the available and acceptable query parameter
+	 *   definitions, as a map of parameter names and {@link QueryParameterDescriptor} objects.
+	 *
+	 * @param model model to inspect
+	 * @return map of parameter names and their descriptors
 	 */
-	public static Map<String, QueryParameterDescriptor> getAvailableQueryParameters(
-			Class<? extends Model<?>> model, boolean useForeignKeyParams){
-		Map<String, QueryParameterDescriptor> descriptorMap = new HashMap<>();
-		if (useForeignKeyParams){
-			descriptorMap.putAll(getForeignKeyModelParameters(model));
-		}
-		descriptorMap.putAll(getModelQueryParameters(model));
-		return descriptorMap;
+	public static Map<String,QueryParameterDescriptor> getAvailableQueryParameters(Class<? extends Model<?>> model) {
+		return getAvailableQueryParameters(model, true);
 	}
 
-	public static Map<String, QueryParameterDescriptor> getAvailableQueryParameters(
-			Class<? extends Model<?>> model){
-		return getAvailableQueryParameters(model, false);
+
+	/**
+	 * Constructs a {@link QueryParameterDescriptor} from an instance of an {@link Alias}, reference 
+	 *   to a field type, and its name.
+	 *
+	 * @param alias alias annotation
+	 * @param type type of the field to be queried
+	 * @param fieldName name of the field
+	 * @return description of the acceptable query parameter.
+	 */
+	public static QueryParameterDescriptor getDescriptorFromAlias(Alias alias, Class<?> type, String fieldName){
+		QueryParameterDescriptor descriptor = new QueryParameterDescriptor();
+		descriptor.setParamName(alias.value());
+		descriptor.setFieldName(alias.fieldName().equals("") ? fieldName : alias.fieldName());
+		descriptor.setRegexMatch(alias.regex());
+		descriptor.setType(type);
+		descriptor.setEvaluation(alias.evaluation());
+		descriptor.setDynaimicParameters(alias.dynamic());
+		return descriptor;
 	}
 	
 }

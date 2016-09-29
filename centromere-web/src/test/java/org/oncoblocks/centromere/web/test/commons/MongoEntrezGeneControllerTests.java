@@ -26,9 +26,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oncoblocks.centromere.core.commons.testing.EntrezGeneDataGenerator;
 import org.oncoblocks.centromere.core.repository.QueryParameterDescriptor;
+import org.oncoblocks.centromere.core.util.QueryParameterUtil;
 import org.oncoblocks.centromere.mongodb.commons.models.MongoGene;
 import org.oncoblocks.centromere.mongodb.commons.repositories.MongoGeneRepository;
-import org.oncoblocks.centromere.web.controller.RequestUtils;
 import org.oncoblocks.centromere.web.test.config.DefaultModelRegistryConfig;
 import org.oncoblocks.centromere.web.test.config.TestWebConfig;
 import org.oncoblocks.centromere.web.util.ApiMediaTypes;
@@ -91,7 +91,7 @@ public class MongoEntrezGeneControllerTests {
 	@Test
 	public void requestUtilTest() throws Exception {
 		Map<String, QueryParameterDescriptor>
-				params = RequestUtils.getAvailableQueryParameters(MongoGene.class);
+				params = QueryParameterUtil.getAvailableQueryParameters(MongoGene.class);
 		Assert.notNull(params);
 		Assert.notEmpty(params);
 		for (Map.Entry entry: params.entrySet()){

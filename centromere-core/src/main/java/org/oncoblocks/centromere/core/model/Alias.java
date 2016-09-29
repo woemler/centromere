@@ -68,4 +68,13 @@ public @interface Alias {
 	 * @return
 	 */
 	boolean regex() default false;
+
+	/**
+	 * Boolean switch.  When true, alias parameter names will be dynamic and allow modification with 
+	 *   {@link Evaluation} name suffixes.
+	 * 
+	 * @return
+	 */
+	boolean dynamic() default true;
+	
 }

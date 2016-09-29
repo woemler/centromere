@@ -20,7 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oncoblocks.centromere.core.repository.Evaluation;
 import org.oncoblocks.centromere.core.repository.QueryParameterDescriptor;
-import org.oncoblocks.centromere.web.controller.RequestUtils;
+import org.oncoblocks.centromere.core.util.QueryParameterUtil;
 import org.oncoblocks.centromere.web.test.config.DefaultModelRegistryConfig;
 import org.oncoblocks.centromere.web.test.config.TestMongoConfig;
 import org.oncoblocks.centromere.web.test.config.TestWebConfig;
@@ -50,7 +50,7 @@ public class RequestUtilTests {
 	
 	@Test
 	public void requestUtilTest() throws Exception {
-		Map<String, QueryParameterDescriptor> params = RequestUtils.getAvailableQueryParameters(CopyNumber.class);
+		Map<String, QueryParameterDescriptor> params = QueryParameterUtil.getAvailableQueryParameters(CopyNumber.class);
 		Assert.notNull(params);
 		Assert.notEmpty(params);
 		for (Map.Entry entry: params.entrySet()){

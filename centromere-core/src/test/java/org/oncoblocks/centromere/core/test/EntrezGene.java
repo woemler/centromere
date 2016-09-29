@@ -37,7 +37,7 @@ public class EntrezGene implements Model<Long> {
 	@Ignored private String chromosomeLocation;
 	@Ignored private String description;
 	private String geneType;
-	@Alias(value = "isKinase", fieldName = "attributes.isKinase") @Ignored private List<Attribute> attributes;
+	@Alias(value = "attributes.\\w+", regex = true) @Ignored private List<Attribute> attributes;
 	@Ignored private Map<String, Object> dbXrefs;
 	@Alias("alias") private Set<String> aliases;
 

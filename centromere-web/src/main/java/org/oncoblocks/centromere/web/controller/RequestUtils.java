@@ -16,10 +16,13 @@
 
 package org.oncoblocks.centromere.web.controller;
 
-import org.oncoblocks.centromere.core.model.*;
+import org.oncoblocks.centromere.core.model.Alias;
+import org.oncoblocks.centromere.core.model.Aliases;
+import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.repository.Evaluation;
 import org.oncoblocks.centromere.core.repository.QueryCriteria;
 import org.oncoblocks.centromere.core.repository.QueryParameterDescriptor;
+import org.oncoblocks.centromere.core.util.QueryParameterUtil;
 import org.oncoblocks.centromere.web.exceptions.InvalidParameterException;
 import org.oncoblocks.centromere.web.exceptions.ParameterMappingException;
 import org.slf4j.Logger;
@@ -33,7 +36,6 @@ import org.springframework.data.domain.Sort;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
 /**
@@ -87,7 +89,7 @@ public class RequestUtils {
 		logger.info(String.format("Generating QueryCriteria for 'find' request parameters: model=%s params=%s",
 				model.getName(), request.getQueryString()));
 		List<String> defaultParameters = findAllParameters();
-		Map<String, QueryParameterDescriptor> paramMap = getAvailableQueryParameters(model);
+		Map<String, QueryParameterDescriptor> paramMap = QueryParameterUtil.getAvailableQueryParameters(model);
 		List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(paramMap, defaultParameters, request);
 		logger.info(String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
 		return criteriaList;
@@ -99,7 +101,7 @@ public class RequestUtils {
 		logger.info(String.format("Generating QueryCriteria for 'findOne' request parameters: model=%s params=%s",
 				model.getName(), request.getQueryString()));
 		List<String> defaultParameters = findOneParameters();
-		Map<String, QueryParameterDescriptor> paramMap = getAvailableQueryParameters(model);
+		Map<String, QueryParameterDescriptor> paramMap = QueryParameterUtil.getAvailableQueryParameters(model);
 		List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(paramMap, defaultParameters, request);
 		logger.info(String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
 		return criteriaList;
@@ -111,7 +113,7 @@ public class RequestUtils {
 		logger.info(String.format("Generating QueryCriteria for 'findDistinct' request parameters: model=%s params=%s",
 				model.getName(), request.getQueryString()));
 		List<String> defaultParameters = findDistinctParameters();
-		Map<String, QueryParameterDescriptor> paramMap = getAvailableQueryParameters(model);
+		Map<String, QueryParameterDescriptor> paramMap = QueryParameterUtil.getAvailableQueryParameters(model);
 		List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(paramMap, defaultParameters, request);
 		logger.info(String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
 		return criteriaList;
@@ -150,7 +152,7 @@ public class RequestUtils {
 					QueryParameterDescriptor descriptor = (QueryParameterDescriptor) e.getValue();
 					if (descriptor.parameterNameMatches(paramName)){
 						criteria = createCriteriaFromRequestParameter(descriptor.getQueryableFieldName(paramName),
-								paramValue, descriptor.getType(), descriptor.getEvaluation());
+								paramValue, descriptor.getType(), descriptor.getDynamicEvaluation(p));
 						break;
 					}
 				}
@@ -164,73 +166,6 @@ public class RequestUtils {
 			}
 		}
 		return criteriaList;
-	}
-
-	/**
-	 * Inspects a {@link Model} class and returns all of the available and acceptable query parameter
-	 *   definitions, as a map of parameter names and {@link QueryParameterDescriptor} objects.
-	 * 
-	 * @param model
-	 * @return
-	 */
-	public static Map<String,QueryParameterDescriptor> getAvailableQueryParameters(
-			Class<? extends Model<?>> model, boolean recursive){
-		Class<?> current = model;
-		Map<String,QueryParameterDescriptor> paramMap = new HashMap<>();
-		while (current.getSuperclass() != null) {
-			for (Field field : current.getDeclaredFields()) {
-				String fieldName = field.getName();
-				Class<?> type = field.getType();
-				if (Collection.class.isAssignableFrom(field.getType())) {
-					ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-					type = (Class<?>) parameterizedType.getActualTypeArguments()[0];
-				}
-				if (field.isAnnotationPresent(Ignored.class)) {
-					continue;
-				} else {
-					paramMap.put(fieldName,
-							new QueryParameterDescriptor(fieldName, fieldName, type, Evaluation.EQUALS, false));
-				}
-				if (field.isAnnotationPresent(ForeignKey.class)) {
-					if (!recursive)
-						continue;
-					ForeignKey foreignKey = field.getAnnotation(ForeignKey.class);
-					String relField = !"".equals(foreignKey.rel()) ? foreignKey.rel() : fieldName;
-					Map<String, QueryParameterDescriptor> foreignModelMap =
-							getAvailableQueryParameters(foreignKey.model(), false);
-					for (QueryParameterDescriptor descriptor : foreignModelMap.values()) {
-						String newParamName = relField + "." + descriptor.getParamName();
-						descriptor.setParamName(newParamName);
-						paramMap.put(newParamName, descriptor);
-					}
-				}
-				if (field.isAnnotationPresent(Aliases.class)) {
-					Aliases aliases = field.getAnnotation(Aliases.class);
-					for (Alias alias : aliases.value()) {
-						paramMap.put(alias.value(), getDescriptorFromAlias(alias, type, fieldName));
-					}
-				} else if (field.isAnnotationPresent(Alias.class)) {
-					Alias alias = field.getAnnotation(Alias.class);
-					paramMap.put(alias.value(), getDescriptorFromAlias(alias, type, fieldName));
-				}
-			}
-			current = current.getSuperclass();
-		}
-		return paramMap;
-	}
-	
-	public static QueryParameterDescriptor getDescriptorFromAlias(Alias alias, Class<?> type, String fieldName){
-		QueryParameterDescriptor descriptor = new QueryParameterDescriptor();
-		descriptor.setParamName(alias.value());
-		descriptor.setFieldName(alias.fieldName().equals("") ? fieldName : alias.fieldName());
-		descriptor.setRegexMatch(alias.regex());
-		descriptor.setType(type);
-		descriptor.setEvaluation(alias.evaluation());
-		return descriptor;
-	}
-
-	public static Map<String,QueryParameterDescriptor> getAvailableQueryParameters(Class<? extends Model<?>> model) {
-		return getAvailableQueryParameters(model, true);
 	}
 	
 	/**

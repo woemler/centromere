@@ -59,7 +59,7 @@ public class QueryCriteriaTests {
 	}
 	
 	@Test
-	public void queryParameterDescriptorTest(){
+	public void standardQueryParameterDescriptorTest(){
 		QueryParameterDescriptor descriptor = new QueryParameterDescriptor();
 		descriptor.setParamName("param");
 		descriptor.setFieldName("field");
@@ -73,17 +73,31 @@ public class QueryCriteriaTests {
 	}
 	
 	@Test
+	public void regexQueryParameterDescriptorTest(){
+		QueryParameterDescriptor descriptor = new QueryParameterDescriptor();
+		descriptor.setParamName("attributes.\\w+");
+		descriptor.setEvaluation(Evaluation.EQUALS);
+		descriptor.setRegexMatch(true);
+		Assert.isTrue(descriptor.parameterNameMatches("attributes.isKinase"));
+		Assert.isTrue(Evaluation.EQUALS.equals(descriptor.getDynamicEvaluation("attributes.isKinase")), 
+				String.format("Expected EQUALS, got %s", descriptor.getDynamicEvaluation("attributes.isKinase").toString()));
+		Assert.isTrue(!descriptor.parameterNameMatches("attributes"));
+		Assert.isTrue(descriptor.parameterNameMatches("attributes.nameIsNull"));
+		Assert.isTrue(Evaluation.EQUALS.equals(descriptor.getDynamicEvaluation("attributes.nameIsNull")));
+	}
+	
+	@Test
 	public void modelToDescriptorTest(){
 		Map<String,QueryParameterDescriptor> descriptorMap 
 				= QueryParameterUtil.getAvailableQueryParameters(EntrezGene.class);
 		for (Map.Entry entry: descriptorMap.entrySet()){
-			System.out.println(String.format("param: %s   descriptor: %s", (String) entry.getKey(),
-					((QueryParameterDescriptor) entry.getValue()).toString()));
+			System.out.println(String.format("param: %s   descriptor: %s", entry.getKey(),
+					(entry.getValue()).toString()));
 		}
 		Assert.notNull(descriptorMap);
 		Assert.notEmpty(descriptorMap);
 		Assert.isTrue(descriptorMap.size() == 9, String.format("Size is actually %s", descriptorMap.size()));
-		Assert.isTrue(descriptorMap.containsKey("isKinase"));
+		Assert.isTrue(descriptorMap.containsKey("attributes.\\w+"));
 		Assert.isTrue(!descriptorMap.containsKey("attributes"));
 		QueryParameterDescriptor descriptor = descriptorMap.get("entrezGeneId");
 		Assert.notNull(descriptor);
