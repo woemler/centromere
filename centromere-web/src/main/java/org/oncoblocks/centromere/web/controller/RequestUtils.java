@@ -19,17 +19,14 @@ package org.oncoblocks.centromere.web.controller;
 import org.oncoblocks.centromere.core.model.Alias;
 import org.oncoblocks.centromere.core.model.Aliases;
 import org.oncoblocks.centromere.core.model.Model;
-import org.oncoblocks.centromere.core.repository.Evaluation;
 import org.oncoblocks.centromere.core.repository.QueryCriteria;
 import org.oncoblocks.centromere.core.repository.QueryParameterDescriptor;
+import org.oncoblocks.centromere.core.repository.QueryParameterException;
 import org.oncoblocks.centromere.core.util.QueryParameterUtil;
 import org.oncoblocks.centromere.web.exceptions.InvalidParameterException;
 import org.oncoblocks.centromere.web.exceptions.ParameterMappingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.convert.ConversionFailedException;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -150,10 +147,15 @@ public class RequestUtils {
 				for (Map.Entry e: paramMap.entrySet()){
 					String p = (String) e.getKey();
 					QueryParameterDescriptor descriptor = (QueryParameterDescriptor) e.getValue();
-					if (descriptor.parameterNameMatches(paramName)){
-						criteria = createCriteriaFromRequestParameter(descriptor.getQueryableFieldName(paramName),
-								paramValue, descriptor.getType(), descriptor.getDynamicEvaluation(p));
-						break;
+					try {
+						if (descriptor.parameterNameMatches(paramName)) {
+							criteria = QueryParameterUtil
+									.getQueryCriteriaFromParameter(descriptor.getQueryableFieldName(paramName),
+											paramValue, descriptor.getType(), descriptor.getDynamicEvaluation(p));
+							break;
+						}
+					} catch (QueryParameterException ex){
+						throw new ParameterMappingException(ex.getMessage());
 					}
 				}
 				if (criteria != null){
@@ -168,110 +170,7 @@ public class RequestUtils {
 		return criteriaList;
 	}
 	
-	/**
-	 * Creates a {@link QueryCriteria} object based upon a request parameter and {@link Evaluation}
-	 *   value.
-	 *
-	 * @param param
-	 * @param values
-	 * @param type
-	 * @param evaluation
-	 * @return
-	 */
-	public static QueryCriteria createCriteriaFromRequestParameter(String param, Object[] values, Class<?> type, Evaluation evaluation){
-		logger.debug(String.format("Generating QueryCriteria object for query string parameter: "
-				+ "param=%s values=%s type=%s eval=%s", param, values.toString(), type.getName(), evaluation.toString()));
-		if (evaluation.equals(Evaluation.EQUALS) && values.length > 1) evaluation = Evaluation.IN;
-		switch (evaluation){
-			case EQUALS:
-				return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.EQUALS);
-			case NOT_EQUALS:
-				return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.NOT_EQUALS);
-			case IN:
-				return new QueryCriteria(param, convertParameterArray(values, type), Evaluation.IN);
-			case NOT_IN:
-				return new QueryCriteria(param, Arrays.asList(values), Evaluation.NOT_IN);
-			case IS_NULL:
-				return new QueryCriteria(param, true, Evaluation.IS_NULL);
-			case NOT_NULL:
-				return new QueryCriteria(param, true, Evaluation.NOT_NULL);
-			case IS_TRUE:
-				return new QueryCriteria(param, true, Evaluation.IS_TRUE);
-			case IS_FALSE:
-				return new QueryCriteria(param, true, Evaluation.IS_FALSE);
-			case GREATER_THAN:
-				return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.GREATER_THAN);
-			case GREATER_THAN_EQUALS:
-				return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.GREATER_THAN_EQUALS);
-			case LESS_THAN:
-				return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.LESS_THAN);
-			case LESS_THAN_EQUALS:
-				return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.LESS_THAN_EQUALS);
-			case BETWEEN:
-				return new QueryCriteria(param, Arrays.asList(convertParameter(values[0], type),
-						convertParameter(values[1], type)), Evaluation.BETWEEN);
-			case OUTSIDE:
-				return new QueryCriteria(param, Arrays.asList(convertParameter(values[0], type),
-						convertParameter(values[1], type)), Evaluation.OUTSIDE);
-			case BETWEEN_INCLUSIVE:
-				return new QueryCriteria(param, Arrays.asList(convertParameter(values[0], type),
-						convertParameter(values[1], type)), Evaluation.BETWEEN_INCLUSIVE);
-			case OUTSIDE_INCLUSIVE:
-				return new QueryCriteria(param, Arrays.asList(convertParameter(values[0], type),
-						convertParameter(values[1], type)), Evaluation.OUTSIDE_INCLUSIVE);
-			case STARTS_WITH:
-				return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.STARTS_WITH);
-			case ENDS_WITH:
-				return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.ENDS_WITH);
-			default:
-				return null;
-		}
-	}
-
-	/**
-	 * Converts an object into the appropriate type defined by the model field being queried.
-	 *
-	 * @param param
-	 * @param type
-	 * @return
-	 */
-	public static Object convertParameter(Object param, Class<?> type, ConversionService conversionService){
-		logger.debug(String.format("Attempting to convert parameter: from=%s to=%s",
-				param.getClass().getName(), type.getName()));
-		if (conversionService.canConvert(param.getClass(), type)){
-			try {
-				return conversionService.convert(param, type);
-			} catch (ConversionFailedException e){
-				e.printStackTrace();
-				throw new ParameterMappingException("Unable to convert parameter string to " + type.getName());
-			}
-		} else {
-			return param;
-		}
-	}
-
-	/**
-	 * {@link RequestUtils#convertParameter(Object, Class, ConversionService)}
-	 */
-	public static Object convertParameter(Object param, Class<?> type){
-		ConversionService conversionService = new DefaultConversionService();
-		return convertParameter(param, type, conversionService);
-	}
-
-	/**
-	 * Converts an array of objects into the appropriate type defined by the model field being queried
-	 *
-	 * @param params
-	 * @param type
-	 * @return
-	 */
-	public static List<Object> convertParameterArray(Object[] params, Class<?> type){
-		List<Object> objects = new ArrayList<>();
-		for (Object param: params){
-			objects.add(convertParameter(param, type));
-		}
-		return objects;
-	}
+	
 
 	/**
 	 * Extracts the requested filtered fields parameter from a request.

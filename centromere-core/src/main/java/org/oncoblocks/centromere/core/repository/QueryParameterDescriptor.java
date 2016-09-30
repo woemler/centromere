@@ -152,9 +152,9 @@ public class QueryParameterDescriptor {
 		if (regexMatch || !dynaimicParameters) return evaluation; // dynamic parameters is not enabled
 		if (paramName.equals(p)) return evaluation; // submitted parameter is default
 		Evaluation eval = null;
-		for (String suffix: Evaluation.SUFFIX_STRINGS){
-			if (parameterNameMatches(p)){
-				eval = Evaluation.fromSuffix(suffix);
+		if (parameterNameMatches(p)){
+			for (String suffix: Evaluation.SUFFIX_STRINGS) {
+				if ((paramName + suffix).equals(p)) eval = Evaluation.fromSuffix(suffix);
 			}
 		}
 		if (eval != null){
