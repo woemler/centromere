@@ -21,16 +21,19 @@ import org.junit.runner.RunWith;
 import org.oncoblocks.centromere.core.repository.Evaluation;
 import org.oncoblocks.centromere.core.repository.QueryParameterDescriptor;
 import org.oncoblocks.centromere.core.util.QueryParameterUtil;
+import org.oncoblocks.centromere.mongodb.commons.models.MongoGene;
 import org.oncoblocks.centromere.web.test.config.DefaultModelRegistryConfig;
 import org.oncoblocks.centromere.web.test.config.TestMongoConfig;
 import org.oncoblocks.centromere.web.test.config.TestWebConfig;
 import org.oncoblocks.centromere.web.test.models.CopyNumber;
 import org.oncoblocks.centromere.web.test.repository.MongoRepositoryConfig;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.util.Assert;
 
+import java.beans.PropertyDescriptor;
 import java.util.Map;
 
 /**
@@ -61,6 +64,25 @@ public class RequestUtilTests {
 		Assert.isTrue(params.containsKey("gene"));
 		Assert.isTrue(params.containsKey("signalOutside"));
 		Assert.isTrue(params.get("signalOutside").getEvaluation().equals(Evaluation.OUTSIDE_INCLUSIVE));
+	}
+	
+	@Test
+	public void superclassQueryParameterTest() throws Exception {
+		Map<String, QueryParameterDescriptor> map = QueryParameterUtil.getAvailableQueryParameters(MongoGene.class);
+		Assert.notNull(map);
+		Assert.notEmpty(map);
+		for (Map.Entry<String, QueryParameterDescriptor> entry: map.entrySet()){
+			System.out.println(String.format("param=%s  descriptor=%s", entry.getKey(), entry.getValue().toString()));	
+		}
+		Assert.isTrue(map.size() == 14, String.format("Expected 14, found %d", map.size()));
+	}
+	
+	@Test
+	public void wrappedSuperclassTest() throws Exception {
+		BeanWrapperImpl wrapper = new BeanWrapperImpl(MongoGene.class);
+		for (PropertyDescriptor descriptor: wrapper.getPropertyDescriptors()){
+			System.out.println(descriptor.toString());
+		}
 	}
 	
 }

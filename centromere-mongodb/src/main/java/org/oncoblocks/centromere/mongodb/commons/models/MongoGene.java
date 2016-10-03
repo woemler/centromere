@@ -19,6 +19,7 @@ package org.oncoblocks.centromere.mongodb.commons.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.oncoblocks.centromere.core.commons.models.Gene;
 import org.oncoblocks.centromere.core.model.Alias;
+import org.oncoblocks.centromere.core.model.Ignored;
 import org.oncoblocks.centromere.core.model.ModelAttributes;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -40,9 +41,11 @@ public class MongoGene extends Gene<String> {
 	private List<String> aliases;
 	
 	@Alias(value = "references.\\w+", regex = true)
+	@Ignored
 	private Map<String,String> externalReferences;
 	
 	@Alias(value = "attributes.\\w+", regex = true)
+	@Ignored
 	private Map<String,Object> attributes;
 
 	

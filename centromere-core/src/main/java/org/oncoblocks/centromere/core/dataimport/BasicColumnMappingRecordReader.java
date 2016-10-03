@@ -16,14 +16,18 @@
 
 package org.oncoblocks.centromere.core.dataimport;
 
+import org.oncoblocks.centromere.core.model.Alias;
+import org.oncoblocks.centromere.core.model.Aliases;
 import org.oncoblocks.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.model.ModelSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 
-import java.beans.PropertyDescriptor;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -40,9 +44,14 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	private BasicImportOptions options = new BasicImportOptions();
 	private Class<T> model;
 	private Map<String,Class<?>> columnMap = new LinkedHashMap<>();
+	private Map<String, Class<?>> fieldTypeMap = new HashMap<>(); // map of actual field name and types
+	private Map<String, String> fieldNameMap = new HashMap<>(); // map of aliases and actual field names
+	private Map<Integer, String> columnIndexMap = new HashMap<>(); // map of column indexes to mapped model field names
 	private boolean headerFlag = true;
 	private String delimiter = "\\t";
 	private ConversionService conversionService = new DefaultConversionService();
+	
+	private static final Logger logger = LoggerFactory.getLogger(BasicColumnMappingRecordReader.class);
 	
 	@Override 
 	public T readRecord() throws DataImportException {
@@ -69,41 +78,75 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	}
 
 	/**
+	 * Builds two maps by inspecting the target {@link Model class}.  The first map links field and 
+	 *   alias names to the actual field name to have data mapped to in the instantiated object.  The 
+	 *   second map links the actual field name to the field type parsed data must be converted to.
+	 * 
+	 * @throws DataImportException
+	 */
+	private void determineMappableModelFields() throws DataImportException {
+		fieldNameMap = new HashMap<>();
+		fieldTypeMap = new HashMap<>();
+		Class<?> current = model;
+		while (current.getSuperclass() != null){
+			for (Field field: current.getDeclaredFields()){
+				String fieldName = field.getName();
+				fieldTypeMap.put(fieldName, field.getType());
+				fieldNameMap.put(fieldName, fieldName);
+				if (field.isAnnotationPresent(Aliases.class)){
+					Aliases aliases = field.getAnnotation(Aliases.class);
+					if (aliases != null && aliases.value().length > 0){
+						for (Alias alias: aliases.value()){
+							fieldNameMap.put(alias.value(), fieldName);
+						}
+					}
+				} else if (field.isAnnotationPresent(Alias.class)){
+					Alias alias = field.getAnnotation(Alias.class);
+					fieldNameMap.put(alias.value(), fieldName);
+				}
+			}
+			current = current.getSuperclass();
+		}
+		
+	}
+
+	/**
 	 * Extracts the column headers from a file and attempts to match them to {@link Model} fields.  If 
 	 *   a header cannot be matched to a field, this column will be ignored.
-	 * 
+	 *
 	 * @param line header line from file
 	 * @throws DataImportException
 	 */
 	private void parseHeader(String line) throws DataImportException {
-		BeanWrapperImpl wrapper = new BeanWrapperImpl(model);
-		for (String head: line.trim().split(delimiter)){
-			Class<?> type = null;
-			String name = head;
-			for (PropertyDescriptor descriptor: wrapper.getPropertyDescriptors()){
-				if (headerMatchesField(head, descriptor.getName())){
-					type = descriptor.getPropertyType();
-					name = descriptor.getName();
-				}
+		determineMappableModelFields();
+		String[] bits = line.split(delimiter);
+		for (int i = 0; i < bits.length; i++){
+			String name = getMatchedHeaderFieldName(bits[i]);
+			if (name != null){
+				columnIndexMap.put(i, name);
 			}
-			columnMap.put(name, type);
 		}
 	}
 
 	/**
-	 * Tests to see if the header name corresponds to a {@link Model} field name.  Strips out non-standard
-	 *   field name characters and ignores case when testing.
+	 * Attemptes to match a file column header to an available {@link Model} attribute name or alias.
+	 *   If no match can be made, or the header is empty, a null value is returned.
 	 * 
-	 * @param headerName name of header column in file
-	 * @param fieldName name of feild in model
-	 * @return true if header matches field
+	 * @param headerName parsed header name
+	 * @return field name that header matches, or null.
 	 * @throws DataImportException
 	 */
-	private boolean headerMatchesField(String headerName, String fieldName) throws DataImportException {
-		if (headerName == null || headerName.equals("") || fieldName == null || fieldName.equals("")){
-			throw new DataImportException("Header name and field name values cannot be null or empty.");
+	private String getMatchedHeaderFieldName(String headerName) throws DataImportException {
+		if (headerName == null || headerName.equals("")){
+			logger.warn("Column header has no name.");
+			return null;
 		}
- 		return headerName.toLowerCase().replaceAll("[\\W\\s_-]", "").equals(fieldName.toLowerCase());	
+		for (Map.Entry<String,String> entry: fieldNameMap.entrySet()){
+			if (headerName.toLowerCase().replaceAll("[\\W\\s_-]", "").equals(entry.getKey().toLowerCase())){
+				return entry.getValue();
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -121,14 +164,13 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 		BeanWrapperImpl wrapper = new BeanWrapperImpl(model);
 		String[] bits = line.split(delimiter);
 		for (int i = 0; i < bits.length; i++){
-			Map.Entry<String, Class<?>> entry = headerList.get(i);
-			if (entry.getValue() != null){
-				if (bits[i].trim().equals("")){
-					wrapper.setPropertyValue(entry.getKey(), null);
-				} else {
-					wrapper.setPropertyValue(entry.getKey(),
-							convertFieldValue(bits[i].trim(), entry.getValue()));
-				}
+			if (!columnIndexMap.containsKey(i)) continue;
+			String fieldName = columnIndexMap.get(i);
+			Class<?> type = fieldTypeMap.get(fieldName);
+			if (bits[i].trim().equals("")){
+				wrapper.setPropertyValue(fieldName, null);
+			} else {
+				wrapper.setPropertyValue(fieldName, convertFieldValue(bits[i].trim(), type));
 			}
 		}
 		return (T) wrapper.getWrappedInstance();

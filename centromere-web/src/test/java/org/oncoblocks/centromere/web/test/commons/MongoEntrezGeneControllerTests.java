@@ -100,7 +100,7 @@ public class MongoEntrezGeneControllerTests {
 		Assert.isTrue(params.containsKey("id"));
 		Assert.isTrue(params.containsKey("primaryGeneSymbol"));
 		Assert.isTrue(params.containsKey("alias"));
-		Assert.isTrue(params.containsKey("attributes"));
+		Assert.isTrue(params.containsKey("attributes.\\w+"));
 		Assert.isTrue(params.containsKey("primaryReferenceId"));
 	}
 

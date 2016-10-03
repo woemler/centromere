@@ -76,5 +76,13 @@ public @interface Alias {
 	 * @return
 	 */
 	boolean dynamic() default true;
+
+	/**
+	 * Boolean switch.  When false, this alias is ignored as a potential query parameter.  Intended for
+	 *   use in matching parsed file column names to differing model attribute names.
+	 * 
+	 * @return
+	 */
+	boolean exposed() default true;
 	
 }

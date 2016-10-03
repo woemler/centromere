@@ -21,6 +21,8 @@ import org.oncoblocks.centromere.core.repository.Evaluation;
 import org.oncoblocks.centromere.core.repository.QueryCriteria;
 import org.oncoblocks.centromere.core.repository.QueryParameterDescriptor;
 import org.oncoblocks.centromere.core.repository.QueryParameterException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
@@ -38,6 +40,8 @@ import java.util.*;
  * @since 0.4.3
  */
 public class QueryParameterUtil {
+	
+	private static final Logger logger = LoggerFactory.getLogger(QueryParameterUtil.class);
 
 	/**
 	 * Inspects a {@link Model} class and returns all of the available and acceptable query parameter
@@ -49,6 +53,7 @@ public class QueryParameterUtil {
 	public static Map<String,QueryParameterDescriptor> getAvailableQueryParameters(
 			Class<? extends Model<?>> model, boolean recursive)
 	{
+		logger.debug(String.format("Determining available query parameters for model: %s", model.getName()));
 		Class<?> current = model;
 		Map<String,QueryParameterDescriptor> paramMap = new HashMap<>();
 		while (current.getSuperclass() != null) {
@@ -61,13 +66,18 @@ public class QueryParameterUtil {
 				}
 				if (field.isSynthetic()) continue;
 				if (!field.isAnnotationPresent(Ignored.class)) {
-					paramMap.put(fieldName,
-							new QueryParameterDescriptor(fieldName, fieldName, type, Evaluation.EQUALS, false, true));
+					QueryParameterDescriptor descriptor = new QueryParameterDescriptor(fieldName, fieldName, 
+							type, Evaluation.EQUALS, false, true);
+					paramMap.put(fieldName, descriptor);
+					logger.debug(String.format("Adding default query parameter: %s = %s", 
+							fieldName, descriptor.toString()));
 				}
 				if (field.isAnnotationPresent(ForeignKey.class)) {
 					if (!recursive)
 						continue;
 					ForeignKey foreignKey = field.getAnnotation(ForeignKey.class);
+					logger.debug(String.format("Adding foreign key parameters for model: %s", 
+							foreignKey.model().getName()));
 					String relField = !"".equals(foreignKey.rel()) ? foreignKey.rel() : fieldName;
 					Map<String, QueryParameterDescriptor> foreignModelMap =
 							getAvailableQueryParameters(foreignKey.model(), false);
@@ -75,20 +85,34 @@ public class QueryParameterUtil {
 						String newParamName = relField + "." + descriptor.getParamName();
 						descriptor.setParamName(newParamName);
 						paramMap.put(newParamName, descriptor);
+						logger.debug(String.format("Adding foreign key parameter: %s = %s", 
+								newParamName, descriptor.toString()));
 					}
 				}
 				if (field.isAnnotationPresent(Aliases.class)) {
 					Aliases aliases = field.getAnnotation(Aliases.class);
+					logger.debug(String.format("Adding parameter aliases for field: %s", field.getName()));
 					for (Alias alias : aliases.value()) {
-						paramMap.put(alias.value(), getDescriptorFromAlias(alias, type, fieldName));
+						QueryParameterDescriptor descriptor = getDescriptorFromAlias(alias, type, fieldName);
+						if (descriptor != null) {
+							paramMap.put(alias.value(), descriptor);
+							logger.debug(String.format("Adding alias parameter: %s = %s", alias.value(), descriptor));
+						}
 					}
 				} else if (field.isAnnotationPresent(Alias.class)) {
 					Alias alias = field.getAnnotation(Alias.class);
-					paramMap.put(alias.value(), getDescriptorFromAlias(alias, type, fieldName));
+					if (alias.exposed()) {
+						QueryParameterDescriptor descriptor = getDescriptorFromAlias(alias, type, fieldName);
+						if (descriptor != null) {
+							paramMap.put(alias.value(), descriptor);
+							logger.debug(String.format("Adding alias parameter: %s = %s", alias.value(), descriptor));
+						}
+					}
 				}
 			}
 			current = current.getSuperclass();
 		}
+		logger.debug(String.format("Found %d query parameters for model: %s", paramMap.size(), model.getName()));
 		return paramMap;
 	}
 
@@ -114,6 +138,7 @@ public class QueryParameterUtil {
 	 * @return description of the acceptable query parameter.
 	 */
 	public static QueryParameterDescriptor getDescriptorFromAlias(Alias alias, Class<?> type, String fieldName){
+		if (!alias.exposed()) return null;
 		QueryParameterDescriptor descriptor = new QueryParameterDescriptor();
 		descriptor.setParamName(alias.value());
 		descriptor.setFieldName(alias.fieldName().equals("") ? fieldName : alias.fieldName());

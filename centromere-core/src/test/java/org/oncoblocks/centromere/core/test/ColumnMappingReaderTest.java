@@ -19,6 +19,7 @@ package org.oncoblocks.centromere.core.test;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oncoblocks.centromere.core.dataimport.BasicColumnMappingRecordReader;
+import org.oncoblocks.centromere.core.model.Alias;
 import org.oncoblocks.centromere.core.model.Model;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
@@ -170,7 +171,7 @@ public class ColumnMappingReaderTest {
 		private String columnA;
 		private Integer columnB;
 		private Double columnC;
-		private List<String> columnD;
+		@Alias("tags") private List<String> columnD;
 
 		@Override public String getId() {
 			return id;
