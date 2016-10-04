@@ -33,7 +33,6 @@ import org.oncoblocks.centromere.web.test.config.DefaultModelRegistryConfig;
 import org.oncoblocks.centromere.web.test.config.TestWebConfig;
 import org.oncoblocks.centromere.web.util.ApiMediaTypes;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -69,7 +68,6 @@ public class MappingMongoEntrezGeneControllerTests {
 	private MockMvc mockMvc;
 	@Autowired private WebApplicationContext webApplicationContext;
 	private static final ObjectMapper objectMapper = new ObjectMapper();
-	@Autowired private Environment env;
 	
 	private static final String BASE_URL = "/api/genes";
 
@@ -78,7 +76,6 @@ public class MappingMongoEntrezGeneControllerTests {
 		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 		geneRepository.deleteAll();
 		geneRepository.insert(new EntrezGeneDataGenerator<MongoGene>().generateData(MongoGene.class));
-		//BASE_URL = env.getRequiredProperty("centromere.api.root-url") + "/genes";
 	}
 	
 	private String getGeneIdByEntrezGeneId(Long id){
@@ -252,6 +249,175 @@ public class MappingMongoEntrezGeneControllerTests {
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasSize(3)))
 				.andExpect(jsonPath("$[2]", is("GeneD")));
+	}
+	
+	@Test
+	public void dynamicParamGreaterThanTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?taxIdGreaterThan=10000"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(0)));
+		mockMvc.perform(get(BASE_URL + "?taxIdGreaterThan=1000"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(5)));
+	}
+
+	@Test
+	public void dynamicParamGreaterThanEqualsTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?taxIdGreaterThanOrEquals=9606"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(5)));
+		mockMvc.perform(get(BASE_URL + "?taxIdGreaterThanOrEquals=9607"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(0)));
+	}
+
+	@Test
+	public void dynamicParamLessThanTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?taxIdLessThan=10000"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(5)))
+				.andExpect(jsonPath("$[0]", hasKey("taxId")))
+				.andExpect(jsonPath("$[0].taxId", lessThan(10000)));
+		mockMvc.perform(get(BASE_URL + "?taxIdLessThan=1000"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(0)));
+	}
+
+	@Test
+	public void dynamicParamLessThanOrEqualsTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?taxIdLessThanOrEquals=9606"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(5)));
+		mockMvc.perform(get(BASE_URL + "?taxIdLessThanOrEquals=9605"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(0)));
+	}
+
+	@Test
+	public void dynamicParamBetweenTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?taxIdBetween=1000,10000"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(5)));
+		mockMvc.perform(get(BASE_URL + "?taxIdBetween=1000,9000"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(0)));
+	}
+
+	@Test
+	public void dynamicParamBetweenInclusiveTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?taxIdBetweenIncluding=9606,10000"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(5)));
+		mockMvc.perform(get(BASE_URL + "?taxIdBetweenIncluding=1000,9605"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(0)));
+	}
+
+	@Test
+	public void dynamicParamOutsideTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?taxIdOutside=1000,10000"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(0)));
+		mockMvc.perform(get(BASE_URL + "?taxIdOutside=1000,9000"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(5)));
+	}
+
+	@Test
+	public void dynamicParamOutsideInclusiveTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?taxIdOutsideIncluding=1000,10000"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(0)));
+		mockMvc.perform(get(BASE_URL + "?taxIdOutsideIncluding=1000,9606"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(5)));
+	}
+
+	@Test
+	public void dynamicParamInvalidParamTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?taxIdLess=10000"))
+				.andExpect(status().is(400))
+				.andExpect(jsonPath("$", hasKey("code")))
+				.andExpect(jsonPath("$.code", is(40001)));
+	}
+
+	@Test
+	public void dynamicParamIsNullTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?primaryGeneSymbolIsNull"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(0)));
+	}
+
+	@Test
+	public void dynamicParamIsNotNullTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?primaryGeneSymbolIsNotNull"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(5)))
+				.andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
+				.andExpect(jsonPath("$[0].primaryGeneSymbol", notNullValue()));
+	}
+
+	@Test
+	public void dynamicParamInTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?primaryGeneSymbolIn=GeneB,GeneC"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(2)))
+				.andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
+				.andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneB")));
+	}
+
+	@Test
+	public void dynamicParamNotEqualsTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?geneTypeNotEquals=protein-coding"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(2)))
+				.andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
+				.andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneC")));
+	}
+
+	@Test
+	public void dynamicParamNotInTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?primaryGeneSymbolNotIn=GeneB,GeneC"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(3)))
+				.andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
+				.andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneA")));
+	}
+
+	@Test
+	public void dynamicParamLikeTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?geneTypeLike=protein"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(3)))
+				.andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
+				.andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneA")));
+	}
+
+	@Test
+	public void dynamicParamNotLikeTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?geneTypeNotLike=protein"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(2)))
+				.andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
+				.andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneC")));
+	}
+
+	@Test
+	public void dynamicParamStartsWithTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?geneTypeStartsWith=protein"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(3)))
+				.andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
+				.andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneA")));
+	}
+
+	@Test
+	public void dynamicParamEndsWithTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?geneTypeEndsWith=coding"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasSize(3)))
+				.andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
+				.andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneA")));
 	}
 
 	@Test

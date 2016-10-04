@@ -87,7 +87,7 @@ public class RequestUtils {
 				model.getName(), request.getQueryString()));
 		List<String> defaultParameters = findAllParameters();
 		Map<String, QueryParameterDescriptor> paramMap = QueryParameterUtil.getAvailableQueryParameters(model);
-		List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(paramMap, defaultParameters, request);
+		List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(paramMap, defaultParameters, request.getParameterMap());
 		logger.info(String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
 		return criteriaList;
 	}
@@ -99,7 +99,7 @@ public class RequestUtils {
 				model.getName(), request.getQueryString()));
 		List<String> defaultParameters = findOneParameters();
 		Map<String, QueryParameterDescriptor> paramMap = QueryParameterUtil.getAvailableQueryParameters(model);
-		List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(paramMap, defaultParameters, request);
+		List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(paramMap, defaultParameters, request.getParameterMap());
 		logger.info(String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
 		return criteriaList;
 	}
@@ -111,7 +111,7 @@ public class RequestUtils {
 				model.getName(), request.getQueryString()));
 		List<String> defaultParameters = findDistinctParameters();
 		Map<String, QueryParameterDescriptor> paramMap = QueryParameterUtil.getAvailableQueryParameters(model);
-		List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(paramMap, defaultParameters, request);
+		List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(paramMap, defaultParameters, request.getParameterMap());
 		logger.info(String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
 		return criteriaList;
 	}
@@ -125,33 +125,40 @@ public class RequestUtils {
 		}
 		return false;
 	}
-	
+
 	/**
-	 * Extracts request parameters and matches them to available database query parameters, as defined
-	 *   in the {@code model} class definition.
-	 *
-	 * @param request {@link HttpServletRequest}
-	 * @return
+	 * Extracts valid repository query parameters from a map of submitted request parameters, and
+	 *   generates a list of {@link QueryCriteria} for querying the database.  
+	 * 
+	 * @param validParams map of valid query parameters for the target {@link Model}
+	 * @param defaultParameters default query parameters for the given controller method
+	 * @param paramMap map of parameters in the HTTP request
+	 * @return list of query criteria
 	 */
 	public static List<QueryCriteria> getQueryCriteriaFromRequest(
-			Map<String, QueryParameterDescriptor> paramMap, 
+			Map<String, QueryParameterDescriptor> validParams, 
 			List<String> defaultParameters,
-			HttpServletRequest request
+			Map<String, String[]> paramMap
 	){
 		List<QueryCriteria> criteriaList = new ArrayList<>();
-		for (Map.Entry entry: request.getParameterMap().entrySet()){
-			String paramName = (String) entry.getKey();
-			String[] paramValue = ((String[]) entry.getValue())[0].split(",");
+		for (Map.Entry<String, String[]> entry: paramMap.entrySet()){
+			String paramName = entry.getKey();
+			String[] paramValue = entry.getValue()[0] != null 
+					? entry.getValue()[0].split(",") : new String[]{""};
 			if (!defaultParameters.contains(paramName)) {
 				QueryCriteria criteria = null;
-				for (Map.Entry e: paramMap.entrySet()){
-					String p = (String) e.getKey();
-					QueryParameterDescriptor descriptor = (QueryParameterDescriptor) e.getValue();
+				for (Map.Entry<String, QueryParameterDescriptor> e: validParams.entrySet()){
+					String p = e.getKey();
+					QueryParameterDescriptor descriptor = e.getValue();
 					try {
 						if (descriptor.parameterNameMatches(paramName)) {
-							criteria = QueryParameterUtil
-									.getQueryCriteriaFromParameter(descriptor.getQueryableFieldName(paramName),
-											paramValue, descriptor.getType(), descriptor.getDynamicEvaluation(p));
+							logger.info(String.format("Request param '%s' matches model parameter: %s", 
+									paramName, descriptor.toString()));
+							criteria = QueryParameterUtil.getQueryCriteriaFromParameter(
+									descriptor.getQueryableFieldName(paramName),
+									paramValue, 
+									descriptor.getType(), 
+									descriptor.getDynamicEvaluation(paramName));
 							break;
 						}
 					} catch (QueryParameterException ex){

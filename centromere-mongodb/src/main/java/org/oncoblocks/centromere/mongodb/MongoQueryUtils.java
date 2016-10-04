@@ -50,7 +50,7 @@ public class MongoQueryUtils {
 						criteria = new Criteria(queryCriteria.getKey()).is(queryCriteria.getValue());
 						break;
 					case NOT_EQUALS:
-						criteria = new Criteria(queryCriteria.getKey()).not().is(queryCriteria.getValue());
+						criteria = new Criteria(queryCriteria.getKey()).ne(queryCriteria.getValue());
 						break;
 					case IN:
 						criteria = new Criteria(queryCriteria.getKey()).in((Collection) queryCriteria.getValue());
@@ -62,7 +62,7 @@ public class MongoQueryUtils {
 						criteria = new Criteria(queryCriteria.getKey()).is(null);
 						break;
 					case NOT_NULL:
-						criteria = new Criteria(queryCriteria.getKey()).not().is(null);
+						criteria = new Criteria(queryCriteria.getKey()).ne(null);
 						break;
 					case GREATER_THAN:
 						criteria = new Criteria(queryCriteria.getKey()).gt(queryCriteria.getValue());
@@ -100,7 +100,7 @@ public class MongoQueryUtils {
 						criteria = new Criteria(queryCriteria.getKey()).regex((String) queryCriteria.getValue());
 						break;
 					case NOT_LIKE:
-						// TODO
+						criteria = new Criteria(queryCriteria.getKey()).not().regex((String) queryCriteria.getValue());
 						break;
 					case STARTS_WITH:
 						criteria = new Criteria(queryCriteria.getKey()).regex("^" + queryCriteria.getValue());

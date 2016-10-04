@@ -170,6 +170,10 @@ public class QueryParameterUtil {
 				return new QueryCriteria(param, convertParameterArray(values, type), Evaluation.IN);
 			case NOT_IN:
 				return new QueryCriteria(param, Arrays.asList(values), Evaluation.NOT_IN);
+			case LIKE :
+				return new QueryCriteria(param, values[0], Evaluation.LIKE);
+			case NOT_LIKE: 
+				return new QueryCriteria(param, values[0], Evaluation.NOT_LIKE);
 			case IS_NULL:
 				return new QueryCriteria(param, true, Evaluation.IS_NULL);
 			case NOT_NULL:

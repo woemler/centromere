@@ -1,6 +1,6 @@
 # Centromere  [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.oncoblocks.centromere/centromere-core/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.oncoblocks.centromere%22) [![Build Status](https://travis-ci.org/blueprintmedicines/centromere.svg?branch=master)](https://travis-ci.org/blueprintmedicines/centromere)  [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5ab173c39407432695f6a5b268135a27)](https://www.codacy.com/app/willoemler/centromere?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=blueprintmedicines/centromere&amp;utm_campaign=Badge_Grade)  [![codecov](https://codecov.io/gh/blueprintmedicines/centromere/branch/master/graph/badge.svg)](https://codecov.io/gh/blueprintmedicines/centromere)  [![Gitter](https://badges.gitter.im/blueprintmedicines/centromere.svg)](https://gitter.im/blueprintmedicines/centromere?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-### Genomics Data Warehouse and REST API Framework
+### Genomic data warehousing, file parsing, and RESTful web services made easy.
 
 ## About
 
@@ -17,6 +17,61 @@ What Centromere is _**not**_:
 - A repository for raw genomic data.
 - An analysis platform.
 - An end-user GUI application.
+
+## Quick Start
+
+##### Requirements
+
+Centromere has the following requirements:
+
+- JDK 1.8+
+- Maven 2+
+- MongoDB 3.0+ or MySQL 5.5+
+
+##### Create a new project with Maven and Spring Boot
+
+A [starter project can be found here](#), which includes all of the required dependencies and a template for creating a new Centromere application.  Artifacts for Centromere release builds are available from the Maven Central Repository:
+
+```xml
+<dependency>
+    <groupId>org.oncoblocks.centromere</groupId>
+    <artifactId>centromere-core</artifactId>
+    <version>0.4.2</version>
+</dependency>
+
+<dependency>
+    <groupId>org.oncoblocks.centromere</groupId>
+    <artifactId>centromere-data-import-cli</artifactId>
+    <version>0.4.2</version>
+</dependency>
+
+<dependency>
+    <groupId>org.oncoblocks.centromere</groupId>
+    <artifactId>centromere-mongodb</artifactId>
+    <version>0.4.2</version>
+</dependency>
+
+<dependency>
+    <groupId>org.oncoblocks.centromere</groupId>
+    <artifactId>centromere-jpa</artifactId>
+    <version>0.4.2</version>
+</dependency>
+
+<dependency>
+    <groupId>org.oncoblocks.centromere</groupId>
+    <artifactId>centromere-sql</artifactId>
+    <version>0.4.2</version>
+</dependency>
+
+<dependency>
+    <groupId>org.oncoblocks.centromere</groupId>
+    <artifactId>centromere-web</artifactId>
+    <version>0.4.2</version>
+</dependency>
+```
+
+##### 
+
 
 ## Documentation
 Detailed documentation for Centromere and its modules can be **[found in the wiki](https://github.com/blueprintmedicines/centromere/wiki)**.  
@@ -56,47 +111,6 @@ For working with development builds, clone the repository and build using Maven:
  > mvn -U clean install -Dgpg.skip
  ```
 
-### Release Builds
-
-Artifacts for Centromere release builds are available from the Maven Central Repository:
-
-```xml
-<dependency>
-    <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-core</artifactId>
-    <version>0.4.2</version>
-</dependency>
-
-<dependency>
-    <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-data-import-cli</artifactId>
-    <version>0.4.2</version>
-</dependency>
-
-<dependency>
-    <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-mongodb</artifactId>
-    <version>0.4.2</version>
-</dependency>
-
-<dependency>
-    <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-jpa</artifactId>
-    <version>0.4.2</version>
-</dependency>
-
-<dependency>
-    <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-sql</artifactId>
-    <version>0.4.2</version>
-</dependency>
-
-<dependency>
-    <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-web</artifactId>
-    <version>0.4.2</version>
-</dependency>
-```
 
 ## Demo
 

@@ -172,6 +172,7 @@ public class MappingCrudApiController implements ModelController {
 	}
 
 	/**
+	 * {@code GET /}
 	 * Queries the repository using inputted query string paramters, defined within a annotated 
 	 *   {@link Model} classes.  Supports hypermedia, pagination, sorting, field 
 	 *   filtering, and field exclusion.
