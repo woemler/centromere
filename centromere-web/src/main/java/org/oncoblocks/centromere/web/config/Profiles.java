@@ -21,7 +21,39 @@ package org.oncoblocks.centromere.web.config;
  */
 public class Profiles {
 	
-	public static final String CUSTOM = "custom";
-	public static final String MONGODB = "mongodb";
+	public static final String SCHEMA_CUSTOM = "schema_custom";
+	public static final String SCHEMA_MONGODB_DEFAULT = "schema_mongodb";
+	public static final String SCHEMA_MYSQL_DEFAULT = "schema_mysql";
+
+	public static final String DB_CUSTOM = "db_custom";
+	public static final String DB_MONGODB = "db_mongodb";
+	public static final String DB_MYSQL = "db_mysql";
+
+	public static String[] getApplicationProfiles(Database database, Schema schema){
+		String dbProfile;
+		String schemaProfile;
+		switch (database){
+			case MONGODB:
+				dbProfile = DB_MONGODB;
+				break;
+			default:
+				dbProfile = DB_CUSTOM;
+		}
+		if (schema.equals(Schema.CUSTOM)){
+			schemaProfile = SCHEMA_CUSTOM;
+		} else if (schema.equals(Schema.DEFAULT)){
+			if (database.equals(Database.MONGODB)) {
+				schemaProfile = SCHEMA_MONGODB_DEFAULT;
+			} else if (database.equals(Database.MYSQL)){
+				schemaProfile = SCHEMA_MYSQL_DEFAULT;
+			} else {
+				schemaProfile = SCHEMA_MONGODB_DEFAULT;
+			}
+		} else {
+			throw new ConfigurationException(String.format("The configured profiles are incompatible: database=%s  schema=%s",
+					database.toString(), schema.toString()));
+		}
+		return new String[]{dbProfile, schemaProfile};
+	}
 	
 }

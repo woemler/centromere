@@ -28,12 +28,12 @@ import org.springframework.context.annotation.Profile;
  */
 public class ProfileConfiguration {
 	
-	@Profile({ "default", Profiles.CUSTOM })
+	@Profile({ "default", Profiles.SCHEMA_CUSTOM })
 	@Configuration
 	public static class DefaultModelConfiguration extends ModelComponentRegistrationConfigurer {
 	}
 	
-	@Profile({ Profiles.MONGODB })
+	@Profile({ Profiles.SCHEMA_MONGODB_DEFAULT})
 	@Configuration
 	@ComponentScan(basePackages = { "org.oncoblocks.centromere.mongodb" },
 			includeFilters = @ComponentScan.Filter(type = FilterType.REGEX, 

@@ -16,6 +16,8 @@
 
 package org.oncoblocks.centromere.web.config;
 
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -30,11 +32,15 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Inherited
+@Configuration
 @AutoConfigureWebServices
 @AutoConfigureApiDocumentation
 @AutoConfigureWebSecurity
 @Import({ 
 		ProfileConfiguration.class
 })
+@SpringBootApplication
 public @interface AutoConfigureCentromere {
+	Database database() default Database.CUSTOM;
+	Schema schema() default Schema.CUSTOM;
 }

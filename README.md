@@ -20,7 +20,7 @@ What Centromere is _**not**_:
 
 ## Quick Start
 
-##### Requirements
+#### Requirements
 
 Centromere has the following requirements:
 
@@ -28,7 +28,7 @@ Centromere has the following requirements:
 - Maven 2+
 - MongoDB 3.0+ or MySQL 5.5+
 
-##### Create a new project with Maven and Spring Boot
+#### Create a new project with Maven and Spring Boot
 
 A [starter project can be found here](#), which includes all of the required dependencies and a template for creating a new Centromere application.  Artifacts for Centromere release builds are available from the Maven Central Repository:
 

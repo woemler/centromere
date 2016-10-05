@@ -43,7 +43,6 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	
 	private BasicImportOptions options = new BasicImportOptions();
 	private Class<T> model;
-	private Map<String,Class<?>> columnMap = new LinkedHashMap<>();
 	private Map<String, Class<?>> fieldTypeMap = new HashMap<>(); // map of actual field name and types
 	private Map<String, String> fieldNameMap = new HashMap<>(); // map of aliases and actual field names
 	private Map<Integer, String> columnIndexMap = new HashMap<>(); // map of column indexes to mapped model field names
@@ -160,7 +159,6 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	 */
 	@SuppressWarnings("unchecked")
 	private T getRecordFromLine(String line) throws DataImportException{
-		List<Map.Entry<String, Class<?>>> headerList = new ArrayList<>(columnMap.entrySet());
 		BeanWrapperImpl wrapper = new BeanWrapperImpl(model);
 		String[] bits = line.split(delimiter);
 		for (int i = 0; i < bits.length; i++){

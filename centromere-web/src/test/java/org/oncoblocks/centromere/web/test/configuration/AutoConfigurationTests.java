@@ -38,7 +38,7 @@ import java.util.Map;
 @ContextConfiguration(classes = {
 		AutoConfigSetup.DefaultAutoConfig.class
 })
-@ActiveProfiles({ Profiles.MONGODB })
+@ActiveProfiles({Profiles.SCHEMA_MONGODB_DEFAULT, Profiles.DB_MONGODB})
 public class AutoConfigurationTests {
 	
 	@Autowired private ApplicationContext context;
