@@ -53,7 +53,8 @@ public class ModelParameterBuilderPlugin implements OperationBuilderPlugin {
 	private static final String FIND_METHOD = "find";
 	private static final Logger logger = LoggerFactory.getLogger(ModelParameterBuilderPlugin.class);
 
-	@Override public void apply(OperationContext context) {
+	@Override 
+	public void apply(OperationContext context) {
 		Object controller = applicationContext.getBean(context.getHandlerMethod().getBeanType());
 		if (controller == null) throw new ApiDocumentationException(String.format("Controller bean is null: %s", 
 				context.getHandlerMethod().getBeanType().getName()));

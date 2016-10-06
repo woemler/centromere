@@ -18,7 +18,10 @@ package org.oncoblocks.centromere.web.test.configuration;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.oncoblocks.centromere.web.config.AutoConfigureCentromere;
+import org.oncoblocks.centromere.web.config.Database;
 import org.oncoblocks.centromere.web.config.Profiles;
+import org.oncoblocks.centromere.web.config.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -52,5 +55,22 @@ public class AutoConfigurationTests {
 		}
 	}
 	
+	@Test
+	public void profilesFromAnnotationTest() throws Exception {
+		Class<?> cfg = AutoConfigSetup.DefaultAutoConfig.class;
+		AutoConfigureCentromere annotation = null;
+		if (cfg.isAnnotationPresent(AutoConfigureCentromere.class)){
+			annotation = cfg.getAnnotation(AutoConfigureCentromere.class);
+		}
+		Assert.notNull(annotation);
+		Assert.notNull(annotation.database());
+		Assert.isTrue(Database.MONGODB.equals(annotation.database()));
+		Assert.notNull(annotation.schema());
+		Assert.isTrue(Schema.DEFAULT.equals(annotation.schema()));
+		String[] profiles = Profiles.getApplicationProfiles(annotation.database(), annotation.schema());
+		Assert.notNull(profiles);
+		Assert.isTrue("db_mongodb".equals(profiles[0]));
+		Assert.isTrue("schema_mongodb".equals(profiles[1]));
+	}
 	
 }

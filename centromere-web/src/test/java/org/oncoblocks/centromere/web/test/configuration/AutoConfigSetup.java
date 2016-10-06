@@ -17,6 +17,8 @@
 package org.oncoblocks.centromere.web.test.configuration;
 
 import org.oncoblocks.centromere.web.config.AutoConfigureCentromere;
+import org.oncoblocks.centromere.web.config.Database;
+import org.oncoblocks.centromere.web.config.Schema;
 import org.oncoblocks.centromere.web.test.config.TestMongoConfig;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -27,7 +29,7 @@ import org.springframework.context.annotation.Import;
 public class AutoConfigSetup {
 	
 	@Configuration
-	@AutoConfigureCentromere
+	@AutoConfigureCentromere(database = Database.MONGODB, schema = Schema.DEFAULT)
 	@Import({ TestMongoConfig.class })
 	public static class DefaultAutoConfig {
 		

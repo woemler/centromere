@@ -18,10 +18,15 @@ package org.oncoblocks.centromere.web.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 
 /**
+ * Extends {@link SpringBootServletInitializer} and wraps the constructor for {@link SpringApplication}
+ *   to allow for quick Spring Boot application initialization, when combined with the
+ *   {@link AutoConfigureCentromere} annotation.
+ * 
  * @author woemler
  * @since 0.4.3
  */
@@ -32,15 +37,30 @@ public abstract class CentromereInitializer extends SpringBootServletInitializer
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder application){
+		return application.sources(this);
+	}
+
+	/**
+	 * Creates a Spring Boot web application instance and loads configuration classes determined by 
+	 *   the profiles defined by {@link AutoConfigureCentromere}.
+	 * 
+	 * @param applicationClass main application class.
+	 * @param args command line arguments.
+	 */
+	public static void run(Class<?> applicationClass, String[] args) {
 		String[] profiles;
-		if (this.getClass().isAnnotationPresent(AutoConfigureCentromere.class)){
-			AutoConfigureCentromere cfg = this.getClass().getAnnotation(AutoConfigureCentromere.class);
+		if (applicationClass.isAnnotationPresent(AutoConfigureCentromere.class)){
+			AutoConfigureCentromere cfg = applicationClass.getAnnotation(AutoConfigureCentromere.class);
+			logger.debug(String.format("Processing AutoConfigureCentromere annotation with params: db=%s  schema=%s",
+					cfg.database(), cfg.schema()));
 			profiles = Profiles.getApplicationProfiles(cfg.database(), cfg.schema());
 		} else {
 			profiles = Profiles.getApplicationProfiles(Database.CUSTOM, Schema.CUSTOM);
 		}
 		logger.info(String.format("[CENTROMERE] Using application profiles: %s", profiles));
-		return application.sources(this).profiles(profiles);
+		SpringApplication springApplication = new SpringApplication(applicationClass);
+		springApplication.setAdditionalProfiles(profiles);
+		springApplication.run(args);
 	}
 	
 }

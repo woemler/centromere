@@ -98,11 +98,6 @@ public class SwaggerConfig {
 	public ModelParameterBuilderPlugin modelParameterBuilderPlugin(){
 		return new ModelParameterBuilderPlugin();
 	}
-//
-//	@Bean
-//	@Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER)
-//	public OperationModelPlugin operationModelPlugin(){
-//		return new OperationModelPlugin();
-//	}
+	
 	
 }
