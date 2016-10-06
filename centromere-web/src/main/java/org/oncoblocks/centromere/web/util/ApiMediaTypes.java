@@ -78,4 +78,13 @@ public class ApiMediaTypes {
 		return Arrays.asList(MediaType.APPLICATION_XML, APPLICATION_HAL_XML);
 	}
 	
+	public static List<String> getAllResponseTypeValues(){
+		return Arrays.asList(APPLICATION_HAL_JSON_VALUE, APPLICATION_HAL_XML_VALUE, 
+				MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, TEXT_PLAIN_UTF8_VALUE);
+	}
+	
+	public static List<String> getAllAcceptTypeValues(){
+		return Arrays.asList(MediaType.APPLICATION_JSON_VALUE);
+	}
+	
 }

@@ -51,7 +51,7 @@ public class QueryParameterUtil {
 	 * @return map of parameter names and their descriptors
 	 */
 	public static Map<String,QueryParameterDescriptor> getAvailableQueryParameters(
-			Class<? extends Model<?>> model, boolean recursive)
+			Class<? extends Model> model, boolean recursive)
 	{
 		logger.debug(String.format("Determining available query parameters for model: %s", model.getName()));
 		Class<?> current = model;
@@ -123,7 +123,7 @@ public class QueryParameterUtil {
 	 * @param model model to inspect
 	 * @return map of parameter names and their descriptors
 	 */
-	public static Map<String,QueryParameterDescriptor> getAvailableQueryParameters(Class<? extends Model<?>> model) {
+	public static Map<String,QueryParameterDescriptor> getAvailableQueryParameters(Class<? extends Model> model) {
 		return getAvailableQueryParameters(model, true);
 	}
 

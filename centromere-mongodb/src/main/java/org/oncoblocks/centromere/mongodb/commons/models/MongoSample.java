@@ -29,7 +29,7 @@ import java.util.*;
 /**
  * @author woemler
  */
-@ModelAttributes(uri = "samples")
+@ModelAttributes(uri = "samples", name = "Sample")
 @Document(collection = "samples")
 public class MongoSample extends Sample<String> {
 	

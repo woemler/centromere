@@ -19,6 +19,7 @@ package org.oncoblocks.centromere.web.config;
 import com.fasterxml.classmate.TypeResolver;
 import com.google.common.base.Predicate;
 import org.oncoblocks.centromere.web.controller.ResponseEnvelope;
+import org.oncoblocks.centromere.web.documentation.MappedModelApiListingPlugin;
 import org.oncoblocks.centromere.web.documentation.ModelParameterBuilderPlugin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -99,5 +100,16 @@ public class SwaggerConfig {
 		return new ModelParameterBuilderPlugin();
 	}
 	
+	@Bean
+	@Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER)
+	public MappedModelApiListingPlugin mappedModelApiListingPlugin(){
+		return new MappedModelApiListingPlugin();
+	}
+	
+//	@Bean
+//	@Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER)
+//	public ResponseModelBuilderPlugin responseModelBuilderPlugin(){
+//		return new ResponseModelBuilderPlugin();
+//	}
 	
 }

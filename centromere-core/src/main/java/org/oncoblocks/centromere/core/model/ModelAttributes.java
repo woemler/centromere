@@ -22,16 +22,34 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
+ * Allows adding or customizing {@link Model} metadata.
+ * 
  * @author woemler
  * @since 0.4.3
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface ModelAttributes {
-	
+
+	/**
+	 * Custom URI to be used when mapping web service requests.  If null, defaults to model class name.
+	 * 
+	 * @return uri value
+	 */
 	String uri() default "";
-	
+
+	/**
+	 * Table or collection to store records in.  If null, defaults to database implementation default.
+	 * 
+	 * @return table/collection name
+	 */
 	String table() default "";
+
+	/**
+	 * Display name to use for model.  If null, default to class name.
+	 * 
+	 * @return model display name
+	 */
+	String name() default "";
 	
 }

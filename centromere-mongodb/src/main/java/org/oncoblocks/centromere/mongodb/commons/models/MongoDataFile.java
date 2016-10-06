@@ -28,7 +28,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 /**
  * @author woemler
  */
-@ModelAttributes(uri = "datafiles")
+@ModelAttributes(uri = "datafiles", name = "DataFile")
 @Document(collection = "data_files")
 public class MongoDataFile extends DataFile<String> {
 	

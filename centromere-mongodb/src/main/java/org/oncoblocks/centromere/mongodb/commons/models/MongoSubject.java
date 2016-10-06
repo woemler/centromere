@@ -28,7 +28,7 @@ import java.util.*;
 /**
  * @author woemler
  */
-@ModelAttributes(uri = "subjects")
+@ModelAttributes(uri = "subjects", name = "Subject")
 @Document(collection = "subjects")
 public class MongoSubject extends Subject<String> {
 	

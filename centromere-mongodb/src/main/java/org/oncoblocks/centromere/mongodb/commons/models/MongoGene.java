@@ -29,7 +29,7 @@ import java.util.*;
 /**
  * @author woemler
  */
-@ModelAttributes(uri = "genes")
+@ModelAttributes(uri = "genes", name = "Gene")
 @Document(collection = "genes")
 public class MongoGene extends Gene<String> {
 	

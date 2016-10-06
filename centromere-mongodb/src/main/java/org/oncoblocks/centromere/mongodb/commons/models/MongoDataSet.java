@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * @author woemler
  */
-@ModelAttributes(uri = "datasets")
+@ModelAttributes(uri = "datasets", name = "DataSet")
 @Document(collection = "data_sets")
 public class MongoDataSet extends DataSet<String> {
 	

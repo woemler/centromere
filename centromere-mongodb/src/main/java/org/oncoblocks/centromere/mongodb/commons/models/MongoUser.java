@@ -25,7 +25,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 /**
  * @author woemler
  */
-@ModelAttributes(uri = "users")
+@ModelAttributes(uri = "users", name = "User")
 @Document(collection = "api_users")
 public class MongoUser extends User<String> {
 	
