@@ -4,19 +4,17 @@
 
 ## About
 
-Centromere is a set of tools for developing scalable data warehouses and RESTful web services for processed genomic data.  It is designed to be modular and flexible, allowing you to mold it to fit your data model and business needs. Centromere is developed using the open-source, enterprise-grade Spring Framework, and supports integration with multiple database technologies.  You can use Centromere to create a new data warehouse from scratch, or bootstrap one or more existing databases, and make your data available via a customizable REST API.
-
-Centromere aims to help solve some common problems inherent in monolithic bioinformatics app development:
-- Fragmentation of data across large organizations.
-- Inconsistent annotation.
-- Horizontal and vertical scalability.
-- Repetition of work in software development.
-
-What Centromere is _**not**_:
-- A LIMS system.
-- A repository for raw genomic data.
-- An analysis platform.
-- An end-user GUI application.
+Centromere aims to make the task of storing and working with processed genomic data easier, by provided a comprehensive tool-set for file parsing, database integration, and data access via REST web services.  You can create your own data model, or use the built-in one, for managing sample or experimental metadata, genomic profile data, and anything else that you can think of.  Centromere includes all of the required dependencies for running a full-featured data warehouse, and provides several starter projects to help you get up and running even faster.  Key features include:
+ 
+- File readers and processors for common bioinformatics data types.
+- Preexisting data models for common data sets (such as The Cancer Genome Atlas).
+- Integration with SQL and NoSQL databases.
+- A Command line utility for reading and writing data to the warehouse.
+- REST web services, with a number of useful features:
+    - Dynamic, user-defined queries.
+    - Automatic API documentation.
+    - Basic security and user-authentication.
+    - Response object field dfiltering and formatting.
 
 ## Quick Start
 

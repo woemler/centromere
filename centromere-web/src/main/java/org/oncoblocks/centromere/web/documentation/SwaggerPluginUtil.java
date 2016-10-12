@@ -114,7 +114,7 @@ public class SwaggerPluginUtil {
 				HttpMethod.GET,
 				"Fetch a single record by ID",
 				"Fetches a single record by the primary key ID.  If no record is found, a 404 error is returned.",
-				new ModelRef(model.getName()),
+				new ModelRef(model.getSimpleName()),
 				"FindById",
 				0,
 				Collections.singleton(ModelUtil.getDisplayName(model)),
@@ -143,7 +143,7 @@ public class SwaggerPluginUtil {
 				HttpMethod.GET,
 				"Fetch all records",
 				"Fetches one or more records.  Can be filtered, paged, and sorted.",
-				new ModelRef(ArrayList.class.getTypeName(), new ModelRef(model.getName())),
+				new ModelRef(ArrayList.class.getSimpleName(), new ModelRef(model.getSimpleName())),
 				"FindAll",
 				1,
 				Collections.singleton(ModelUtil.getDisplayName(model)),
@@ -172,7 +172,7 @@ public class SwaggerPluginUtil {
 				HttpMethod.GET,
 				"Fetch distinct field values",
 				"Fetches all unique values of the requested model field.",
-				new ModelRef(ArrayList.class.getTypeName(), new ModelRef(String.class.getName())),
+				new ModelRef(ArrayList.class.getSimpleName(), new ModelRef(String.class.getSimpleName())),
 				"FindDistinct",
 				2,
 				Collections.singleton(ModelUtil.getDisplayName(model)),
@@ -200,7 +200,7 @@ public class SwaggerPluginUtil {
 				HttpMethod.POST,
 				"Create new record",
 				"Attempts to create a new record using the submitted object",
-				new ModelRef(model.getName()),
+				new ModelRef(model.getSimpleName()),
 				"Create",
 				3,
 				Collections.singleton(ModelUtil.getDisplayName(model)),
@@ -228,7 +228,7 @@ public class SwaggerPluginUtil {
 				HttpMethod.PUT,
 				"Update an existing record",
 				"Attempts to update an existing record using the submitted object",
-				new ModelRef(model.getName()),
+				new ModelRef(model.getSimpleName()),
 				"Update",
 				4,
 				Collections.singleton(ModelUtil.getDisplayName(model)),
@@ -256,7 +256,7 @@ public class SwaggerPluginUtil {
 				HttpMethod.DELETE,
 				"Delete an existing record",
 				"Attempts to delete an existing record, identified by the submitted ID.",
-				new ModelRef(String.class.getName()),
+				new ModelRef(String.class.getSimpleName()),
 				"Delete",
 				5,
 				Collections.singleton(ModelUtil.getDisplayName(model)),
@@ -283,7 +283,7 @@ public class SwaggerPluginUtil {
 				HttpMethod.HEAD,
 				"Get endpoint headers",
 				"Retrieves only endpoint headers.",
-				new ModelRef(String.class.getName()),
+				new ModelRef(String.class.getSimpleName()),
 				"Head",
 				6,
 				Collections.singleton(ModelUtil.getDisplayName(model)),
@@ -310,7 +310,7 @@ public class SwaggerPluginUtil {
 				HttpMethod.OPTIONS,
 				"Get endpoint information",
 				"Retrieves endpoint information.",
-				new ModelRef(String.class.getName()),
+				new ModelRef(String.class.getSimpleName()),
 				"Options",
 				7,
 				Collections.singleton(ModelUtil.getDisplayName(model)),
@@ -328,27 +328,27 @@ public class SwaggerPluginUtil {
 	
 	private static List<ResponseMessage> getStandardGetResponseMessages(Class<?> responseModel){
 		List<ResponseMessage> messages = new ArrayList<>();
-		messages.add(new ResponseMessage(200, "OK", new ModelRef(responseModel.getName()), 
+		messages.add(new ResponseMessage(200, "OK", new ModelRef(responseModel.getSimpleName()), 
 				Collections.emptyMap()));
 		messages.add(new ResponseMessage(400, "Invalid parameters", 
-				new ModelRef(RestError.class.getName()), Collections.emptyMap()));
+				new ModelRef(RestError.class.getSimpleName()), Collections.emptyMap()));
 		messages.add(new ResponseMessage(401, "Unauthorized",
-				new ModelRef(RestError.class.getName()), Collections.emptyMap()));
+				new ModelRef(RestError.class.getSimpleName()), Collections.emptyMap()));
 		messages.add(new ResponseMessage(404, "Record not found",
-				new ModelRef(RestError.class.getName()), Collections.emptyMap()));
+				new ModelRef(RestError.class.getSimpleName()), Collections.emptyMap()));
 		return messages;
 	}
 
 	private static List<ResponseMessage> getWriteResponseMessages(Class<?> responseModel){
 		List<ResponseMessage> messages = new ArrayList<>();
-		messages.add(new ResponseMessage(201, "Created", new ModelRef(responseModel.getName()),
+		messages.add(new ResponseMessage(201, "Created", new ModelRef(responseModel.getSimpleName()),
 				Collections.emptyMap()));
 		messages.add(new ResponseMessage(401, "Unauthorized",
-				new ModelRef(RestError.class.getName()), Collections.emptyMap()));
+				new ModelRef(RestError.class.getSimpleName()), Collections.emptyMap()));
 		messages.add(new ResponseMessage(403, "Forbidden",
-				new ModelRef(RestError.class.getName()), Collections.emptyMap()));
+				new ModelRef(RestError.class.getSimpleName()), Collections.emptyMap()));
 		messages.add(new ResponseMessage(404, "Record not found",
-				new ModelRef(RestError.class.getName()), Collections.emptyMap()));
+				new ModelRef(RestError.class.getSimpleName()), Collections.emptyMap()));
 		return messages;
 	}
 
@@ -357,9 +357,9 @@ public class SwaggerPluginUtil {
 		messages.add(new ResponseMessage(204, "No Content", new ModelRef("String"),
 				Collections.emptyMap()));
 		messages.add(new ResponseMessage(401, "Unauthorized",
-				new ModelRef(RestError.class.getName()), Collections.emptyMap()));
+				new ModelRef(RestError.class.getSimpleName()), Collections.emptyMap()));
 		messages.add(new ResponseMessage(403, "Forbidden",
-				new ModelRef(RestError.class.getName()), Collections.emptyMap()));
+				new ModelRef(RestError.class.getSimpleName()), Collections.emptyMap()));
 		return messages;
 	}
 	

@@ -16,8 +16,10 @@
 
 package org.oncoblocks.centromere.web.config;
 
+import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.TypeResolver;
 import com.google.common.base.Predicate;
+import org.oncoblocks.centromere.core.config.ModelRegistry;
 import org.oncoblocks.centromere.web.controller.ResponseEnvelope;
 import org.oncoblocks.centromere.web.documentation.MappedModelApiListingPlugin;
 import org.oncoblocks.centromere.web.documentation.ModelParameterBuilderPlugin;
@@ -26,6 +28,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -38,6 +41,8 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger.common.SwaggerPluginSupport;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.util.ArrayList;
 
 import static springfox.documentation.builders.PathSelectors.regex;
 
@@ -54,6 +59,7 @@ public class SwaggerConfig {
 	
 	@Autowired private Environment env;
 	@Autowired private TypeResolver typeResolver;
+	@Autowired private ModelRegistry modelRegistry;
 
 	public static final Class<?>[] FILTERED_TYPES = {
 			Pageable.class,
@@ -74,8 +80,9 @@ public class SwaggerConfig {
 						AlternateTypeRules.newRule(
 								typeResolver.resolve(ResponseEntity.class, 
 										typeResolver.resolve(ResponseEnvelope.class, WildcardType.class)), 
-								typeResolver.resolve(WildcardType.class))
-				).useDefaultResponseMessages(false);
+								typeResolver.resolve(WildcardType.class)))
+				.useDefaultResponseMessages(false)
+				.additionalModels(typeResolver.resolve(PageImpl.class), registeredModelTypes());
 	}
 
 	private ApiInfo apiInfo(){
@@ -88,6 +95,14 @@ public class SwaggerConfig {
 				env.getRequiredProperty("centromere.api.license"),
 				env.getRequiredProperty("centromere.api.license-url")
 		);
+	}
+	
+	private ResolvedType[] registeredModelTypes(){
+		ArrayList<ResolvedType> types = new ArrayList<>();
+		for (Class<?> model: modelRegistry.getModels()){
+			types.add(typeResolver.resolve(model));
+		}
+		return types.toArray(new ResolvedType[types.size()]);
 	}
 
 	private Predicate<String> apiPaths(){
@@ -105,11 +120,5 @@ public class SwaggerConfig {
 	public MappedModelApiListingPlugin mappedModelApiListingPlugin(){
 		return new MappedModelApiListingPlugin();
 	}
-	
-//	@Bean
-//	@Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER)
-//	public ResponseModelBuilderPlugin responseModelBuilderPlugin(){
-//		return new ResponseModelBuilderPlugin();
-//	}
 	
 }
