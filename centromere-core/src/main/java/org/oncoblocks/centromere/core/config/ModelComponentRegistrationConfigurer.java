@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.env.Environment;
 
 /**
@@ -62,28 +63,7 @@ public abstract class ModelComponentRegistrationConfigurer {
 	@Bean
 	public ModelRegistry modelRegistry(){
 		
-		ModelRegistry modelRegistry;
-		
-		// By default, check this class and superclass for ModelScan and ComponentScan annotations
-		if (this.getClass().isAnnotationPresent(ModelScan.class)) {
-			ModelScan modelScan = this.getClass().getAnnotation(ModelScan.class);
-			modelRegistry = ModelRegistry.fromModelScan(modelScan);
-			logger.debug(String.format("Creating ModelRegistry from ModelScan: %s", modelScan.toString()));
-		} else if (this.getClass().isAnnotationPresent(ComponentScan.class)) {
-			ComponentScan componentScan = this.getClass().getAnnotation(ComponentScan.class);
-			modelRegistry = ModelRegistry.fromComponentScan(componentScan);
-			logger.debug(String.format("Creating ModelRegistry from ComponentScan: %s", componentScan.toString()));
-		} else if (this.getClass().getSuperclass().isAnnotationPresent(ModelScan.class)) {
-			ModelScan modelScan = this.getClass().getSuperclass().getAnnotation(ModelScan.class);
-			modelRegistry = ModelRegistry.fromModelScan(modelScan);
-			logger.debug(String.format("Creating ModelRegistry from ModelScan: %s", modelScan.toString()));
-		} else if (this.getClass().getSuperclass().isAnnotationPresent(ComponentScan.class)) {
-			ComponentScan componentScan = this.getClass().getSuperclass().getAnnotation(ComponentScan.class);
-			modelRegistry = ModelRegistry.fromComponentScan(componentScan);
-			logger.debug(String.format("Creating ModelRegistry from ComponentScan: %s", componentScan.toString()));
-		} else {
-			modelRegistry = new ModelRegistry();
-		}
+		ModelRegistry modelRegistry = ModelRegistry.fromConfigurationClass(this.getClass());
 		
 		// If no models have been found, check for property-defined model path
 		if (env.containsProperty("centromere.models.base-package") 
@@ -95,7 +75,7 @@ public abstract class ModelComponentRegistrationConfigurer {
 		// If no models have been found, check for config classes with ModelScan and ComponentScan annotations
 		if (modelRegistry.getModels().isEmpty()){
 			for (Object bean: applicationContext.getBeansWithAnnotation(ModelScan.class).values()){
-				ModelScan modelScan = bean.getClass().getAnnotation(ModelScan.class);
+				ModelScan modelScan = AnnotatedElementUtils.getMergedAnnotation(bean.getClass(), ModelScan.class);
 				if (modelScan != null) {
 					modelRegistry.addModelScanModels(modelScan);
 				}
@@ -103,7 +83,7 @@ public abstract class ModelComponentRegistrationConfigurer {
 		}
 		if (modelRegistry.getModels().isEmpty()){
 			for (Object bean: applicationContext.getBeansWithAnnotation(ComponentScan.class).values()){
-				ComponentScan componentScan = bean.getClass().getAnnotation(ComponentScan.class);
+				ComponentScan componentScan = AnnotatedElementUtils.getMergedAnnotation(bean.getClass(), ComponentScan.class);
 				if (componentScan != null) {
 					modelRegistry.addComponentScanModels(componentScan);
 				}

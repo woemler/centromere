@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.web.config;
+package org.oncoblocks.centromere.core.config;
 
 /**
  * @author woemler

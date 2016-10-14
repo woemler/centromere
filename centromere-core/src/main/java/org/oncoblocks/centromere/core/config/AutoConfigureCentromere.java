@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.web.config;
+package org.oncoblocks.centromere.core.config;
 
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.oncoblocks.centromere.core.model.Model;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
 
@@ -33,14 +35,35 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Inherited
 @Configuration
-@AutoConfigureWebServices
-@AutoConfigureApiDocumentation
-@AutoConfigureWebSecurity
+@ComponentScan(basePackages = { "org.oncoblocks.centromere.web.config" })
 @Import({ 
 		ProfileConfiguration.class
 })
-@SpringBootApplication
+@ModelScan
 public @interface AutoConfigureCentromere {
+
+	/**
+	 * Allows selection of a default database configuration.  Defaults to {@code CUSTOM}, which assumes
+	 *   a user-supplied configuration class is present.
+	 * 
+	 * @return database profile
+	 */
 	Database database() default Database.CUSTOM;
+
+	/**
+	 * Allows selection fo a default set of {@link org.oncoblocks.centromere.core.model.Model} classes,
+	 *   which will be registered in the application.  Defaults to {@code CUSTOM}, which assumes that
+	 *   model registration will be handled by the user, or with the {@link #basePackages()} or 
+	 *   {@link #modelClasses()} methods.
+	 * 
+	 * @return
+	 */
 	Schema schema() default Schema.CUSTOM;
+	
+	@AliasFor(annotation = ModelScan.class, attribute = "basePackages")
+	String[] basePackages() default {};
+	
+	@AliasFor(annotation = ModelScan.class, attribute = "modelClasses")
+	Class<? extends Model<?>>[] modelClasses() default {};
+	
 }

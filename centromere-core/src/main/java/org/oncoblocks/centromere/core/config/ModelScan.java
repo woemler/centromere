@@ -16,6 +16,9 @@
 
 package org.oncoblocks.centromere.core.config;
 
+import org.oncoblocks.centromere.core.model.Model;
+import org.springframework.core.annotation.AliasFor;
+
 import java.lang.annotation.*;
 
 /**
@@ -38,6 +41,7 @@ public @interface ModelScan {
 	 * 
 	 * @return an array of package locations.
 	 */
+	@AliasFor("basePackages")
 	String[] value() default {};
 
 	/**
@@ -45,6 +49,7 @@ public @interface ModelScan {
 	 *
 	 * @return an array of package locations.
 	 */
+	@AliasFor("value")
 	String[] basePackages() default {};
 
 	/**
@@ -52,5 +57,5 @@ public @interface ModelScan {
 	 * 
 	 * @return an array of model classes.
 	 */
-	Class<?>[] basePackageClasses() default {};
+	Class<? extends Model<?>>[] modelClasses() default {};
 }

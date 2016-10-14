@@ -16,9 +16,14 @@
 
 package org.oncoblocks.centromere.web.config;
 
+import org.oncoblocks.centromere.core.config.AutoConfigureCentromere;
+import org.oncoblocks.centromere.core.config.Database;
+import org.oncoblocks.centromere.core.config.Profiles;
+import org.oncoblocks.centromere.core.config.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 
@@ -30,7 +35,7 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
  * @author woemler
  * @since 0.4.3
  */
-
+@SpringBootApplication
 public abstract class CentromereInitializer extends SpringBootServletInitializer {
 	
 	private static final Logger logger = LoggerFactory.getLogger(CentromereInitializer.class);

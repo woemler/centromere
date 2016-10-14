@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.web.config;
+package org.oncoblocks.centromere.core.config;
 
 /**
  * @author woemler
  */
-public enum Database {
-	CUSTOM, MONGODB, MYSQL;
-	
+public enum Schema {
+	CUSTOM,
+	DEFAULT,
+	TCGA
+	;
 }

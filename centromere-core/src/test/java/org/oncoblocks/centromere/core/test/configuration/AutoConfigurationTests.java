@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.web.test.configuration;
+package org.oncoblocks.centromere.core.test.configuration;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oncoblocks.centromere.web.config.AutoConfigureCentromere;
-import org.oncoblocks.centromere.web.config.Database;
-import org.oncoblocks.centromere.web.config.Profiles;
-import org.oncoblocks.centromere.web.config.Schema;
+import org.oncoblocks.centromere.core.config.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.util.Assert;
 
 import java.util.Map;
@@ -37,7 +35,6 @@ import java.util.Map;
  * @author woemler
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@WebAppConfiguration
 @ContextConfiguration(classes = {
 		AutoConfigSetup.DefaultAutoConfig.class
 })
@@ -71,6 +68,24 @@ public class AutoConfigurationTests {
 		Assert.notNull(profiles);
 		Assert.isTrue("db_mongodb".equals(profiles[0]));
 		Assert.isTrue("schema_mongodb".equals(profiles[1]));
+	}
+	
+	@Test
+	public void metaAnnotationTest() throws Exception {
+		Class<?> cfg = AutoConfigSetup.DefaultAutoConfig.class;
+		Assert.isTrue(AnnotatedElementUtils.isAnnotated(cfg, AutoConfigureCentromere.class));
+		AutoConfigureCentromere autoConf = AnnotationUtils.getAnnotation(cfg, AutoConfigureCentromere.class);
+		Assert.notNull(autoConf);
+		Assert.notNull(autoConf.modelClasses());
+		Assert.notEmpty(autoConf.modelClasses());
+		Assert.isTrue(ExampleModel.class.equals(autoConf.modelClasses()[0]));
+		Assert.isTrue(AnnotatedElementUtils.isAnnotated(cfg, ModelScan.class));
+		ModelScan modelScan = AnnotatedElementUtils.findMergedAnnotation(cfg, ModelScan.class);
+		modelScan = AnnotationUtils.synthesizeAnnotation(modelScan, cfg);
+		Assert.notNull(modelScan.modelClasses());
+		Assert.notEmpty(modelScan.modelClasses());
+		Assert.isTrue(ExampleModel.class.equals(modelScan.modelClasses()[0]));
+		
 	}
 	
 }

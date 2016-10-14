@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.web.config;
+package org.oncoblocks.centromere.core.config;
 
-import org.oncoblocks.centromere.core.config.ModelComponentRegistrationConfigurer;
-import org.oncoblocks.centromere.core.config.ModelScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;

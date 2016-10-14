@@ -28,6 +28,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.util.Assert;
 
@@ -74,8 +75,8 @@ public class ModelRegistry implements InitializingBean, ApplicationListener<Cont
 		if (!models.contains(model)){
 			models.add(model);
 			String uri = model.getSimpleName().toLowerCase();
-			if (model.isAnnotationPresent(ModelAttributes.class)){
-				ModelAttributes modelAttributes = model.getAnnotation(ModelAttributes.class);
+			if (AnnotatedElementUtils.isAnnotated(model, ModelAttributes.class)){
+				ModelAttributes modelAttributes = AnnotatedElementUtils.findMergedAnnotation(model, ModelAttributes.class);
 				if (!modelAttributes.uri().equals("")){
 					uri = modelAttributes.uri();
 				}
@@ -168,8 +169,8 @@ public class ModelRegistry implements InitializingBean, ApplicationListener<Cont
 				this.addClassPathModels(path);
 			}
 		}
-		if (modelScan.basePackageClasses().length > 0){
-			for (Class<?> model: modelScan.basePackageClasses()){
+		if (modelScan.modelClasses().length > 0){
+			for (Class<?> model: modelScan.modelClasses()){
 				if (Model.class.isAssignableFrom(model)
 						&& !Modifier.isAbstract(model.getModifiers())
 						&& !Modifier.isInterface(model.getModifiers())) {
@@ -390,6 +391,30 @@ public class ModelRegistry implements InitializingBean, ApplicationListener<Cont
 	public static ModelRegistry fromModelScan(ModelScan modelScan){
 		ModelRegistry registry = new ModelRegistry();
 		registry.addModelScanModels(modelScan);
+		return registry;
+	}
+	
+	public static ModelRegistry fromConfigurationClass(Class<?> config){
+		ModelRegistry registry;
+		if (AnnotatedElementUtils.isAnnotated(config, ModelScan.class)) {
+			ModelScan modelScan = AnnotatedElementUtils.findMergedAnnotation(config, ModelScan.class);
+			registry = ModelRegistry.fromModelScan(modelScan);
+			logger.debug(String.format("Creating ModelRegistry from ModelScan: %s", modelScan.toString()));
+		} else if (AnnotatedElementUtils.isAnnotated(config, ComponentScan.class)) {
+			ComponentScan componentScan = AnnotatedElementUtils.getMergedAnnotation(config, ComponentScan.class);
+			registry = ModelRegistry.fromComponentScan(componentScan);
+			logger.debug(String.format("Creating ModelRegistry from ComponentScan: %s", componentScan.toString()));
+		} else if (AnnotatedElementUtils.isAnnotated(config.getSuperclass(), ModelScan.class)) {
+			ModelScan modelScan = AnnotatedElementUtils.findMergedAnnotation(config.getSuperclass(), ModelScan.class);
+			registry = ModelRegistry.fromModelScan(modelScan);
+			logger.debug(String.format("Creating ModelRegistry from ModelScan: %s", modelScan.toString()));
+		} else if (AnnotatedElementUtils.isAnnotated(config.getSuperclass(), ComponentScan.class)) {
+			ComponentScan componentScan = AnnotatedElementUtils.getMergedAnnotation(config.getSuperclass(), ComponentScan.class);
+			registry = ModelRegistry.fromComponentScan(componentScan);
+			logger.debug(String.format("Creating ModelRegistry from ComponentScan: %s", componentScan.toString()));
+		} else {
+			registry = new ModelRegistry();
+		}
 		return registry;
 	}
 	

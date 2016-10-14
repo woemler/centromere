@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package org.oncoblocks.centromere.web.test.configuration;
+package org.oncoblocks.centromere.core.test.configuration;
 
-import org.oncoblocks.centromere.web.config.AutoConfigureCentromere;
-import org.oncoblocks.centromere.web.config.Database;
-import org.oncoblocks.centromere.web.config.Schema;
-import org.oncoblocks.centromere.web.test.config.TestMongoConfig;
+import org.oncoblocks.centromere.core.config.AutoConfigureCentromere;
+import org.oncoblocks.centromere.core.config.Database;
+import org.oncoblocks.centromere.core.config.Schema;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 /**
  * @author woemler
@@ -29,8 +27,8 @@ import org.springframework.context.annotation.Import;
 public class AutoConfigSetup {
 	
 	@Configuration
-	@AutoConfigureCentromere(database = Database.MONGODB, schema = Schema.DEFAULT)
-	@Import({ TestMongoConfig.class })
+	@AutoConfigureCentromere(database = Database.MONGODB, schema = Schema.DEFAULT, 
+			modelClasses = { ExampleModel.class })
 	public static class DefaultAutoConfig {
 		
 	}

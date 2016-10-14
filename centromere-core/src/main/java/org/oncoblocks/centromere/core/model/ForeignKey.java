@@ -22,6 +22,8 @@ import java.lang.annotation.*;
  * Marks a {@link Model} class field as being a foreign key identifier of another class.  Allows for 
  *   automatic generation of hypermedia links in web responses, based upon the inferred relationship 
  *   and query string parameters.
+ *   
+ *   TODO: AliasFor JPA annotations?
  * 
  * @author woemler
  */
