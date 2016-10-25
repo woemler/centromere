@@ -73,10 +73,11 @@ import java.util.List;
 @Import({DefaultConfigurations.DefaultCentromerePropertiesConfig.class})
 @PropertySource(value = "classpath*:centromere.properties", ignoreResourceNotFound = true)
 public class WebServicesConfig extends WebMvcConfigurerAdapter {
-	
+
+	private static final Logger logger = LoggerFactory.getLogger(WebServicesConfig.class);
+
 	@Autowired private Environment env;
 	@Autowired private ApplicationContext context;
-	private static final Logger logger = LoggerFactory.getLogger(WebServicesConfig.class);
 
 	@Bean
 	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer(){
@@ -131,18 +132,15 @@ public class WebServicesConfig extends WebMvcConfigurerAdapter {
 	public EmbeddedServletContainerCustomizer servletContainerCustomizer(){
 		return configurableEmbeddedServletContainer -> 
 				((TomcatEmbeddedServletContainerFactory) configurableEmbeddedServletContainer).addConnectorCustomizers(
-				new TomcatConnectorCustomizer() {
-					@Override
-					public void customize(Connector connector) {
-						AbstractHttp11Protocol httpProtocol = (AbstractHttp11Protocol) connector.getProtocolHandler();
-						httpProtocol.setCompression("on");
-						httpProtocol.setCompressionMinSize(256);
-						String mimeTypes = httpProtocol.getCompressableMimeTypes();
-						String mimeTypesWithJson = mimeTypes + "," + MediaType.APPLICATION_JSON_VALUE;
-						httpProtocol.setCompressableMimeTypes(mimeTypesWithJson);
-					}
-				}
-		);
+						(TomcatConnectorCustomizer) connector -> {
+                            AbstractHttp11Protocol httpProtocol = (AbstractHttp11Protocol) connector.getProtocolHandler();
+                            httpProtocol.setCompression("on");
+                            httpProtocol.setCompressionMinSize(256);
+                            String mimeTypes = httpProtocol.getCompressableMimeTypes();
+                            String mimeTypesWithJson = mimeTypes + "," + MediaType.APPLICATION_JSON_VALUE;
+                            httpProtocol.setCompressableMimeTypes(mimeTypesWithJson);
+                        }
+				);
 	}
 
 	@Override 

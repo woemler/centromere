@@ -78,18 +78,6 @@ public class MappingCrudApiController implements ModelController {
 	 * @param id primary ID for the target record.
 	 * @return {@code T} instance
 	 */
-	@ApiImplicitParams({
-			@ApiImplicitParam(name = "fields", value = "List of fields to be included in response objects", 
-					dataType = "string", paramType = "query"),
-			@ApiImplicitParam(name = "exclude", value = "List of fields to be excluded from response objects", 
-					dataType = "string", paramType = "query")
-	})
-	@ApiResponses({
-			@ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
-			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
-			@ApiResponse(code = 404, message = "Record not found.", response = RestError.class)
-	})
 	@RequestMapping(
 			value = "/{uri}/{id}", 
 			method = RequestMethod.GET,
@@ -97,7 +85,7 @@ public class MappingCrudApiController implements ModelController {
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE, 
 					MediaType.TEXT_PLAIN_VALUE })
 	public <T extends Model<ID>, ID extends Serializable> ResponseEntity<ResponseEnvelope<T>> findById(
-			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable String id,
+			@PathVariable String id,
 			@PathVariable String uri,
 			HttpServletRequest request
 	) {
@@ -133,12 +121,6 @@ public class MappingCrudApiController implements ModelController {
 	 * @param request {@link HttpServletRequest}
 	 * @return List of distinct field values.
 	 */
-	@ApiResponses({
-			@ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
-			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
-			@ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
-	})
 	@RequestMapping(
 			value = "/{uri}/distinct", 
 			method = RequestMethod.GET,
@@ -146,7 +128,7 @@ public class MappingCrudApiController implements ModelController {
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE })
 	public <T extends Model<ID>, ID extends Serializable> ResponseEntity<ResponseEnvelope<Object>> findDistinct(
-			@ApiParam(name = "field", value = "Model field name.") @RequestParam String field,
+			@RequestParam String field,
 			@PathVariable String uri,
 			HttpServletRequest request)
 	{
@@ -181,24 +163,6 @@ public class MappingCrudApiController implements ModelController {
 	 * @param request {@link HttpServletRequest}
 	 * @return a {@link List} of {@link Model} objects.
 	 */
-	@ApiImplicitParams({
-			@ApiImplicitParam(name = "page", value = "Page number.", defaultValue = "0", dataType = "int", 
-					paramType = "query"),
-			@ApiImplicitParam(name = "size", value = "Number of records per page.", defaultValue = "1000", 
-					dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "sort", value = "Sort order field and direction.", dataType = "string", 
-					paramType = "query", example = "name,asc"),
-			@ApiImplicitParam(name = "fields", value = "List of fields to be included in response objects", 
-					dataType = "string", paramType = "query"),
-			@ApiImplicitParam(name = "exclude", value = "List of fields to be excluded from response objects", 
-					dataType = "string", paramType = "query")
-	})
-	@ApiResponses({
-			@ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
-			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
-			@ApiResponse(code = 404, message = "Record not found.", response = RestError.class)
-	})
 	@RequestMapping(
 			value = "/{uri}", 
 			method = RequestMethod.GET,
@@ -263,12 +227,6 @@ public class MappingCrudApiController implements ModelController {
 	 * @param entity entity representation to be persisted
 	 * @return updated representation of the submitted entity
 	 */
-	@ApiResponses({
-			@ApiResponse(code = 201, message = "Created"),
-			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
-			@ApiResponse(code = 404, message = "Resource not found.", response = RestError.class),
-			@ApiResponse(code = 406, message = "Malformed entity", response = RestError.class)
-	})
 	@RequestMapping(
 			value = "/{uri}",
 			method = RequestMethod.POST,
@@ -276,7 +234,7 @@ public class MappingCrudApiController implements ModelController {
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE})
 	public <T extends Model<ID>, ID extends Serializable> ResponseEntity<?> create(
-			@ApiParam(name = "entity", value = "Model record entity.") @RequestBody Object entity,
+			@RequestBody Object entity,
 			@PathVariable String uri,
 			HttpServletRequest request
 	) {
@@ -306,12 +264,6 @@ public class MappingCrudApiController implements ModelController {
 	 * @param id primary ID of the target entity
 	 * @return updated representation of the submitted entity.
 	 */
-	@ApiResponses({
-			@ApiResponse(code = 201, message = "Created"),
-			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
-			@ApiResponse(code	= 404, message = "Record not found", response = RestError.class),
-			@ApiResponse(code = 406, message = "Malformed entity", response = RestError.class)
-	})
 	@RequestMapping(
 			value = "/{uri}/{id}",
 			method = RequestMethod.PUT,
@@ -319,8 +271,8 @@ public class MappingCrudApiController implements ModelController {
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE})
 	public <T extends Model<ID>, ID extends Serializable> ResponseEntity<?> update(
-			@ApiParam(name = "entity", value = "Model record entity.") @RequestBody Object entity,
-			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable String id,
+			@RequestBody Object entity,
+			@PathVariable String id,
 			@PathVariable String uri,
 			HttpServletRequest request
 	) {
@@ -351,16 +303,11 @@ public class MappingCrudApiController implements ModelController {
 	 * @param id primary ID of the target record.
 	 * @return {@link HttpStatus} indicating success or failure.
 	 */
-	@ApiResponses({
-			@ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
-			@ApiResponse(code	= 404, message = "Record not found", response = RestError.class)
-	})
 	@RequestMapping(
 			value = "/{uri}/{id}",
 			method = RequestMethod.DELETE)
 	public <T extends Model<ID>, ID extends Serializable> ResponseEntity<?> delete(
-			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable String id,
+			@PathVariable String id,
 			@PathVariable String uri,
 			HttpServletRequest request) {
 		if (!registry.isSupportedUri(uri)){
@@ -379,10 +326,6 @@ public class MappingCrudApiController implements ModelController {
 	 *
 	 * @return headers only.
 	 */
-	@ApiResponses({
-			@ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
-	})
 	@RequestMapping(value = { "/{uri}", "/{uri}/**" }, method = RequestMethod.HEAD)
 	public ResponseEntity<?> head(HttpServletRequest request, @PathVariable String uri){
 		if (!registry.isSupportedUri(uri)){
@@ -399,10 +342,6 @@ public class MappingCrudApiController implements ModelController {
 	 *
 	 * @return TBD
 	 */
-	@ApiResponses({
-			@ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
-	})
 	@RequestMapping(value = { "/{uri}", "/{uri}/**" }, method = RequestMethod.OPTIONS)
 	public ResponseEntity<?> options(HttpServletRequest request, @PathVariable String uri) {
 		if (!registry.isSupportedUri(uri)){
