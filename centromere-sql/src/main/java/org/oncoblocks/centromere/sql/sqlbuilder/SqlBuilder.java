@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.sql.sqlbuilder;
 
-import org.oncoblocks.centromere.core.repository.Evaluation;
+import com.blueprint.centromere.core.repository.Evaluation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;

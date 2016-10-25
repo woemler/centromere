@@ -16,13 +16,13 @@
 
 package org.oncoblocks.centromere.web.controller;
 
-import org.oncoblocks.centromere.core.model.Alias;
-import org.oncoblocks.centromere.core.model.Aliases;
-import org.oncoblocks.centromere.core.model.Model;
-import org.oncoblocks.centromere.core.repository.QueryCriteria;
-import org.oncoblocks.centromere.core.repository.QueryParameterDescriptor;
-import org.oncoblocks.centromere.core.repository.QueryParameterException;
-import org.oncoblocks.centromere.core.util.QueryParameterUtil;
+import com.blueprint.centromere.core.model.Alias;
+import com.blueprint.centromere.core.model.Aliases;
+import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.repository.QueryCriteria;
+import com.blueprint.centromere.core.repository.QueryParameterDescriptor;
+import com.blueprint.centromere.core.repository.QueryParameterException;
+import com.blueprint.centromere.core.util.QueryParameterUtil;
 import org.oncoblocks.centromere.web.exceptions.InvalidParameterException;
 import org.oncoblocks.centromere.web.exceptions.ParameterMappingException;
 import org.slf4j.Logger;

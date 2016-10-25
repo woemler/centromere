@@ -16,8 +16,9 @@
 
 package org.oncoblocks.centromere.web.test.models;
 
+import com.blueprint.centromere.core.model.*;
 import org.oncoblocks.centromere.core.model.*;
-import org.oncoblocks.centromere.core.repository.Evaluation;
+import com.blueprint.centromere.core.repository.Evaluation;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 

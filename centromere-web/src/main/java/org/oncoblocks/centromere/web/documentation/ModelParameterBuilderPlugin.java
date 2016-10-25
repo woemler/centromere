@@ -17,9 +17,9 @@
 package org.oncoblocks.centromere.web.documentation;
 
 import com.fasterxml.classmate.TypeResolver;
-import org.oncoblocks.centromere.core.model.Model;
-import org.oncoblocks.centromere.core.repository.QueryParameterDescriptor;
-import org.oncoblocks.centromere.core.util.QueryParameterUtil;
+import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.repository.QueryParameterDescriptor;
+import com.blueprint.centromere.core.util.QueryParameterUtil;
 import org.oncoblocks.centromere.web.controller.AbstractApiController;
 import org.oncoblocks.centromere.web.exceptions.ApiDocumentationException;
 import org.slf4j.Logger;

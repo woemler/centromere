@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.mongodb.commons.repositories;
 
-import org.oncoblocks.centromere.core.commons.repositories.SampleRepository;
+import com.blueprint.centromere.core.commons.repositories.SampleRepository;
 import org.oncoblocks.centromere.mongodb.commons.models.MongoSample;
 
 /**

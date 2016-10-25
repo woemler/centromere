@@ -16,9 +16,9 @@
 
 package org.oncoblocks.centromere.web.controller;
 
-import org.oncoblocks.centromere.core.config.ModelRegistry;
-import org.oncoblocks.centromere.core.model.ForeignKey;
-import org.oncoblocks.centromere.core.model.Model;
+import com.blueprint.centromere.core.config.ModelRegistry;
+import com.blueprint.centromere.core.model.ForeignKey;
+import com.blueprint.centromere.core.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.Link;

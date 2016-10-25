@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.jpa.commons;
 
-import org.oncoblocks.centromere.core.commons.repositories.GeneOperations;
+import com.blueprint.centromere.core.commons.repositories.GeneOperations;
 import org.oncoblocks.centromere.jpa.JpaQueryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

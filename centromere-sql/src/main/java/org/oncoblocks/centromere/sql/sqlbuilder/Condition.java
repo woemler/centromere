@@ -16,10 +16,11 @@
 
 package org.oncoblocks.centromere.sql.sqlbuilder;
 
-import org.oncoblocks.centromere.core.repository.Evaluation;
+import com.blueprint.centromere.core.repository.Evaluation;
+import com.blueprint.centromere.core.repository.QueryCriteria;
 
 /**
- * Maps a {@link org.oncoblocks.centromere.core.repository.QueryCriteria} to SQL operations.
+ * Maps a {@link QueryCriteria} to SQL operations.
  * 
  * @author woemler 
  */

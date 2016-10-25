@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.jpa.test.springdata;
 
-import org.oncoblocks.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.Model;
 
 import javax.persistence.*;
 import java.util.ArrayList;

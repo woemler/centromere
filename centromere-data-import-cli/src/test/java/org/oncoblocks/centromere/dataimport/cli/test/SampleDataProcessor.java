@@ -16,6 +16,7 @@
 
 package org.oncoblocks.centromere.dataimport.cli.test;
 
+import com.blueprint.centromere.core.dataimport.*;
 import org.oncoblocks.centromere.core.dataimport.*;
 import org.oncoblocks.centromere.dataimport.cli.test.support.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +92,7 @@ public class SampleDataProcessor extends GenericRecordProcessor<SampleData> {
 	}
 
 	// Reader
-	public static class SampleDataReader extends RecordCollectionReader<SampleData>  {
+	public static class SampleDataReader extends RecordCollectionReader<SampleData> {
 		
 		private DataFile dataFile;
 		

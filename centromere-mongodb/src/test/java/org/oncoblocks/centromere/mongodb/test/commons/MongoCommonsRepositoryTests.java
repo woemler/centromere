@@ -16,14 +16,15 @@
 
 package org.oncoblocks.centromere.mongodb.test.commons;
 
+import com.blueprint.centromere.core.commons.repositories.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.oncoblocks.centromere.core.commons.repositories.*;
-import org.oncoblocks.centromere.core.commons.testing.DataFileGenerator;
-import org.oncoblocks.centromere.core.commons.testing.DataSetGenerator;
-import org.oncoblocks.centromere.core.commons.testing.SampleDataGenerator;
-import org.oncoblocks.centromere.core.commons.testing.SubjectDataGenerator;
+import com.blueprint.centromere.core.commons.testing.DataFileGenerator;
+import com.blueprint.centromere.core.commons.testing.DataSetGenerator;
+import com.blueprint.centromere.core.commons.testing.SampleDataGenerator;
+import com.blueprint.centromere.core.commons.testing.SubjectDataGenerator;
 import org.oncoblocks.centromere.mongodb.commons.models.*;
 import org.oncoblocks.centromere.mongodb.commons.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;

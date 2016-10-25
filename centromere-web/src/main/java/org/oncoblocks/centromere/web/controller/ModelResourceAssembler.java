@@ -17,8 +17,8 @@
 package org.oncoblocks.centromere.web.controller;
 
 import com.google.common.reflect.TypeToken;
-import org.oncoblocks.centromere.core.model.ForeignKey;
-import org.oncoblocks.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.ForeignKey;
+import com.blueprint.centromere.core.model.Model;
 import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;

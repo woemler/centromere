@@ -6,7 +6,7 @@
         </encoder>
     </appender>
 
-    <logger name="org.oncoblocks.centromere" level="DEBUG" />
+    <logger name="com.blueprint" level="DEBUG" />
 
     <root level="warn">
         <appender-ref ref="STDOUT" />

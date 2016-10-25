@@ -18,7 +18,9 @@ package org.oncoblocks.centromere.dataimport.cli;
 
 import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.Parameter;
-import org.oncoblocks.centromere.core.dataimport.BasicImportOptions;
+import com.blueprint.centromere.core.dataimport.BasicImportOptions;
+import com.blueprint.centromere.core.dataimport.ImportOptions;
+import com.blueprint.centromere.core.dataimport.RecordProcessor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -131,8 +133,8 @@ public class ImportCommandArguments {
 	}
 
 	/**
-	 * Uses user-inputted and default flag values to create a {@link org.oncoblocks.centromere.core.dataimport.ImportOptions}
-	 *   instance that can be passed to {@link org.oncoblocks.centromere.core.dataimport.RecordProcessor}
+	 * Uses user-inputted and default flag values to create a {@link ImportOptions}
+	 *   instance that can be passed to {@link RecordProcessor}
 	 *   instances to modify their behavior.
 	 * 
 	 * @return

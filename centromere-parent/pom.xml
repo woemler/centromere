@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2016 William Oemler, Blueprint Medicines
+  ~ Copyright 2016 the original author or authors
   ~
   ~ Licensed under the Apache License, Version datatables-buttons.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -21,13 +21,13 @@
 
     <modelVersion>4.0.0</modelVersion>
     
-    <groupId>org.oncoblocks.centromere</groupId>
+    <groupId>com.blueprint</groupId>
     <artifactId>centromere-parent</artifactId>
-    <version>0.4.3-SNAPSHOT</version>
-    <name>Oncoblocks: Centromere Parent</name>
+    <version>0.5.0-SNAPSHOT</version>
+    <name>Centromere Parent</name>
     <packaging>pom</packaging>
     
-    <description>Genomic data warehouse and RESTful web services framework. Parent POM file.</description>
+    <description>Genomic data warehouse and web service utilities.</description>
     <url>https://github.com/blueprintmedicines/centromere</url>
     
     <modules>
@@ -73,7 +73,7 @@
     </distributionManagement>
 
     <properties>
-        <spring.platform.version>2.0.6.RELEASE</spring.platform.version>
+        <spring.platform.version>Athens-RELEASE</spring.platform.version>
     </properties>
 
     <dependencyManagement>
@@ -96,20 +96,20 @@
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-gpg-plugin</artifactId>-->
+                <!--<version>1.5</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>sign-artifacts</id>-->
+                        <!--<phase>verify</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>sign</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 

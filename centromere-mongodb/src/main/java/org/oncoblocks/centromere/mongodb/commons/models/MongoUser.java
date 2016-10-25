@@ -16,9 +16,9 @@
 
 package org.oncoblocks.centromere.mongodb.commons.models;
 
-import org.oncoblocks.centromere.core.commons.models.User;
-import org.oncoblocks.centromere.core.model.Alias;
-import org.oncoblocks.centromere.core.model.ModelAttributes;
+import com.blueprint.centromere.core.commons.models.User;
+import com.blueprint.centromere.core.model.Alias;
+import com.blueprint.centromere.core.model.ModelAttributes;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 

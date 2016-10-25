@@ -16,8 +16,8 @@
 
 package org.oncoblocks.centromere.web.controller;
 
-import org.oncoblocks.centromere.core.model.Model;
-import org.oncoblocks.centromere.core.model.ModelSupport;
+import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.ModelSupport;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.HttpEntity;

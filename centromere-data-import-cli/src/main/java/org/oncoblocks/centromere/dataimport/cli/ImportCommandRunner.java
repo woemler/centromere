@@ -16,11 +16,11 @@
 
 package org.oncoblocks.centromere.dataimport.cli;
 
-import org.oncoblocks.centromere.core.dataimport.BasicImportOptions;
-import org.oncoblocks.centromere.core.dataimport.DataImportException;
-import org.oncoblocks.centromere.core.dataimport.ImportOptionsAware;
-import org.oncoblocks.centromere.core.dataimport.RecordProcessor;
-import org.oncoblocks.centromere.core.config.DataTypeProcessorBeanRegistry;
+import com.blueprint.centromere.core.dataimport.BasicImportOptions;
+import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.ImportOptionsAware;
+import com.blueprint.centromere.core.dataimport.RecordProcessor;
+import com.blueprint.centromere.core.config.DataTypeProcessorBeanRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

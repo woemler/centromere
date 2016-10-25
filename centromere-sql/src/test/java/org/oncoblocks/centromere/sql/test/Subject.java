@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.sql.test;
 
-import org.oncoblocks.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.model.support.Attribute;
 import org.oncoblocks.centromere.core.model.support.SourcedAlias;
 import org.oncoblocks.centromere.sql.sqlbuilder.ComplexTableDescription;

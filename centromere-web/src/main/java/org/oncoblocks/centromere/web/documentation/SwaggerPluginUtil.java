@@ -17,10 +17,10 @@
 package org.oncoblocks.centromere.web.documentation;
 
 import com.fasterxml.classmate.TypeResolver;
-import org.oncoblocks.centromere.core.model.Model;
-import org.oncoblocks.centromere.core.repository.QueryParameterDescriptor;
-import org.oncoblocks.centromere.core.util.ModelUtil;
-import org.oncoblocks.centromere.core.util.QueryParameterUtil;
+import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.repository.QueryParameterDescriptor;
+import com.blueprint.centromere.core.util.ModelUtil;
+import com.blueprint.centromere.core.util.QueryParameterUtil;
 import org.oncoblocks.centromere.web.exceptions.RestError;
 import org.oncoblocks.centromere.web.util.ApiMediaTypes;
 import org.springframework.http.HttpMethod;

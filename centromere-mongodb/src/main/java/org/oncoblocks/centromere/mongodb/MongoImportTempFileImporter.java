@@ -16,9 +16,9 @@
 
 package org.oncoblocks.centromere.mongodb;
 
-import org.oncoblocks.centromere.core.dataimport.DataImportException;
-import org.oncoblocks.centromere.core.dataimport.DatabaseCredentials;
-import org.oncoblocks.centromere.core.dataimport.RecordImporter;
+import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.DatabaseCredentials;
+import com.blueprint.centromere.core.dataimport.RecordImporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

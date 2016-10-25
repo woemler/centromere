@@ -16,6 +16,10 @@
 
 package org.oncoblocks.centromere.web.test.models;
 
+import com.blueprint.centromere.core.model.Alias;
+import com.blueprint.centromere.core.model.Aliases;
+import com.blueprint.centromere.core.model.Ignored;
+import com.blueprint.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.model.*;
 import org.oncoblocks.centromere.core.model.support.Attribute;
 import org.springframework.data.annotation.Id;

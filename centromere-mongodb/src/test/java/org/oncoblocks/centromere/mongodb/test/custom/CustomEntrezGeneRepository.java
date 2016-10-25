@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.mongodb.test.custom;
 
-import org.oncoblocks.centromere.core.repository.RepositoryOperations;
+import com.blueprint.centromere.core.repository.RepositoryOperations;
 import org.oncoblocks.centromere.mongodb.test.EntrezGene;
 import org.springframework.data.repository.NoRepositoryBean;
 

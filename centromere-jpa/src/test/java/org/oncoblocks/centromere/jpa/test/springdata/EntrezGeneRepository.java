@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.jpa.test.springdata;
 
-import org.oncoblocks.centromere.core.repository.RepositoryOperations;
+import com.blueprint.centromere.core.repository.RepositoryOperations;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;

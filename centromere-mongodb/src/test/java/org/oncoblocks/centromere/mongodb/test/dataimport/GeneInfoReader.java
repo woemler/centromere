@@ -16,8 +16,8 @@
 
 package org.oncoblocks.centromere.mongodb.test.dataimport;
 
-import org.oncoblocks.centromere.core.dataimport.DataImportException;
-import org.oncoblocks.centromere.core.dataimport.AbstractRecordFileReader;
+import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.AbstractRecordFileReader;
 import org.oncoblocks.centromere.mongodb.test.EntrezGene;
 
 import java.io.IOException;

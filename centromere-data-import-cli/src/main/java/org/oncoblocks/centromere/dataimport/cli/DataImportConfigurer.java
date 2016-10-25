@@ -16,15 +16,12 @@
 
 package org.oncoblocks.centromere.dataimport.cli;
 
+import com.blueprint.centromere.core.config.DataTypeProcessorBeanRegistry;
+import com.blueprint.centromere.core.config.ModelComponentRegistrationConfigurer;
 import org.oncoblocks.centromere.core.config.*;
-import org.oncoblocks.centromere.core.dataimport.RecordProcessor;
-import org.oncoblocks.centromere.core.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-
-import java.util.Map;
 
 /**
  * Helper class for handling default creation of command line importer bean classes and configurations.

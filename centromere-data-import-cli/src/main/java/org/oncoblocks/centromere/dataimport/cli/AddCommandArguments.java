@@ -18,6 +18,8 @@ package org.oncoblocks.centromere.dataimport.cli;
 
 import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.Parameter;
+import com.blueprint.centromere.core.config.ModelRegistry;
+import com.blueprint.centromere.core.model.Model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,9 +28,9 @@ import java.util.Map;
 
 /**
  * Command line argument configuration for the {@code add} command.  The {@code add} command expects
- *   two arguments: {@link org.oncoblocks.centromere.core.model.Model} class name and model object 
+ *   two arguments: {@link Model} class name and model object 
  *   representation.  The model class is identified using a full class name or shorthand alias, which
- *   is registered by a {@link org.oncoblocks.centromere.core.config.ModelRegistry} instance.  The 
+ *   is registered by a {@link ModelRegistry} instance.  The 
  *   body can be a complete JSON representation of the target class, or represented as key-value
  *   pairs using dynamic parameter arguments. 
  * 

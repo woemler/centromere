@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.dataimport.cli.test.support;
 
-import org.oncoblocks.centromere.core.repository.ModelRepository;
+import com.blueprint.centromere.core.repository.ModelRepository;
 import org.oncoblocks.centromere.mongodb.GenericMongoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;

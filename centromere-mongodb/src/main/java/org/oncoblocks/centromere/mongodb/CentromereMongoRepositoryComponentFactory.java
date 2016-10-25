@@ -16,10 +16,10 @@
 
 package org.oncoblocks.centromere.mongodb;
 
-import org.oncoblocks.centromere.core.config.ModelComponentFactory;
-import org.oncoblocks.centromere.core.model.Model;
-import org.oncoblocks.centromere.core.model.ModelAttributes;
-import org.oncoblocks.centromere.core.repository.RepositoryOperations;
+import com.blueprint.centromere.core.config.ModelComponentFactory;
+import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.ModelAttributes;
+import com.blueprint.centromere.core.repository.RepositoryOperations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.mapping.BasicMongoPersistentEntity;

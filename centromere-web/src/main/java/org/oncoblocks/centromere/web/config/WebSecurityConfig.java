@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.web.config;
 
-import org.oncoblocks.centromere.core.config.DefaultConfigurations;
+import com.blueprint.centromere.core.config.DefaultConfigurations;
 import org.oncoblocks.centromere.web.security.AuthenticationTokenProcessingFilter;
 import org.oncoblocks.centromere.web.security.BasicTokenUtils;
 import org.oncoblocks.centromere.web.security.TokenOperations;

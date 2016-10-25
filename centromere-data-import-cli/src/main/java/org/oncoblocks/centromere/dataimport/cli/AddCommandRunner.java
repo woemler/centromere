@@ -17,12 +17,12 @@
 package org.oncoblocks.centromere.dataimport.cli;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.oncoblocks.centromere.core.config.ModelRegistry;
-import org.oncoblocks.centromere.core.dataimport.DataImportException;
-import org.oncoblocks.centromere.core.model.Model;
-import org.oncoblocks.centromere.core.repository.RepositoryOperations;
-import org.oncoblocks.centromere.core.util.JsonModelConverter;
-import org.oncoblocks.centromere.core.util.KeyValueMapModelConverter;
+import com.blueprint.centromere.core.config.ModelRegistry;
+import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.repository.RepositoryOperations;
+import com.blueprint.centromere.core.util.JsonModelConverter;
+import com.blueprint.centromere.core.util.KeyValueMapModelConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

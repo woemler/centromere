@@ -18,10 +18,10 @@ package org.oncoblocks.centromere.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
-import org.oncoblocks.centromere.core.config.ModelRegistry;
-import org.oncoblocks.centromere.core.model.Model;
-import org.oncoblocks.centromere.core.repository.QueryCriteria;
-import org.oncoblocks.centromere.core.repository.RepositoryOperations;
+import com.blueprint.centromere.core.config.ModelRegistry;
+import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.repository.QueryCriteria;
+import com.blueprint.centromere.core.repository.RepositoryOperations;
 import org.oncoblocks.centromere.web.exceptions.*;
 import org.oncoblocks.centromere.web.util.ApiMediaTypes;
 import org.slf4j.Logger;

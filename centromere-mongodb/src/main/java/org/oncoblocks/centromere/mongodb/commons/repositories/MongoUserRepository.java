@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.mongodb.commons.repositories;
 
-import org.oncoblocks.centromere.core.commons.repositories.UserRepository;
+import com.blueprint.centromere.core.commons.repositories.UserRepository;
 import org.oncoblocks.centromere.mongodb.commons.models.MongoUser;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.security.core.userdetails.UserDetails;
