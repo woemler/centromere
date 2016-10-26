@@ -16,6 +16,7 @@
 
 package org.oncoblocks.centromere.web.util;
 
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.MediaType;
 
 import java.nio.charset.Charset;
@@ -29,6 +30,7 @@ import java.util.List;
  * 
  * @author woemler
  */
+@Deprecated
 public class ApiMediaTypes {
 	
 	public static final String APPLICATION_HAL_JSON_VALUE = "application/hal+json";

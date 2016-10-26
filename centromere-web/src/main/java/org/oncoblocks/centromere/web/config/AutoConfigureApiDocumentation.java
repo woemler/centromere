@@ -30,5 +30,6 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Inherited
 @Import({SwaggerConfig.class})
+@Deprecated
 public @interface AutoConfigureApiDocumentation {
 }

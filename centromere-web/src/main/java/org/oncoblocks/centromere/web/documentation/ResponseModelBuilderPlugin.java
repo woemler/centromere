@@ -16,23 +16,11 @@
 
 package org.oncoblocks.centromere.web.documentation;
 
-import com.fasterxml.classmate.TypeResolver;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.blueprint.centromere.core.config.ModelRegistry;
-import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.util.ModelUtil;
-import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import springfox.documentation.builders.ModelBuilder;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spi.schema.ModelBuilderPlugin;
-import springfox.documentation.spi.schema.contexts.ModelContext;
-import springfox.documentation.swagger.common.SwaggerPluginSupport;
-
 /**
  * @author woemler
  */
-public class ResponseModelBuilderPlugin implements ModelBuilderPlugin {
+@Deprecated
+public class ResponseModelBuilderPlugin {} /*implements ModelBuilderPlugin {
 	
 	@Autowired private ModelRegistry modelRegistry;
 	@Autowired private TypeResolver typeResolver;
@@ -62,3 +50,4 @@ public class ResponseModelBuilderPlugin implements ModelBuilderPlugin {
 		return SwaggerPluginSupport.pluginDoesApply(documentationType);
 	}
 }
+*/

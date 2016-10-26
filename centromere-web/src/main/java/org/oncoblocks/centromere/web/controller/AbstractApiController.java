@@ -17,13 +17,11 @@
 package org.oncoblocks.centromere.web.controller;
 
 import com.google.common.reflect.TypeToken;
-import io.swagger.annotations.*;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.core.repository.RepositoryOperations;
 import org.oncoblocks.centromere.web.exceptions.InvalidParameterException;
 import org.oncoblocks.centromere.web.exceptions.ResourceNotFoundException;
-import org.oncoblocks.centromere.web.exceptions.RestError;
 import org.oncoblocks.centromere.web.util.ApiMediaTypes;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +60,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
  * 
  * @author woemler
  */
+@Deprecated
 public abstract class AbstractApiController<T extends Model<ID>, ID extends Serializable> 
 		implements WebServicesController<T,ID>, ApplicationContextAware {
 
@@ -98,18 +97,18 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 	 * @param id primary ID for the target record.
 	 * @return {@code T} instance
 	 */
-	@ApiImplicitParams({
-			@ApiImplicitParam(name = "fields", value = "List of fields to be included in response objects", 
-					dataType = "string", paramType = "query"),
-			@ApiImplicitParam(name = "exclude", value = "List of fields to be excluded from response objects", 
-					dataType = "string", paramType = "query")
-	})
-	@ApiResponses({
-			@ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
-			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
-			@ApiResponse(code = 404, message = "Record not found.", response = RestError.class)
-	})
+//	@ApiImplicitParams({
+//			@ApiImplicitParam(name = "fields", value = "List of fields to be included in response objects",
+//					dataType = "string", paramType = "query"),
+//			@ApiImplicitParam(name = "exclude", value = "List of fields to be excluded from response objects",
+//					dataType = "string", paramType = "query")
+//	})
+//	@ApiResponses({
+//			@ApiResponse(code = 200, message = "OK"),
+//			@ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
+//			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
+//			@ApiResponse(code = 404, message = "Record not found.", response = RestError.class)
+//	})
 	@RequestMapping(
 			value = "/{id}", 
 			method = RequestMethod.GET,
@@ -117,7 +116,7 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE, 
 					MediaType.TEXT_PLAIN_VALUE })
 	public ResponseEntity<ResponseEnvelope<T>> findById(
-			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable ID id,
+			/*@ApiParam(name = "id", value = "Model record primary id.")*/ @PathVariable ID id,
 			HttpServletRequest request
 	) {
 		if (RequestUtils.requestContainsNonDefaultParameters(RequestUtils.findOneParameters(), request.getParameterMap())){
@@ -146,11 +145,11 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 	 * @param request {@link HttpServletRequest}
 	 * @return List of distinct field values.
 	 */
-	@ApiResponses({
-			@ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
-			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class)
-	})
+//	@ApiResponses({
+//			@ApiResponse(code = 200, message = "OK"),
+//			@ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
+//			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class)
+//	})
 	@RequestMapping(
 			value = "/distinct", 
 			method = RequestMethod.GET,
@@ -158,7 +157,7 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE })
 	public ResponseEntity<ResponseEnvelope<Object>> findDistinct(
-			@ApiParam(name = "field", value = "Model field name.") @RequestParam String field, 
+			/*@ApiParam(name = "field", value = "Model field name.")*/ @RequestParam String field,
 			HttpServletRequest request)
 	{
 		List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromFindDistinctRequest(model, request);
@@ -185,24 +184,24 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 	 * @param request {@link HttpServletRequest}
 	 * @return a {@link List} of {@link Model} objects.
 	 */
-	@ApiImplicitParams({
-			@ApiImplicitParam(name = "page", value = "Page number.", defaultValue = "0", dataType = "int", 
-					paramType = "query"),
-			@ApiImplicitParam(name = "size", value = "Number of records per page.", defaultValue = "1000", 
-					dataType = "int", paramType = "query"),
-			@ApiImplicitParam(name = "sort", value = "Sort order field and direction.", dataType = "string", 
-					paramType = "query", example = "name,asc"),
-			@ApiImplicitParam(name = "fields", value = "List of fields to be included in response objects", 
-					dataType = "string", paramType = "query"),
-			@ApiImplicitParam(name = "exclude", value = "List of fields to be excluded from response objects", 
-					dataType = "string", paramType = "query")
-	})
-	@ApiResponses({
-			@ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
-			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
-			@ApiResponse(code = 404, message = "Record not found.", response = RestError.class)
-	})
+//	@ApiImplicitParams({
+//			@ApiImplicitParam(name = "page", value = "Page number.", defaultValue = "0", dataType = "int",
+//					paramType = "query"),
+//			@ApiImplicitParam(name = "size", value = "Number of records per page.", defaultValue = "1000",
+//					dataType = "int", paramType = "query"),
+//			@ApiImplicitParam(name = "sort", value = "Sort order field and direction.", dataType = "string",
+//					paramType = "query", example = "name,asc"),
+//			@ApiImplicitParam(name = "fields", value = "List of fields to be included in response objects",
+//					dataType = "string", paramType = "query"),
+//			@ApiImplicitParam(name = "exclude", value = "List of fields to be excluded from response objects",
+//					dataType = "string", paramType = "query")
+//	})
+//	@ApiResponses({
+//			@ApiResponse(code = 200, message = "OK"),
+//			@ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
+//			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
+//			@ApiResponse(code = 404, message = "Record not found.", response = RestError.class)
+//	})
 	@RequestMapping(
 			value = "", 
 			method = RequestMethod.GET,
@@ -258,7 +257,7 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 	 *
 	 * @return headers only.
 	 */
-	@ApiResponses({@ApiResponse(code = 200, message = "OK")})
+	//@ApiResponses({@ApiResponse(code = 200, message = "OK")})
 	@RequestMapping(value = { "", "/**" }, method = RequestMethod.HEAD)
 	public ResponseEntity<?> head(HttpServletRequest request){
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -271,7 +270,7 @@ public abstract class AbstractApiController<T extends Model<ID>, ID extends Seri
 	 *
 	 * @return TBD
 	 */
-	@ApiResponses({@ApiResponse(code = 200, message = "OK")})
+	//@ApiResponses({@ApiResponse(code = 200, message = "OK")})
 	@RequestMapping(method = RequestMethod.OPTIONS)
 	public ResponseEntity<?> options(HttpServletRequest request) {
 		return new ResponseEntity<>(HttpStatus.OK);

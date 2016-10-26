@@ -16,50 +16,37 @@
 
 package org.oncoblocks.centromere.web.documentation;
 
-import com.fasterxml.classmate.TypeResolver;
-import com.blueprint.centromere.core.config.ModelRegistry;
-import com.blueprint.centromere.core.model.Model;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.util.Assert;
-import springfox.documentation.service.ApiDescription;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spi.service.ApiListingBuilderPlugin;
-import springfox.documentation.spi.service.contexts.ApiListingContext;
-import springfox.documentation.swagger.common.SwaggerPluginSupport;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author woemler
  */
-public class MappedModelApiListingPlugin implements ApiListingBuilderPlugin {
+@Deprecated
+public class MappedModelApiListingPlugin /*implements ApiListingBuilderPlugin*/ {
 
-	@Autowired private ModelRegistry modelRegistry;
-	@Autowired private Environment env;
-	@Autowired private TypeResolver typeResolver;
-	
-	@Override 
-	public void apply(ApiListingContext apiListingContext) {
-		apiListingContext.apiListingBuilder().apis(getApiDescriptions());
-				
-	}
-	
-	protected List<ApiDescription> getApiDescriptions(){
-		Assert.notNull(modelRegistry, "ModelRegistry must not be null.");
-		Assert.notNull(env, "Environment must not be null.");
-		List<ApiDescription> descriptions = new ArrayList<>();
-		for (Class<? extends Model> model: modelRegistry.getModels()){
-			String path = env.getRequiredProperty("centromere.api.root-url") + "/" + modelRegistry.getModelUri(model);
-			descriptions.addAll(SwaggerPluginUtil.getModelApiDescriptions(model, typeResolver, path));
-		}
-		return descriptions;
-	}
-	
-	@Override 
-	public boolean supports(DocumentationType documentationType) {
-		return SwaggerPluginSupport.pluginDoesApply(documentationType); 
-	}
+//	@Autowired private ModelRegistry modelRegistry;
+//	@Autowired private Environment env;
+//	@Autowired private TypeResolver typeResolver;
+//
+//	@Override
+//	public void apply(ApiListingContext apiListingContext) {
+//		apiListingContext.apiListingBuilder().apis(getApiDescriptions());
+//
+//	}
+//
+//	protected List<ApiDescription> getApiDescriptions(){
+//		Assert.notNull(modelRegistry, "ModelRegistry must not be null.");
+//		Assert.notNull(env, "Environment must not be null.");
+//		List<ApiDescription> descriptions = new ArrayList<>();
+//		for (Class<? extends Model> model: modelRegistry.getModels()){
+//			String path = env.getRequiredProperty("centromere.api.root-url") + "/" + modelRegistry.getModelUri(model);
+//			descriptions.addAll(SwaggerPluginUtil.getModelApiDescriptions(model, typeResolver, path));
+//		}
+//		return descriptions;
+//	}
+//
+//	@Override
+//	public boolean supports(DocumentationType documentationType) {
+//		return SwaggerPluginSupport.pluginDoesApply(documentationType);
+//	}
 
 }

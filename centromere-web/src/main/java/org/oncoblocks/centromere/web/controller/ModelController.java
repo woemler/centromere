@@ -22,7 +22,7 @@ package org.oncoblocks.centromere.web.controller;
  * @author woemler
  * @since 0.4.3
  */
-
+@Deprecated
 public interface ModelController {
 	
 }

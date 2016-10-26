@@ -16,28 +16,7 @@
 
 package org.oncoblocks.centromere.web.documentation;
 
-import com.fasterxml.classmate.TypeResolver;
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.repository.QueryParameterDescriptor;
-import com.blueprint.centromere.core.util.QueryParameterUtil;
-import org.oncoblocks.centromere.web.controller.AbstractApiController;
-import org.oncoblocks.centromere.web.exceptions.ApiDocumentationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import springfox.documentation.builders.ParameterBuilder;
-import springfox.documentation.schema.ModelRef;
-import springfox.documentation.service.Operation;
-import springfox.documentation.service.Parameter;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spi.service.OperationBuilderPlugin;
-import springfox.documentation.spi.service.contexts.OperationContext;
-import springfox.documentation.swagger.common.SwaggerPluginSupport;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Springfox plugin for adding {@link Model} query parameters to the auto-generated Swagger
@@ -46,7 +25,8 @@ import java.util.Map;
  * @author woemler
  * @since 0.4.1
  */
-public class ModelParameterBuilderPlugin implements OperationBuilderPlugin {
+@Deprecated
+public class ModelParameterBuilderPlugin { } /*implements OperationBuilderPlugin {
 	
 	@Autowired private TypeResolver typeResolver;
 	@Autowired private ApplicationContext applicationContext;
@@ -91,3 +71,4 @@ public class ModelParameterBuilderPlugin implements OperationBuilderPlugin {
 	}
 	
 }
+*/

@@ -30,6 +30,7 @@ import java.io.Serializable;
  * 
  * @author woemler
  */
+@Deprecated
 public interface WebServicesController<T extends Model<ID>, ID extends Serializable> 
 		extends ModelSupport<T> {
 

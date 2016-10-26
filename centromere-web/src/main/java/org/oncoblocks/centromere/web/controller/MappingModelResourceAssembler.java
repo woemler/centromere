@@ -36,6 +36,7 @@ import java.util.*;
  * @author woemler
  */
 @Component
+@Deprecated
 public class MappingModelResourceAssembler 
 		extends ResourceAssemblerSupport<Model, FilterableResource> {
 

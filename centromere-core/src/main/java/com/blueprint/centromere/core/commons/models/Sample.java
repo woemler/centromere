@@ -20,8 +20,15 @@ import com.blueprint.centromere.core.model.Alias;
 import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Model for representing a single biological sample taken from a {@link Subject} for experimentation.
@@ -30,26 +37,45 @@ import java.io.Serializable;
  * 
  * @author woemler
  */
-@MappedSuperclass
-public abstract class Sample<ID extends Serializable> implements Model<ID>, Attributes, SimpleAliases {
-	
+@Entity
+@Document
+public class Sample implements Model<Long>, Attributes {
+
+	@Id @GeneratedValue private Long id;
+	private Long subjectId;
 	private String name;
-	
-	@Alias("type")
 	private String sampleType;
-	
 	private String tissue;
-	
 	private String histology;
-	
-	@Ignored
 	private String notes;
-	
-	
-	abstract public Object getSubjectId();
-	abstract public <S extends Subject<?>> void setSubjectMetadata(S subject);
-	
-	
+	private Map<String, String> attributes = new HashMap<>();
+
+	@Override
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Long getSubjectId() {
+		return subjectId;
+	}
+
+	public void setSubjectId(Long subjectId) {
+		this.subjectId = subjectId;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(Map<String, String> attributes) {
+		this.attributes = attributes;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -88,5 +114,25 @@ public abstract class Sample<ID extends Serializable> implements Model<ID>, Attr
 
 	public void setNotes(String notes) {
 		this.notes = notes;
+	}
+
+	@Override
+	public void addAttribute(String name, String value) {
+		attributes.put(name, value);
+	}
+
+	@Override
+	public void addAttributes(Map<String, String> attributes) {
+		this.attributes.putAll(attributes);
+	}
+
+	@Override
+	public boolean hasAttribute(String name) {
+		return attributes.containsKey(name);
+	}
+
+	@Override
+	public String getAttribute(String name) {
+		return attributes.containsKey(name) ? attributes.get(name) : null;
 	}
 }

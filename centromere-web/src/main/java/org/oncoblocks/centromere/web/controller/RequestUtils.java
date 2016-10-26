@@ -157,7 +157,7 @@ public class RequestUtils {
 							criteria = QueryParameterUtil.getQueryCriteriaFromParameter(
 									descriptor.getQueryableFieldName(paramName),
 									paramValue, 
-									descriptor.getType(), 
+									descriptor.getType().getType(),
 									descriptor.getDynamicEvaluation(paramName));
 							break;
 						}

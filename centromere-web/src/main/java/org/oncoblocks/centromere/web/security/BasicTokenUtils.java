@@ -16,8 +16,8 @@
 
 package org.oncoblocks.centromere.web.security;
 
-import org.apache.commons.codec.binary.Hex;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.codec.Hex;
 import org.springframework.util.Assert;
 
 import java.security.MessageDigest;
@@ -78,7 +78,7 @@ public class BasicTokenUtils implements TokenOperations {
 			throw new IllegalStateException("No MD5 algorithm available!");
 		}
 		
-		return new String(Hex.encodeHex(digest.digest(signatureBuilder.toString().getBytes())));
+		return new String(Hex.encode(digest.digest(signatureBuilder.toString().getBytes())));
 		
 	}
 

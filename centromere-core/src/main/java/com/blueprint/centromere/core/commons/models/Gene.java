@@ -16,46 +16,55 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-import com.blueprint.centromere.core.model.Alias;
-import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Model;
 
-import javax.persistence.MappedSuperclass;
-import java.io.Serializable;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author woemler
  */
-@MappedSuperclass
-public abstract class Gene<ID extends Serializable> implements Model<ID>, Attributes, SimpleAliases {
-	
-	@Alias("primaryId")
+@Entity
+@Document
+public class Gene implements Model<Long>, Attributes {
+
+	@Id @GeneratedValue private Long id;
 	private String primaryReferenceId;
-	
-	@Alias("symbol")
 	private String primaryGeneSymbol;
-	
 	private Integer taxId;
-	
 	private String chromosome;
-	
-	@Ignored
 	private String chromosomeLocation;
-	
 	private String geneType;
-	
-	@Ignored
 	private String description;
-	
 	private String referenceSource;
 
-	
-	public abstract Map<String, String> getExternalReferenceMap();
-	public abstract void addExternalReference(String name, String value);
-	public abstract boolean hasExternalReference(String name);
+	@ElementCollection(fetch = FetchType.EAGER)
+	private List<String> aliases = new ArrayList<>();
 
-	
+	@ElementCollection(fetch = FetchType.EAGER)
+	private Map<String, String> attributes = new HashMap<>();
+
+	@ElementCollection(fetch = FetchType.EAGER)
+	private Map<String, String> externalReferences = new HashMap<>();
+
+	@Override
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
 	public String getPrimaryReferenceId() {
 		return primaryReferenceId;
 	}
@@ -79,8 +88,6 @@ public abstract class Gene<ID extends Serializable> implements Model<ID>, Attrib
 	public void setPrimaryGeneSymbol(String primaryGeneSymbol) {
 		this.primaryGeneSymbol = primaryGeneSymbol;
 	}
-
-	
 
 	public Integer getTaxId() {
 		return taxId;
@@ -122,4 +129,60 @@ public abstract class Gene<ID extends Serializable> implements Model<ID>, Attrib
 		this.description = description;
 	}
 
+	public Map<String, String> getExternalReferences(){
+		return externalReferences;
+	}
+
+	public void addExternalReference(String name, String value){
+		externalReferences.put(name, value);
+	}
+
+	public boolean hasExternalReference(String name){
+		return externalReferences.containsKey(name);
+	}
+
+	public List<String> getAliases() {
+		return aliases;
+	}
+
+	public void setAliases(List<String> aliases) {
+		this.aliases = aliases;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(Map<String, String> attributes) {
+		this.attributes = attributes;
+	}
+
+	public void setExternalReferences(Map<String, String> externalReferences) {
+		this.externalReferences = externalReferences;
+	}
+
+	@Override
+	public void addAttribute(String name, String value) {
+		attributes.put(name, value);
+	}
+
+	@Override
+	public void addAttributes(Map<String, String> attributes) {
+		this.attributes.putAll(attributes);
+	}
+
+	@Override
+	public boolean hasAttribute(String name) {
+		return attributes.containsKey(name);
+	}
+
+	@Override
+	public String getAttribute(String name) {
+		return attributes.containsKey(name) ? attributes.get(name) : null;
+	}
+
+	public void addAlias(String alias){
+		this.aliases.add(alias);
+	}
 }

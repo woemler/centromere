@@ -39,8 +39,6 @@ import org.springframework.hateoas.config.EnableEntityLinks;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
-import org.springframework.oxm.xstream.XStreamMarshaller;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -90,13 +88,13 @@ public class WebServicesConfig extends WebMvcConfigurerAdapter {
 				= new FilteringJackson2HttpMessageConverter();
 		jsonConverter.setSupportedMediaTypes(ApiMediaTypes.getJsonMediaTypes());
 		converters.add(jsonConverter);
-		
-		MarshallingHttpMessageConverter xmlConverter = new MarshallingHttpMessageConverter();
-		xmlConverter.setSupportedMediaTypes(ApiMediaTypes.getXmlMediaTypes());
-		XStreamMarshaller xStreamMarshaller = new XStreamMarshaller();
-		xmlConverter.setMarshaller(xStreamMarshaller);
-		xmlConverter.setUnmarshaller(xStreamMarshaller);
-		converters.add(xmlConverter);
+//
+//		MarshallingHttpMessageConverter xmlConverter = new MarshallingHttpMessageConverter();
+//		xmlConverter.setSupportedMediaTypes(ApiMediaTypes.getXmlMediaTypes());
+//		XStreamMarshaller xStreamMarshaller = new XStreamMarshaller();
+//		xmlConverter.setMarshaller(xStreamMarshaller);
+//		xmlConverter.setUnmarshaller(xStreamMarshaller);
+//		converters.add(xmlConverter);
 		
 		FilteringTextMessageConverter filteringTextMessageConverter = 
 				new FilteringTextMessageConverter(new MediaType("text", "plain", Charset.forName("utf-8")));
@@ -137,9 +135,9 @@ public class WebServicesConfig extends WebMvcConfigurerAdapter {
 						AbstractHttp11Protocol httpProtocol = (AbstractHttp11Protocol) connector.getProtocolHandler();
 						httpProtocol.setCompression("on");
 						httpProtocol.setCompressionMinSize(256);
-						String mimeTypes = httpProtocol.getCompressableMimeTypes();
+						String[] mimeTypes = httpProtocol.getCompressableMimeTypes();
 						String mimeTypesWithJson = mimeTypes + "," + MediaType.APPLICATION_JSON_VALUE;
-						httpProtocol.setCompressableMimeTypes(mimeTypesWithJson);
+						httpProtocol.setCompressableMimeType(mimeTypesWithJson);
 					}
 				}
 		);

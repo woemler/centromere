@@ -16,9 +16,6 @@
 
 package org.oncoblocks.centromere.web.controller;
 
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.RepositoryOperations;
 import org.oncoblocks.centromere.web.exceptions.RequestFailureException;
@@ -44,6 +41,7 @@ import java.io.Serializable;
  * 
  * @author woemler
  */
+@Deprecated
 public class CrudApiController<T extends Model<ID>, ID extends Serializable> 
 		extends AbstractApiController<T, ID> {
 	
@@ -70,11 +68,11 @@ public class CrudApiController<T extends Model<ID>, ID extends Serializable>
 	 * @param entity entity representation to be persisted
 	 * @return updated representation of the submitted entity
 	 */
-	@ApiResponses({
-			@ApiResponse(code = 201, message = "Created"),
-			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
-			@ApiResponse(code = 406, message = "Malformed entity", response = RestError.class)
-	})
+//	@ApiResponses({
+//			@ApiResponse(code = 201, message = "Created"),
+//			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
+//			@ApiResponse(code = 406, message = "Malformed entity", response = RestError.class)
+//	})
 	@RequestMapping(
 			value = "", 
 			method = RequestMethod.POST, 
@@ -82,7 +80,7 @@ public class CrudApiController<T extends Model<ID>, ID extends Serializable>
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE})
 	public ResponseEntity<?> create(
-			@ApiParam(name = "entity", value = "Model record entity.") @RequestBody T entity, 
+			/*@ApiParam(name = "entity", value = "Model record entity.")*/ @RequestBody T entity,
 			HttpServletRequest request
 	) {
 		T created = getRepository().insert(entity);
@@ -104,12 +102,12 @@ public class CrudApiController<T extends Model<ID>, ID extends Serializable>
 	 * @param id primary ID of the target entity
 	 * @return updated representation of the submitted entity.
 	 */
-	@ApiResponses({
-			@ApiResponse(code = 201, message = "Created"),
-			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
-			@ApiResponse(code	= 404, message = "Record not found", response = RestError.class),
-			@ApiResponse(code = 406, message = "Malformed entity", response = RestError.class)
-	})
+//	@ApiResponses({
+//			@ApiResponse(code = 201, message = "Created"),
+//			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
+//			@ApiResponse(code	= 404, message = "Record not found", response = RestError.class),
+//			@ApiResponse(code = 406, message = "Malformed entity", response = RestError.class)
+//	})
 	@RequestMapping(
 			value = "/{id}", 
 			method = RequestMethod.PUT,
@@ -117,8 +115,8 @@ public class CrudApiController<T extends Model<ID>, ID extends Serializable>
 					ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
 					MediaType.TEXT_PLAIN_VALUE})
 	public ResponseEntity<?> update(
-			@ApiParam(name = "entity", value = "Model record entity.") @RequestBody T entity,
-			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable ID id, 
+			/*@ApiParam(name = "entity", value = "Model record entity.")*/ @RequestBody T entity,
+			/*@ApiParam(name = "id", value = "Model record primary id.")*/ @PathVariable ID id,
 			HttpServletRequest request) {
 		if (!getRepository().exists(id)) throw new ResourceNotFoundException();
 		T updated = getRepository().update(entity);
@@ -138,16 +136,16 @@ public class CrudApiController<T extends Model<ID>, ID extends Serializable>
 	 * @param id primary ID of the target record.
 	 * @return {@link HttpStatus} indicating success or failure.
 	 */
-	@ApiResponses({
-			@ApiResponse(code = 200, message = "OK"),
-			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
-			@ApiResponse(code	= 404, message = "Record not found", response = RestError.class)
-	})
+//	@ApiResponses({
+//			@ApiResponse(code = 200, message = "OK"),
+//			@ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
+//			@ApiResponse(code	= 404, message = "Record not found", response = RestError.class)
+//	})
 	@RequestMapping(
 			value = "/{id}", 
 			method = RequestMethod.DELETE)
 	public ResponseEntity<?> delete(
-			@ApiParam(name = "id", value = "Model record primary id.") @PathVariable ID id, 
+			/*@ApiParam(name = "id", value = "Model record primary id.")*/ @PathVariable ID id,
 			HttpServletRequest request) {
 		getRepository().delete(id);
 		return new ResponseEntity<>(HttpStatus.OK);
