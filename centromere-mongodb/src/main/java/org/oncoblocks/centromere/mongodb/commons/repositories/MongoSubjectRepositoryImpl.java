@@ -16,8 +16,8 @@
 
 package org.oncoblocks.centromere.mongodb.commons.repositories;
 
-import org.oncoblocks.centromere.core.commons.models.Sample;
-import org.oncoblocks.centromere.core.commons.repositories.SubjectOperations;
+import com.blueprint.centromere.core.commons.models.Sample;
+import com.blueprint.centromere.core.commons.repositories.SubjectOperations;
 import org.oncoblocks.centromere.mongodb.commons.models.MongoSubject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;

@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.dataimport.cli.test.support;
 
-import org.oncoblocks.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.Model;
 import org.oncoblocks.centromere.core.model.support.DataFileMetadata;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

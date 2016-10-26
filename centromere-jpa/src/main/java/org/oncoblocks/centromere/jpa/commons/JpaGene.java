@@ -17,7 +17,7 @@
 package org.oncoblocks.centromere.jpa.commons;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.oncoblocks.centromere.core.commons.models.Gene;
+import com.blueprint.centromere.core.commons.models.Gene;
 
 import javax.persistence.*;
 import java.io.Serializable;

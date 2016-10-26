@@ -16,10 +16,10 @@
 
 package org.oncoblocks.centromere.web.config;
 
-import org.oncoblocks.centromere.core.config.AutoConfigureCentromere;
-import org.oncoblocks.centromere.core.config.Database;
-import org.oncoblocks.centromere.core.config.Profiles;
-import org.oncoblocks.centromere.core.config.Schema;
+import com.blueprint.centromere.core.config.AutoConfigureCentromere;
+import com.blueprint.centromere.core.config.Database;
+import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.config.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;

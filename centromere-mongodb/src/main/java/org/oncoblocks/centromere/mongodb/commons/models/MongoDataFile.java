@@ -16,11 +16,11 @@
 
 package org.oncoblocks.centromere.mongodb.commons.models;
 
-import org.oncoblocks.centromere.core.commons.models.DataFile;
-import org.oncoblocks.centromere.core.commons.models.DataSet;
-import org.oncoblocks.centromere.core.model.Alias;
-import org.oncoblocks.centromere.core.model.ForeignKey;
-import org.oncoblocks.centromere.core.model.ModelAttributes;
+import com.blueprint.centromere.core.commons.models.DataFile;
+import com.blueprint.centromere.core.commons.models.DataSet;
+import com.blueprint.centromere.core.model.Alias;
+import com.blueprint.centromere.core.model.ForeignKey;
+import com.blueprint.centromere.core.model.ModelAttributes;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 

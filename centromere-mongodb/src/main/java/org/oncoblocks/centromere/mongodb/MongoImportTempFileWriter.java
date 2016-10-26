@@ -16,10 +16,10 @@
 
 package org.oncoblocks.centromere.mongodb;
 
-import org.oncoblocks.centromere.core.dataimport.RecordWriter;
-import org.oncoblocks.centromere.core.dataimport.DataImportException;
-import org.oncoblocks.centromere.core.dataimport.AbstractRecordFileWriter;
-import org.oncoblocks.centromere.core.model.Model;
+import com.blueprint.centromere.core.dataimport.RecordWriter;
+import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.AbstractRecordFileWriter;
+import com.blueprint.centromere.core.model.Model;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.io.FileWriter;

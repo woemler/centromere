@@ -16,8 +16,8 @@
 
 package org.oncoblocks.centromere.jpa;
 
-import org.oncoblocks.centromere.core.model.Model;
-import org.oncoblocks.centromere.core.repository.QueryCriteria;
+import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.repository.QueryCriteria;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.domain.Specifications;
 

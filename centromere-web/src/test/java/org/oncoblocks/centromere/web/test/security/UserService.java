@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.web.test.security;
 
-import org.oncoblocks.centromere.core.repository.QueryCriteria;
+import com.blueprint.centromere.core.repository.QueryCriteria;
 import org.oncoblocks.centromere.web.test.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

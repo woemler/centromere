@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.mongodb.commons.repositories;
 
-import org.oncoblocks.centromere.core.commons.repositories.GeneRepository;
+import com.blueprint.centromere.core.commons.repositories.GeneRepository;
 import org.oncoblocks.centromere.mongodb.commons.models.MongoGene;
 
 /**

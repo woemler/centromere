@@ -18,9 +18,9 @@ package org.oncoblocks.centromere.web.controller;
 
 import com.google.common.reflect.TypeToken;
 import io.swagger.annotations.*;
-import org.oncoblocks.centromere.core.model.Model;
-import org.oncoblocks.centromere.core.repository.QueryCriteria;
-import org.oncoblocks.centromere.core.repository.RepositoryOperations;
+import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.repository.QueryCriteria;
+import com.blueprint.centromere.core.repository.RepositoryOperations;
 import org.oncoblocks.centromere.web.exceptions.InvalidParameterException;
 import org.oncoblocks.centromere.web.exceptions.ResourceNotFoundException;
 import org.oncoblocks.centromere.web.exceptions.RestError;

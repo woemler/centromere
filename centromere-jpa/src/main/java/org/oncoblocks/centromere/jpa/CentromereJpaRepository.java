@@ -16,9 +16,9 @@
 
 package org.oncoblocks.centromere.jpa;
 
-import org.oncoblocks.centromere.core.model.Model;
-import org.oncoblocks.centromere.core.repository.QueryCriteria;
-import org.oncoblocks.centromere.core.repository.RepositoryOperations;
+import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.repository.QueryCriteria;
+import com.blueprint.centromere.core.repository.RepositoryOperations;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;

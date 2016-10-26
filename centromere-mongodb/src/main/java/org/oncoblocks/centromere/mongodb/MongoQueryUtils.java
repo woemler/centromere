@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.mongodb;
 
-import org.oncoblocks.centromere.core.repository.QueryCriteria;
+import com.blueprint.centromere.core.repository.QueryCriteria;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 

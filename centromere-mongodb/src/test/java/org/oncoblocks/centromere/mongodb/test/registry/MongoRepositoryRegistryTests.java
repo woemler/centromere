@@ -18,7 +18,7 @@ package org.oncoblocks.centromere.mongodb.test.registry;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.oncoblocks.centromere.core.repository.RepositoryOperations;
+import com.blueprint.centromere.core.repository.RepositoryOperations;
 import org.oncoblocks.centromere.mongodb.CentromereMongoRepositoryComponentFactory;
 import org.oncoblocks.centromere.mongodb.commons.models.MongoGene;
 import org.oncoblocks.centromere.mongodb.test.commons.MongoCommonsDataSourceTestConfig;

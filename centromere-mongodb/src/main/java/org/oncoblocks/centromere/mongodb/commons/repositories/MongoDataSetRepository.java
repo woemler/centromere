@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.mongodb.commons.repositories;
 
-import org.oncoblocks.centromere.core.commons.repositories.DataSetRepository;
+import com.blueprint.centromere.core.commons.repositories.DataSetRepository;
 import org.oncoblocks.centromere.mongodb.commons.models.MongoDataSet;
 
 /**

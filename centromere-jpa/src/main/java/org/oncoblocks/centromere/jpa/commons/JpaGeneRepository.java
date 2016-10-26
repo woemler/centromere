@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.jpa.commons;
 
-import org.oncoblocks.centromere.core.commons.repositories.GeneRepository;
+import com.blueprint.centromere.core.commons.repositories.GeneRepository;
 
 /**
  * @author woemler

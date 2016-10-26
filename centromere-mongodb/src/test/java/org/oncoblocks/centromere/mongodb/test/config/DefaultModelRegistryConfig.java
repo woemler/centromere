@@ -16,8 +16,8 @@
 
 package org.oncoblocks.centromere.mongodb.test.config;
 
-import org.oncoblocks.centromere.core.config.ModelComponentRegistrationConfigurer;
-import org.oncoblocks.centromere.core.config.ModelScan;
+import com.blueprint.centromere.core.config.ModelComponentRegistrationConfigurer;
+import com.blueprint.centromere.core.config.ModelScan;
 import org.springframework.context.annotation.Configuration;
 
 /**

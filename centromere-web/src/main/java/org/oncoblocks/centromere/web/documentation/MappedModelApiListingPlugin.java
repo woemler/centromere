@@ -17,8 +17,8 @@
 package org.oncoblocks.centromere.web.documentation;
 
 import com.fasterxml.classmate.TypeResolver;
-import org.oncoblocks.centromere.core.config.ModelRegistry;
-import org.oncoblocks.centromere.core.model.Model;
+import com.blueprint.centromere.core.config.ModelRegistry;
+import com.blueprint.centromere.core.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;

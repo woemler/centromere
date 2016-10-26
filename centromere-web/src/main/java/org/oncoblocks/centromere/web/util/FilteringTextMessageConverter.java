@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.web.util;
 
-import org.oncoblocks.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.Model;
 import org.oncoblocks.centromere.web.controller.FilterableResource;
 import org.oncoblocks.centromere.web.controller.ResponseEnvelope;
 import org.springframework.data.domain.Page;

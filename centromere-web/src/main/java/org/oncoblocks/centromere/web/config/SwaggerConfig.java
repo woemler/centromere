@@ -19,7 +19,7 @@ package org.oncoblocks.centromere.web.config;
 import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.TypeResolver;
 import com.google.common.base.Predicate;
-import org.oncoblocks.centromere.core.config.ModelRegistry;
+import com.blueprint.centromere.core.config.ModelRegistry;
 import org.oncoblocks.centromere.web.controller.ResponseEnvelope;
 import org.oncoblocks.centromere.web.documentation.MappedModelApiListingPlugin;
 import org.oncoblocks.centromere.web.documentation.ModelParameterBuilderPlugin;

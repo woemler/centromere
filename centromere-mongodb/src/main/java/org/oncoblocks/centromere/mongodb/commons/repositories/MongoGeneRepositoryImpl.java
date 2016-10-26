@@ -16,7 +16,7 @@
 
 package org.oncoblocks.centromere.mongodb.commons.repositories;
 
-import org.oncoblocks.centromere.core.commons.repositories.GeneOperations;
+import com.blueprint.centromere.core.commons.repositories.GeneOperations;
 import org.oncoblocks.centromere.mongodb.commons.models.MongoGene;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
