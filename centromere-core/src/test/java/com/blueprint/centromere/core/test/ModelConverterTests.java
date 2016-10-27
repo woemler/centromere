@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.test;
 
-import com.blueprint.centromere.core.test.model.Gene;
+import com.blueprint.centromere.core.commons.models.Gene;
 import com.blueprint.centromere.core.util.JsonModelConverter;
 import com.blueprint.centromere.core.util.KeyValueMapModelConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,7 +42,7 @@ public class ModelConverterTests {
 		JsonModelConverter converter = new JsonModelConverter(Gene.class);
 		Gene gene = (Gene) converter.convert(json);
 		Assert.notNull(gene);
-		Assert.isTrue(gene.getEntrezGeneId() == 1L);
+		Assert.isTrue("1".equals(gene.getPrimaryReferenceId()));
 		Assert.isTrue("ABC".equals(gene.getPrimaryGeneSymbol()));
 		Assert.isNull(gene.getChromosome());
 	}
@@ -64,7 +64,7 @@ public class ModelConverterTests {
 		KeyValueMapModelConverter converter = new KeyValueMapModelConverter(Gene.class);
 		Gene gene = (Gene) converter.convert(map);
 		Assert.notNull(gene);
-		Assert.isTrue(gene.getEntrezGeneId() == 1L);
+		Assert.isTrue("1".equals(gene.getPrimaryReferenceId()));
 		Assert.isTrue("ABC".equals(gene.getPrimaryGeneSymbol()));
 		Assert.isNull(gene.getChromosome());
 	}

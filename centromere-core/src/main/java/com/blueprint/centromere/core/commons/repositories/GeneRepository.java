@@ -18,32 +18,29 @@ package com.blueprint.centromere.core.commons.repositories;
 
 import com.blueprint.centromere.core.commons.models.Gene;
 import com.blueprint.centromere.core.repository.BaseRepository;
-import com.blueprint.centromere.core.repository.MetadataOperations;
-import com.blueprint.centromere.core.repository.RepositoryOperations;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.MapPath;
 import com.querydsl.core.types.dsl.PathBuilder;
-
-import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author woemler
  */
-@NoRepositoryBean
+@RepositoryRestResource(path = "genes", collectionResourceRel = "genes")
 public interface GeneRepository extends
-		BaseRepository<Gene, Long>,
-		MetadataOperations<Gene, Long>,
+		BaseRepository<Gene, UUID>,
+		MetadataOperations<Gene, UUID>,
 		AttributeOperations<Gene> {
 
-	List<Gene> findByPrimaryRefereneId(@Param("refId") String refId);
+	List<Gene> findByPrimaryReferenceId(@Param("refId") String refId);
 	List<Gene> findByPrimaryGeneSymbol(@Param("symbol") String symbol);
 	List<Gene> findByAliases(@Param("alias") String alias);
 
@@ -57,9 +54,9 @@ public interface GeneRepository extends
 	}
 
 	@Override
-	default Iterable<Gene> guess(String keyword){
+	default List<Gene> guess(@Param("keyword") String keyword){
 		List<Gene> genes = new ArrayList<>();
-		genes.addAll(findByPrimaryRefereneId(keyword));
+		genes.addAll(findByPrimaryReferenceId(keyword));
 		genes.addAll(findByPrimaryGeneSymbol(keyword));
 		genes.addAll(findByAliases(keyword));
 		return genes;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 William Oemler, Blueprint Medicines
+ * Copyright 2016 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package com.blueprint.centromere.core.commons.repositories;
 
-import com.blueprint.centromere.core.commons.models.Sample;
-import com.blueprint.centromere.core.commons.models.Subject;
+
+import org.springframework.data.repository.query.Param;
 
 import java.io.Serializable;
 import java.util.List;
@@ -25,8 +25,6 @@ import java.util.List;
 /**
  * @author woemler
  */
-public interface SampleOperations<T extends Sample<ID>, ID extends Serializable> 
-		extends AttributeOperations<T>, SimpleAliasOperations<T> {
-	List<T> guessSample(String keyword);
-	<S extends Subject<I>, I extends Serializable> List<T> findBySubjectId(I subjectId);
+public interface MetadataOperations<T, ID extends Serializable> {
+	List<T> guess(@Param("keyword") String keyword);
 }

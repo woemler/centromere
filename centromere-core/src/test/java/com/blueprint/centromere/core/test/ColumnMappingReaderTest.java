@@ -16,12 +16,12 @@
 
 package com.blueprint.centromere.core.test;
 
-import com.blueprint.centromere.core.test.model.Gene;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import com.blueprint.centromere.core.commons.models.Gene;
 import com.blueprint.centromere.core.dataimport.BasicColumnMappingRecordReader;
 import com.blueprint.centromere.core.model.Alias;
 import com.blueprint.centromere.core.model.Model;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
@@ -150,8 +150,8 @@ public class ColumnMappingReaderTest {
 		Assert.notNull(gene);
 		Assert.notNull(gene.getPrimaryGeneSymbol());
 		Assert.isTrue("TEST".equals(gene.getPrimaryGeneSymbol()));
-		Assert.notNull(gene.getEntrezGeneId());
-		Assert.isTrue(gene.getEntrezGeneId() == 7L);
+		Assert.notNull(gene.getPrimaryReferenceId());
+		Assert.isTrue(gene.getPrimaryReferenceId() == "7");
 		Assert.notNull(gene.getTaxId());
 		Assert.isTrue(gene.getTaxId() == 9606);
 		Assert.notNull(gene.getAliases());

@@ -16,15 +16,10 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-import com.blueprint.centromere.core.model.Model;
-
-import org.springframework.data.annotation.Id;
+import com.blueprint.centromere.core.model.AbstractModel;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,9 +30,9 @@ import java.util.Map;
  */
 @Entity
 @Document
-public class Gene implements Model<Long>, Attributes {
+public class Gene extends AbstractModel implements Attributes {
 
-	@Id @GeneratedValue private Long id;
+	//@Id @GeneratedValue private Long id;
 	private String primaryReferenceId;
 	private String primaryGeneSymbol;
 	private Integer taxId;
@@ -56,14 +51,14 @@ public class Gene implements Model<Long>, Attributes {
 	@ElementCollection(fetch = FetchType.EAGER)
 	private Map<String, String> externalReferences = new HashMap<>();
 
-	@Override
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
+//	@Override
+//	public Long getId() {
+//		return id;
+//	}
+//
+//	public void setId(Long id) {
+//		this.id = id;
+//	}
 
 	public String getPrimaryReferenceId() {
 		return primaryReferenceId;
@@ -183,6 +178,6 @@ public class Gene implements Model<Long>, Attributes {
 	}
 
 	public void addAlias(String alias){
-		this.aliases.add(alias);
+		if (!aliases.contains(alias)) this.aliases.add(alias);
 	}
 }

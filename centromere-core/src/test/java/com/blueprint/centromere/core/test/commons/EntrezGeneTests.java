@@ -36,14 +36,14 @@ public class EntrezGeneTests {
 	@Test
 	public void geneInfoReaderTest() throws Exception {
 		ClassPathResource resource = new ClassPathResource("Homo_sapiens.gene_info");
-		EntrezGeneInfoReader<GeneImpl> reader = new EntrezGeneInfoReader<>(GeneImpl.class);
-		Assert.isTrue(GeneImpl.class.equals(reader.getModel()), String.format("Expected %s, got %s",
-				GeneImpl.class.getName(), reader.getModel().getName()));
+		EntrezGeneInfoReader reader = new EntrezGeneInfoReader();
+		Assert.isTrue(Gene.class.equals(reader.getModel()), String.format("Expected %s, got %s",
+				Gene.class.getName(), reader.getModel().getName()));
 		try {
 			reader.doBefore(new String[] {resource.getPath()});
 			Gene gene = reader.readRecord();
 			Assert.notNull(gene);
-			Assert.isTrue(gene instanceof GeneImpl);
+			Assert.isTrue(gene instanceof Gene);
 			Assert.isTrue("A1BG".equals(gene.getPrimaryGeneSymbol()));
 		} finally {
 			reader.doAfter();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 William Oemler, Blueprint Medicines
+ * Copyright 2016 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,32 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.commons.testing;
+package com.blueprint.centromere.core.model;
 
-import com.blueprint.centromere.core.model.Model;
+import com.fasterxml.uuid.EthernetAddress;
+import com.fasterxml.uuid.Generators;
 
-import java.util.List;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+import java.util.UUID;
 
 /**
  * @author woemler
  */
-public interface DummyDataGenerator<T extends Model<?>> {
-	List<T> generateData(Class<T> type) throws Exception;
+@MappedSuperclass
+public abstract class AbstractModel implements Model<UUID> {
+	
+	@Id private UUID id;
+
+	public AbstractModel() {
+		this.id = Generators.timeBasedGenerator(EthernetAddress.fromInterface()).generate();
+	}
+
+	@Override public UUID getId() {
+		return id;
+	}
+
+	public void setId(UUID id) {
+		this.id = id;
+	}
 }

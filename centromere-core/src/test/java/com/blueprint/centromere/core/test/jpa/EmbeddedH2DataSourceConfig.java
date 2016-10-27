@@ -34,7 +34,7 @@ import javax.sql.DataSource;
  * @author woemler
  */
 @Configuration
-@EnableJpaRepositories(basePackages = { "com.blueprint.centromere.core.test.model" })
+@EnableJpaRepositories(basePackages = { "com.blueprint.centromere.core.commons.repositories" })
 @EnableTransactionManagement
 public class EmbeddedH2DataSourceConfig {
 
@@ -52,7 +52,7 @@ public class EmbeddedH2DataSourceConfig {
 		vendorAdapter.setShowSql(true);
 		LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 		factory.setJpaVendorAdapter(vendorAdapter);
-		factory.setPackagesToScan("com.blueprint.centromere.core.test.model");
+		factory.setPackagesToScan("com.blueprint.centromere.core.commons.models");
 		factory.setDataSource(dataSource());
 		factory.afterPropertiesSet();
 		return factory.getObject();

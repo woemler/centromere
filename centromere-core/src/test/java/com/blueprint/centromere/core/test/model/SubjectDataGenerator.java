@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 William Oemler, Blueprint Medicines
+ * Copyright 2016 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.commons.testing;
+package com.blueprint.centromere.core.test.model;
 
 import com.blueprint.centromere.core.commons.models.Subject;
 
@@ -24,13 +24,13 @@ import java.util.List;
 /**
  * @author woemler
  */
-public class SubjectDataGenerator<T extends Subject<?>> implements DummyDataGenerator<T> {
+public class SubjectDataGenerator implements DummyDataGenerator<Subject> {
 
-	public List<T> generateData(Class<T> type) throws Exception {
+	public List<Subject> generateData(Class<Subject> type) throws Exception {
 		
-		List<T> subjects = new ArrayList<>();
+		List<Subject> subjects = new ArrayList<>();
 		
-		T subject = type.newInstance();
+		Subject subject = type.newInstance();
 		subject.setName("SubjectA");
 		subject.setSpecies("Human");
 		subject.setGender("M");

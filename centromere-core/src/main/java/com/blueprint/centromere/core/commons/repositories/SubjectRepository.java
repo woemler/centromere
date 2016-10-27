@@ -17,17 +17,31 @@
 package com.blueprint.centromere.core.commons.repositories;
 
 import com.blueprint.centromere.core.commons.models.Subject;
-import com.blueprint.centromere.core.repository.RepositoryOperations;
-import org.springframework.data.repository.NoRepositoryBean;
+import com.blueprint.centromere.core.repository.BaseRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author woemler
  */
-@NoRepositoryBean
-public interface SubjectRepository<T extends Subject<ID>, ID extends Serializable>
-		extends RepositoryOperations<T, ID>, SubjectOperations<T, ID> {
-	List<T> findByName(String name);
+@RepositoryRestResource(path = "subjects", collectionResourceRel = "subjects")
+public interface SubjectRepository
+		extends BaseRepository<Subject, Long>,
+		MetadataOperations<Subject, Long>,
+ 		AttributeOperations<Subject> {
+	
+	List<Subject> findByName(@Param("name") String name);
+	List<Subject> findBySpecies(@Param("species") String species);
+	Subject findOneBySampleIds(@Param("sampleId") Long sampleId);
+	
+	@Override
+	default List<Subject> guess(@Param("keyword") String keyword){
+		List<Subject> subjects = new ArrayList<>();
+		subjects.addAll(findByName(keyword));
+		return subjects;
+	}
+	
 }

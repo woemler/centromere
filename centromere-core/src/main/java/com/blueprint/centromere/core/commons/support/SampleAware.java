@@ -23,7 +23,7 @@ import java.util.Collection;
 /**
  * @author woemler
  */
-public interface SampleAware<T extends Sample<?>> {
+public interface SampleAware<T extends Sample> {
 	Collection<T> getSamples();
 	//void setSamples(Collection<T> samples);
 }

@@ -17,12 +17,14 @@
 package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.Model;
+import org.springframework.data.annotation.Id;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.MappedSuperclass;
-import java.io.Serializable;
+import javax.persistence.ElementCollection;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -30,16 +32,25 @@ import java.util.List;
 /**
  * @author woemler
  */
-@MappedSuperclass
-public abstract class User<ID extends Serializable> implements Model<ID>, UserDetails {
+public class User implements Model<Long>, UserDetails {
 	
+	@Id @GeneratedValue private Long id;
 	private String username;
 	private String password;
 	private boolean accountNonExpired = true;
 	private boolean accountNonLocked = true;
 	private boolean enabled = false;
 	private boolean credentialsNonExpired = true;
-	private List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+	@ElementCollection(fetch = FetchType.EAGER) private List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+
+	@Override 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	@Override 
 	public boolean isEnabled() {

@@ -16,9 +16,9 @@
 
 package com.blueprint.centromere.core.test;
 
+import com.blueprint.centromere.core.commons.models.Gene;
 import com.blueprint.centromere.core.dataimport.AbstractRecordFileReader;
 import com.blueprint.centromere.core.dataimport.DataImportException;
-import com.blueprint.centromere.core.test.model.Gene;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -61,7 +61,7 @@ public class GeneInfoReader extends AbstractRecordFileReader<Gene> {
 		String[] bits = line.split("\\t");
 		Gene gene = new Gene();
 		gene.setTaxId(Integer.parseInt(bits[0]));
-		gene.setEntrezGeneId(Long.parseLong(bits[1]));
+		gene.setPrimaryReferenceId(bits[1]);
 		gene.setPrimaryGeneSymbol(bits[2]);
 		gene.setAliases(Arrays.asList(bits[3].split("\\|")));
 		Map<String,Object> dbXrefs = new HashMap<>();

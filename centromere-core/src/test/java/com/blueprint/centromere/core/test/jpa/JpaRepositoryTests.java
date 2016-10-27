@@ -16,9 +16,9 @@
 
 package com.blueprint.centromere.core.test.jpa;
 
-import com.blueprint.centromere.core.test.model.Gene;
-import com.blueprint.centromere.core.test.model.GeneRepository;
-import com.blueprint.centromere.core.test.model.ModelTestUtil;
+import com.blueprint.centromere.core.commons.models.Gene;
+import com.blueprint.centromere.core.commons.repositories.GeneRepository;
+import com.blueprint.centromere.core.test.model.EntrezGeneDataGenerator;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Ops;
@@ -52,11 +52,12 @@ public class JpaRepositoryTests {
 	
 	@Autowired private GeneRepository geneRepository;
 	private final Class<Gene> model = Gene.class;
+	private final EntrezGeneDataGenerator dataGenerator = new EntrezGeneDataGenerator();
 
 	@Before
-	public void setup(){
+	public void setup() throws Exception {
 		geneRepository.deleteAll();
-		geneRepository.save(ModelTestUtil.createDummyGeneData());
+		geneRepository.save(dataGenerator.generateData(Gene.class));
 	}
 
 	@Test
@@ -66,11 +67,12 @@ public class JpaRepositoryTests {
 		
 		Gene gene = geneRepository.findOne(genes.get(0).getId());
 		Assert.notNull(gene);
-		Assert.isTrue(gene.getEntrezGeneId().equals(1L));
+		Assert.isTrue(gene.getPrimaryReferenceId().equals("1"));
 		Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
 		Assert.notNull(gene.getAliases());
 		Assert.notEmpty(gene.getAliases());
 		Assert.isTrue(gene.getAliases().size() == 1);
+		System.out.println("PKID: " + gene.getId().toString());
 
 	}
 
@@ -84,7 +86,7 @@ public class JpaRepositoryTests {
 
 		Gene gene = genes.get(0);
 		Assert.notNull(gene);
-		Assert.isTrue(gene.getEntrezGeneId().equals(1L));
+		Assert.isTrue(gene.getPrimaryReferenceId().equals("1"));
 		Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
 		Assert.notNull(gene.getAliases());
 		Assert.notEmpty(gene.getAliases());
@@ -108,7 +110,7 @@ public class JpaRepositoryTests {
 		Predicate predicate = Expressions.predicate(Ops.EQ, attribute, variable);
 		long count = geneRepository.count(predicate);
 		Assert.notNull(count);
-		Assert.isTrue(count == 4L);
+		Assert.isTrue(count == 3L);
 	}
 
 	@Test
@@ -126,7 +128,7 @@ public class JpaRepositoryTests {
 
 		Gene gene = genes.get(0);
 		Assert.notNull(gene);
-		Assert.isTrue(gene.getEntrezGeneId().equals(2L));
+		Assert.isTrue(gene.getPrimaryReferenceId().equals("2"));
 		Assert.isTrue("GeneB".equals(gene.getPrimaryGeneSymbol()));
 
 	}
@@ -151,7 +153,7 @@ public class JpaRepositoryTests {
 
 		Gene gene = genes.get(0);
 		Assert.notNull(gene);
-		Assert.isTrue(gene.getEntrezGeneId().equals(2L));
+		Assert.isTrue(gene.getPrimaryReferenceId().equals("2"));
 		Assert.isTrue("GeneB".equals(gene.getPrimaryGeneSymbol()));
 
 	}
@@ -171,7 +173,7 @@ public class JpaRepositoryTests {
 
 		Gene gene = genes.get(0);
 		Assert.notNull(gene);
-		Assert.isTrue(gene.getEntrezGeneId().equals(2L));
+		Assert.isTrue(gene.getPrimaryReferenceId().equals("2"));
 		Assert.isTrue("GeneB".equals(gene.getPrimaryGeneSymbol()));
 		Assert.isTrue("DEF".equals(gene.getAliases().get(0)));
 
@@ -193,7 +195,7 @@ public class JpaRepositoryTests {
 
 		Gene gene = genes.get(0);
 		Assert.notNull(gene);
-		Assert.isTrue(gene.getEntrezGeneId().equals(1L));
+		Assert.isTrue(gene.getPrimaryReferenceId().equals("1"));
 		Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
 		Assert.isTrue(gene.getAttributes().size() == 1);
 		Assert.isTrue(gene.getAttributes().containsKey("isKinase"));
@@ -209,7 +211,7 @@ public class JpaRepositoryTests {
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
 		Assert.isTrue(genes.size() == 5);
-		Assert.isTrue(genes.get(0).getEntrezGeneId().equals(5L));
+		Assert.isTrue(genes.get(0).getPrimaryReferenceId().equals("5"));
 
 	}
 
@@ -226,8 +228,8 @@ public class JpaRepositoryTests {
 		List<Gene> genes = (List<Gene>) geneRepository.findAll(predicate, sort);
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
-		Assert.isTrue(genes.size() == 4);
-		Assert.isTrue(genes.get(0).getEntrezGeneId().equals(5L));
+		Assert.isTrue(genes.size() == 3);
+		Assert.isTrue(genes.get(0).getPrimaryReferenceId().equals("4"));
 	}
 
 	@Test
@@ -246,7 +248,7 @@ public class JpaRepositoryTests {
 
 		Gene gene = genes.get(0);
 		Assert.notNull(gene);
-		Assert.isTrue(gene.getEntrezGeneId().equals(3l));
+		Assert.isTrue(gene.getPrimaryReferenceId().equals("3"));
 
 	}
 
@@ -261,33 +263,33 @@ public class JpaRepositoryTests {
 		PageRequest pageRequest = new PageRequest(1, 2);
 		Page<Gene> page = geneRepository.findAll(predicate, pageRequest);
 		Assert.notNull(page);
-		Assert.isTrue(page.getTotalElements() == 4);
+		Assert.isTrue(page.getTotalElements() == 3);
 		Assert.isTrue(page.getTotalPages() == 2);
 
 		List<Gene> genes = page.getContent();
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
-		Assert.isTrue(genes.size() == 2);
+		Assert.isTrue(genes.size() == 1);
 
 		Gene gene = genes.get(0);
 		Assert.notNull(gene);
-		Assert.isTrue(gene.getEntrezGeneId().equals(4L));
+		Assert.isTrue(gene.getPrimaryReferenceId().equals("4"));
 
 	}
 
 	@Test
 	public void insertTest(){
 		Gene gene = new Gene();
-		gene.setEntrezGeneId(100L);
+		gene.setPrimaryReferenceId("100");
 		gene.setPrimaryGeneSymbol("TEST");
 		gene.setTaxId(9606);
 		gene.setChromosome("1");
 		gene.setGeneType("protein-coding");
 		geneRepository.save(gene);
 
-		Gene created = geneRepository.findOneByEntrezGeneId(100L);
+		Gene created = geneRepository.findByPrimaryReferenceId("100").get(0);
 		Assert.notNull(created);
-		Assert.isTrue(created.getEntrezGeneId().equals(100L));
+		Assert.isTrue(created.getPrimaryReferenceId().equals("100"));
 		Assert.isTrue("TEST".equals(created.getPrimaryGeneSymbol()));
 
 		geneRepository.delete(created);
@@ -298,23 +300,29 @@ public class JpaRepositoryTests {
 	public void insertMultipleTest(){
 		List<Gene> genes = new ArrayList<>();
 		Gene gene1 = new Gene();
-		gene1.setEntrezGeneId(100L);
+		gene1.setPrimaryReferenceId("100");
 		gene1.setPrimaryGeneSymbol("TEST");
 		gene1.setTaxId(9606);
 		gene1.setChromosome("1");
 		gene1.setGeneType("protein-coding");
 		genes.add(gene1);
 		Gene gene2 = new Gene();
-		gene2.setEntrezGeneId(101L);
+		gene2.setPrimaryReferenceId("101");
 		gene2.setPrimaryGeneSymbol("TEST2");
 		gene2.setTaxId(9606);
 		gene2.setChromosome("12");
 		gene2.setGeneType("pseudo");
 		genes.add(gene2);
 		geneRepository.save(genes);
-		Gene gene = geneRepository.findOneByEntrezGeneId(100L);
+		genes = geneRepository.findByPrimaryReferenceId("100");
+		Assert.notNull(genes);
+		Assert.notEmpty(genes);
+		Gene gene = genes.get(0);
 		Assert.notNull(gene);
-		gene = geneRepository.findOneByEntrezGeneId(101L);
+		genes = geneRepository.findByPrimaryReferenceId("101");
+		Assert.notNull(genes);
+		Assert.notEmpty(genes);
+		gene = genes.get(0);
 		Assert.notNull(gene);
 		Assert.isTrue(geneRepository.count() == 7L);
 	}
@@ -323,7 +331,7 @@ public class JpaRepositoryTests {
 	public void updateTest(){
 
 		Gene gene = new Gene();
-		gene.setEntrezGeneId(100L);
+		gene.setPrimaryReferenceId("100");
 		gene.setPrimaryGeneSymbol("TEST");
 		gene.setTaxId(9606);
 		gene.setChromosome("1");
@@ -334,7 +342,10 @@ public class JpaRepositoryTests {
 		gene.setGeneType("pseudogene");
 		geneRepository.save(gene);
 
-		Gene updated = geneRepository.findOneByEntrezGeneId(100L);
+		List<Gene> genes = geneRepository.findByPrimaryReferenceId("100");
+		Assert.notNull(genes);
+		Assert.notEmpty(genes);
+		Gene updated = genes.get(0);
 		Assert.notNull(updated);
 		Assert.isTrue("TEST_TEST".equals(updated.getPrimaryGeneSymbol()));
 		Assert.isTrue("pseudogene".equals(updated.getGeneType()));
@@ -345,14 +356,14 @@ public class JpaRepositoryTests {
 	public void updateMultipleTest(){
 		List<Gene> genes = new ArrayList<>();
 		Gene gene1 = new Gene();
-		gene1.setEntrezGeneId(100L);
+		gene1.setPrimaryReferenceId("100");
 		gene1.setPrimaryGeneSymbol("TEST");
 		gene1.setTaxId(9606);
 		gene1.setChromosome("1");
 		gene1.setGeneType("protein-coding");
 		genes.add(gene1);
 		Gene gene2 = new Gene();
-		gene2.setEntrezGeneId(101L);
+		gene2.setPrimaryReferenceId("101");
 		gene2.setPrimaryGeneSymbol("TEST2");
 		gene2.setTaxId(9606);
 		gene2.setChromosome("12");
@@ -368,10 +379,16 @@ public class JpaRepositoryTests {
 		genes.add(gene2);
 		geneRepository.save(genes);
 
-		Gene gene = geneRepository.findOneByEntrezGeneId(100L);
+		genes = geneRepository.findByPrimaryReferenceId("100");
+		Assert.notNull(genes);
+		Assert.notEmpty(genes);
+		Gene gene = genes.get(0);
 		Assert.notNull(gene);
 		Assert.isTrue("TEST".equals(gene.getGeneType()));
-		gene = geneRepository.findOneByEntrezGeneId(101L);
+		genes = geneRepository.findByPrimaryReferenceId("101");
+		Assert.notNull(genes);
+		Assert.notEmpty(genes);
+		gene = genes.get(0);
 		Assert.notNull(gene);
 		Assert.isTrue("TEST".equals(gene.getGeneType()));
 	}
@@ -380,20 +397,24 @@ public class JpaRepositoryTests {
 	public void deleteTest(){
 
 		Gene gene = new Gene();
-		gene.setEntrezGeneId(100L);
+		gene.setPrimaryReferenceId("100");
 		gene.setPrimaryGeneSymbol("TEST");
 		gene.setTaxId(9606);
 		gene.setChromosome("1");
 		gene.setGeneType("protein-coding");
 		geneRepository.save(gene);
 
-		Gene created = geneRepository.findOneByEntrezGeneId(100L);
+		List<Gene> genes = geneRepository.findByPrimaryReferenceId("100");
+		Assert.notNull(genes);
+		Assert.notEmpty(genes);
+		Gene created = genes.get(0);
 		Assert.notNull(created);
-		Assert.isTrue(created.getEntrezGeneId().equals(100L));
+		Assert.isTrue(created.getPrimaryReferenceId().equals("100"));
 
 		geneRepository.delete(created);
-		Gene deleted = geneRepository.findOneByEntrezGeneId(100L);
-		Assert.isNull(deleted);
+		genes = geneRepository.findByPrimaryReferenceId("100");
+		Assert.notNull(genes);
+		Assert.isTrue(genes.isEmpty());
 
 	}
 
@@ -416,7 +437,7 @@ public class JpaRepositoryTests {
 		Set<Object> geneSymbols = geneRepository.distinct("primaryGeneSymbol", predicate);
 		Assert.notNull(geneSymbols);
 		Assert.notEmpty(geneSymbols);
-		Assert.isTrue(geneSymbols.size() == 4);
+		Assert.isTrue(geneSymbols.size() == 3);
 		Assert.isTrue(geneSymbols.contains("GeneD"));
 
 	}
@@ -430,14 +451,14 @@ public class JpaRepositoryTests {
 		Assert.notEmpty(genes);
 
 		Gene gene = genes.get(0);
-		Assert.isTrue(gene.getEntrezGeneId().equals(1L));
+		Assert.isTrue(gene.getPrimaryReferenceId().equals("1"));
 
 		genes = (List<Gene>) geneRepository.guess("MNO");
 		Assert.notNull(genes);
 		Assert.notEmpty(genes);
 
 		gene = genes.get(0);
-		Assert.isTrue(gene.getEntrezGeneId().equals(5L));
+		Assert.isTrue(gene.getPrimaryReferenceId().equals("5"));
 
 		genes = (List<Gene>) geneRepository.guess("XYZ");
 		Assert.isTrue(genes.size() == 0);

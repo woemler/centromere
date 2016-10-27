@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 William Oemler, Blueprint Medicines
+ * Copyright 2016 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.commons.testing;
+package com.blueprint.centromere.core.test.model;
 
 import com.blueprint.centromere.core.commons.models.Gene;
 
@@ -27,13 +27,13 @@ import java.util.List;
  * @author woemler
  * @since 0.4.3
  */
-public class EntrezGeneDataGenerator<T extends Gene<?>> implements DummyDataGenerator<T> {
+public class EntrezGeneDataGenerator implements DummyDataGenerator<Gene> {
 	
-	public List<T> generateData(Class<T> type) throws Exception {
+	public List<Gene> generateData(Class<Gene> type) throws Exception {
 
-		List<T> genes = new ArrayList<>();
+		List<Gene> genes = new ArrayList<>();
 		
-		T gene = type.newInstance();
+		Gene gene = type.newInstance();
 		gene.setPrimaryReferenceId("1");
 		gene.setPrimaryGeneSymbol("GeneA");
 		gene.setTaxId(9606);
@@ -48,7 +48,7 @@ public class EntrezGeneDataGenerator<T extends Gene<?>> implements DummyDataGene
 		gene.setPrimaryReferenceId("2");
 		gene.setPrimaryGeneSymbol("GeneB");
 		gene.setTaxId(9606);
-		gene.setChromosome("3");
+		gene.setChromosome("5");
 		gene.setDescription("Test Gene B");
 		gene.setGeneType("protein-coding");
 		gene.addAttribute("isKinase", "N");
@@ -59,7 +59,7 @@ public class EntrezGeneDataGenerator<T extends Gene<?>> implements DummyDataGene
 		gene.setPrimaryReferenceId("3");
 		gene.setPrimaryGeneSymbol("GeneC");
 		gene.setTaxId(9606);
-		gene.setChromosome("3");
+		gene.setChromosome("9");
 		gene.setDescription("Test Gene C");
 		gene.setGeneType("pseudo");
 		gene.addAttribute("isKinase", "N");
@@ -70,7 +70,7 @@ public class EntrezGeneDataGenerator<T extends Gene<?>> implements DummyDataGene
 		gene.setPrimaryReferenceId("4");
 		gene.setPrimaryGeneSymbol("GeneD");
 		gene.setTaxId(9606);
-		gene.setChromosome("9");
+		gene.setChromosome("X");
 		gene.setDescription("Test Gene D");
 		gene.setGeneType("protein-coding");
 		gene.addAttribute("isKinase", "Y");
@@ -81,7 +81,7 @@ public class EntrezGeneDataGenerator<T extends Gene<?>> implements DummyDataGene
 		gene.setPrimaryReferenceId("5");
 		gene.setPrimaryGeneSymbol("GeneE");
 		gene.setTaxId(9606);
-		gene.setChromosome("X");
+		gene.setChromosome("13");
 		gene.setDescription("Test Gene E");
 		gene.setGeneType("pseudo");
 		gene.addAttribute("isKinase", "N");

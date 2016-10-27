@@ -1,6 +1,6 @@
 package com.blueprint.centromere.core.ws;
 
-import com.blueprint.centromere.core.repository.MetadataOperations;
+import com.blueprint.centromere.core.commons.repositories.MetadataOperations;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,6 +13,7 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.rest.webmvc.RootResourceInformation;
 import org.springframework.data.rest.webmvc.support.DefaultedPageable;
+import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,7 @@ public class ModelController {
 
     @Autowired private Repositories repositories;
     @Autowired @Qualifier("defaultConversionService") private ConversionService conversionService;
+    @Autowired RepositoryEntityLinks entityLinks;
 
     @RequestMapping(value = "/{repository}/guess", method = RequestMethod.GET)
     public HttpEntity guess(@QuerydslPredicate RootResourceInformation resourceInformation,

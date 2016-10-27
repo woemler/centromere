@@ -24,7 +24,7 @@ import java.util.Date;
  * @author woemler
  */
 @MappedSuperclass
-public abstract class ClinicalSubject<ID extends Serializable> extends Subject<ID> {
+public abstract class ClinicalSubject<ID extends Serializable> extends Subject {
 	
 	private String ethnicity;
 	private Date dateOfBirth;

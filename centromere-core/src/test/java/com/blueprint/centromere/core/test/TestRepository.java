@@ -16,10 +16,10 @@
 
 package com.blueprint.centromere.core.test;
 
+import com.blueprint.centromere.core.commons.models.Gene;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.core.repository.RepositoryOperations;
-import com.blueprint.centromere.core.test.model.Gene;
-import com.blueprint.centromere.core.test.model.ModelTestUtil;
+import com.blueprint.centromere.core.test.model.EntrezGeneDataGenerator;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Page;
@@ -35,17 +35,22 @@ import java.util.*;
  */
 
 @Component
-public class TestRepository implements RepositoryOperations<Gene, Long> {
+public class TestRepository implements RepositoryOperations<Gene, UUID> {
 
-	private Map<Long, Gene> geneMap;
+	private Map<Object, Gene> geneMap;
 	private Class<Gene> model = Gene.class;
+	private EntrezGeneDataGenerator dataGenerator = new EntrezGeneDataGenerator();
 
 	public TestRepository() {
 		geneMap = new HashMap<>();
-		this.setGeneMap(ModelTestUtil.createDummyGeneData());
+		try {
+			this.setGeneMap(dataGenerator.generateData(Gene.class));
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 
-	public Map<Long, Gene> getGeneMap() {
+	public Map<Object, Gene> getGeneMap() {
 		return geneMap;
 	}
 	
@@ -55,16 +60,16 @@ public class TestRepository implements RepositoryOperations<Gene, Long> {
 		}
 	}
 
-	public void setGeneMap(Map<Long, Gene> geneMap) {
+	public void setGeneMap(Map<Object, Gene> geneMap) {
 		this.geneMap = geneMap;
 	}
 
-	@Override public Gene findOne(Long aLong) {
+	@Override public Gene findOne(UUID aLong) {
 		if (geneMap.containsKey(aLong)) return geneMap.get(aLong);
 		return null;
 	}
 
-	@Override public boolean exists(Long aLong) {
+	@Override public boolean exists(UUID aLong) {
 		return geneMap.containsKey(aLong);
 	}
 
@@ -140,7 +145,7 @@ public class TestRepository implements RepositoryOperations<Gene, Long> {
 		return entities;
 	}
 
-	@Override public void delete(Long aLong) {
+	@Override public void delete(UUID aLong) {
 		geneMap.remove(aLong);
 	}
 
@@ -155,7 +160,7 @@ public class TestRepository implements RepositoryOperations<Gene, Long> {
 	}
 
 	@Override 
-	public Iterable<Gene> findAll(Iterable<Long> iterable) {
+	public Iterable<Gene> findAll(Iterable<UUID> iterable) {
 		return null;
 	}
 

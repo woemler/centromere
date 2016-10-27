@@ -26,6 +26,6 @@ import java.io.Serializable;
 public interface Data {
 	<T extends DataFile<I>, I extends Serializable> I getDataFileId();
 	<T extends DataFile<I>, I extends Serializable> void setDataFileMetadata(T dataFile);
-	<T extends Sample<I>, I extends Serializable> I getSampleId();
-	<T extends Sample<I>, I extends Serializable> void setSampleMetadata(T sample);
+	<T extends Sample, I extends Serializable> I getSampleId();
+	<T extends Sample, I extends Serializable> void setSampleMetadata(T sample);
 }

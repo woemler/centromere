@@ -22,6 +22,6 @@ import java.io.Serializable;
  * @author woemler
  */
 public interface GeneData extends Data {
-	<T extends Gene<I>, I extends Serializable> I getGeneId();
-	<T extends Gene<I>, I extends Serializable> void setGeneMetadata(T gene);
+	<T extends Gene, I extends Serializable> I getGeneId();
+	<T extends Gene, I extends Serializable> void setGeneMetadata(T gene);
 }

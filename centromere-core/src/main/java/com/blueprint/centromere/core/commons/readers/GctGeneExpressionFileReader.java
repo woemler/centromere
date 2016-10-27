@@ -98,7 +98,7 @@ public class GctGeneExpressionFileReader<T extends GeneExpression<?>>
 				if (sampleMap.containsKey(this.getHeaders().get(i))){
 					sample = sampleMap.get(this.getHeaders().get(i));
 				} else {
-					List<Sample> samples = sampleRepository.guessSample(this.getHeaders().get(i));
+					List<Sample> samples = sampleRepository.guess(this.getHeaders().get(i));
 					if (samples != null && !samples.isEmpty()){
 						sample = samples.get(0);
 						sampleMap.put(this.getHeaders().get(i), sample);
@@ -139,10 +139,10 @@ public class GctGeneExpressionFileReader<T extends GeneExpression<?>>
 		if (b.length > 1){
 			List<Gene> genes = null;
 			if (!b[0].equals("")){
-				genes = geneRepository.guessGene(b[0]);
+				genes = geneRepository.guess(b[0]);
 			}
 			if (genes == null || genes.isEmpty()){
-				genes = geneRepository.guessGene(b[1]);
+				genes = geneRepository.guess(b[1]);
 			}
 			if (genes.size() > 0){
 				gene = genes.get(0);

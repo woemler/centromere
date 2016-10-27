@@ -16,12 +16,17 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-import com.blueprint.centromere.core.model.Ignored;
-import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.AbstractModel;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.MappedSuperclass;
-import java.io.Serializable;
-import java.util.Collection;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Model representation of an individual organism, such as a clinical subject or model animal.  A 
@@ -30,20 +35,31 @@ import java.util.Collection;
  * 
  * @author woemler
  */
-@MappedSuperclass
-public abstract class Subject<ID extends Serializable> implements Model<ID>, Attributes, SimpleAliases {
+@Entity
+@Document
+public class Subject extends AbstractModel implements Attributes {
 	
+	//@Id @GeneratedValue private Long id;
 	private String name;
-	
 	private String species;
-	
 	private String gender;
-	
-	@Ignored
 	private String notes;
-
-	abstract public Collection<?> getSampleIds();
 	
+	@ElementCollection(fetch = FetchType.EAGER) private List<String> aliases = new ArrayList<>();
+	@ElementCollection(fetch = FetchType.EAGER) private Map<String, String> attributes = new HashMap<>();
+	
+	@OneToMany(targetEntity = Sample.class, mappedBy = "subjectId")
+	private List<Long> sampleIds = new ArrayList<>();
+
+//	@Override 
+//	public Long getId() {
+//		return id;
+//	}
+//
+//	public void setId(Long id) {
+//		this.id = id;
+//	}
+
 	public String getName() {
 		return name;
 	}
@@ -75,4 +91,53 @@ public abstract class Subject<ID extends Serializable> implements Model<ID>, Att
 	public void setNotes(String notes) {
 		this.notes = notes;
 	}
+
+	public List<String> getAliases() {
+		return aliases;
+	}
+
+	public void setAliases(List<String> aliases) {
+		this.aliases = aliases;
+	}
+
+	@Override public Map<String, String> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(Map<String, String> attributes) {
+		this.attributes = attributes;
+	}
+
+	public List<Long> getSampleIds() {
+		return sampleIds;
+	}
+
+	public void setSampleIds(List<Long> sampleIds) {
+		this.sampleIds = sampleIds;
+	}
+
+	@Override
+	public void addAttribute(String name, String value) {
+		attributes.put(name, value);
+	}
+
+	@Override
+	public void addAttributes(Map<String, String> attributes) {
+		this.attributes.putAll(attributes);
+	}
+
+	@Override
+	public boolean hasAttribute(String name) {
+		return attributes.containsKey(name);
+	}
+
+	@Override
+	public String getAttribute(String name) {
+		return attributes.containsKey(name) ? attributes.get(name) : null;
+	}
+
+	public void addAlias(String alias){
+		if (!aliases.contains(alias)) this.aliases.add(alias);
+	}
+	
 }

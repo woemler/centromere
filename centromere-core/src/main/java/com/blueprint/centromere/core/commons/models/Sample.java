@@ -16,17 +16,10 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-import com.blueprint.centromere.core.model.Alias;
-import com.blueprint.centromere.core.model.Ignored;
-import com.blueprint.centromere.core.model.Model;
-
-import org.springframework.data.annotation.Id;
+import com.blueprint.centromere.core.model.AbstractModel;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.MappedSuperclass;
-import java.io.Serializable;
+import javax.persistence.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,25 +32,29 @@ import java.util.Map;
  */
 @Entity
 @Document
-public class Sample implements Model<Long>, Attributes {
+public class Sample extends AbstractModel implements Attributes {
 
-	@Id @GeneratedValue private Long id;
-	private Long subjectId;
+	//@Id @GeneratedValue private Long id;
+	//private Long subjectId;
 	private String name;
 	private String sampleType;
 	private String tissue;
 	private String histology;
 	private String notes;
-	private Map<String, String> attributes = new HashMap<>();
+	@ElementCollection(fetch = FetchType.EAGER) private Map<String, String> attributes = new HashMap<>();
+	
+	@ManyToOne(targetEntity = Subject.class)
+	@JoinColumn(name = "subjectId")
+	private Long subjectId;
 
-	@Override
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
+//	@Override
+//	public Long getId() {
+//		return id;
+//	}
+//
+//	public void setId(Long id) {
+//		this.id = id;
+//	}
 
 	public Long getSubjectId() {
 		return subjectId;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 William Oemler, Blueprint Medicines
+ * Copyright 2016 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.commons.testing;
+package com.blueprint.centromere.core.test.model;
 
 import com.blueprint.centromere.core.commons.models.Sample;
 
@@ -24,19 +24,18 @@ import java.util.List;
 /**
  * @author woemler
  */
-public class SampleDataGenerator<T extends Sample<?>> implements DummyDataGenerator<T> {
+public class SampleDataGenerator implements DummyDataGenerator<Sample> {
 	
-	public List<T> generateData(Class<T> type) throws Exception {
+	public List<Sample> generateData(Class<Sample> type) throws Exception {
 		
-		List<T> samples = new ArrayList<>();
+		List<Sample> samples = new ArrayList<>();
 		
-		T sample = type.newInstance();
+		Sample sample = type.newInstance();
 		sample.setName("SampleA");
 		sample.setTissue("Lung");
 		sample.setHistology("carcinoma");
 		sample.setSampleType("cell line");
 		sample.setNotes("This is an example sample.");
-		sample.addAlias("sample_a");
 		sample.addAttribute("tag", "tagA");
 		samples.add(sample);
 
@@ -46,7 +45,6 @@ public class SampleDataGenerator<T extends Sample<?>> implements DummyDataGenera
 		sample.setHistology("carcinoma");
 		sample.setSampleType("cell line");
 		sample.setNotes("This is an example sample.");
-		sample.addAlias("sample_b");
 		sample.addAttribute("tag", "tagB");
 		samples.add(sample);
 
@@ -56,7 +54,6 @@ public class SampleDataGenerator<T extends Sample<?>> implements DummyDataGenera
 		sample.setHistology("carcinoma: HCC");
 		sample.setSampleType("PDX");
 		sample.setNotes("This is an example sample.");
-		sample.addAlias("sample_c");
 		sample.addAttribute("tag", "tagA");
 		samples.add(sample);
 
@@ -66,7 +63,6 @@ public class SampleDataGenerator<T extends Sample<?>> implements DummyDataGenera
 		sample.setHistology("ductal carcinoma");
 		sample.setSampleType("cell line");
 		sample.setNotes("This is an example sample.");
-		sample.addAlias("sample_d");
 		sample.addAttribute("tag", "tagA");
 		samples.add(sample);
 
@@ -76,7 +72,6 @@ public class SampleDataGenerator<T extends Sample<?>> implements DummyDataGenera
 		sample.setHistology("ductal carcinoma");
 		sample.setSampleType("PDX");
 		sample.setNotes("This is an example sample.");
-		sample.addAlias("sample_e");
 		sample.addAttribute("tag", "tagB");
 		samples.add(sample);
 		

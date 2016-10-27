@@ -28,5 +28,5 @@ import java.util.List;
  */
 public interface DataOperations<T extends Model<?>> {
 	<S extends DataFile<I>, I extends Serializable> List<T> findByDataFileId(I dataFileId);
-	<S extends Sample<I>, I extends Serializable> List<T> findBySampleId(I sampleId);
+	<S extends Sample, I extends Serializable> List<T> findBySampleId(I sampleId);
 }

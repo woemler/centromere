@@ -26,5 +26,5 @@ import java.util.List;
  * @author woemler
  */
 public interface GenomicDataOperations<T extends Model<?>> extends DataOperations<T> {
-	<S extends Gene<I>, I extends Serializable> List<T> findByGeneId(I geneId);
+	<S extends Gene, I extends Serializable> List<T> findByGeneId(I geneId);
 }

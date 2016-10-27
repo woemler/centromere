@@ -16,11 +16,11 @@
 
 package com.blueprint.centromere.core.test;
 
+import com.blueprint.centromere.core.commons.models.Gene;
 import com.blueprint.centromere.core.dataimport.BasicImportOptions;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.RepositoryRecordWriter;
-import com.blueprint.centromere.core.test.model.Gene;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

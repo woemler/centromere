@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 William Oemler, Blueprint Medicines
+ * Copyright 2016 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.commons.repositories;
+package com.blueprint.centromere.core.test.model;
 
-import com.blueprint.centromere.core.commons.models.Sample;
-import com.blueprint.centromere.core.commons.models.Subject;
+import com.blueprint.centromere.core.model.Model;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author woemler
  */
-public interface SubjectOperations<T extends Subject<ID>, ID extends Serializable>
-		extends SimpleAliasOperations<T>, AttributeOperations<T> {
-	List<T> guessSubject(String keyword);
-	<S extends Sample<I>, I extends Serializable> T findBySampleId(I sampleId); 
+public interface DummyDataGenerator<T extends Model<?>> {
+	List<T> generateData(Class<T> type) throws Exception;
 }
