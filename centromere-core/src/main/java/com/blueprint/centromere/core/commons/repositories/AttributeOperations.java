@@ -16,7 +16,17 @@
 
 package com.blueprint.centromere.core.commons.repositories;
 
+import com.blueprint.centromere.core.commons.models.Gene;
 import com.blueprint.centromere.core.model.Model;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Ops;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.MapPath;
+import com.querydsl.core.types.dsl.PathBuilder;
+
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -24,6 +34,22 @@ import java.util.List;
  * @author woemler
  */
 public interface AttributeOperations<T extends Model> {
-	List<T> findByAttribute(String name, Object value);
-	List<T> findRecordsWithAttribute(String name);
+
+	default List<Gene> findWithAttribute(@Param("name") String name){
+		PathBuilder<Gene> pathBuilder = new PathBuilder<>(Gene.class, "gene");
+		MapPath<String, String, PathBuilder<String>> mapPath
+				= pathBuilder.getMap("attributes", String.class, String.class);
+		Predicate predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE, mapPath.containsKey(name));
+		return (List<Gene>) ((QueryDslPredicateExecutor) this).findAll(predicate);
+	}
+
+	default List<Gene> findByAttribute(@Param("name") String name, @Param("value") String value){
+		PathBuilder<Gene> pathBuilder = new PathBuilder<>(Gene.class, "gene");
+		MapPath<String, String, PathBuilder<String>> mapPath
+				= pathBuilder.getMap("attributes", String.class, String.class);
+		Expression<String> constant = Expressions.constant(value);
+		Predicate predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE, mapPath.get(name), constant);
+		return (List<Gene>) ((QueryDslPredicateExecutor) this).findAll(predicate);
+	}
+
 }

@@ -17,18 +17,52 @@
 package com.blueprint.centromere.core.commons.repositories;
 
 import com.blueprint.centromere.core.commons.models.Gene;
+import com.blueprint.centromere.core.repository.BaseRepository;
+import com.blueprint.centromere.core.repository.MetadataOperations;
 import com.blueprint.centromere.core.repository.RepositoryOperations;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Ops;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.MapPath;
+import com.querydsl.core.types.dsl.PathBuilder;
+
 import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.data.repository.query.Param;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author woemler
  */
 @NoRepositoryBean
-public interface GeneRepository<T extends Gene<ID>, ID extends Serializable> 
-		extends RepositoryOperations<T, ID>, GeneOperations<T, ID> {
-	List<T> findByPrimaryReferenceId(String primaryReferenceId);
-	List<T> findByPrimaryGeneSymbol(String primaryGeneSymbol);
+public interface GeneRepository extends
+		BaseRepository<Gene, Long>,
+		MetadataOperations<Gene, Long>,
+		AttributeOperations<Gene> {
+
+	List<Gene> findByPrimaryRefereneId(@Param("refId") String refId);
+	List<Gene> findByPrimaryGeneSymbol(@Param("symbol") String symbol);
+	List<Gene> findByAliases(@Param("alias") String alias);
+
+	default List<Gene> findByExternalReference(@Param("source") String source, @Param("value") String value){
+		PathBuilder<Gene> pathBuilder = new PathBuilder<>(Gene.class, "gene");
+		MapPath<String, String, PathBuilder<String>> mapPath
+				= pathBuilder.getMap("externalReferences", String.class, String.class);
+		Expression<String> constant = Expressions.constant(value);
+		Predicate predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE, mapPath.get(source), constant);
+		return (List<Gene>) this.findAll(predicate);
+	}
+
+	@Override
+	default Iterable<Gene> guess(String keyword){
+		List<Gene> genes = new ArrayList<>();
+		genes.addAll(findByPrimaryRefereneId(keyword));
+		genes.addAll(findByPrimaryGeneSymbol(keyword));
+		genes.addAll(findByAliases(keyword));
+		return genes;
+	}
+
 }
