@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 William Oemler, Blueprint Medicines
+ * Copyright 2016 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,27 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.model;
+package com.blueprint.centromere.core.ws;
 
-import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
-
-import java.lang.annotation.*;
+import com.blueprint.centromere.core.model.Filterable;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resource;
 
 /**
- * Allows field filtering during JSON serialization, XML marshalling, etc.
+ * Allows filtering of the 'links' attribute using {@link FilteringJackson2HttpMessageConverter}
  * 
  * @author woemler
  */
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@JacksonAnnotationsInside
-//@JsonFilter("fieldFilter") //TODO JsonFIlter handling for standard SDR endpoints
-@Inherited
-public @interface Filterable {
+@Filterable
+public class FilterableResource<T> extends Resource<T> {
+	
+	public FilterableResource(T content, Link... links) {
+		super(content, links);
+	}
+	
+	public FilterableResource(T content, Iterable<Link> links) {
+		super(content, links);
+	}
+	
 }

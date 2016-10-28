@@ -16,13 +16,16 @@
 
 package org.oncoblocks.centromere.web.config;
 
+import com.blueprint.centromere.core.config.DefaultConfigurations;
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
-import com.blueprint.centromere.core.config.DefaultConfigurations;
 import org.oncoblocks.centromere.web.controller.MappingCrudApiController;
 import org.oncoblocks.centromere.web.controller.MappingModelResourceAssembler;
 import org.oncoblocks.centromere.web.exceptions.RestExceptionHandler;
-import org.oncoblocks.centromere.web.util.*;
+import org.oncoblocks.centromere.web.util.ApiMediaTypes;
+import org.oncoblocks.centromere.web.util.CorsFilter;
+import org.oncoblocks.centromere.web.util.FilteringJackson2HttpMessageConverter;
+import org.oncoblocks.centromere.web.util.FilteringTextMessageConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +37,6 @@ import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
-import org.springframework.format.FormatterRegistry;
 import org.springframework.hateoas.config.EnableEntityLinks;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.http.MediaType;
@@ -118,12 +120,12 @@ public class WebServicesConfig extends WebMvcConfigurerAdapter {
 //		registry.addMapping(env.getRequiredProperty("centromere.api.antMatcherUrl"));
 //	}
 
-	@Override 
-	public void addFormatters(FormatterRegistry registry) {
-		registry.addConverter(new StringToAttributeConverter());
-		registry.addConverter(new StringToSourcedAliasConverter());
-		super.addFormatters(registry);
-	}
+//	@Override 
+//	public void addFormatters(FormatterRegistry registry) {
+//		registry.addConverter(new StringToAttributeConverter());
+//		registry.addConverter(new StringToSourcedAliasConverter());
+//		super.addFormatters(registry);
+//	}
 
 	@Bean
 	public EmbeddedServletContainerCustomizer servletContainerCustomizer(){
