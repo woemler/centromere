@@ -19,7 +19,7 @@ package com.blueprint.centromere.core.test;
 import com.blueprint.centromere.core.repository.Evaluation;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.core.repository.QueryCriteriaBuilder;
-import com.blueprint.centromere.core.repository.QueryParameterDescriptor;
+import com.blueprint.centromere.core.ws.QueryParameterDescriptor;
 import com.blueprint.centromere.core.util.QueryParameterUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;

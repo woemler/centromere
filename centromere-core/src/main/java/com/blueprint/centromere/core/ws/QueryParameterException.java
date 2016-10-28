@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 William Oemler, Blueprint Medicines
+ * Copyright 2016 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.repository;
+package com.blueprint.centromere.core.ws;
 
 /**
  * Generic exception to alert mishandling of query parameter generation, mapping, conversion, or 

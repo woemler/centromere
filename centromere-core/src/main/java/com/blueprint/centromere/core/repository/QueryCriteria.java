@@ -22,6 +22,7 @@ package com.blueprint.centromere.core.repository;
  * 
  * @author woemler
  */
+@Deprecated
 public class QueryCriteria {
 	
 	private String key;

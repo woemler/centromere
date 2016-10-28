@@ -19,7 +19,7 @@ package org.oncoblocks.centromere.web.test.controller;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import com.blueprint.centromere.core.repository.Evaluation;
-import com.blueprint.centromere.core.repository.QueryParameterDescriptor;
+import com.blueprint.centromere.core.ws.QueryParameterDescriptor;
 import com.blueprint.centromere.core.util.QueryParameterUtil;
 import org.oncoblocks.centromere.mongodb.commons.models.MongoGene;
 import org.oncoblocks.centromere.web.test.config.DefaultModelRegistryConfig;

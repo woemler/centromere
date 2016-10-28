@@ -25,7 +25,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import com.blueprint.centromere.core.commons.testing.EntrezGeneDataGenerator;
-import com.blueprint.centromere.core.repository.QueryParameterDescriptor;
+import com.blueprint.centromere.core.ws.QueryParameterDescriptor;
 import com.blueprint.centromere.core.util.QueryParameterUtil;
 import org.oncoblocks.centromere.mongodb.commons.models.MongoGene;
 import org.oncoblocks.centromere.mongodb.commons.repositories.MongoGeneRepository;

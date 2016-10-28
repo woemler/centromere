@@ -17,6 +17,8 @@
 package com.blueprint.centromere.core.repository;
 
 import com.google.common.collect.Iterables;
+
+import com.blueprint.centromere.core.ws.QueryParameterException;
 import com.querydsl.core.types.Predicate;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
