@@ -19,6 +19,8 @@ package com.blueprint.centromere.core.model;
 import com.fasterxml.uuid.EthernetAddress;
 import com.fasterxml.uuid.Generators;
 
+import org.springframework.data.rest.core.annotation.RestResource;
+
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import java.util.UUID;

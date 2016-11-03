@@ -14,9 +14,15 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.ws;
+package com.blueprint.centromere.core.ws.config;
 
+import com.blueprint.centromere.core.model.AbstractModel;
+import com.blueprint.centromere.core.ws.ModelController;
+
+import org.apache.log4j.spi.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -39,29 +45,34 @@ import java.util.List;
 public class SpringWebCustomization {
 	
 	@Configuration
-	@ComponentScan(basePackageClasses = { SpringDataRestCustomConfig.class })
+	@ComponentScan(basePackageClasses = { ModelController.class })
 	@PropertySources({
 			@PropertySource({"classpath:centromere-defaults.properties"}),
 			@PropertySource(value = {"classpath:centromere.properties"},ignoreResourceNotFound = true)
 	})
 	public static class WebServicesConfig {
+
+		@Bean
+		public SpringDataRestCustomConfig springDataRestCustomConfig(){
+			return new SpringDataRestCustomConfig();
+		}
+
 	}
-	
-	@Component
+
 	public static class SpringDataRestCustomConfig extends RepositoryRestConfigurerAdapter {
 		
 		@Autowired private Environment env;
+		private static final Logger logger = org.slf4j.LoggerFactory.getLogger(SpringDataRestCustomConfig.class);
 
 		@Override 
 		public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
 			config.setBasePath(env.getRequiredProperty("centromere.api.root-url"));
 			config.setReturnBodyForPutAndPost(true);
+			config.exposeIdsFor(AbstractModel.class);
 		}
 
 		@Override
 		public void configureHttpMessageConverters(List<HttpMessageConverter<?>> converters) {
-
-			super.configureHttpMessageConverters(converters);
 			
 			FilteringJackson2HttpMessageConverter jsonConverter
 					= new FilteringJackson2HttpMessageConverter();
@@ -75,6 +86,8 @@ public class SpringWebCustomization {
 					new FilteringTextMessageConverter(new MediaType("text", "plain", Charset.forName("utf-8")));
 			filteringTextMessageConverter.setDelimiter("\t");
 			converters.add(filteringTextMessageConverter);
+
+			super.configureHttpMessageConverters(converters);
 			
 		}
 	}

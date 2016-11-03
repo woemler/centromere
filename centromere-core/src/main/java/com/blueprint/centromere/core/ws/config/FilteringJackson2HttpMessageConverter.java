@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.ws;
+package com.blueprint.centromere.core.ws.config;
 
+import com.blueprint.centromere.core.ws.ResponseEnvelope;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,7 +33,7 @@ import java.lang.reflect.Type;
 import java.util.Set;
 
 /**
- * Uses {@link ResponseEnvelope} to identify filterable entities and 
+ * Uses {@link ResponseEnvelope} to identify filterable entities and
  *   filters or includes fields based upon request parameters.
  * 
  * @author woemler 

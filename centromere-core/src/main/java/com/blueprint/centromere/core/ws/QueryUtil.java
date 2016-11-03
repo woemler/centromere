@@ -16,10 +16,14 @@
 
 package com.blueprint.centromere.core.ws;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+
 import com.blueprint.centromere.core.repository.Evaluation;
 import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.ListPath;
 import com.querydsl.core.types.dsl.MapPath;
 import com.querydsl.core.types.dsl.PathBuilder;
@@ -36,16 +40,19 @@ import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
+ * Utility methods for generating repository queries from web service query requests.
+ *
  * @author woemler
  */
 public class QueryUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(QueryUtil.class);
+    private static final List<Ops> collectionParamOps = Arrays.asList(Ops.EQ, Ops.NE,
+            Ops.EQ_IGNORE_CASE, Ops.IN, Ops.NOT_IN, Ops.BETWEEN);
 
     public static <T> QueryParameterDescriptors getAvailableQueryParameters(Class<T> model) {
 
@@ -116,7 +123,7 @@ public class QueryUtil {
                     Path objPath = pathBuilder.get(fieldName, type.getObjectType());
                     descriptors.add(new QueryParameterDescriptor(fieldName, objPath, type, Ops.EQ));
                 }
-//
+
             }
             current = current.getSuperclass();
         }
@@ -124,22 +131,100 @@ public class QueryUtil {
                 descriptors.getDescriptors().size(), model.getName()));
         return descriptors;
     }
-    
+
+    /**
+     * Creates a {@link Predicate} from a submitted query string parameter and its associated
+     *   {@link QueryParameterDescriptor}. Uses submitted {@link ConversionService}.
+     *
+     * @param name
+     * @param value
+     * @param descriptor
+     * @param conversionService
+     * @return
+     */
+    @SuppressWarnings("unchecked")
     public static Predicate getParameterPredicate(String name, String value,
                                                   QueryParameterDescriptor descriptor,
                                                   ConversionService conversionService){
+
         Predicate predicate = null;
-        // determine if value is single object or array
-        // determine type to convert value to
-        // convert value
-        // determine type of path in descriptor
-        // create predicate based on path and value type
+
+        TypeDescriptor targetType = null;
+        if (descriptor.getType().isCollection()){
+            targetType = descriptor.getType().getElementTypeDescriptor();
+        } else if (descriptor.getType().isMap()){
+            targetType = descriptor.getType().getMapValueTypeDescriptor();
+        } else {
+            targetType = descriptor.getType();
+        }
+
+        // Multiple values submitted
+        if (value.contains(",")){
+
+            List<Object> params = new ArrayList<>();
+            for (String s: Splitter.on(",").trimResults().omitEmptyStrings().split(value)){
+                params.add(convertParameter(s, targetType, conversionService));
+            }
+
+            if (!collectionParamOps.contains(descriptor.getOperation())){
+                throw new QueryParameterException(String.format("Query parameter mismatch.  Target" +
+                        " query operation %s does not accept multiple values are arguments: %s",
+                        descriptor.getOperation().toString(), value));
+            }
+
+            Ops operation = descriptor.getOperation();
+            if (operation.equals(Ops.EQ) || operation.equals(Ops.EQ_IGNORE_CASE)) operation = Ops.IN;
+            if (operation.equals(Ops.NE)) operation = Ops.NOT_IN;
+
+            if (descriptor.getType().isMap() && descriptor.getPath() instanceof MapPath){
+                predicate = getMapPathPredicate(name, params, operation, (MapPath) descriptor.getPath());
+            } else if (descriptor.getType().isCollection() && descriptor.getPath() instanceof ListPath){
+                predicate = Expressions.predicate(operation, ((ListPath) descriptor.getPath()).any(),
+                        Expressions.constant(params));
+            } else {
+                predicate = Expressions.predicate(operation, descriptor.getPath(),
+                        Expressions.constant(params));
+            }
+
+        }
+        // single value
+        else {
+            Object param = convertParameter(value, targetType, conversionService);
+            if (descriptor.getType().isMap() && descriptor.getPath() instanceof MapPath){
+                predicate = getMapPathPredicate(name, param, descriptor.getOperation(),
+                        (MapPath) descriptor.getPath());
+            } else if (descriptor.getType().isCollection() && descriptor.getPath() instanceof ListPath){
+                predicate = Expressions.predicate(descriptor.getOperation(),
+                        ((ListPath) descriptor.getPath()).any(), Expressions.constant(param));
+            } else {
+                predicate = Expressions.predicate(descriptor.getOperation(), descriptor.getPath(),
+                        Expressions.constant(param));
+            }
+        }
+
         return predicate;
     }
 
+    /**
+     * Creates a {@link Predicate} from a submitted query string parameter and its associated
+     *   {@link QueryParameterDescriptor}.  Uses new {@link DefaultConversionService}.
+     *
+     * @param name
+     * @param value
+     * @param descriptor
+     * @return
+     */
     public static Predicate getParameterPredicate(String name, String value,
                                                   QueryParameterDescriptor descriptor) {
         return getParameterPredicate(name, value, descriptor, new DefaultConversionService());
+    }
+
+    private static Predicate getMapPathPredicate(String name, Object value, Ops operation,
+                                                 MapPath<String,?,?> path){
+        List<String> b = Lists.newArrayList(
+                Splitter.on(".").trimResults().omitEmptyStrings().split(name));
+        String key = b.get(b.size()-1);
+        return Expressions.predicate(operation, path.get(key), Expressions.constant(value));
     }
 
     /**
@@ -149,10 +234,10 @@ public class QueryUtil {
      * @param type
      * @return
      */
-    private static Object convertParameter(Object param, Class<?> type, ConversionService conversionService){
-        if (conversionService.canConvert(param.getClass(), type)){
+    private static Object convertParameter(String param, TypeDescriptor type, ConversionService conversionService){
+        if (conversionService.canConvert(TypeDescriptor.valueOf(String.class), type)){
             try {
-                return conversionService.convert(param, type);
+                return conversionService.convert(param, TypeDescriptor.valueOf(String.class), type);
             } catch (ConversionFailedException e){
                 e.printStackTrace();
                 throw new RuntimeException("Unable to convert parameter string to " + type.getName());
@@ -163,26 +248,11 @@ public class QueryUtil {
     }
 
     /**
-     * {@link QueryUtil#convertParameter(Object, Class, ConversionService)}
+     * {@link #convertParameter(String, TypeDescriptor, ConversionService)}  }
      */
-    private static Object convertParameter(Object param, Class<?> type){
+    private static Object convertParameter(String param, TypeDescriptor type){
         ConversionService conversionService = new DefaultConversionService();
         return convertParameter(param, type, conversionService);
-    }
-
-    /**
-     * Converts an array of objects into the appropriate type defined by the model field being queried
-     *
-     * @param params
-     * @param type
-     * @return
-     */
-    private static List<Object> convertParameterArray(Object[] params, Class<?> type){
-        List<Object> objects = new ArrayList<>();
-        for (Object param: params){
-            objects.add(convertParameter(param, type));
-        }
-        return objects;
     }
 
 }

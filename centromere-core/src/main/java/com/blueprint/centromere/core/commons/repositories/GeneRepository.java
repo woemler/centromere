@@ -55,11 +55,26 @@ public interface GeneRepository extends
 
 	@Override
 	default List<Gene> guess(@Param("keyword") String keyword){
+
 		List<Gene> genes = new ArrayList<>();
-		genes.addAll(findByPrimaryReferenceId(keyword));
-		genes.addAll(findByPrimaryGeneSymbol(keyword));
-		genes.addAll(findByAliases(keyword));
+
+		PathBuilder<Gene> pathBuilder = new PathBuilder<>(Gene.class, "gene");
+		Expression constant = Expressions.constant(keyword);
+
+		Predicate predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE,
+				pathBuilder.getString("primaryReferenceId"), constant);
+		genes.addAll((List<Gene>) findAll(predicate));
+
+		predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE,
+				pathBuilder.getString("primaryGeneSymbol"), constant);
+		genes.addAll((List<Gene>) findAll(predicate));
+
+		predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE,
+				pathBuilder.getList("aliases", String.class).any(), constant);
+		genes.addAll((List<Gene>) findAll(predicate));
+
 		return genes;
+
 	}
 
 }

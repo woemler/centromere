@@ -17,6 +17,8 @@
 package com.blueprint.centromere.core.ws;
 
 import com.blueprint.centromere.core.model.Filterable;
+import com.blueprint.centromere.core.ws.config.FilteringJackson2HttpMessageConverter;
+
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 

@@ -35,7 +35,7 @@ public interface SubjectRepository
 	
 	List<Subject> findByName(@Param("name") String name);
 	List<Subject> findBySpecies(@Param("species") String species);
-	Subject findOneBySampleIds(@Param("sampleId") Long sampleId);
+	//Subject findOneBySamples(@Param("sampleId") Long sampleId);
 	
 	@Override
 	default List<Subject> guess(@Param("keyword") String keyword){

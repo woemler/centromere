@@ -16,6 +16,7 @@
 
 package com.blueprint.centromere.core.ws;
 
+import com.blueprint.centromere.core.ws.config.FilteringJackson2HttpMessageConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.HashSet;
@@ -23,7 +24,7 @@ import java.util.Set;
 
 /**
  * Wrapper for GET request responses to allow for field filtering via 
- *   {@link com.blueprint.centromere.core.ws.FilteringJackson2HttpMessageConverter}
+ *   {@link FilteringJackson2HttpMessageConverter}
  * 
  * @author woemler 
  */

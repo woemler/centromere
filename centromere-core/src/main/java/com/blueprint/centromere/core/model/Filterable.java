@@ -17,6 +17,7 @@
 package com.blueprint.centromere.core.model;
 
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
+import com.fasterxml.jackson.annotation.JsonFilter;
 
 import java.lang.annotation.*;
 

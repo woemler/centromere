@@ -38,7 +38,7 @@ public class ModelConverterTests {
 	
 	@Test
 	public void jsonConverterTest() throws Exception {
-		String json = "{\"entrezGeneId\": 1, \"primaryGeneSymbol\": \"ABC\", \"taxId\": 9606}";
+		String json = "{\"primaryReferenceId\": 1, \"primaryGeneSymbol\": \"ABC\", \"taxId\": 9606}";
 		JsonModelConverter converter = new JsonModelConverter(Gene.class);
 		Gene gene = (Gene) converter.convert(json);
 		Assert.notNull(gene);
@@ -49,7 +49,7 @@ public class ModelConverterTests {
 	
 	@Test
 	public void badJsonConversiontest() throws Exception {
-		String json = "{\"entrezGeneId\": 1, \"primaryGeneSymbol\": \"ABC\", \"badField\": 0}";
+		String json = "{\"primaryReferenceId\": 1, \"primaryGeneSymbol\": \"ABC\", \"badField\": 0}";
 		JsonModelConverter converter = new JsonModelConverter(new ObjectMapper(), Gene.class);
 		Gene gene = (Gene) converter.convert(json);
 		Assert.isNull(gene);
@@ -58,7 +58,7 @@ public class ModelConverterTests {
 	@Test
 	public void mapConversionTest() throws Exception {
 		Map<String, String> map = new HashMap<>();
-		map.put("entrezGeneId", "1");
+		map.put("primaryReferenceId", "1");
 		map.put("primaryGeneSymbol", "ABC");
 		map.put("taxId", "9606");
 		KeyValueMapModelConverter converter = new KeyValueMapModelConverter(Gene.class);
@@ -72,7 +72,7 @@ public class ModelConverterTests {
 	@Test
 	public void badMapConversionTest() throws Exception {
 		Map<String, String> map = new HashMap<>();
-		map.put("entrezGeneId", "1");
+		map.put("primaryReferenceId", "1");
 		map.put("primaryGeneSymbol", "ABC");
 		map.put("badField", "0");
 		KeyValueMapModelConverter converter = new KeyValueMapModelConverter(new ObjectMapper(), Gene.class);

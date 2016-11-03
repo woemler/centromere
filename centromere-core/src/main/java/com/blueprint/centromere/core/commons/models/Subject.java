@@ -19,6 +19,7 @@ package com.blueprint.centromere.core.commons.models;
 import com.blueprint.centromere.core.model.AbstractModel;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -39,7 +40,6 @@ import java.util.Map;
 @Document
 public class Subject extends AbstractModel implements Attributes {
 	
-	//@Id @GeneratedValue private Long id;
 	private String name;
 	private String species;
 	private String gender;
@@ -48,17 +48,8 @@ public class Subject extends AbstractModel implements Attributes {
 	@ElementCollection(fetch = FetchType.EAGER) private List<String> aliases = new ArrayList<>();
 	@ElementCollection(fetch = FetchType.EAGER) private Map<String, String> attributes = new HashMap<>();
 	
-	@OneToMany(targetEntity = Sample.class, mappedBy = "subjectId")
-	private List<Long> sampleIds = new ArrayList<>();
-
-//	@Override 
-//	public Long getId() {
-//		return id;
-//	}
-//
-//	public void setId(Long id) {
-//		this.id = id;
-//	}
+	@OneToMany(mappedBy = "subject", cascade = CascadeType.ALL)
+	private List<Sample> samples = new ArrayList<>();
 
 	public String getName() {
 		return name;
@@ -108,12 +99,12 @@ public class Subject extends AbstractModel implements Attributes {
 		this.attributes = attributes;
 	}
 
-	public List<Long> getSampleIds() {
-		return sampleIds;
+	public List<Sample> getSamples() {
+		return samples;
 	}
 
-	public void setSampleIds(List<Long> sampleIds) {
-		this.sampleIds = sampleIds;
+	public void setSamples(List<Sample> samples) {
+		this.samples = samples;
 	}
 
 	@Override

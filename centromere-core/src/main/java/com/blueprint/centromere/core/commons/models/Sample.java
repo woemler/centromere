@@ -22,6 +22,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.persistence.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Model for representing a single biological sample taken from a {@link Subject} for experimentation.
@@ -34,7 +35,6 @@ import java.util.Map;
 @Document
 public class Sample extends AbstractModel implements Attributes {
 
-	//@Id @GeneratedValue private Long id;
 	//private Long subjectId;
 	private String name;
 	private String sampleType;
@@ -43,24 +43,26 @@ public class Sample extends AbstractModel implements Attributes {
 	private String notes;
 	@ElementCollection(fetch = FetchType.EAGER) private Map<String, String> attributes = new HashMap<>();
 	
-	@ManyToOne(targetEntity = Subject.class)
+	@ManyToOne
 	@JoinColumn(name = "subjectId")
-	private Long subjectId;
+	private Subject subject;
 
-//	@Override
-//	public Long getId() {
-//		return id;
-//	}
-//
-//	public void setId(Long id) {
-//		this.id = id;
-//	}
+	@Column(updatable = false, insertable = false)
+	private UUID subjectId;
 
-	public Long getSubjectId() {
+	public Subject getSubject() {
+		return subject;
+	}
+
+	public void setSubject(Subject subject) {
+		this.subject = subject;
+	}
+
+	public UUID getSubjectId() {
 		return subjectId;
 	}
 
-	public void setSubjectId(Long subjectId) {
+	public void setSubjectId(UUID subjectId) {
 		this.subjectId = subjectId;
 	}
 

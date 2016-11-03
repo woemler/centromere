@@ -22,6 +22,7 @@ import com.blueprint.centromere.core.ws.QueryParameterException;
 import com.querydsl.core.types.Predicate;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -42,8 +43,9 @@ public interface BaseRepository<T, ID extends Serializable>
 	}
 	
 	default Set<Object> distinct(String field){
+		Sort sort = new Sort(Sort.Direction.ASC, field);
 		HashSet<Object> distinct = new HashSet<>();
-		for (T obj: findAll()){
+		for (T obj: findAll(sort)){
 			BeanWrapper wrapper = new BeanWrapperImpl(obj);
 			if (!wrapper.isReadableProperty(field)){
 				throw new QueryParameterException(String.format("Submitted parameter is not valid entity field: %s", field));
@@ -55,7 +57,8 @@ public interface BaseRepository<T, ID extends Serializable>
 
 	default Set<Object> distinct(String field, Predicate predicate){
 		HashSet<Object> distinct = new HashSet<>();
-		for (T obj: findAll(predicate)){
+		Sort sort = new Sort(Sort.Direction.ASC, field);
+		for (T obj: findAll(predicate, sort)){
 			BeanWrapper wrapper = new BeanWrapperImpl(obj);
 			if (!wrapper.isReadableProperty(field)){
 				throw new QueryParameterException(String.format("Submitted parameter is not valid entity field: %s", field));
