@@ -23,6 +23,8 @@ import java.util.List;
 /**
  * @author woemler
  */
-public interface DummyDataGenerator<T extends Model<?>> {
-	List<T> generateData(Class<T> type) throws Exception;
+public class DummyDataGenerator {
+
+
+
 }

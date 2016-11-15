@@ -27,13 +27,13 @@ import java.util.List;
  * @author woemler
  * @since 0.4.3
  */
-public class EntrezGeneDataGenerator implements DummyDataGenerator<Gene> {
+public class EntrezGeneDataGenerator {
 	
-	public List<Gene> generateData(Class<Gene> type) throws Exception {
+	public static List<Gene> generateData() throws Exception {
 
 		List<Gene> genes = new ArrayList<>();
 		
-		Gene gene = type.newInstance();
+		Gene gene = new Gene();
 		gene.setPrimaryReferenceId("1");
 		gene.setPrimaryGeneSymbol("GeneA");
 		gene.setTaxId(9606);
@@ -44,7 +44,7 @@ public class EntrezGeneDataGenerator implements DummyDataGenerator<Gene> {
 		gene.addAlias("ABC");
 		genes.add(gene);
 
-		gene = type.newInstance();
+		gene = new Gene();
 		gene.setPrimaryReferenceId("2");
 		gene.setPrimaryGeneSymbol("GeneB");
 		gene.setTaxId(9606);
@@ -55,7 +55,7 @@ public class EntrezGeneDataGenerator implements DummyDataGenerator<Gene> {
 		gene.addAlias("DEF");
 		genes.add(gene);
 
-		gene = type.newInstance();
+		gene = new Gene();
 		gene.setPrimaryReferenceId("3");
 		gene.setPrimaryGeneSymbol("GeneC");
 		gene.setTaxId(9606);
@@ -66,7 +66,7 @@ public class EntrezGeneDataGenerator implements DummyDataGenerator<Gene> {
 		gene.addAlias("GHI");
 		genes.add(gene);
 		
-		gene = type.newInstance();
+		gene = new Gene();
 		gene.setPrimaryReferenceId("4");
 		gene.setPrimaryGeneSymbol("GeneD");
 		gene.setTaxId(9606);
@@ -77,7 +77,7 @@ public class EntrezGeneDataGenerator implements DummyDataGenerator<Gene> {
 		gene.addAlias("JKL");
 		genes.add(gene);
 		
-		gene = type.newInstance();
+		gene = new Gene();
 		gene.setPrimaryReferenceId("5");
 		gene.setPrimaryGeneSymbol("GeneE");
 		gene.setTaxId(9606);

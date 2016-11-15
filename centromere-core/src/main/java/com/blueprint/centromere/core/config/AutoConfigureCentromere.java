@@ -36,10 +36,7 @@ import java.lang.annotation.*;
 @Inherited
 @Configuration
 @ComponentScan(basePackages = { "org.oncoblocks.centromere.web.config" })
-@Import({ 
-		ProfileConfiguration.class
-})
-@ModelScan
+@Import({ ProfileConfiguration.class })
 public @interface AutoConfigureCentromere {
 
 	/**
@@ -60,10 +57,10 @@ public @interface AutoConfigureCentromere {
 	 */
 	Schema schema() default Schema.CUSTOM;
 	
-	@AliasFor(annotation = ModelScan.class, attribute = "basePackages")
+	@AliasFor(annotation = ComponentScan.class, attribute = "basePackages")
 	String[] basePackages() default {};
 	
-	@AliasFor(annotation = ModelScan.class, attribute = "modelClasses")
+	@AliasFor(annotation = ComponentScan.class, attribute = "modelClasses")
 	Class<? extends Model<?>>[] modelClasses() default {};
 	
 }

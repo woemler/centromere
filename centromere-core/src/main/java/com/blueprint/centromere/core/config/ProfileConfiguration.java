@@ -31,12 +31,12 @@ public class ProfileConfiguration {
 	public static class DefaultModelConfiguration extends ModelComponentRegistrationConfigurer {
 	}
 	
-	@Profile({ Profiles.SCHEMA_MONGODB_DEFAULT})
+	@Profile({ Profiles.SCHEMA_DEFAULT })
 	@Configuration
 	@ComponentScan(basePackages = { "org.oncoblocks.centromere.mongodb" },
 			includeFilters = @ComponentScan.Filter(type = FilterType.REGEX, 
-					pattern =  ".+?DefaultMongoRepositoryConfig.DefaultSpringDataConfig.*"), useDefaultFilters = false)
-	@ModelScan(basePackages = { "org.oncoblocks.centromere.mongodb.commons.models" })
+					pattern =  ".+?DefaultMongoRepositoryConfig.DefaultSpringDataConfig.*"),
+			useDefaultFilters = false)
 	public static class DefaultMongoDbConfiguration extends ModelComponentRegistrationConfigurer {
 		
 	}

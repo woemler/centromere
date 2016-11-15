@@ -16,12 +16,19 @@
 
 package com.blueprint.centromere.core.commons.models;
 
+import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Model;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Model representation of an annotated set of data, which may be compromised of multiple data types
@@ -29,19 +36,16 @@ import java.util.Collection;
  * 
  * @author woemler
  */
-@MappedSuperclass
-public abstract class DataSet<ID extends Serializable> implements Model<ID> {
+@Entity
+public class DataSet extends AbstractModel {
 	
 	private String name;
-	
 	private String source;
-	
 	private String version;
-	
-	@Ignored
 	private String description;
-	
-	abstract public Collection<?> getDataFileIds();
+
+	@OneToMany(mappedBy = "dataSet", cascade = CascadeType.ALL)
+	private List<DataFile> dataFiles = new ArrayList<>();
 
 	public String getName() {
 		return name;

@@ -22,8 +22,7 @@ package com.blueprint.centromere.core.config;
 public class Profiles {
 	
 	public static final String SCHEMA_CUSTOM = "schema_custom";
-	public static final String SCHEMA_MONGODB_DEFAULT = "schema_mongodb";
-	public static final String SCHEMA_MYSQL_DEFAULT = "schema_mysql";
+	public static final String SCHEMA_DEFAULT = "schema_default";
 
 	public static final String DB_CUSTOM = "db_custom";
 	public static final String DB_MONGODB = "db_mongodb";
@@ -42,13 +41,7 @@ public class Profiles {
 		if (schema.equals(Schema.CUSTOM)){
 			schemaProfile = SCHEMA_CUSTOM;
 		} else if (schema.equals(Schema.DEFAULT)){
-			if (database.equals(Database.MONGODB)) {
-				schemaProfile = SCHEMA_MONGODB_DEFAULT;
-			} else if (database.equals(Database.MYSQL)){
-				schemaProfile = SCHEMA_MYSQL_DEFAULT;
-			} else {
-				schemaProfile = SCHEMA_MONGODB_DEFAULT;
-			}
+			schemaProfile = SCHEMA_DEFAULT;
 		} else {
 			throw new ConfigurationException(String.format("The configured profiles are incompatible: database=%s  schema=%s",
 					database.toString(), schema.toString()));

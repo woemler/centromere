@@ -30,7 +30,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = {
 		AutoConfigSetup.DefaultAutoConfig.class
 })
-@ActiveProfiles({Profiles.SCHEMA_MONGODB_DEFAULT, Profiles.DB_MONGODB})
+@ActiveProfiles({Profiles.SCHEMA_DEFAULT, Profiles.DB_MONGODB})
 public class AutoConfigurationTests {
 	
 	@Test

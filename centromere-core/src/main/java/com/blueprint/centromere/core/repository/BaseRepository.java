@@ -18,6 +18,7 @@ package com.blueprint.centromere.core.repository;
 
 import com.google.common.collect.Iterables;
 
+import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.ws.QueryParameterException;
 import com.querydsl.core.types.Predicate;
 import org.springframework.beans.BeanWrapper;
@@ -35,7 +36,7 @@ import java.util.Set;
  * @author woemler
  */
 @NoRepositoryBean
-public interface BaseRepository<T, ID extends Serializable> 
+public interface BaseRepository<T extends Model<ID>, ID extends Serializable>
 		extends PagingAndSortingRepository<T, ID>, QueryDslPredicateExecutor<T> {
 	
 	default long count(Predicate predicate){

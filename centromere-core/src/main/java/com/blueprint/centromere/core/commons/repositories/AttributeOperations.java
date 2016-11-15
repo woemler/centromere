@@ -16,8 +16,11 @@
 
 package com.blueprint.centromere.core.commons.repositories;
 
-import com.blueprint.centromere.core.commons.models.Gene;
+import com.google.common.reflect.TypeResolver;
+import com.google.common.reflect.TypeToken;
+
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.ModelSupport;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.Predicate;
@@ -33,23 +36,29 @@ import java.util.List;
 /**
  * @author woemler
  */
-public interface AttributeOperations<T extends Model> {
+public interface AttributeOperations<T extends Model<?>> {
 
-	default List<Gene> findWithAttribute(@Param("name") String name){
-		PathBuilder<Gene> pathBuilder = new PathBuilder<>(Gene.class, "gene");
+	@SuppressWarnings("unchecked")
+	default List<T> findWithAttribute(@Param("name") String name){
+		TypeToken<T> type = new TypeToken<T>(getClass()) {};
+		Class<T> model = (Class<T>) type.getRawType();
+		PathBuilder<T> pathBuilder = new PathBuilder<>(model, model.getSimpleName().toLowerCase());
 		MapPath<String, String, PathBuilder<String>> mapPath
 				= pathBuilder.getMap("attributes", String.class, String.class);
 		Predicate predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE, mapPath.containsKey(name));
-		return (List<Gene>) ((QueryDslPredicateExecutor) this).findAll(predicate);
+		return (List<T>) ((QueryDslPredicateExecutor) this).findAll(predicate);
 	}
 
-	default List<Gene> findByAttribute(@Param("name") String name, @Param("value") String value){
-		PathBuilder<Gene> pathBuilder = new PathBuilder<>(Gene.class, "gene");
+	@SuppressWarnings("unchecked")
+	default List<T> findByAttribute(@Param("name") String name, @Param("value") String value){
+		TypeToken<T> type = new TypeToken<T>(getClass()) {};
+		Class<T> model = (Class<T>) type.getRawType();
+		PathBuilder<T> pathBuilder = new PathBuilder<>(model, model.getSimpleName().toLowerCase());
 		MapPath<String, String, PathBuilder<String>> mapPath
 				= pathBuilder.getMap("attributes", String.class, String.class);
 		Expression<String> constant = Expressions.constant(value);
 		Predicate predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE, mapPath.get(name), constant);
-		return (List<Gene>) ((QueryDslPredicateExecutor) this).findAll(predicate);
+		return (List<T>) ((QueryDslPredicateExecutor) this).findAll(predicate);
 	}
 
 }

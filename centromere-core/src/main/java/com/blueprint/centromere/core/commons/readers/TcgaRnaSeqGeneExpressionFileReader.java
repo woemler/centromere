@@ -44,16 +44,17 @@ import java.util.Map;
  * @author woemler
  * @since 0.4.3
  */
-public class TcgaRnaSeqGeneExpressionFileReader<T extends GeneExpression<?>> 
-		extends MultiRecordLineFileReader<T> 
-		implements InitializingBean, ImportOptionsAware, ModelSupport<T>, DataFileAware, SampleAware {
+public class TcgaRnaSeqGeneExpressionFileReader
+		extends MultiRecordLineFileReader<GeneExpression>
+		implements InitializingBean, ImportOptionsAware, ModelSupport<GeneExpression>,
+			DataFileAware, SampleAware {
 
 	private SampleRepository sampleRepository;
 	private GeneRepository geneRepository;
 	private BasicImportOptions options;
 	private DataFile dataFile;
 	private Map<String, Sample> sampleMap;
-	private Class<T> model;
+	private Class<GeneExpression> model;
 	
 	private static final Logger logger = LoggerFactory.getLogger(TcgaRnaSeqGeneExpressionFileReader.class);
 	
@@ -73,8 +74,8 @@ public class TcgaRnaSeqGeneExpressionFileReader<T extends GeneExpression<?>>
 	}
 
 	@Override 
-	protected List<T> getRecordsFromLine(String line) throws DataImportException {
-		List<T> records = new ArrayList<>();
+	protected List<GeneExpression> getRecordsFromLine(String line) throws DataImportException {
+		List<GeneExpression> records = new ArrayList<>();
 		String[] bits = line.trim().split(this.getDelimiter());
 		if (bits.length > 1){
 			Gene gene = getGene(bits[0]);
@@ -87,9 +88,9 @@ public class TcgaRnaSeqGeneExpressionFileReader<T extends GeneExpression<?>>
 				}
 			}
 			for (int i = 1; i < bits.length; i++){
-				T record;
+				GeneExpression record;
 				try {
-					record = this.getModel().newInstance();
+					record = new GeneExpression();
 				} catch (Exception e){
 					throw new DataImportException(String.format("Unable to create instance of model object: %s"
 							, model.getName()));
@@ -123,9 +124,9 @@ public class TcgaRnaSeqGeneExpressionFileReader<T extends GeneExpression<?>>
 						throw new DataImportException(String.format("Cannot parse value: %s", bits[i]));
 					}
 				}
-				record.setDataFileMetadata(dataFile);
-				record.setGeneMetadata(gene);
-				record.setSampleMetadata(sample);
+				record.setDataFile(dataFile);
+				record.setGene(gene);
+				record.setSample(sample);
 				records.add(record);
 			}
 			
@@ -183,12 +184,12 @@ public class TcgaRnaSeqGeneExpressionFileReader<T extends GeneExpression<?>>
 	}
 
 	@Override 
-	public Class<T> getModel() {
+	public Class<GeneExpression> getModel() {
 		return model;
 	}
 
 	@Override 
-	public void setModel(Class<T> model) {
+	public void setModel(Class<GeneExpression> model) {
 		this.model = model;
 	}
 

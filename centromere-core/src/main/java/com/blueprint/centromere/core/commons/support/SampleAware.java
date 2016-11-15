@@ -19,11 +19,11 @@ package com.blueprint.centromere.core.commons.support;
 import com.blueprint.centromere.core.commons.models.Sample;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author woemler
  */
-public interface SampleAware<T extends Sample> {
-	Collection<T> getSamples();
-	//void setSamples(Collection<T> samples);
+public interface SampleAware {
+	List<Sample> getSamples();
 }

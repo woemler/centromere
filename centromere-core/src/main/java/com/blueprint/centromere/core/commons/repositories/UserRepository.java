@@ -31,11 +31,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * @author woemler
+ * @since 0.5.0
  */
-@RepositoryRestResource(path = "users", collectionResourceRel = "users")
+@RepositoryRestResource(path = "users", collectionResourceRel = "users", exported = false)
 public interface UserRepository extends BaseRepository<User, Long>, UserDetailsService {
-	
-	@RestResource(exported = false)
+
 	@Override 
 	default User loadUserByUsername(String username) throws UsernameNotFoundException {
 		PathBuilder<User> pathBuilder = new PathBuilder<>(User.class, "user");

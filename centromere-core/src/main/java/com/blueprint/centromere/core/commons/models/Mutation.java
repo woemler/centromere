@@ -18,14 +18,18 @@ package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.Model;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
 
 /**
  * @author woemler
  */
-@MappedSuperclass
-public abstract class Mutation<ID extends Serializable> implements Model<ID> {
+@Entity
+@Document
+public class Mutation extends Data {
 	
 	private String chromosome;
 	private String referenceGenome;
@@ -39,5 +43,100 @@ public abstract class Mutation<ID extends Serializable> implements Model<ID> {
 	private String proteinChange;
 	private String mutationClassification;
 	private String mutationType;
-	
+
+	public String getChromosome() {
+		return chromosome;
+	}
+
+	public void setChromosome(String chromosome) {
+		this.chromosome = chromosome;
+	}
+
+	public String getReferenceGenome() {
+		return referenceGenome;
+	}
+
+	public void setReferenceGenome(String referenceGenome) {
+		this.referenceGenome = referenceGenome;
+	}
+
+	public String getStrand() {
+		return strand;
+	}
+
+	public void setStrand(String strand) {
+		this.strand = strand;
+	}
+
+	public Integer getStartPosition() {
+		return startPosition;
+	}
+
+	public void setStartPosition(Integer startPosition) {
+		this.startPosition = startPosition;
+	}
+
+	public Integer getStopPosition() {
+		return stopPosition;
+	}
+
+	public void setStopPosition(Integer stopPosition) {
+		this.stopPosition = stopPosition;
+	}
+
+	public String getReferenceAllele() {
+		return referenceAllele;
+	}
+
+	public void setReferenceAllele(String referenceAllele) {
+		this.referenceAllele = referenceAllele;
+	}
+
+	public String getAlternateAllele() {
+		return alternateAllele;
+	}
+
+	public void setAlternateAllele(String alternateAllele) {
+		this.alternateAllele = alternateAllele;
+	}
+
+	public String getcDnaChange() {
+		return cDnaChange;
+	}
+
+	public void setcDnaChange(String cDnaChange) {
+		this.cDnaChange = cDnaChange;
+	}
+
+	public String getCodonChange() {
+		return codonChange;
+	}
+
+	public void setCodonChange(String codonChange) {
+		this.codonChange = codonChange;
+	}
+
+	public String getProteinChange() {
+		return proteinChange;
+	}
+
+	public void setProteinChange(String proteinChange) {
+		this.proteinChange = proteinChange;
+	}
+
+	public String getMutationClassification() {
+		return mutationClassification;
+	}
+
+	public void setMutationClassification(String mutationClassification) {
+		this.mutationClassification = mutationClassification;
+	}
+
+	public String getMutationType() {
+		return mutationType;
+	}
+
+	public void setMutationType(String mutationType) {
+		this.mutationType = mutationType;
+	}
 }

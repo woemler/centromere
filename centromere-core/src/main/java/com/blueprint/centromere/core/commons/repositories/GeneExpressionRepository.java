@@ -17,15 +17,18 @@
 package com.blueprint.centromere.core.commons.repositories;
 
 import com.blueprint.centromere.core.commons.models.GeneExpression;
+import com.blueprint.centromere.core.repository.BaseRepository;
 import com.blueprint.centromere.core.repository.RepositoryOperations;
 import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * @author woemler
  */
-@NoRepositoryBean
-public interface GeneExpressionRepository<T extends GeneExpression<ID>, ID extends Serializable> 
-		extends RepositoryOperations<T, ID>, GenomicDataOperations<T> {
+@RepositoryRestResource(path = "expression")
+public interface GeneExpressionRepository extends BaseRepository<GeneExpression, UUID>,
+		DataOperations<GeneExpression> {
 }

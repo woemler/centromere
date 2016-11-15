@@ -20,6 +20,8 @@ import com.blueprint.centromere.core.commons.models.Sample;
 import com.blueprint.centromere.core.commons.models.Subject;
 import com.blueprint.centromere.core.commons.repositories.SampleRepository;
 import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
+import com.blueprint.centromere.core.test.model.SampleDataGenerator;
+import com.blueprint.centromere.core.test.model.SubjectDataGenerator;
 
 import org.hibernate.Hibernate;
 import org.junit.Before;
@@ -51,36 +53,18 @@ public class JpaRelationshipTests {
 		sampleRepository.deleteAll();
 		subjectRepository.deleteAll();
 
-		Subject subject = new Subject();
-		subject.setName("SubjectA");
-		subject.setAliases(Collections.singletonList("PatientA"));
-		subject.setGender("M");
-		subject.setSpecies("Human");
-		subject.setAttributes(Collections.singletonMap("isSmoker", "N"));
-		subjectRepository.save(subject);
+		List<Subject> subjects = SubjectDataGenerator.generateData();
+		subjectRepository.save(subjects);
 
-		Sample sample = new Sample();
-		sample.setName("A001");
-		sample.setSubject(subject);
-		sample.setSampleType("biopsy");
-		sample.setTissue("liver");
-		sample.setHistology("HCC");
-		sampleRepository.save(sample);
+		List<Sample> samples = SampleDataGenerator.generateData(subjects);
+		sampleRepository.save(samples);
 
-		sample = new Sample();
-		sample.setName("A002");
-		sample.setSubject(subject);
-		sample.setSampleType("biopsy");
-		sample.setTissue("skin");
-		sample.setHistology("normal");
-		sampleRepository.save(sample);
-		
 	}
 	
 	@Test
 	public void setupTest(){
-		Assert.isTrue(sampleRepository.count() == 2L);
-		Assert.isTrue(subjectRepository.count() == 1L);
+		Assert.isTrue(sampleRepository.count() == 5L);
+		Assert.isTrue(subjectRepository.count() == 5L);
 	}
 
 	@Test
@@ -88,7 +72,7 @@ public class JpaRelationshipTests {
 		List<Sample> samples = (List<Sample>) sampleRepository.findAll();
 		Assert.notNull(samples);
 		Assert.notEmpty(samples);
-		Assert.isTrue(samples.size() == 2L);
+		Assert.isTrue(samples.size() == 5L);
 		Sample sample = samples.get(0);
 		Assert.notNull(sample.getId());
 		Assert.notNull(sample.getSubjectId());

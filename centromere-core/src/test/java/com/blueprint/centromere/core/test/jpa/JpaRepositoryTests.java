@@ -57,7 +57,7 @@ public class JpaRepositoryTests {
 	@Before
 	public void setup() throws Exception {
 		geneRepository.deleteAll();
-		geneRepository.save(dataGenerator.generateData(Gene.class));
+		geneRepository.save(dataGenerator.generateData());
 	}
 
 	@Test

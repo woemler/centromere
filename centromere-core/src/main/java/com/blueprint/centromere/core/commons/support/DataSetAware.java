@@ -24,7 +24,7 @@ import com.blueprint.centromere.core.commons.models.DataSet;
  * 
  * @author woemler
  */
-public interface DataSetAware<T extends DataSet<?>> {
-	T getDataSet();
-	void setDataSet(T dataSet);
+public interface DataSetAware {
+	DataSet getDataSet();
+	void setDataSet(DataSet dataSet);
 }

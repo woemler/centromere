@@ -16,26 +16,39 @@
 
 package com.blueprint.centromere.core.commons.models;
 
+import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Alias;
 import com.blueprint.centromere.core.model.Model;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * @author woemler
  */
-@MappedSuperclass
-public abstract class DataFile<ID extends Serializable> implements Model<ID> {
+@Entity
+@Document
+public class DataFile extends AbstractModel {
 	
 	private String filePath;
-	@Alias("type") private String dataType;
+	private String dataType;
 	private Date dateCreated;
 	private Date dateUpdated;
-	
-	abstract public Object getDataSetId();
-	abstract public <S extends DataSet<?>> void setDataSetMetadata(S dataSet);
+
+	@ManyToOne
+	@JoinColumn(name = "dataSetId")
+	private DataSet dataSet;
+
+	@Column(updatable = false, insertable = false)
+	private UUID dataSetId;
 
 	public String getFilePath() {
 		return filePath;
@@ -67,5 +80,21 @@ public abstract class DataFile<ID extends Serializable> implements Model<ID> {
 
 	public void setDateUpdated(Date dateUpdated) {
 		this.dateUpdated = dateUpdated;
+	}
+
+	public DataSet getDataSet() {
+		return dataSet;
+	}
+
+	public void setDataSet(DataSet dataSet) {
+		this.dataSet = dataSet;
+	}
+
+	public UUID getDataSetId() {
+		return dataSetId;
+	}
+
+	public void setDataSetId(UUID dataSetId) {
+		this.dataSetId = dataSetId;
 	}
 }

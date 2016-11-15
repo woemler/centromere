@@ -17,14 +17,18 @@
 package com.blueprint.centromere.core.commons.repositories;
 
 
+import com.blueprint.centromere.core.model.Model;
+
 import org.springframework.data.repository.query.Param;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author woemler
+ * @since 0.5.0
  */
-public interface MetadataOperations<T, ID extends Serializable> {
+public interface MetadataOperations<T extends Model<UUID>> {
 	List<T> guess(@Param("keyword") String keyword);
 }

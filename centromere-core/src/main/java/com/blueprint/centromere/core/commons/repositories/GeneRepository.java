@@ -37,7 +37,7 @@ import java.util.UUID;
 @RepositoryRestResource(path = "genes", collectionResourceRel = "genes")
 public interface GeneRepository extends
 		BaseRepository<Gene, UUID>,
-		MetadataOperations<Gene, UUID>,
+		MetadataOperations<Gene>,
 		AttributeOperations<Gene> {
 
 	List<Gene> findByPrimaryReferenceId(@Param("refId") String refId);

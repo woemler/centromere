@@ -17,6 +17,8 @@
 package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
+
+import org.springframework.core.annotation.Order;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.*;
@@ -35,13 +37,15 @@ import java.util.UUID;
 @Document
 public class Sample extends AbstractModel implements Attributes {
 
-	//private Long subjectId;
 	private String name;
 	private String sampleType;
 	private String tissue;
 	private String histology;
 	private String notes;
-	@ElementCollection(fetch = FetchType.EAGER) private Map<String, String> attributes = new HashMap<>();
+
+	@ElementCollection(fetch = FetchType.EAGER)
+	@OrderColumn
+	private Map<String, String> attributes = new HashMap<>();
 	
 	@ManyToOne
 	@JoinColumn(name = "subjectId")

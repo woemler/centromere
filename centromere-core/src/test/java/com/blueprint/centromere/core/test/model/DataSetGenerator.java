@@ -24,42 +24,41 @@ import java.util.List;
 /**
  * @author woemler
  */
-public class DataSetGenerator<T extends DataSet<?>> implements DummyDataGenerator<T> {
+public class DataSetGenerator {
 
-	@Override 
-	public List<T> generateData(Class<T> type) throws Exception {
+	public static List<DataSet> generateData() throws Exception {
 		
-		List<T> dataSets = new ArrayList<>();
+		List<DataSet> dataSets = new ArrayList<>();
 		
-		T dataSet = type.newInstance();
+		DataSet dataSet = new DataSet();
 		dataSet.setName("DataSetA");
 		dataSet.setSource("Internal");
 		dataSet.setVersion("1.0");
 		dataSet.setDescription("This is an example data set.");
 		dataSets.add(dataSet);
 
-		dataSet = type.newInstance();
+		dataSet = new DataSet();
 		dataSet.setName("DataSetB");
 		dataSet.setSource("External");
 		dataSet.setVersion("1.0");
 		dataSet.setDescription("This is an example data set.");
 		dataSets.add(dataSet);
 
-		dataSet = type.newInstance();
+		dataSet = new DataSet();
 		dataSet.setName("DataSetC");
 		dataSet.setSource("Internal");
 		dataSet.setVersion("2.0");
 		dataSet.setDescription("This is an example data set.");
 		dataSets.add(dataSet);
 
-		dataSet = type.newInstance();
+		dataSet = new DataSet();
 		dataSet.setName("DataSetD");
 		dataSet.setSource("External");
 		dataSet.setVersion("1.0");
 		dataSet.setDescription("This is an example data set.");
 		dataSets.add(dataSet);
 
-		dataSet = type.newInstance();
+		dataSet = new DataSet();
 		dataSet.setName("DataSetE");
 		dataSet.setSource("Internal");
 		dataSet.setVersion("1.0");

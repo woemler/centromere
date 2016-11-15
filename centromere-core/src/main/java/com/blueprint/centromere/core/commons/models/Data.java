@@ -16,16 +16,89 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-import java.io.Serializable;
+import com.blueprint.centromere.core.model.AbstractModel;
+
+import java.util.UUID;
+
+import javax.persistence.Column;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
 
 /**
  * 
  * @author woemler
  * @since 0.4.3
  */
-public interface Data {
-	<T extends DataFile<I>, I extends Serializable> I getDataFileId();
-	<T extends DataFile<I>, I extends Serializable> void setDataFileMetadata(T dataFile);
-	<T extends Sample, I extends Serializable> I getSampleId();
-	<T extends Sample, I extends Serializable> void setSampleMetadata(T sample);
+@MappedSuperclass
+public abstract class Data extends AbstractModel {
+
+	@ManyToOne
+	@JoinColumn(name = "sampleId")
+	private Sample sample;
+
+	@Column(updatable = false, insertable = false)
+	private UUID sampleId;
+
+	@ManyToOne
+	@JoinColumn(name = "dataFileId")
+	private DataFile dataFile;
+
+	@Column(updatable = false, insertable = false)
+	private UUID dataFileId;
+
+	@ManyToOne
+	@JoinColumn(name = "geneId")
+	private Gene gene;
+
+	@Column(updatable = false, insertable = false)
+	private UUID geneId;
+
+	public Sample getSample() {
+		return sample;
+	}
+
+	public void setSample(Sample sample) {
+		this.sample = sample;
+	}
+
+	public UUID getSampleId() {
+		return sampleId;
+	}
+
+	public void setSampleId(UUID sampleId) {
+		this.sampleId = sampleId;
+	}
+
+	public DataFile getDataFile() {
+		return dataFile;
+	}
+
+	public void setDataFile(DataFile dataFile) {
+		this.dataFile = dataFile;
+	}
+
+	public UUID getDataFileId() {
+		return dataFileId;
+	}
+
+	public void setDataFileId(UUID dataFileId) {
+		this.dataFileId = dataFileId;
+	}
+
+	public Gene getGene() {
+		return gene;
+	}
+
+	public void setGene(Gene gene) {
+		this.gene = gene;
+	}
+
+	public UUID getGeneId() {
+		return geneId;
+	}
+
+	public void setGeneId(UUID geneId) {
+		this.geneId = geneId;
+	}
 }

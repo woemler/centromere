@@ -18,8 +18,12 @@ package com.blueprint.centromere.core.config;
 
 /**
  * @author woemler
+ * @since 0.5.0
  */
 public enum Database {
-	CUSTOM, MONGODB, MYSQL;
+	CUSTOM,
+	MONGODB,
+	MYSQL
+	;
 	
 }

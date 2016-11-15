@@ -23,21 +23,22 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author woemler
  */
 @RepositoryRestResource(path = "samples", collectionResourceRel = "samples")
 public interface SampleRepository extends 
-		BaseRepository<Sample, Long>, 
-		MetadataOperations<Sample, Long>,
+		BaseRepository<Sample, UUID>,
+		MetadataOperations<Sample>,
 		AttributeOperations<Sample> {
 	
 	List<Sample> findByName(@Param("name") String name);
 	List<Sample> findBySampleType(@Param("type") String sampleType);
 	List<Sample> findByTissue(@Param("tissue") String tissue);
 	List<Sample> findByHistology(@Param("histology") String histology);
-	List<Sample> findBySubjectId(@Param("subjectId") Long subjectId);
+	List<Sample> findBySubjectId(@Param("subjectId") UUID subjectId);
 	
 	@Override
 	default List<Sample> guess(@Param("keyword") String keyword){

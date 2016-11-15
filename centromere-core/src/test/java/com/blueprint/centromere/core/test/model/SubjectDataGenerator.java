@@ -24,13 +24,13 @@ import java.util.List;
 /**
  * @author woemler
  */
-public class SubjectDataGenerator implements DummyDataGenerator<Subject> {
+public class SubjectDataGenerator {
 
-	public List<Subject> generateData(Class<Subject> type) throws Exception {
+	public static List<Subject> generateData() throws Exception {
 		
 		List<Subject> subjects = new ArrayList<>();
 		
-		Subject subject = type.newInstance();
+		Subject subject = new Subject();
 		subject.setName("SubjectA");
 		subject.setSpecies("Human");
 		subject.setGender("M");
@@ -39,7 +39,7 @@ public class SubjectDataGenerator implements DummyDataGenerator<Subject> {
 		subject.addAttribute("tag", "tagA");
 		subjects.add(subject);
 
-		subject = type.newInstance();
+		subject = new Subject();
 		subject.setName("SubjectB");
 		subject.setSpecies("Human");
 		subject.setGender("F");
@@ -48,7 +48,7 @@ public class SubjectDataGenerator implements DummyDataGenerator<Subject> {
 		subject.addAttribute("tag", "tagA");
 		subjects.add(subject);
 
-		subject = type.newInstance();
+		subject = new Subject();
 		subject.setName("SubjectC");
 		subject.setSpecies("Mouse");
 		subject.setGender("M");
@@ -57,7 +57,7 @@ public class SubjectDataGenerator implements DummyDataGenerator<Subject> {
 		subject.addAttribute("tag", "tagB");
 		subjects.add(subject);
 
-		subject = type.newInstance();
+		subject = new Subject();
 		subject.setName("SubjectD");
 		subject.setSpecies("Human");
 		subject.setGender("U");
@@ -66,7 +66,7 @@ public class SubjectDataGenerator implements DummyDataGenerator<Subject> {
 		subject.addAttribute("tag", "tagB");
 		subjects.add(subject);
 
-		subject = type.newInstance();
+		subject = new Subject();
 		subject.setName("SubjectE");
 		subject.setSpecies("Mouse");
 		subject.setGender("F");

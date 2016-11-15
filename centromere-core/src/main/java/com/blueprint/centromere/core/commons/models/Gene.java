@@ -32,7 +32,6 @@ import java.util.Map;
 @Document
 public class Gene extends AbstractModel implements Attributes {
 
-	//@Id @GeneratedValue private Long id;
 	private String primaryReferenceId;
 	private String primaryGeneSymbol;
 	private Integer taxId;
@@ -43,22 +42,19 @@ public class Gene extends AbstractModel implements Attributes {
 	private String referenceSource;
 
 	@ElementCollection(fetch = FetchType.EAGER)
+	//@CollectionTable(name = "GeneAliases", joinColumns = @JoinColumn(name = "GeneId"))
+	@OrderColumn
 	private List<String> aliases = new ArrayList<>();
 
 	@ElementCollection(fetch = FetchType.EAGER)
+	//@CollectionTable(name = "GeneAttributes")
+	@OrderColumn
 	private Map<String, String> attributes = new HashMap<>();
 
 	@ElementCollection(fetch = FetchType.EAGER)
+	//@CollectionTable(name = "GeneExternalResources")
+	@OrderColumn
 	private Map<String, String> externalReferences = new HashMap<>();
-
-//	@Override
-//	public Long getId() {
-//		return id;
-//	}
-//
-//	public void setId(Long id) {
-//		this.id = id;
-//	}
 
 	public String getPrimaryReferenceId() {
 		return primaryReferenceId;

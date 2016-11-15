@@ -23,19 +23,19 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author woemler
  */
 @RepositoryRestResource(path = "subjects", collectionResourceRel = "subjects")
 public interface SubjectRepository
-		extends BaseRepository<Subject, Long>,
-		MetadataOperations<Subject, Long>,
+		extends BaseRepository<Subject, UUID>,
+		MetadataOperations<Subject>,
  		AttributeOperations<Subject> {
 	
 	List<Subject> findByName(@Param("name") String name);
 	List<Subject> findBySpecies(@Param("species") String species);
-	//Subject findOneBySamples(@Param("sampleId") Long sampleId);
 	
 	@Override
 	default List<Subject> guess(@Param("keyword") String keyword){

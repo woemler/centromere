@@ -17,6 +17,9 @@
 package com.blueprint.centromere.core.test.model;
 
 import com.blueprint.centromere.core.commons.models.DataFile;
+import com.blueprint.centromere.core.commons.models.DataSet;
+
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,46 +28,52 @@ import java.util.List;
 /**
  * @author woemler
  */
-public class DataFileGenerator<T extends DataFile<?>> implements DummyDataGenerator<T> {
+public class DataFileGenerator {
 
-	@Override 
-	public List<T> generateData(Class<T> type) throws Exception {
+	public static List<DataFile> generateData(List<DataSet> dataSets) throws Exception {
+
+		Assert.isTrue(dataSets.size() > 1);
+
+		List<DataFile> dataFiles = new ArrayList<>();
 		
-		List<T> dataFiles = new ArrayList<>();
-		
-		T dataFile = type.newInstance();
+		DataFile dataFile = new DataFile();
 		dataFile.setFilePath("/path/to/fileA");
 		dataFile.setDataType("GCT RNA-Seq gene expression");
 		dataFile.setDateCreated(new Date());
 		dataFile.setDateUpdated(new Date());
+		dataFile.setDataSet(dataSets.get(0));
 		dataFiles.add(dataFile);
 
-		dataFile = type.newInstance();
+		dataFile = new DataFile();
 		dataFile.setFilePath("/path/to/fileB");
 		dataFile.setDataType("GCT RNA-Seq transcript expression");
 		dataFile.setDateCreated(new Date());
 		dataFile.setDateUpdated(new Date());
+		dataFile.setDataSet(dataSets.get(0));
 		dataFiles.add(dataFile);
 
-		dataFile = type.newInstance();
+		dataFile = new DataFile();
 		dataFile.setFilePath("/path/to/fileC");
 		dataFile.setDataType("MAF mutations");
 		dataFile.setDateCreated(new Date());
 		dataFile.setDateUpdated(new Date());
+		dataFile.setDataSet(dataSets.get(0));
 		dataFiles.add(dataFile);
 
-		dataFile = type.newInstance();
+		dataFile = new DataFile();
 		dataFile.setFilePath("/path/to/fileD");
 		dataFile.setDataType("Gene copy number");
 		dataFile.setDateCreated(new Date());
 		dataFile.setDateUpdated(new Date());
+		dataFile.setDataSet(dataSets.get(1));
 		dataFiles.add(dataFile);
 
-		dataFile = type.newInstance();
+		dataFile = new DataFile();
 		dataFile.setFilePath("/path/to/fileE");
 		dataFile.setDataType("Segment copy number");
 		dataFile.setDateCreated(new Date());
 		dataFile.setDateUpdated(new Date());
+		dataFile.setDataSet(dataSets.get(1));
 		dataFiles.add(dataFile);
 		
 		return dataFiles;

@@ -74,7 +74,7 @@ public class DefaultControllerTests {
 	public void setup() throws Exception {
 		mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
 		geneRepository.deleteAll();
-		geneRepository.save(dataGenerator.generateData(Gene.class));
+		geneRepository.save(dataGenerator.generateData());
 	}
 	
 	@Test

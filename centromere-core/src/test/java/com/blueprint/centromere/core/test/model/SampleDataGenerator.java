@@ -17,6 +17,9 @@
 package com.blueprint.centromere.core.test.model;
 
 import com.blueprint.centromere.core.commons.models.Sample;
+import com.blueprint.centromere.core.commons.models.Subject;
+
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,55 +27,62 @@ import java.util.List;
 /**
  * @author woemler
  */
-public class SampleDataGenerator implements DummyDataGenerator<Sample> {
+public class SampleDataGenerator {
 	
-	public List<Sample> generateData(Class<Sample> type) throws Exception {
-		
+	public static List<Sample> generateData(List<Subject> subjects) throws Exception {
+
+		Assert.isTrue(subjects.size() > 1);
+
 		List<Sample> samples = new ArrayList<>();
 		
-		Sample sample = type.newInstance();
+		Sample sample = new Sample();
 		sample.setName("SampleA");
 		sample.setTissue("Lung");
 		sample.setHistology("carcinoma");
 		sample.setSampleType("cell line");
 		sample.setNotes("This is an example sample.");
 		sample.addAttribute("tag", "tagA");
+		sample.setSubject(subjects.get(0));
 		samples.add(sample);
 
-		sample = type.newInstance();
+		sample = new Sample();
 		sample.setName("SampleB");
 		sample.setTissue("Liver");
 		sample.setHistology("carcinoma");
 		sample.setSampleType("cell line");
 		sample.setNotes("This is an example sample.");
 		sample.addAttribute("tag", "tagB");
+		sample.setSubject(subjects.get(0));
 		samples.add(sample);
 
-		sample = type.newInstance();
+		sample = new Sample();
 		sample.setName("SampleC");
 		sample.setTissue("Liver");
 		sample.setHistology("carcinoma: HCC");
 		sample.setSampleType("PDX");
 		sample.setNotes("This is an example sample.");
 		sample.addAttribute("tag", "tagA");
+		sample.setSubject(subjects.get(0));
 		samples.add(sample);
 
-		sample = type.newInstance();
+		sample = new Sample();
 		sample.setName("SampleD");
 		sample.setTissue("Breast");
 		sample.setHistology("ductal carcinoma");
 		sample.setSampleType("cell line");
 		sample.setNotes("This is an example sample.");
 		sample.addAttribute("tag", "tagA");
+		sample.setSubject(subjects.get(1));
 		samples.add(sample);
 
-		sample = type.newInstance();
+		sample = new Sample();
 		sample.setName("SampleE");
 		sample.setTissue("Breats");
 		sample.setHistology("ductal carcinoma");
 		sample.setSampleType("PDX");
 		sample.setNotes("This is an example sample.");
 		sample.addAttribute("tag", "tagB");
+		sample.setSubject(subjects.get(1));
 		samples.add(sample);
 		
 		return samples;

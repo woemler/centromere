@@ -16,8 +16,12 @@
 
 package com.blueprint.centromere.core.commons.models;
 
+import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Model;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
 
@@ -27,8 +31,9 @@ import java.io.Serializable;
  * 
  * @author woemler
  */
-@MappedSuperclass
-public abstract class Term<ID extends Serializable> implements Model<ID> {
+@Entity
+@Document
+public class Term extends AbstractModel {
 	
 	private String term;
 	private String source;

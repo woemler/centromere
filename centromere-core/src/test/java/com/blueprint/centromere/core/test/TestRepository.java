@@ -44,7 +44,7 @@ public class TestRepository implements RepositoryOperations<Gene, UUID> {
 	public TestRepository() {
 		geneMap = new HashMap<>();
 		try {
-			this.setGeneMap(dataGenerator.generateData(Gene.class));
+			this.setGeneMap(dataGenerator.generateData());
 		} catch (Exception e){
 			e.printStackTrace();
 		}

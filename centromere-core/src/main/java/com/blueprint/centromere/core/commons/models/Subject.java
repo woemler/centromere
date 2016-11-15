@@ -20,10 +20,14 @@ import com.blueprint.centromere.core.model.AbstractModel;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,8 +49,15 @@ public class Subject extends AbstractModel implements Attributes {
 	private String gender;
 	private String notes;
 	
-	@ElementCollection(fetch = FetchType.EAGER) private List<String> aliases = new ArrayList<>();
-	@ElementCollection(fetch = FetchType.EAGER) private Map<String, String> attributes = new HashMap<>();
+	@ElementCollection(fetch = FetchType.EAGER)
+	//@CollectionTable(name = "SubjectAliases", joinColumns = @JoinColumn(name = "SubjectId"))
+	@OrderColumn
+	private List<String> aliases = new ArrayList<>();
+
+	@ElementCollection(fetch = FetchType.EAGER)
+	//@CollectionTable(name = "SubjectAttributes")
+	@OrderColumn
+	private Map<String, String> attributes = new HashMap<>();
 	
 	@OneToMany(mappedBy = "subject", cascade = CascadeType.ALL)
 	private List<Sample> samples = new ArrayList<>();
