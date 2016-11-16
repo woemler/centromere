@@ -16,14 +16,13 @@
 
 package com.blueprint.centromere.core.test.jpa;
 
-import com.blueprint.centromere.core.commons.models.Sample;
-import com.blueprint.centromere.core.commons.models.Subject;
-import com.blueprint.centromere.core.commons.repositories.SampleRepository;
-import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
-import com.blueprint.centromere.core.test.model.SampleDataGenerator;
-import com.blueprint.centromere.core.test.model.SubjectDataGenerator;
-
-import org.hibernate.Hibernate;
+import com.blueprint.centromere.core.commons.models.*;
+import com.blueprint.centromere.core.commons.repositories.*;
+import com.blueprint.centromere.core.test.model.*;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Ops;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,9 +32,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author woemler
@@ -46,19 +43,36 @@ public class JpaRelationshipTests {
 	
 	@Autowired private SampleRepository sampleRepository;
 	@Autowired private SubjectRepository subjectRepository;
+	@Autowired private DataFileRepository dataFileRepository;
+	@Autowired private DataSetRepository dataSetRepository;
+	@Autowired private GeneRepository geneRepository;
+	@Autowired private GeneExpressionRepository geneExpressionRepository;
+	private boolean isConfigured = false;
 
 	@Before
 	public void setup() throws Exception {
-		
-		sampleRepository.deleteAll();
-		subjectRepository.deleteAll();
+		if (!isConfigured) {
+			sampleRepository.deleteAll();
+			subjectRepository.deleteAll();
+			dataFileRepository.deleteAll();
+			dataSetRepository.deleteAll();
+			geneRepository.deleteAll();
+			geneExpressionRepository.deleteAll();
 
-		List<Subject> subjects = SubjectDataGenerator.generateData();
-		subjectRepository.save(subjects);
-
-		List<Sample> samples = SampleDataGenerator.generateData(subjects);
-		sampleRepository.save(samples);
-
+			List<Subject> subjects = SubjectDataGenerator.generateData();
+			subjectRepository.save(subjects);
+			List<Sample> samples = SampleDataGenerator.generateData(subjects);
+			sampleRepository.save(samples);
+			List<Gene> genes = EntrezGeneDataGenerator.generateData();
+			geneRepository.save(genes);
+			List<DataSet> dataSets = DataSetGenerator.generateData();
+			dataSetRepository.save(dataSets);
+			List<DataFile> dataFiles = DataFileGenerator.generateData(dataSets);
+			dataFileRepository.save(dataFiles);
+			List<GeneExpression> data = ExpressionDataGenerator.generateData(samples, genes, dataFiles);
+			geneExpressionRepository.save(data);
+			isConfigured = true;
+		}
 	}
 	
 	@Test
@@ -95,7 +109,55 @@ public class JpaRelationshipTests {
 		Assert.notNull(sample.getId());
 		Assert.notNull(sample.getSubjectId());
 		Assert.isTrue(sample.getSubjectId().equals(subject.getId()));
-		
+	}
+	
+	@Test
+	public void queryByManyToOneRelationshipTest(){
+		PathBuilder<Sample> pathBuilder = new PathBuilder<>(Sample.class, "sample");
+		SimplePath<Subject> subjectPath = pathBuilder.getSimple("subject", Subject.class);
+		StringPath stringPath = Expressions.stringPath(subjectPath, "name");
+		Expression constant = Expressions.constant("SubjectB");
+		Predicate predicate = Expressions.predicate(Ops.EQ, stringPath, constant);
+		List<Sample> samples = (List<Sample>) sampleRepository.findAll(predicate);
+		Assert.notNull(samples);
+		Assert.notEmpty(samples);
+		Assert.isTrue(samples.size() == 2);
+		Sample sample = samples.get(0);
+		Assert.isTrue("SampleD".equals(sample.getName()));
+	}
+	
+	@Test
+	public void queryByOneToManyRelationshipTest(){
+		PathBuilder<Subject> pathBuilder = new PathBuilder<>(Subject.class, "subject");
+		CollectionPath<Sample, PathBuilder<Sample>> samplePath = pathBuilder.getCollection("samples", Sample.class);
+		StringPath stringPath = Expressions.stringPath(samplePath.any(), "tissue");
+		Expression constant = Expressions.constant("Breast");
+		Predicate predicate = Expressions.predicate(Ops.EQ, stringPath, constant);
+		List<Subject> subjects = (List<Subject>) subjectRepository.findAll(predicate);
+		Assert.notNull(subjects);
+		Assert.notEmpty(subjects);
+		Assert.isTrue(subjects.size() == 1);
+		Subject subject = subjects.get(0);
+		Assert.isTrue("SubjectB".equals(subject.getName()));
+	}
+	
+	@Test
+	public void findDataByDataSetTest(){
+		PathBuilder<GeneExpression> pathBuilder = new PathBuilder<>(GeneExpression.class, "geneExpression");
+		SimplePath<DataFile> dataFilePath = pathBuilder.getSimple("dataFile", DataFile.class);
+		SimplePath<DataSet> dataSetPath = Expressions.simplePath(DataSet.class, dataFilePath, "dataSet");
+		StringPath stringPath = Expressions.stringPath(dataSetPath, "source");
+		Expression constant = Expressions.constant("Internal");
+		Predicate predicate = Expressions.predicate(Ops.EQ, stringPath, constant);
+		List<GeneExpression> data = (List<GeneExpression>) geneExpressionRepository.findAll(predicate);
+		Assert.notNull(data);
+		Assert.notEmpty(data);
+		Assert.isTrue(data.size() == 6);
+		constant = Expressions.constant("External");
+		predicate = Expressions.predicate(Ops.EQ, stringPath, constant);
+		data = (List<GeneExpression>) geneExpressionRepository.findAll(predicate);
+		Assert.notNull(data);
+		Assert.isTrue(data.size() == 0);
 	}
 	
 }

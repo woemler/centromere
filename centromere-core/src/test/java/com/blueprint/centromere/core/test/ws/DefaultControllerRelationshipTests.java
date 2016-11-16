@@ -16,16 +16,11 @@
 
 package com.blueprint.centromere.core.test.ws;
 
-import com.blueprint.centromere.core.commons.models.Sample;
-import com.blueprint.centromere.core.commons.models.Subject;
-import com.blueprint.centromere.core.commons.repositories.SampleRepository;
-import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
+import com.blueprint.centromere.core.commons.models.*;
+import com.blueprint.centromere.core.commons.repositories.*;
 import com.blueprint.centromere.core.test.jpa.EmbeddedH2DataSourceConfig;
-import com.blueprint.centromere.core.test.model.SampleDataGenerator;
-import com.blueprint.centromere.core.test.model.SubjectDataGenerator;
+import com.blueprint.centromere.core.test.model.*;
 import com.blueprint.centromere.core.ws.config.SpringWebCustomization;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,16 +32,13 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -58,28 +50,48 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 @SpringBootTest(classes = {EmbeddedH2DataSourceConfig.class, RepositoryRestMvcConfiguration.class,
 		SpringWebCustomization.WebServicesConfig.class})
+@Transactional
 public class DefaultControllerRelationshipTests {
 
 	private static final String SUBJECT_URL = "/api/subjects";
 	private static final String SAMPLE_URL = "/api/samples";
+	private static final String GENE_EXP_URL = "/api/geneexpression";
 
 	@Autowired private WebApplicationContext context;
-	@Autowired private SubjectRepository subjectRepository;
 	@Autowired private SampleRepository sampleRepository;
+	@Autowired private SubjectRepository subjectRepository;
+	@Autowired private DataFileRepository dataFileRepository;
+	@Autowired private DataSetRepository dataSetRepository;
+	@Autowired private GeneRepository geneRepository;
+	@Autowired private GeneExpressionRepository geneExpressionRepository;
 
 	private MockMvc mockMvc;
 
 	@Before
 	public void setup() throws Exception {
 		mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-		subjectRepository.deleteAll();
 		sampleRepository.deleteAll();
+		subjectRepository.deleteAll();
+		dataFileRepository.deleteAll();
+		dataSetRepository.deleteAll();
+		geneRepository.deleteAll();
+		geneExpressionRepository.deleteAll();
+
 		List<Subject> subjects = SubjectDataGenerator.generateData();
 		subjectRepository.save(subjects);
 		List<Sample> samples = SampleDataGenerator.generateData(subjects);
 		sampleRepository.save(samples);
+		List<Gene> genes = EntrezGeneDataGenerator.generateData();
+		geneRepository.save(genes);
+		List<DataSet> dataSets = DataSetGenerator.generateData();
+		dataSetRepository.save(dataSets);
+		List<DataFile> dataFiles = DataFileGenerator.generateData(dataSets);
+		dataFileRepository.save(dataFiles);
+		List<GeneExpression> data = ExpressionDataGenerator.generateData(samples, genes, dataFiles);
+		geneExpressionRepository.save(data);
+			
 	}
-	
+
 	@Test
 	public void findAllSubjectsTest() throws Exception {
 		mockMvc.perform(get(SUBJECT_URL))
@@ -191,7 +203,6 @@ public class DefaultControllerRelationshipTests {
 
 	@Test
 	public void findSubjectFilteredRelatedSamplesTest() throws Exception {
-
 		mockMvc.perform(get(SUBJECT_URL + "?samples.tissue=Breast"))
 				.andExpect(status().isOk())
 				.andDo(MockMvcResultHandlers.print())
@@ -200,12 +211,10 @@ public class DefaultControllerRelationshipTests {
 				.andExpect(jsonPath("$._embedded.subjects", hasSize(1)))
 				.andExpect(jsonPath("$._embedded.subjects[0]", hasKey("name")))
 				.andExpect(jsonPath("$._embedded.subjects[0].name", is("SubjectB")));
-
 	}
 
 	@Test
 	public void findSamplesFilteredRelatedSubjectTest() throws Exception {
-
 		mockMvc.perform(get(SAMPLE_URL + "?subject.name=SubjectB"))
 				.andExpect(status().isOk())
 				.andDo(MockMvcResultHandlers.print())
@@ -214,7 +223,42 @@ public class DefaultControllerRelationshipTests {
 				.andExpect(jsonPath("$._embedded.samples", hasSize(2)))
 				.andExpect(jsonPath("$._embedded.samples[0]", hasKey("name")))
 				.andExpect(jsonPath("$._embedded.samples[0].name", is("SampleD")));
+	}
 
+	@Test
+	public void findAllDataTest() throws Exception {
+		mockMvc.perform(get(GENE_EXP_URL))
+				.andExpect(status().isOk())
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(jsonPath("$", hasKey("_embedded")))
+				.andExpect(jsonPath("$._embedded", hasKey("geneExpression")))
+				.andExpect(jsonPath("$._embedded.geneExpression", hasSize(6)))
+				.andExpect(jsonPath("$._embedded.geneExpression[0]", hasKey("value")))
+				.andExpect(jsonPath("$._embedded.geneExpression[0].value", is(1.23)));
+	}
+
+	@Test
+	public void findDataByGeneSymbol() throws Exception {
+		mockMvc.perform(get(GENE_EXP_URL + "?gene.primaryGeneSymbol=GeneB"))
+				.andExpect(status().isOk())
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(jsonPath("$", hasKey("_embedded")))
+				.andExpect(jsonPath("$._embedded", hasKey("geneExpression")))
+				.andExpect(jsonPath("$._embedded.geneExpression", hasSize(2)))
+				.andExpect(jsonPath("$._embedded.geneExpression[0]", hasKey("value")))
+				.andExpect(jsonPath("$._embedded.geneExpression[0].value", is(2.34)));
+	}
+
+	@Test
+	public void findDataBySubjectName() throws Exception {
+		mockMvc.perform(get(GENE_EXP_URL + "?sample.subject.name=SubjectA"))
+				.andExpect(status().isOk())
+				.andDo(MockMvcResultHandlers.print())
+				.andExpect(jsonPath("$", hasKey("_embedded")))
+				.andExpect(jsonPath("$._embedded", hasKey("geneExpression")))
+				.andExpect(jsonPath("$._embedded.geneExpression", hasSize(6)))
+				.andExpect(jsonPath("$._embedded.geneExpression[0]", hasKey("value")))
+				.andExpect(jsonPath("$._embedded.geneExpression[0].value", is(1.23)));
 	}
 
 }
