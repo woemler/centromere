@@ -77,7 +77,7 @@ public class SampleDataGenerator {
 
 		sample = new Sample();
 		sample.setName("SampleE");
-		sample.setTissue("Breats");
+		sample.setTissue("Breast");
 		sample.setHistology("ductal carcinoma");
 		sample.setSampleType("PDX");
 		sample.setNotes("This is an example sample.");

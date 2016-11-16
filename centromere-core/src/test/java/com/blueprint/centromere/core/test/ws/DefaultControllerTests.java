@@ -67,14 +67,13 @@ public class DefaultControllerTests {
 	@Autowired private GeneRepository geneRepository;
 	
 	private MockMvc mockMvc;
-	private EntrezGeneDataGenerator dataGenerator = new EntrezGeneDataGenerator();
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	
 	@Before
 	public void setup() throws Exception {
 		mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
 		geneRepository.deleteAll();
-		geneRepository.save(dataGenerator.generateData());
+		geneRepository.save(EntrezGeneDataGenerator.generateData());
 	}
 	
 	@Test
