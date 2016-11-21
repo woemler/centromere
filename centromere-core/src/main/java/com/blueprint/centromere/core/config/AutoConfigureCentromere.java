@@ -17,10 +17,13 @@
 package com.blueprint.centromere.core.config;
 
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.ws.config.SpringWebCustomization;
+
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AliasFor;
+import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 
 import java.lang.annotation.*;
 
@@ -36,7 +39,11 @@ import java.lang.annotation.*;
 @Inherited
 @Configuration
 @ComponentScan(basePackages = { "org.oncoblocks.centromere.web.config" })
-@Import({ ProfileConfiguration.class })
+@Import({
+		ProfileConfiguration.class,
+		RepositoryRestMvcConfiguration.class,
+		SpringWebCustomization.WebServicesConfig.class
+})
 public @interface AutoConfigureCentromere {
 
 	/**
@@ -60,7 +67,7 @@ public @interface AutoConfigureCentromere {
 	@AliasFor(annotation = ComponentScan.class, attribute = "basePackages")
 	String[] basePackages() default {};
 	
-	@AliasFor(annotation = ComponentScan.class, attribute = "modelClasses")
+	@AliasFor(annotation = ComponentScan.class, attribute = "basePackageClasses")
 	Class<? extends Model<?>>[] modelClasses() default {};
 	
 }

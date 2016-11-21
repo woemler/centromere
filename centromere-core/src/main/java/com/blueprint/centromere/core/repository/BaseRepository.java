@@ -20,16 +20,25 @@ import com.google.common.collect.Iterables;
 
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.ws.QueryParameterException;
+import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.ListPath;
+import com.querydsl.core.types.dsl.MapPath;
+import com.querydsl.core.types.dsl.StringPath;
+
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -37,7 +46,7 @@ import java.util.Set;
  */
 @NoRepositoryBean
 public interface BaseRepository<T extends Model<ID>, ID extends Serializable>
-		extends PagingAndSortingRepository<T, ID>, QueryDslPredicateExecutor<T> {
+		extends PagingAndSortingRepository<T, ID>, QueryDslPredicateExecutor<T>, QuerydslBinderCustomizer {
 	
 	default long count(Predicate predicate){
 		return Iterables.size(findAll(predicate));	
@@ -68,5 +77,19 @@ public interface BaseRepository<T extends Model<ID>, ID extends Serializable>
 		}
 		return distinct;
 	}
-	
+
+	@Override
+	default void customize(QuerydslBindings bindings, EntityPath entityPath){
+		bindings.bind(String.class).all((path, value) -> {
+			List<String> values = new ArrayList<>(value);
+			if (path instanceof MapPath) {
+				String[] bits = values.get(0).split(":"); //TODO allow for multiple values via 'in()'
+				return ((MapPath) path).get(bits[0]).eq(bits[1]);
+			} else if (path instanceof ListPath){
+				return ((ListPath) path).any().in(values);
+			} else {
+				return ((StringPath) path).in(values);
+			}
+		});
+	}
 }

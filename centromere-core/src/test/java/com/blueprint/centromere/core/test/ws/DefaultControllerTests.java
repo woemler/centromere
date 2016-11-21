@@ -134,6 +134,25 @@ public class DefaultControllerTests {
 	}
 
 	@Test
+	public void findByMapElement() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?attributes=isKinase:Y"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasKey("_embedded")))
+				.andExpect(jsonPath("$._embedded", hasKey("genes")))
+				.andExpect(jsonPath("$._embedded.genes", hasSize(2)))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("primaryReferenceId")))
+				.andExpect(jsonPath("$._embedded.genes[0].primaryReferenceId", is("1")))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("aliases")))
+				.andExpect(jsonPath("$._embedded.genes[0].aliases", hasSize(1)))
+				.andExpect(jsonPath("$._embedded.genes[0].aliases[0]", is("ABC")))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("attributes")))
+				.andExpect(jsonPath("$._embedded.genes[0].attributes", hasKey("isKinase")))
+				.andExpect(jsonPath("$._embedded.genes[0].attributes.isKinase", is("Y")))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("_links")))
+				.andExpect(jsonPath("$._embedded.genes[0]._links", hasKey("self")));
+	}
+
+	@Test
 	public void findById() throws Exception {
 
 		List<Gene> genes = (List<Gene>) geneRepository.findAll();

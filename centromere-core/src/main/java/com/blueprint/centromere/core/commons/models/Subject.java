@@ -50,12 +50,10 @@ public class Subject extends AbstractModel implements Attributes {
 	private String notes;
 	
 	@ElementCollection(fetch = FetchType.EAGER)
-	//@CollectionTable(name = "SubjectAliases", joinColumns = @JoinColumn(name = "SubjectId"))
 	@OrderColumn
 	private List<String> aliases = new ArrayList<>();
 
 	@ElementCollection(fetch = FetchType.EAGER)
-	//@CollectionTable(name = "SubjectAttributes")
 	@OrderColumn
 	private Map<String, String> attributes = new HashMap<>();
 	

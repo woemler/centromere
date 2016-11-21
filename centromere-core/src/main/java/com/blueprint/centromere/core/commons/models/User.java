@@ -16,15 +16,21 @@
 
 package com.blueprint.centromere.core.commons.models;
 
+import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Model;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.OrderColumn;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -32,25 +38,20 @@ import java.util.List;
 /**
  * @author woemler
  */
-public class User implements Model<Long>, UserDetails {
+@Entity
+@Document
+public class User extends AbstractModel implements UserDetails {
 	
-	@Id @GeneratedValue private Long id;
 	private String username;
 	private String password;
 	private boolean accountNonExpired = true;
 	private boolean accountNonLocked = true;
 	private boolean enabled = false;
 	private boolean credentialsNonExpired = true;
-	@ElementCollection(fetch = FetchType.EAGER) private List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
-	@Override 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
+	@ElementCollection(fetch = FetchType.EAGER)
+	@OrderColumn
+	private List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
 	@Override 
 	public boolean isEnabled() {

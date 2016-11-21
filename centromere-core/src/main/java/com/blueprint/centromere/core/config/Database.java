@@ -23,7 +23,7 @@ package com.blueprint.centromere.core.config;
 public enum Database {
 	CUSTOM,
 	MONGODB,
-	MYSQL
+	JPA
 	;
 	
 }

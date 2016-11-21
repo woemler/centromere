@@ -26,7 +26,7 @@ public class Profiles {
 
 	public static final String DB_CUSTOM = "db_custom";
 	public static final String DB_MONGODB = "db_mongodb";
-	public static final String DB_MYSQL = "db_mysql";
+	public static final String DB_JPA = "db_jpa";
 
 	public static String[] getApplicationProfiles(Database database, Schema schema){
 		String dbProfile;
@@ -34,6 +34,9 @@ public class Profiles {
 		switch (database){
 			case MONGODB:
 				dbProfile = DB_MONGODB;
+				break;
+			case JPA:
+				dbProfile = DB_JPA;
 				break;
 			default:
 				dbProfile = DB_CUSTOM;
@@ -47,6 +50,10 @@ public class Profiles {
 					database.toString(), schema.toString()));
 		}
 		return new String[]{dbProfile, schemaProfile};
+	}
+
+	public static String[] getApplicationProfiles(AutoConfigureCentromere annotation){
+		return getApplicationProfiles(annotation.database(), annotation.schema());
 	}
 	
 }
