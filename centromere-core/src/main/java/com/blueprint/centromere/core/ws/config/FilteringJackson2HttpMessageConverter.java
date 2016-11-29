@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.ws.config;
 
-import com.blueprint.centromere.core.ws.ResponseEnvelope;
+import com.blueprint.centromere.core.ws.controller.ResponseEnvelope;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

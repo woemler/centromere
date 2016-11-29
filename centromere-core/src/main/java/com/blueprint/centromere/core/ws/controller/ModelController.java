@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.ws;
+package com.blueprint.centromere.core.ws.controller;
 
 import com.blueprint.centromere.core.commons.repositories.MetadataOperations;
 import com.blueprint.centromere.core.repository.BaseRepository;
+import com.blueprint.centromere.core.ws.QueryParameterDescriptor;
+import com.blueprint.centromere.core.ws.QueryParameterDescriptors;
+import com.blueprint.centromere.core.ws.QueryUtil;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 
@@ -49,7 +52,6 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.RequestMapping;

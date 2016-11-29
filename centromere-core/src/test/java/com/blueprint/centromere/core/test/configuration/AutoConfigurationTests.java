@@ -16,7 +16,8 @@
 
 package com.blueprint.centromere.core.test.configuration;
 
-import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.config.Database;
+import com.blueprint.centromere.core.config.Schema;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ActiveProfiles;
@@ -30,7 +31,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = {
 		AutoConfigSetup.DefaultAutoConfig.class
 })
-@ActiveProfiles({Profiles.SCHEMA_DEFAULT, Profiles.DB_MONGODB})
+@ActiveProfiles({Schema.DEFAULT_PROFILE, Database.MONGODB_PROFILE})
 public class AutoConfigurationTests {
 	
 	@Test

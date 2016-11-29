@@ -17,8 +17,8 @@
 package com.blueprint.centromere.core.ws.config;
 
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.ws.FilterableResource;
-import com.blueprint.centromere.core.ws.ResponseEnvelope;
+import com.blueprint.centromere.core.ws.controller.FilterableResource;
+import com.blueprint.centromere.core.ws.controller.ResponseEnvelope;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

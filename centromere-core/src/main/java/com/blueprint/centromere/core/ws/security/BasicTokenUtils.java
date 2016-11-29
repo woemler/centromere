@@ -135,6 +135,16 @@ public class BasicTokenUtils implements TokenOperations {
 	}
 
 	/**
+	 * Sets the token lifespan.
+	 * 
+	 * @param time
+	 */
+	public void setTokenLifespan(Long time){
+		Assert.notNull(time, "Token lifespan must not be null");
+		tokenLifespan = time;
+	}
+
+	/**
 	 * Creates a {@link TokenDetails} object, based upon submitted {@link UserDetails}.
 	 * 
 	 * @param userDetails

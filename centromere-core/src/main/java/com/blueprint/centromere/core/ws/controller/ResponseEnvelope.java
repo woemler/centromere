@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.ws;
+package com.blueprint.centromere.core.ws.controller;
 
 import com.blueprint.centromere.core.ws.config.FilteringJackson2HttpMessageConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;

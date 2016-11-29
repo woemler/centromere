@@ -18,11 +18,9 @@ package com.blueprint.centromere.core.config;
 
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.ws.config.SpringWebCustomization;
-
-import org.springframework.context.annotation.ComponentScan;
+import com.blueprint.centromere.core.ws.config.WebSecurityConfig;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.annotation.AliasFor;
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 
 import java.lang.annotation.*;
@@ -38,11 +36,11 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Inherited
 @Configuration
-@ComponentScan(basePackages = { "org.oncoblocks.centromere.web.config" })
 @Import({
 		ProfileConfiguration.class,
 		RepositoryRestMvcConfiguration.class,
-		SpringWebCustomization.WebServicesConfig.class
+		SpringWebCustomization.WebServicesConfig.class,
+		WebSecurityConfig.class
 })
 public @interface AutoConfigureCentromere {
 
@@ -57,8 +55,7 @@ public @interface AutoConfigureCentromere {
 	/**
 	 * Allows selection fo a default set of {@link Model} classes,
 	 *   which will be registered in the application.  Defaults to {@code CUSTOM}, which assumes that
-	 *   model registration will be handled by the user, or with the {@link #basePackages()} or 
-	 *   {@link #modelClasses()} methods.
+	 *   model creation and repository instantiation will be handled by the user.
 	 * 
 	 * @return
 	 */
@@ -72,10 +69,10 @@ public @interface AutoConfigureCentromere {
 	 */
 	Security webSecurity() default Security.NONE;
 	
-	@AliasFor(annotation = ComponentScan.class, attribute = "basePackages")
-	String[] basePackages() default {};
-	
-	@AliasFor(annotation = ComponentScan.class, attribute = "basePackageClasses")
-	Class<? extends Model<?>>[] modelClasses() default {};
+//	@AliasFor(annotation = ComponentScan.class, attribute = "basePackages")
+//	String[] basePackages() default {};
+//	
+//	@AliasFor(annotation = ComponentScan.class, attribute = "basePackageClasses")
+//	Class<? extends Model<?>>[] modelClasses() default {};
 	
 }

@@ -17,9 +17,8 @@
 package com.blueprint.centromere.core.ws.config;
 
 import com.blueprint.centromere.core.model.AbstractModel;
-import com.blueprint.centromere.core.ws.ModelController;
+import com.blueprint.centromere.core.ws.controller.ModelController;
 
-import org.apache.log4j.spi.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -33,7 +32,6 @@ import org.springframework.data.rest.webmvc.RestMediaTypes;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.stereotype.Component;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;

@@ -27,8 +27,7 @@ import org.springframework.context.annotation.Configuration;
 public class AutoConfigSetup {
 	
 	@Configuration
-	@AutoConfigureCentromere(database = Database.MONGODB, schema = Schema.DEFAULT, 
-			modelClasses = { ExampleModel.class })
+	@AutoConfigureCentromere(database = Database.MONGODB, schema = Schema.DEFAULT)
 	public static class DefaultAutoConfig {
 		
 	}
