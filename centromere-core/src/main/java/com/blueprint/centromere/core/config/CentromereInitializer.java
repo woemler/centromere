@@ -41,12 +41,13 @@ public class CentromereInitializer extends SpringBootServletInitializer {
         if (source.isAnnotationPresent(AutoConfigureCentromere.class)){
             AutoConfigureCentromere annotation = source.getAnnotation(AutoConfigureCentromere.class);
             String[] profiles = Profiles.getApplicationProfiles(annotation.database(),
-                    annotation.schema());
+                    annotation.schema(), annotation.webSecurity());
             springApplication.setAdditionalProfiles(profiles);
             logger.info(String.format("Running Centromere with profiles: %s", Arrays.asList(profiles)));
         } else {
             logger.info("Running Centromere with default profiles.");
         }
+
         springApplication.run(args);
     }
 

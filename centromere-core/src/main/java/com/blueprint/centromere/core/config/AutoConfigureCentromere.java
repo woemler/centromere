@@ -63,6 +63,14 @@ public @interface AutoConfigureCentromere {
 	 * @return
 	 */
 	Schema schema() default Schema.CUSTOM;
+
+	/**
+	 * Sets the level of security to be automaticaly configured within the web services context.
+	 *   Defaults to NONE, which is no security.
+	 *
+	 * @return
+	 */
+	Security webSecurity() default Security.NONE;
 	
 	@AliasFor(annotation = ComponentScan.class, attribute = "basePackages")
 	String[] basePackages() default {};

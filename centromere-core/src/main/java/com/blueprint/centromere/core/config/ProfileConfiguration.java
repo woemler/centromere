@@ -28,18 +28,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 public class ProfileConfiguration {
 	
-	@Profile({ "default", Profiles.SCHEMA_CUSTOM })
+	@Profile({ "default", Schema.CUSTOM_PROFILE })
 	@Configuration
 	public static class DefaultModelConfiguration {
 	}
-	
-	@Profile({ Profiles.SCHEMA_DEFAULT })
-	@Configuration
-	@ComponentScan(basePackages = { "com.blueprint.centromere.core.commons.models" })
-	public static class DefaultMongoDbConfiguration {
-	}
 
-	@Profile({ Profiles.DB_JPA ,Profiles.SCHEMA_DEFAULT })
+	@Profile({ Database.GENERIC_JPA_PROFILE, Schema.DEFAULT_PROFILE })
 	@Configuration
 	@EnableJpaRepositories(basePackages = { "com.blueprint.centromere.core.commons.repositories" })
 	@EnableTransactionManagement

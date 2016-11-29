@@ -20,40 +20,16 @@ package com.blueprint.centromere.core.config;
  * @author woemler
  */
 public class Profiles {
-	
-	public static final String SCHEMA_CUSTOM = "schema_custom";
-	public static final String SCHEMA_DEFAULT = "schema_default";
 
-	public static final String DB_CUSTOM = "db_custom";
-	public static final String DB_MONGODB = "db_mongodb";
-	public static final String DB_JPA = "db_jpa";
-
-	public static String[] getApplicationProfiles(Database database, Schema schema){
-		String dbProfile;
-		String schemaProfile;
-		switch (database){
-			case MONGODB:
-				dbProfile = DB_MONGODB;
-				break;
-			case JPA:
-				dbProfile = DB_JPA;
-				break;
-			default:
-				dbProfile = DB_CUSTOM;
-		}
-		if (schema.equals(Schema.CUSTOM)){
-			schemaProfile = SCHEMA_CUSTOM;
-		} else if (schema.equals(Schema.DEFAULT)){
-			schemaProfile = SCHEMA_DEFAULT;
-		} else {
-			throw new ConfigurationException(String.format("The configured profiles are incompatible: database=%s  schema=%s",
-					database.toString(), schema.toString()));
-		}
-		return new String[]{dbProfile, schemaProfile};
+	public static String[] getApplicationProfiles(Database database, Schema schema, Security security){
+		String dbProfile = Database.getProfile(database);
+		String schemaProfile = Schema.getProfile(schema);
+		String securityProfile = Security.getProfile(security);
+		return new String[]{dbProfile, schemaProfile, securityProfile};
 	}
 
 	public static String[] getApplicationProfiles(AutoConfigureCentromere annotation){
-		return getApplicationProfiles(annotation.database(), annotation.schema());
+		return getApplicationProfiles(annotation.database(), annotation.schema(), annotation.webSecurity());
 	}
 	
 }
