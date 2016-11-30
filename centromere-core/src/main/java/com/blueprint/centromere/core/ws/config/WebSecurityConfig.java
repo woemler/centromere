@@ -17,9 +17,7 @@
 package com.blueprint.centromere.core.ws.config;
 
 import com.blueprint.centromere.core.config.Security;
-import com.blueprint.centromere.core.ws.controller.UserAuthenticationController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.blueprint.centromere.core.ws.controller.SecurityControllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -43,15 +41,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity
-@ComponentScan(basePackageClasses = { UserAuthenticationController.class })
-//@Import({ DefaultConfigurations.DefaultCentromerePropertiesConfig.class })
-//@PropertySource(value = "classpath:centromere.properties", ignoreResourceNotFound = true)
+@ComponentScan(basePackageClasses = { SecurityControllers.class })
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
-    private static Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
-
-    @Autowired
-    private Environment env;
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -63,16 +54,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .passwordEncoder(new BCryptPasswordEncoder());
     }
 
-//    @Bean
-//    public BasicTokenUtils tokenUtils() {
-//        return new BasicTokenUtils(env.getRequiredProperty("centromere.security.token"));
-//    }
-//
-//    @Bean
-//    public AuthenticationTokenProcessingFilter authenticationTokenProcessingFilter() {
-//        return new AuthenticationTokenProcessingFilter(tokenUtils(), userService);
-//    }
-
     @Configuration
     @Order(1)
     @Profile({"default", Security.NONE_PROFILE})
@@ -80,10 +61,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         
         @Autowired private Environment env;
         
-//        @Autowired
-//        @SuppressWarnings("SpringJavaAutowiringInspection")
-//        AuthenticationTokenProcessingFilter authenticationTokenProcessingFilter;
-
         @Override
         protected void configure(HttpSecurity http) throws Exception {
 
@@ -115,10 +92,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public static class SecuredWriteTokenSecurityConfig extends TokenSecurityConfiguration {
 
         @Autowired private Environment env;
-
-//        @Autowired
-//        @SuppressWarnings("SpringJavaAutowiringInspection")
-//        AuthenticationTokenProcessingFilter authenticationTokenProcessingFilter;
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
@@ -152,10 +125,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         @Autowired private Environment env;
 
-//        @Autowired
-//        @SuppressWarnings("SpringJavaAutowiringInspection")
-//        AuthenticationTokenProcessingFilter authenticationTokenProcessingFilter;
-
         @Override
         protected void configure(HttpSecurity http) throws Exception {
 
@@ -180,7 +149,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         }
     }
-    
 
     @Configuration
     @Order(2)

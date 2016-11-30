@@ -18,7 +18,6 @@ package com.blueprint.centromere.core.ws.config;
 
 import com.blueprint.centromere.core.ws.security.AuthenticationTokenProcessingFilter;
 import com.blueprint.centromere.core.ws.security.BasicTokenUtils;
-import com.blueprint.centromere.core.ws.security.TokenOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,7 @@ public abstract class TokenSecurityConfiguration extends WebSecurityConfigurerAd
 	private Environment env;
 
 	@Bean
-	public TokenOperations tokenUtils() {
+	public BasicTokenUtils tokenUtils() {
 		BasicTokenUtils tokenUtils = new BasicTokenUtils(env.getRequiredProperty("centromere.security.token"));
 		tokenUtils.setTokenLifespan(getTokenLifespan());
 		return tokenUtils;
@@ -54,12 +53,13 @@ public abstract class TokenSecurityConfiguration extends WebSecurityConfigurerAd
 	}
 	
 	protected Long getTokenLifespan(){
-		Long lifespan = 1000L * 60 * 60 * 24; // one day
+		long hour = 1000L * 60 * 60;
+		Long lifespan = hour * 24; // one day
 		try {
-			lifespan = 1000L * 60 * 60 * Long.parseLong(env.getRequiredProperty("centromere.security.token-lifespan-hours"));
+			lifespan = hour * Long.parseLong(env.getRequiredProperty("centromere.security.token-lifespan-hours"));
 		} catch (NumberFormatException e){
 			try {
-				lifespan = 1000L * 60 * 60 * Long.parseLong(env.getRequiredProperty("centromere.security.token-lifespan-days"));
+				lifespan = hour * 24 * Long.parseLong(env.getRequiredProperty("centromere.security.token-lifespan-days"));
 			} catch (NumberFormatException ex){
 				logger.warn("[CENTROMERE] Token lifespan not properly configured.  Reverting to default configuration");
 			}

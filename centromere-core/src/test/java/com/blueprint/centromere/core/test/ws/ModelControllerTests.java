@@ -16,41 +16,28 @@
 
 package com.blueprint.centromere.core.test.ws;
 
-import com.blueprint.centromere.core.commons.models.Gene;
 import com.blueprint.centromere.core.commons.repositories.GeneRepository;
 import com.blueprint.centromere.core.test.jpa.EmbeddedH2DataSourceConfig;
 import com.blueprint.centromere.core.test.model.EntrezGeneDataGenerator;
 import com.blueprint.centromere.core.ws.config.SpringWebCustomization;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.blueprint.centromere.core.ws.config.WebSecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
-import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.List;
-import java.util.UUID;
-
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -59,30 +46,36 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@SpringBootTest(classes = {EmbeddedH2DataSourceConfig.class, RepositoryRestMvcConfiguration.class,
-		SpringWebCustomization.WebServicesConfig.class})
+@SpringBootTest(classes = {
+		EmbeddedH2DataSourceConfig.class, 
+		RepositoryRestMvcConfiguration.class,
+		SpringWebCustomization.WebServicesConfig.class,
+		WebSecurityConfig.class
+})
+@ActiveProfiles({ "default" })
 public class ModelControllerTests {
 	
 	private static final String BASE_URL = "/api/genes";
 	
 	@Autowired private WebApplicationContext context;
 	@Autowired private GeneRepository geneRepository;
-	
+
 	private MockMvc mockMvc;
-	private EntrezGeneDataGenerator dataGenerator = new EntrezGeneDataGenerator();
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	
 	@Before
 	public void setup() throws Exception {
-		mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+		mockMvc = MockMvcBuilders.webAppContextSetup(context)
+				.build();
 		geneRepository.deleteAll();
-		geneRepository.save(dataGenerator.generateData());
+		geneRepository.save(EntrezGeneDataGenerator.generateData());
 	}
 	
 	@Test
 	public void guessTest() throws Exception {
 		mockMvc.perform(get(BASE_URL + "/guess?keyword=abc"))
 				.andExpect(status().isOk())
+				.andDo(print())
 				.andExpect(jsonPath("$", hasKey("_embedded")))
 				.andExpect(jsonPath("$._embedded", hasKey("genes")))
 				.andExpect(jsonPath("$._embedded.genes", hasSize(1)))
@@ -96,6 +89,13 @@ public class ModelControllerTests {
 				.andExpect(jsonPath("$._embedded.genes[0].attributes.isKinase", is("Y")))
 				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("_links")))
 				.andExpect(jsonPath("$._embedded.genes[0]._links", hasKey("self")));
+	}
+	
+	@Test
+	public void distinctTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "/distinct?field=geneType"))
+				.andExpect(status().isOk())
+				.andDo(print());
 	}
 
 }

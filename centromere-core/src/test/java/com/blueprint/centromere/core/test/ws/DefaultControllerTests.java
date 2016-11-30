@@ -21,6 +21,7 @@ import com.blueprint.centromere.core.commons.repositories.GeneRepository;
 import com.blueprint.centromere.core.test.jpa.EmbeddedH2DataSourceConfig;
 import com.blueprint.centromere.core.test.model.EntrezGeneDataGenerator;
 import com.blueprint.centromere.core.ws.config.SpringWebCustomization;
+import com.blueprint.centromere.core.ws.config.WebSecurityConfig;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
@@ -57,8 +58,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@SpringBootTest(classes = {EmbeddedH2DataSourceConfig.class, RepositoryRestMvcConfiguration.class,
-		SpringWebCustomization.WebServicesConfig.class})
+@SpringBootTest(classes = {
+		EmbeddedH2DataSourceConfig.class, 
+		RepositoryRestMvcConfiguration.class,
+		SpringWebCustomization.WebServicesConfig.class,
+		WebSecurityConfig.class
+})
 public class DefaultControllerTests {
 	
 	private static final String BASE_URL = "/api/genes";

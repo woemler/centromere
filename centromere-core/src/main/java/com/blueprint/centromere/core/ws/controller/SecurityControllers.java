@@ -34,19 +34,23 @@ import org.springframework.web.bind.annotation.RequestMethod;
 /**
  * @author woemler
  */
-@Controller
-public class UserAuthenticationController {
+public class SecurityControllers {
 
-	@Autowired private BasicTokenUtils tokenUtils;
-	@Autowired private UserRepository userRepository;
-	private static final Logger logger = LoggerFactory.getLogger(UserAuthenticationController.class);
+	@Controller
+	public static class UserAuthenticationController {
 
-	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-	public ResponseEntity<TokenDetails> createToken(@AuthenticationPrincipal User user){
-		Assert.notNull(user, "Unable to authenticate user!");
-		TokenDetails tokenDetails = tokenUtils.createTokenAndDetails(user);
-		logger.info(String.format("Successfully generated authentication token for user: %s", user.getUsername()));
-		return new ResponseEntity<>(tokenDetails, HttpStatus.OK);
+		@Autowired private BasicTokenUtils tokenUtils;
+		@Autowired private UserRepository userRepository;
+		private static final Logger logger = LoggerFactory.getLogger(UserAuthenticationController.class);
+
+		@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+		public ResponseEntity<TokenDetails> createToken(@AuthenticationPrincipal User user){
+			Assert.notNull(user, "Unable to authenticate user!");
+			TokenDetails tokenDetails = tokenUtils.createTokenAndDetails(user);
+			logger.info(String.format("Successfully generated authentication token for user: %s", user.getUsername()));
+			return new ResponseEntity<>(tokenDetails, HttpStatus.OK);
+		}
+
 	}
 	
 }
