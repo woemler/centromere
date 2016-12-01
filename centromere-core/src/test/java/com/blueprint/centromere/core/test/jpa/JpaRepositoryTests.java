@@ -28,8 +28,6 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.ListPath;
 import com.querydsl.core.types.dsl.MapPath;
 import com.querydsl.core.types.dsl.PathBuilder;
-import com.querydsl.core.types.dsl.StringPath;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,6 +40,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -115,6 +114,7 @@ public class JpaRepositoryTests {
 		Assert.isTrue(count == 3L);
 	}
 
+	// gene.primaryGeneSymbol = 'GeneB'
 	@Test
 	public void findBySimpleCriteriaTest(){
 		
@@ -135,6 +135,29 @@ public class JpaRepositoryTests {
 
 	}
 
+	// gene.primaryGeneSymbol = 'GeneB,GeneD'
+	@Test
+	public void findByMultipleSimpleStringCriteriaTest(){
+
+		Path<Gene> entity = Expressions.path(model, model.getSimpleName().toLowerCase());
+		Path<String> attribute = Expressions.stringPath(entity, "primaryGeneSymbol");
+		//Expression<String> variable = Expressions.constant("GeneB");
+		Expression<List<String>> variable = Expressions.constant(Arrays.asList("GeneB", "GeneD")); 
+		Predicate predicate = Expressions.predicate(Ops.IN, attribute, variable);
+
+		List<Gene> genes = (List<Gene>) geneRepository.findAll(predicate);
+		Assert.notNull(genes);
+		Assert.notEmpty(genes);
+		Assert.isTrue(genes.size() == 2);
+
+		Gene gene = genes.get(1);
+		Assert.notNull(gene);
+		Assert.isTrue(gene.getPrimaryReferenceId().equals("4"));
+		Assert.isTrue("GeneD".equals(gene.getPrimaryGeneSymbol()));
+
+	}
+
+	// gene.geneType = 'protein-coding' && gene.chromosome = 5
 	@Test
 	public void findByMultipleCriteriaTest(){
 
@@ -160,6 +183,7 @@ public class JpaRepositoryTests {
 
 	}
 
+	// gene.aliases = 'DEF'
 	@Test
 	public void findByNestedArrayCriteriaTest(){
 
@@ -181,6 +205,7 @@ public class JpaRepositoryTests {
 
 	}
 
+	// gene.attributes.isKinase = 'Y'
 	@Test
 	public void findByNestedObjectCriteriaTest(){
 

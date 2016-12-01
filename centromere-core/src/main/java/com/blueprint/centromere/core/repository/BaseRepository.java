@@ -16,16 +16,15 @@
 
 package com.blueprint.centromere.core.repository;
 
-import com.google.common.collect.Iterables;
-
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.ws.QueryParameterException;
+import com.google.common.collect.Iterables;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.ListPath;
 import com.querydsl.core.types.dsl.MapPath;
+import com.querydsl.core.types.dsl.SimplePath;
 import com.querydsl.core.types.dsl.StringPath;
-
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Sort;
@@ -36,10 +35,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author woemler
@@ -79,17 +75,63 @@ public interface BaseRepository<T extends Model<ID>, ID extends Serializable>
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	default void customize(QuerydslBindings bindings, EntityPath entityPath){
-		bindings.bind(String.class).all((path, value) -> {
-			List<String> values = new ArrayList<>(value);
+		
+		bindings.bind(String.class).all((path, strings) -> {
+			List<Object> value = new ArrayList<>(strings);
+			List<String> values;
+			Object o = value.get(0); // only the first occurrence of a query parameter is accepted
 			if (path instanceof MapPath) {
-				String[] bits = values.get(0).split(":"); //TODO allow for multiple values via 'in()'
-				return ((MapPath) path).get(bits[0]).eq(bits[1]);
+				MapPath p = (MapPath) path;
+				if (o instanceof String){
+					String s = (String) o;
+					String key = s.split(":")[0];
+					values = Arrays.asList(s.split(":")[1].split(","));
+					if (values.size() > 1){
+						return p.get(key).in(values);
+					} else {
+						return p.get(key).eq(values.get(0));
+					}
+				} else {
+					throw new IllegalArgumentException("Cannot determine map key from non-string parameter object.");
+				}
 			} else if (path instanceof ListPath){
-				return ((ListPath) path).any().in(values);
+				ListPath p = (ListPath) path; 
+				if (o instanceof List){
+					List<Object> l = (List<Object>) o;
+					return p.any().in(l);
+				} else {
+					return p.any().in(o);
+				}
 			} else {
-				return ((StringPath) path).in(values);
+				if (o instanceof String){
+					String s = (String) o; 
+					StringPath p = (StringPath) path; 
+					values = Arrays.asList(s.split(","));
+					if (values.size() > 1){
+						return p.in(values);
+					} else {
+						String v = values.get(0);
+						if (v.startsWith("*")) {
+							v = "%" + v.replaceFirst("\\*", "") + "%";
+							return p.like(v);
+						} else if (v.startsWith("!*")){
+							v = "%" + v.replaceFirst("!\\*", "") + "%";
+							return p.notLike(v);
+						} else if (v.startsWith("!")){
+							v = v.replaceFirst("!", "");
+							return p.ne(v);
+						} else {
+							return p.eq(v); // defaults to equality test
+						}
+					}
+				} else {
+					return ((SimplePath) path).eq(o);
+				}
 			}
 		});
+		
 	}
+
 }

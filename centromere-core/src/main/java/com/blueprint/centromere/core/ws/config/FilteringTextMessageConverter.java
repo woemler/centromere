@@ -75,7 +75,7 @@ public class FilteringTextMessageConverter extends AbstractHttpMessageConverter<
 				|| Resources.class.equals(aClass)
 				|| PagedResources.class.equals(aClass)
 				|| ResourceSupport.class.equals(aClass)
-				|| Model.class.equals(aClass)
+				|| Model.class.isAssignableFrom(aClass)
 				|| ResponseEnvelope.class.equals(aClass);
 	}
 
