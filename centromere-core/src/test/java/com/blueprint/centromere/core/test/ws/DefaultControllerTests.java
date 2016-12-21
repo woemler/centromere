@@ -50,6 +50,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -99,9 +100,9 @@ public class DefaultControllerTests {
 				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("_links")))
 				.andExpect(jsonPath("$._embedded.genes[0]._links", hasKey("self")));
 	}
-
+	
 	@Test
-	public void findByAttributeTest() throws Exception {
+	public void findBySimpleStringAttributeTest() throws Exception {
 		mockMvc.perform(get(BASE_URL + "?primaryGeneSymbol=GeneB"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasKey("_embedded")))
@@ -120,7 +121,7 @@ public class DefaultControllerTests {
 	}
 
 	@Test
-	public void findByCollectionElement() throws Exception {
+	public void findBySimpleCollectionElement() throws Exception {
 		mockMvc.perform(get(BASE_URL + "?aliases=GHI"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasKey("_embedded")))
@@ -139,7 +140,7 @@ public class DefaultControllerTests {
 	}
 
 	@Test
-	public void findByMapElement() throws Exception {
+	public void findBySimpleMapElement() throws Exception {
 		mockMvc.perform(get(BASE_URL + "?attributes=isKinase:Y"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasKey("_embedded")))
@@ -153,6 +154,120 @@ public class DefaultControllerTests {
 				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("attributes")))
 				.andExpect(jsonPath("$._embedded.genes[0].attributes", hasKey("isKinase")))
 				.andExpect(jsonPath("$._embedded.genes[0].attributes.isKinase", is("Y")))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("_links")))
+				.andExpect(jsonPath("$._embedded.genes[0]._links", hasKey("self")));
+	}
+
+	@Test
+	public void findByMultipleStringAttributesTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?primaryGeneSymbol=GeneB,GeneD"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasKey("_embedded")))
+				.andExpect(jsonPath("$._embedded", hasKey("genes")))
+				.andExpect(jsonPath("$._embedded.genes", hasSize(2)))
+				.andExpect(jsonPath("$._embedded.genes[1]", hasKey("primaryReferenceId")))
+				.andExpect(jsonPath("$._embedded.genes[1].primaryReferenceId", is("4")))
+				.andExpect(jsonPath("$._embedded.genes[1]", hasKey("aliases")))
+				.andExpect(jsonPath("$._embedded.genes[1].aliases", hasSize(1)))
+				.andExpect(jsonPath("$._embedded.genes[1].aliases[0]", is("JKL")))
+				.andExpect(jsonPath("$._embedded.genes[1]", hasKey("attributes")))
+				.andExpect(jsonPath("$._embedded.genes[1].attributes", hasKey("isKinase")))
+				.andExpect(jsonPath("$._embedded.genes[1].attributes.isKinase", is("Y")))
+				.andExpect(jsonPath("$._embedded.genes[1]", hasKey("_links")))
+				.andExpect(jsonPath("$._embedded.genes[1]._links", hasKey("self")));
+	}
+
+	@Test
+	public void findByMultipleCollectionElements() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?aliases=DEF,GHI"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasKey("_embedded")))
+				.andExpect(jsonPath("$._embedded", hasKey("genes")))
+				.andExpect(jsonPath("$._embedded.genes", hasSize(2)))
+				.andExpect(jsonPath("$._embedded.genes[1]", hasKey("primaryReferenceId")))
+				.andExpect(jsonPath("$._embedded.genes[1].primaryReferenceId", is("3")))
+				.andExpect(jsonPath("$._embedded.genes[1]", hasKey("aliases")))
+				.andExpect(jsonPath("$._embedded.genes[1].aliases", hasSize(1)))
+				.andExpect(jsonPath("$._embedded.genes[1].aliases[0]", is("GHI")))
+				.andExpect(jsonPath("$._embedded.genes[1]", hasKey("attributes")))
+				.andExpect(jsonPath("$._embedded.genes[1].attributes", hasKey("isKinase")))
+				.andExpect(jsonPath("$._embedded.genes[1].attributes.isKinase", is("N")))
+				.andExpect(jsonPath("$._embedded.genes[1]", hasKey("_links")))
+				.andExpect(jsonPath("$._embedded.genes[1]._links", hasKey("self")));
+	}
+
+	@Test
+	public void findByMultipleMapElements() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?attributes=isKinase:Y,N"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasKey("_embedded")))
+				.andExpect(jsonPath("$._embedded", hasKey("genes")))
+				.andExpect(jsonPath("$._embedded.genes", hasSize(5)))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("primaryReferenceId")))
+				.andExpect(jsonPath("$._embedded.genes[0].primaryReferenceId", is("1")))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("aliases")))
+				.andExpect(jsonPath("$._embedded.genes[0].aliases", hasSize(1)))
+				.andExpect(jsonPath("$._embedded.genes[0].aliases[0]", is("ABC")))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("attributes")))
+				.andExpect(jsonPath("$._embedded.genes[0].attributes", hasKey("isKinase")))
+				.andExpect(jsonPath("$._embedded.genes[0].attributes.isKinase", is("Y")))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("_links")))
+				.andExpect(jsonPath("$._embedded.genes[0]._links", hasKey("self")));
+	}
+
+	@Test
+	public void findByStringLikeTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?primaryGeneSymbol=*B"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasKey("_embedded")))
+				.andExpect(jsonPath("$._embedded", hasKey("genes")))
+				.andExpect(jsonPath("$._embedded.genes", hasSize(1)))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("primaryReferenceId")))
+				.andExpect(jsonPath("$._embedded.genes[0].primaryReferenceId", is("2")))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("aliases")))
+				.andExpect(jsonPath("$._embedded.genes[0].aliases", hasSize(1)))
+				.andExpect(jsonPath("$._embedded.genes[0].aliases[0]", is("DEF")))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("attributes")))
+				.andExpect(jsonPath("$._embedded.genes[0].attributes", hasKey("isKinase")))
+				.andExpect(jsonPath("$._embedded.genes[0].attributes.isKinase", is("N")))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("_links")))
+				.andExpect(jsonPath("$._embedded.genes[0]._links", hasKey("self")));
+	}
+
+	@Test
+	public void findByStringNotLikeTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?primaryGeneSymbol=!*B"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasKey("_embedded")))
+				.andExpect(jsonPath("$._embedded", hasKey("genes")))
+				.andExpect(jsonPath("$._embedded.genes", hasSize(4)))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("primaryReferenceId")))
+				.andExpect(jsonPath("$._embedded.genes[0].primaryReferenceId", is("1")))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("aliases")))
+				.andExpect(jsonPath("$._embedded.genes[0].aliases", hasSize(1)))
+				.andExpect(jsonPath("$._embedded.genes[0].aliases[0]", is("ABC")))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("attributes")))
+				.andExpect(jsonPath("$._embedded.genes[0].attributes", hasKey("isKinase")))
+				.andExpect(jsonPath("$._embedded.genes[0].attributes.isKinase", is("Y")))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("_links")))
+				.andExpect(jsonPath("$._embedded.genes[0]._links", hasKey("self")));
+	}
+
+	@Test
+	public void findByStringEqualsTest() throws Exception {
+		mockMvc.perform(get(BASE_URL + "?geneType=!protein-coding"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$", hasKey("_embedded")))
+				.andExpect(jsonPath("$._embedded", hasKey("genes")))
+				.andExpect(jsonPath("$._embedded.genes", hasSize(2)))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("primaryReferenceId")))
+				.andExpect(jsonPath("$._embedded.genes[0].primaryReferenceId", is("3")))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("aliases")))
+				.andExpect(jsonPath("$._embedded.genes[0].aliases", hasSize(1)))
+				.andExpect(jsonPath("$._embedded.genes[0].aliases[0]", is("GHI")))
+				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("attributes")))
+				.andExpect(jsonPath("$._embedded.genes[0].attributes", hasKey("isKinase")))
+				.andExpect(jsonPath("$._embedded.genes[0].attributes.isKinase", is("N")))
 				.andExpect(jsonPath("$._embedded.genes[0]", hasKey("_links")))
 				.andExpect(jsonPath("$._embedded.genes[0]._links", hasKey("self")));
 	}
@@ -257,6 +372,13 @@ public class DefaultControllerTests {
 		mockMvc.perform(get(BASE_URL + "/{id}", gene.getId()))
 				.andExpect(status().isNotFound());
 
+	}
+	
+	@Test
+	public void delimtedTextTest() throws Exception {
+		mockMvc.perform(get(BASE_URL).accept(MediaType.TEXT_PLAIN))
+				.andExpect(status().isOk())
+				.andDo(print());
 	}
 	
 }

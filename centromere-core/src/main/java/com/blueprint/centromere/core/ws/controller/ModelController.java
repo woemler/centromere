@@ -18,10 +18,6 @@ package com.blueprint.centromere.core.ws.controller;
 
 import com.blueprint.centromere.core.commons.repositories.MetadataOperations;
 import com.blueprint.centromere.core.repository.BaseRepository;
-import com.blueprint.centromere.core.ws.QueryParameterDescriptor;
-import com.blueprint.centromere.core.ws.QueryParameterDescriptors;
-import com.blueprint.centromere.core.ws.QueryUtil;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +49,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -184,31 +179,31 @@ public class ModelController {
 //        }
 //    }
 
-    protected Predicate getPredicateFromRequest(Class<?> model, HttpServletRequest request) {
-
-        logger.info(String.format("Generating dynamic query for model: %s", model.getName()));
-        QueryParameterDescriptors descriptors = QueryUtil.getAvailableQueryParameters(model);
-        BooleanBuilder builder = new BooleanBuilder();
-
-        for (Map.Entry<String, String[]> param: request.getParameterMap().entrySet()){
-
-            logger.info(String.format("Inspecting query parameter: key=%s  value=%s",
-                    param.getKey(), Arrays.asList(param.getValue()).toString()));
-
-            if (param.getValue().length == 0 || param.getValue()[0].trim().equals("")) continue;
-
-            if (descriptors.matches(param.getKey())){
-                QueryParameterDescriptor descriptor = descriptors.get(param.getKey());
-                logger.info(String.format("Matched descriptor: %s", descriptor.toString()));
-                Predicate predicate = QueryUtil.getParameterPredicate(param.getKey(),
-                        param.getValue()[0], descriptor, conversionService);
-                if (predicate != null) builder.and(predicate);
-            }
-        }
-
-        return builder.getValue();
-
-    }
+//    protected Predicate getPredicateFromRequest(Class<?> model, HttpServletRequest request) {
+//
+//        logger.info(String.format("Generating dynamic query for model: %s", model.getName()));
+//        QueryParameterDescriptors descriptors = QueryUtil.getAvailableQueryParameters(model);
+//        BooleanBuilder builder = new BooleanBuilder();
+//
+//        for (Map.Entry<String, String[]> param: request.getParameterMap().entrySet()){
+//
+//            logger.info(String.format("Inspecting query parameter: key=%s  value=%s",
+//                    param.getKey(), Arrays.asList(param.getValue()).toString()));
+//
+//            if (param.getValue().length == 0 || param.getValue()[0].trim().equals("")) continue;
+//
+//            if (descriptors.matches(param.getKey())){
+//                QueryParameterDescriptor descriptor = descriptors.get(param.getKey());
+//                logger.info(String.format("Matched descriptor: %s", descriptor.toString()));
+//                Predicate predicate = QueryUtil.getParameterPredicate(param.getKey(),
+//                        param.getValue()[0], descriptor, conversionService);
+//                if (predicate != null) builder.and(predicate);
+//            }
+//        }
+//
+//        return builder.getValue();
+//
+//    }
     
     @SuppressWarnings("unchecked")
     protected Resources<?> toPagedResources(Page<?> page, Class<?> model, 

@@ -18,22 +18,20 @@ package com.blueprint.centromere.core.ws.config;
 
 import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.ws.controller.ModelController;
-
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
+import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.RestMediaTypes;
+import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,43 +49,59 @@ public class SpringWebCustomization {
 	public static class WebServicesConfig {
 
 		@Bean
-		public SpringDataRestCustomConfig springDataRestCustomConfig(){
-			return new SpringDataRestCustomConfig();
+		public RepositoryRestConfigurer springDataRestCustomConfig(){
+			return new RepositoryRestConfigurerAdapter(){
+
+				@Autowired private Environment env;
+				
+				@Override
+				public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
+					config.setBasePath(env.getRequiredProperty("centromere.api.root-url"));
+					config.setReturnBodyForPutAndPost(true);
+					config.exposeIdsFor(AbstractModel.class);
+				}
+
+				@Override
+				public void configureHttpMessageConverters(List<HttpMessageConverter<?>> converters) {
+					converters.addAll(httpMessageConverters());
+				}
+				
+			};
+		}
+		
+		@Bean
+		public WebMvcConfigurer springMvcCustomConfig(){
+			return new WebMvcConfigurerAdapter() {
+				@Override 
+				public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+					converters.addAll(httpMessageConverters());
+				}
+			};
 		}
 
 	}
-
-	public static class SpringDataRestCustomConfig extends RepositoryRestConfigurerAdapter {
+	
+	static List<HttpMessageConverter<?>> httpMessageConverters(){
 		
-		@Autowired private Environment env;
-		private static final Logger logger = org.slf4j.LoggerFactory.getLogger(SpringDataRestCustomConfig.class);
+		List<HttpMessageConverter<?>> converters = new ArrayList<>();
+		
+		FilteringJackson2HttpMessageConverter jsonConverter
+				= new FilteringJackson2HttpMessageConverter();
+		jsonConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON,
+				MediaType.APPLICATION_JSON_UTF8, RestMediaTypes.ALPS_JSON, RestMediaTypes.HAL_JSON,
+				RestMediaTypes.JSON_PATCH_JSON, RestMediaTypes.MERGE_PATCH_JSON,
+				RestMediaTypes.SPRING_DATA_COMPACT_JSON, RestMediaTypes.SPRING_DATA_VERBOSE_JSON));
+		converters.add(jsonConverter);
 
-		@Override 
-		public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
-			config.setBasePath(env.getRequiredProperty("centromere.api.root-url"));
-			config.setReturnBodyForPutAndPost(true);
-			config.exposeIdsFor(AbstractModel.class);
-		}
-
-		@Override
-		public void configureHttpMessageConverters(List<HttpMessageConverter<?>> converters) {
-			
-			FilteringJackson2HttpMessageConverter jsonConverter
-					= new FilteringJackson2HttpMessageConverter();
-			jsonConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON, 
-					MediaType.APPLICATION_JSON_UTF8, RestMediaTypes.ALPS_JSON, RestMediaTypes.HAL_JSON, 
-					RestMediaTypes.JSON_PATCH_JSON, RestMediaTypes.MERGE_PATCH_JSON, 
-					RestMediaTypes.SPRING_DATA_COMPACT_JSON, RestMediaTypes.SPRING_DATA_VERBOSE_JSON));
-			converters.add(jsonConverter);
-			
-			FilteringTextMessageConverter filteringTextMessageConverter =
-					new FilteringTextMessageConverter(new MediaType("text", "plain", Charset.forName("utf-8")));
-			filteringTextMessageConverter.setDelimiter("\t");
-			converters.add(filteringTextMessageConverter);
-
-			super.configureHttpMessageConverters(converters);
-			
-		}
+		FilteringTextMessageConverter filteringTextMessageConverter =
+				new FilteringTextMessageConverter(new MediaType("text", "plain", Charset.forName("utf-8")));
+		filteringTextMessageConverter.setSupportedMediaTypes(Arrays.asList(
+				new MediaType("text", "plain", Charset.forName("utf-8")), MediaType.TEXT_PLAIN));
+		filteringTextMessageConverter.setDelimiter("\t");
+		converters.add(filteringTextMessageConverter);
+		
+		return converters;
+		
 	}
 	
 }

@@ -17,6 +17,7 @@
 package com.blueprint.centromere.core.test.jpa;
 
 import com.blueprint.centromere.core.test.AbstractRepositoryTests;
+
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -27,5 +28,5 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { EmbeddedH2DataSourceConfig.class })
 public class JpaRepositoryTests extends AbstractRepositoryTests {
-	
+
 }
