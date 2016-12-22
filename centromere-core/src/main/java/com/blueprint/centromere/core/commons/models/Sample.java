@@ -54,6 +54,13 @@ public class Sample extends AbstractModel implements Attributes {
 	@Column(updatable = false, insertable = false)
 	private UUID subjectId;
 
+	@ManyToOne
+	@JoinColumn(name = "dataSetId")
+	private DataSet dataSet;
+
+	@Column(updatable = false, insertable = false)
+	private UUID dataSetId;
+
 	public Subject getSubject() {
 		return subject;
 	}
@@ -117,6 +124,22 @@ public class Sample extends AbstractModel implements Attributes {
 
 	public void setNotes(String notes) {
 		this.notes = notes;
+	}
+
+	public DataSet getDataSet() {
+		return dataSet;
+	}
+
+	public void setDataSet(DataSet dataSet) {
+		this.dataSet = dataSet;
+	}
+
+	public UUID getDataSetId() {
+		return dataSetId;
+	}
+
+	public void setDataSetId(UUID dataSetId) {
+		this.dataSetId = dataSetId;
 	}
 
 	@Override

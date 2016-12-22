@@ -23,12 +23,18 @@ import com.blueprint.centromere.core.model.Model;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OrderColumn;
+
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -36,7 +42,7 @@ import java.util.UUID;
  */
 @Entity
 @Document
-public class DataFile extends AbstractModel {
+public class DataFile extends AbstractModel implements Attributes {
 	
 	private String filePath;
 	private String dataType;
@@ -49,6 +55,10 @@ public class DataFile extends AbstractModel {
 
 	@Column(updatable = false, insertable = false)
 	private UUID dataSetId;
+
+	@ElementCollection(fetch = FetchType.EAGER)
+	@OrderColumn
+	private Map<String, String> attributes = new HashMap<>();
 
 	public String getFilePath() {
 		return filePath;
@@ -96,5 +106,34 @@ public class DataFile extends AbstractModel {
 
 	public void setDataSetId(UUID dataSetId) {
 		this.dataSetId = dataSetId;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(Map<String, String> attributes) {
+		this.attributes = attributes;
+	}
+
+	@Override
+	public void addAttribute(String name, String value) {
+		attributes.put(name, value);
+	}
+
+	@Override
+	public void addAttributes(Map<String, String> attributes) {
+		this.attributes.putAll(attributes);
+	}
+
+	@Override
+	public boolean hasAttribute(String name) {
+		return attributes.containsKey(name);
+	}
+
+	@Override
+	public String getAttribute(String name) {
+		return attributes.containsKey(name) ? attributes.get(name) : null;
 	}
 }

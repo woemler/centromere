@@ -21,14 +21,19 @@ import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Model;
 
 import javax.persistence.CascadeType;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Model representation of an annotated set of data, which may be compromised of multiple data types
@@ -37,7 +42,7 @@ import java.util.List;
  * @author woemler
  */
 @Entity
-public class DataSet extends AbstractModel {
+public class DataSet extends AbstractModel implements Attributes {
 	
 	private String name;
 	private String source;
@@ -46,6 +51,13 @@ public class DataSet extends AbstractModel {
 
 	@OneToMany(mappedBy = "dataSet", cascade = CascadeType.ALL)
 	private List<DataFile> dataFiles = new ArrayList<>();
+
+	@OneToMany(mappedBy = "dataSet", cascade = CascadeType.ALL)
+	private List<Sample> samples = new ArrayList<>();
+
+	@ElementCollection(fetch = FetchType.EAGER)
+	@OrderColumn
+	private Map<String, String> attributes = new HashMap<>();
 
 	public String getName() {
 		return name;
@@ -77,5 +89,50 @@ public class DataSet extends AbstractModel {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public List<DataFile> getDataFiles() {
+		return dataFiles;
+	}
+
+	public void setDataFiles(List<DataFile> dataFiles) {
+		this.dataFiles = dataFiles;
+	}
+
+	public List<Sample> getSamples() {
+		return samples;
+	}
+
+	public void setSamples(List<Sample> samples) {
+		this.samples = samples;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(Map<String, String> attributes) {
+		this.attributes = attributes;
+	}
+
+	@Override
+	public void addAttribute(String name, String value) {
+		attributes.put(name, value);
+	}
+
+	@Override
+	public void addAttributes(Map<String, String> attributes) {
+		this.attributes.putAll(attributes);
+	}
+
+	@Override
+	public boolean hasAttribute(String name) {
+		return attributes.containsKey(name);
+	}
+
+	@Override
+	public String getAttribute(String name) {
+		return attributes.containsKey(name) ? attributes.get(name) : null;
 	}
 }
