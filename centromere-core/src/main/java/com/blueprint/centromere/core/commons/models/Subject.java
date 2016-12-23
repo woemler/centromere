@@ -57,7 +57,7 @@ public class Subject extends AbstractModel implements Attributes {
 	@OrderColumn
 	private Map<String, String> attributes = new HashMap<>();
 	
-	@OneToMany(mappedBy = "subject", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "subject", cascade = CascadeType.REMOVE, orphanRemoval = true)
 	private List<Sample> samples = new ArrayList<>();
 
 	public String getName() {

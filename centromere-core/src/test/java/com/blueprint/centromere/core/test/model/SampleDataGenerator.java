@@ -16,6 +16,7 @@
 
 package com.blueprint.centromere.core.test.model;
 
+import com.blueprint.centromere.core.commons.models.DataSet;
 import com.blueprint.centromere.core.commons.models.Sample;
 import com.blueprint.centromere.core.commons.models.Subject;
 
@@ -29,7 +30,7 @@ import java.util.List;
  */
 public class SampleDataGenerator {
 	
-	public static List<Sample> generateData(List<Subject> subjects) throws Exception {
+	public static List<Sample> generateData(List<Subject> subjects, DataSet dataSet) throws Exception {
 
 		Assert.isTrue(subjects.size() > 1);
 
@@ -43,6 +44,7 @@ public class SampleDataGenerator {
 		sample.setNotes("This is an example sample.");
 		sample.addAttribute("tag", "tagA");
 		sample.setSubject(subjects.get(0));
+		sample.setDataSet(dataSet);
 		samples.add(sample);
 
 		sample = new Sample();
@@ -53,6 +55,7 @@ public class SampleDataGenerator {
 		sample.setNotes("This is an example sample.");
 		sample.addAttribute("tag", "tagB");
 		sample.setSubject(subjects.get(0));
+		sample.setDataSet(dataSet);
 		samples.add(sample);
 
 		sample = new Sample();
@@ -63,6 +66,7 @@ public class SampleDataGenerator {
 		sample.setNotes("This is an example sample.");
 		sample.addAttribute("tag", "tagA");
 		sample.setSubject(subjects.get(0));
+		sample.setDataSet(dataSet);
 		samples.add(sample);
 
 		sample = new Sample();
@@ -73,6 +77,7 @@ public class SampleDataGenerator {
 		sample.setNotes("This is an example sample.");
 		sample.addAttribute("tag", "tagA");
 		sample.setSubject(subjects.get(1));
+		sample.setDataSet(dataSet);
 		samples.add(sample);
 
 		sample = new Sample();
@@ -83,6 +88,7 @@ public class SampleDataGenerator {
 		sample.setNotes("This is an example sample.");
 		sample.addAttribute("tag", "tagB");
 		sample.setSubject(subjects.get(1));
+		sample.setDataSet(dataSet);
 		samples.add(sample);
 		
 		return samples;

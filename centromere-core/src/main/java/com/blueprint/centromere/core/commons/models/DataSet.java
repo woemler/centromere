@@ -20,6 +20,8 @@ import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Model;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -42,6 +44,7 @@ import java.util.Map;
  * @author woemler
  */
 @Entity
+@Document
 public class DataSet extends AbstractModel implements Attributes {
 	
 	private String name;
@@ -49,10 +52,10 @@ public class DataSet extends AbstractModel implements Attributes {
 	private String version;
 	private String description;
 
-	@OneToMany(mappedBy = "dataSet", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "dataSet", cascade = CascadeType.REMOVE, orphanRemoval = true)
 	private List<DataFile> dataFiles = new ArrayList<>();
 
-	@OneToMany(mappedBy = "dataSet", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "dataSet", cascade = CascadeType.REMOVE, orphanRemoval = true)
 	private List<Sample> samples = new ArrayList<>();
 
 	@ElementCollection(fetch = FetchType.EAGER)

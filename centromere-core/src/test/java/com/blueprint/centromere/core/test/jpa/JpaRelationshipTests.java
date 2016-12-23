@@ -52,23 +52,23 @@ public class JpaRelationshipTests {
 	@Before
 	public void setup() throws Exception {
 		if (!isConfigured) {
+			geneExpressionRepository.deleteAll();
 			sampleRepository.deleteAll();
 			subjectRepository.deleteAll();
 			dataFileRepository.deleteAll();
 			dataSetRepository.deleteAll();
 			geneRepository.deleteAll();
-			geneExpressionRepository.deleteAll();
 
-			List<Subject> subjects = SubjectDataGenerator.generateData();
-			subjectRepository.save(subjects);
-			List<Sample> samples = SampleDataGenerator.generateData(subjects);
-			sampleRepository.save(samples);
-			List<Gene> genes = EntrezGeneDataGenerator.generateData();
-			geneRepository.save(genes);
 			List<DataSet> dataSets = DataSetGenerator.generateData();
 			dataSetRepository.save(dataSets);
 			List<DataFile> dataFiles = DataFileGenerator.generateData(dataSets);
 			dataFileRepository.save(dataFiles);
+			List<Subject> subjects = SubjectDataGenerator.generateData();
+			subjectRepository.save(subjects);
+			List<Sample> samples = SampleDataGenerator.generateData(subjects, dataSets.get(0));
+			sampleRepository.save(samples);
+			List<Gene> genes = EntrezGeneDataGenerator.generateData();
+			geneRepository.save(genes);
 			List<GeneExpression> data = ExpressionDataGenerator.generateData(samples, genes, dataFiles);
 			geneExpressionRepository.save(data);
 			isConfigured = true;
