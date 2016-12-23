@@ -78,6 +78,7 @@ public interface BaseRepository<T extends Model<ID>, ID extends Serializable>
 	@SuppressWarnings("unchecked")
 	default void customize(QuerydslBindings bindings, EntityPath entityPath){
 		
+		// String properties
 		bindings.bind(String.class).all((path, strings) -> {
 			List<Object> value = new ArrayList<>(strings);
 			List<String> values;
