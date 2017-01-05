@@ -18,14 +18,40 @@ package com.blueprint.centromere.core.config;
 
 /**
  * @author woemler
+ * @since 0.5.0
  */
 public class Profiles {
+	
+	public enum ApplicationMode {
+		WEB,
+		CLI
+	}
+	
+	public static final String WEB_PROFILE = "mode_web";
+	public static final String CLI_PROFILE = "mode_cli";
+	
+	public static String getApplicationModeProfile(ApplicationMode mode){
+		switch (mode){
+			case WEB:
+				return WEB_PROFILE;
+			case CLI:
+				return CLI_PROFILE;
+			default:
+				return null;
+		}
+	}
 
 	public static String[] getApplicationProfiles(Database database, Schema schema, Security security){
 		String dbProfile = Database.getProfile(database);
 		String schemaProfile = Schema.getProfile(schema);
 		String securityProfile = Security.getProfile(security);
 		return new String[]{dbProfile, schemaProfile, securityProfile};
+	}
+
+	public static String[] getApplicationProfiles(Database database, Schema schema){
+		String dbProfile = Database.getProfile(database);
+		String schemaProfile = Schema.getProfile(schema);
+		return new String[]{dbProfile, schemaProfile};
 	}
 
 	public static String[] getApplicationProfiles(AutoConfigureCentromere annotation){

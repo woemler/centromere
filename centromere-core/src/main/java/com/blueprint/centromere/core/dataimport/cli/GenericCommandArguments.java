@@ -39,4 +39,11 @@ public abstract class GenericCommandArguments {
 	public void setParameters(Map<String, String> parameters) {
 		this.parameters = parameters;
 	}
+
+	@Override 
+	public String toString() {
+		return "GenericCommandArguments{" +
+				"parameters=" + parameters +
+				'}';
+	}
 }

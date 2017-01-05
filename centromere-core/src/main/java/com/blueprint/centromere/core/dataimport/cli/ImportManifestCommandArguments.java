@@ -22,7 +22,7 @@ import com.beust.jcommander.Parameter;
  * @author woemler
  * @since 0.5.0
  */
-public class ImportManifestCommandArguments extends GenericCommandArguments {
+public class ImportManifestCommandArguments {
 	
 	@Parameter(names = { "-f", "--file" }, required = true, description = "Input file path.  Required")
 	private String filePath;
@@ -35,4 +35,11 @@ public class ImportManifestCommandArguments extends GenericCommandArguments {
 		this.filePath = filePath;
 	}
 
+	@Override 
+	public String toString() {
+		return "ImportManifestCommandArguments{" +
+				"filePath='" + filePath + '\'' +
+				'}';
+	}
+	
 }

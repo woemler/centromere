@@ -24,6 +24,7 @@ import java.util.Map;
  * 
  * @author woemler
  */
+@Deprecated
 public interface ImportOptions {
 
 	/**

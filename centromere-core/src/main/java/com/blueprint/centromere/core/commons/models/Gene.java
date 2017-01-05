@@ -42,17 +42,14 @@ public class Gene extends AbstractModel implements Attributes {
 	private String referenceSource;
 
 	@ElementCollection(fetch = FetchType.EAGER)
-	//@CollectionTable(name = "GeneAliases", joinColumns = @JoinColumn(name = "GeneId"))
 	@OrderColumn
 	private List<String> aliases = new ArrayList<>();
 
 	@ElementCollection(fetch = FetchType.EAGER)
-	//@CollectionTable(name = "GeneAttributes")
 	@OrderColumn
 	private Map<String, String> attributes = new HashMap<>();
 
 	@ElementCollection(fetch = FetchType.EAGER)
-	//@CollectionTable(name = "GeneExternalResources")
 	@OrderColumn
 	private Map<String, String> externalReferences = new HashMap<>();
 

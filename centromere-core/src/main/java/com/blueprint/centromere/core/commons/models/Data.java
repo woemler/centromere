@@ -18,12 +18,11 @@ package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
 
-import java.util.UUID;
-
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import java.util.UUID;
 
 /**
  * 

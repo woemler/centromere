@@ -16,6 +16,7 @@
 
 package com.blueprint.centromere.core.config;
 
+import com.blueprint.centromere.core.dataimport.cli.CommandLineInputConfiguration;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.ws.config.SpringWebCustomization;
 import com.blueprint.centromere.core.ws.config.WebSecurityConfig;
@@ -40,7 +41,8 @@ import java.lang.annotation.*;
 		ProfileConfiguration.class,
 		RepositoryRestMvcConfiguration.class,
 		SpringWebCustomization.WebServicesConfig.class,
-		WebSecurityConfig.class
+		WebSecurityConfig.class,
+		CommandLineInputConfiguration.class
 })
 public @interface AutoConfigureCentromere {
 

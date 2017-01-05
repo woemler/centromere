@@ -33,7 +33,7 @@ import java.util.Map;
  * @author woemler
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { TestConfig.class })
+@ContextConfiguration
 public class ModelConverterTests {
 	
 	@Test

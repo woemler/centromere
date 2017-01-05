@@ -1,5 +1,5 @@
 # This is a comment line and should be ignored
-columnA	column_b	column C	tags
+columnA	column_b	column C	column d
 Joe	34	3.123	aaa,bbb
 Mary	45	4	
 Henry	12		stuff

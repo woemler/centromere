@@ -17,6 +17,8 @@
 package com.blueprint.centromere.core.dataimport;
 
 import com.blueprint.centromere.core.model.Model;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,7 @@ import java.util.List;
 public class RecordCollectionReader<T extends Model<?>> implements RecordReader<T> {
 	
 	private final List<T> records = new ArrayList<>();
+	private Environment environment;
 
 	public RecordCollectionReader(List<T> records) {
 		this.records.addAll(records);
@@ -40,12 +43,11 @@ public class RecordCollectionReader<T extends Model<?>> implements RecordReader<
 		return null;
 	}
 
-	public void doBefore(Object... args) throws DataImportException {
-
+	@Override 
+	@Autowired
+	public void setEnvironment(Environment environment) {
+		this.environment = environment;
 	}
-
-	public void doAfter(Object... args) throws DataImportException {
-
-	}
+	
 	
 }

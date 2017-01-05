@@ -17,7 +17,7 @@
 package com.blueprint.centromere.core.test.ws;
 
 import com.blueprint.centromere.core.config.AutoConfigureCentromere;
-import com.blueprint.centromere.core.config.CentromereInitializer;
+import com.blueprint.centromere.core.ws.CentromereWebInitializer;
 
 /**
  * @author woemler
@@ -25,9 +25,9 @@ import com.blueprint.centromere.core.config.CentromereInitializer;
 public class SpringBootApplicationConfigurations {
 	
 	@AutoConfigureCentromere
-	public static class DefaultSpringBootWebConfig extends CentromereInitializer {
+	public static class DefaultSpringBootWebConfig extends CentromereWebInitializer {
 		public static void main(String[] args) {
-			CentromereInitializer.run(DefaultSpringBootWebConfig.class, args);
+			CentromereWebInitializer.run(DefaultSpringBootWebConfig.class, args);
 		}
 	}
 	

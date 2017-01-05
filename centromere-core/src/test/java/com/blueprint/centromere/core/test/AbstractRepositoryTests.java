@@ -46,8 +46,7 @@ import java.util.Set;
  */
 public abstract class AbstractRepositoryTests {
 
-    @Autowired
-    private GeneRepository geneRepository;
+    @Autowired private GeneRepository geneRepository;
     private final Class<Gene> model = Gene.class;
     private final EntrezGeneDataGenerator dataGenerator = new EntrezGeneDataGenerator();
 

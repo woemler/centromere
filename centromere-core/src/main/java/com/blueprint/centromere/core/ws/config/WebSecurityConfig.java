@@ -16,6 +16,7 @@
 
 package com.blueprint.centromere.core.ws.config;
 
+import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.core.ws.controller.SecurityControllers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableGlobalMethodSecurity
 @ComponentScan(basePackageClasses = { SecurityControllers.class })
+@Profile({ Profiles.WEB_PROFILE })
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @SuppressWarnings("SpringJavaAutowiringInspection")

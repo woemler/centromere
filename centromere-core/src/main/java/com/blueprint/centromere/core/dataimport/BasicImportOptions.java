@@ -24,6 +24,7 @@ import java.util.Map;
  * 
  * @author woemler
  */
+@Deprecated
 public class BasicImportOptions implements ImportOptions {
 
 	private Map<String,String> options = new HashMap<>();

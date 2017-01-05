@@ -18,7 +18,6 @@ package com.blueprint.centromere.core.test.commons;
 
 import com.blueprint.centromere.core.commons.models.Gene;
 import com.blueprint.centromere.core.commons.readers.EntrezGeneInfoReader;
-import com.blueprint.centromere.core.test.TestConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.core.io.ClassPathResource;
@@ -30,7 +29,7 @@ import org.springframework.util.Assert;
  * @author woemler
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {TestConfig.class})
+@ContextConfiguration
 public class EntrezGeneTests {
 	
 	@Test

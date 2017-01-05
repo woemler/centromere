@@ -18,9 +18,11 @@ package com.blueprint.centromere.core.test.ws;
 
 import com.blueprint.centromere.core.commons.models.*;
 import com.blueprint.centromere.core.commons.repositories.*;
+import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.test.jpa.EmbeddedH2DataSourceConfig;
 import com.blueprint.centromere.core.test.model.*;
 import com.blueprint.centromere.core.ws.config.SpringWebCustomization;
+import com.blueprint.centromere.core.ws.config.WebSecurityConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +31,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestData
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -51,8 +54,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@SpringBootTest(classes = {EmbeddedH2DataSourceConfig.class, RepositoryRestMvcConfiguration.class,
-		SpringWebCustomization.WebServicesConfig.class})
+@SpringBootTest(classes = {
+		EmbeddedH2DataSourceConfig.class, 
+		RepositoryRestMvcConfiguration.class,
+		SpringWebCustomization.WebServicesConfig.class,
+		WebSecurityConfig.class
+})
+@ActiveProfiles({ "default", Profiles.WEB_PROFILE })
 @DataJpaTest
 @AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 public class DefaultControllerRelationshipTests {

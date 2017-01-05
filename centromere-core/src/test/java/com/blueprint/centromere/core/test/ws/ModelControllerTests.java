@@ -16,7 +16,9 @@
 
 package com.blueprint.centromere.core.test.ws;
 
+import com.blueprint.centromere.core.commons.repositories.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repositories.GeneRepository;
+import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.test.jpa.EmbeddedH2DataSourceConfig;
 import com.blueprint.centromere.core.test.model.EntrezGeneDataGenerator;
 import com.blueprint.centromere.core.ws.config.SpringWebCustomization;
@@ -52,13 +54,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 		SpringWebCustomization.WebServicesConfig.class,
 		WebSecurityConfig.class
 })
-@ActiveProfiles({ "default" })
+@ActiveProfiles({ "default", Profiles.WEB_PROFILE })
 public class ModelControllerTests {
 	
 	private static final String BASE_URL = "/api/genes";
 	
 	@Autowired private WebApplicationContext context;
 	@Autowired private GeneRepository geneRepository;
+	@Autowired private GeneExpressionRepository geneExpressionRepository;
 
 	private MockMvc mockMvc;
 	private final ObjectMapper objectMapper = new ObjectMapper();
@@ -67,6 +70,7 @@ public class ModelControllerTests {
 	public void setup() throws Exception {
 		mockMvc = MockMvcBuilders.webAppContextSetup(context)
 				.build();
+		geneExpressionRepository.deleteAll();
 		geneRepository.deleteAll();
 		geneRepository.save(EntrezGeneDataGenerator.generateData());
 	}

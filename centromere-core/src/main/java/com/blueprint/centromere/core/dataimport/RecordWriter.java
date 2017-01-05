@@ -17,11 +17,10 @@
 package com.blueprint.centromere.core.dataimport;
 
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.repository.RepositoryOperations;
 
 /**
  * Data import component class for writing imported {@link Model} records to a temporary file or
- *   {@link RepositoryOperations} implementation.
+ *   repository implementation.
  * 
  * @author woemler
  */

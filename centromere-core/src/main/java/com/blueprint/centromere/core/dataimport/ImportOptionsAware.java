@@ -22,6 +22,7 @@ package com.blueprint.centromere.core.dataimport;
  * 
  * @author woemler
  */
+@Deprecated
 public interface ImportOptionsAware {
 	void setImportOptions(ImportOptions importOptions);
 }

@@ -17,12 +17,16 @@
 package com.blueprint.centromere.core.dataimport;
 
 import com.blueprint.centromere.core.model.Model;
+import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 import org.springframework.validation.Validator;
 
 import java.io.Serializable;
 
 /**
+ * Factory class for programatically creating instances of a {@link RecordProcessor} type, given types
+ *   or instances of data import component classes.
+ * 
  * @author woemler
  * @since 0.4.3
  */
@@ -74,16 +78,14 @@ public class RecordProcessorFactory<P extends RecordProcessor<T>, T extends Mode
 		processor.setModel(model);
 	}
 	
-	public void setImportOptions(ImportOptions options){
-		if (processor instanceof ImportOptionsAware){
-			((ImportOptionsAware) processor).setImportOptions(options);
-		}
+	public void setEnvironment(Environment environment){
+		processor.setEnvironment(environment);
 	}
 	
 	public P getProcessor() throws Exception {
-		processor.afterPropertiesSet();
 		Assert.notNull(processor.getReader(), "RecordReader must not be null.");
 		Assert.notNull(processor.getWriter(), "RecordWriter must not be null.");
+		processor.afterPropertiesSet();
 		return processor;
 	}
 	

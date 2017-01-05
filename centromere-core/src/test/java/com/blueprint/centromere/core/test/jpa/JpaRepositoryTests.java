@@ -16,9 +16,11 @@
 
 package com.blueprint.centromere.core.test.jpa;
 
+import com.blueprint.centromere.core.commons.repositories.GeneExpressionRepository;
 import com.blueprint.centromere.core.test.AbstractRepositoryTests;
 
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -28,5 +30,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { EmbeddedH2DataSourceConfig.class })
 public class JpaRepositoryTests extends AbstractRepositoryTests {
+	
+	@Autowired private GeneExpressionRepository geneExpressionRepository;
 
+	@Override public void setup() throws Exception {
+		geneExpressionRepository.deleteAll();
+		super.setup();
+	}
 }

@@ -16,6 +16,7 @@
 
 package com.blueprint.centromere.core.ws.config;
 
+import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.ws.controller.ModelController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,7 @@ public class SpringWebCustomization {
 			@PropertySource({"classpath:centromere-defaults.properties"}),
 			@PropertySource(value = {"classpath:centromere.properties"},ignoreResourceNotFound = true)
 	})
+	@Profile({ Profiles.WEB_PROFILE })
 	public static class WebServicesConfig {
 
 		@Bean
