@@ -153,9 +153,9 @@ public class GenericRecordProcessor<T extends Model<?>>
 		if (!environment.containsProperty("centromere.import.temp-dir") 
 				|| environment.getRequiredProperty("centromere.import.temp-dir") == null 
 				|| "".equals(environment.getRequiredProperty("centromere.import.temp-dir"))){
-			tempDir = new File(environment.getRequiredProperty("centromere.import.temp-dir"));
-		} else {
 			tempDir = new File(System.getProperty("java.io.tmpdir"));
+		} else {
+			tempDir = new File(environment.getRequiredProperty("centromere.import.temp-dir"));
 		}
 		String fileName = "centromere.import.tmp";
 		File tempFile = new File(tempDir, fileName);

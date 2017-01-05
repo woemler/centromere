@@ -109,7 +109,6 @@ public class CommandLineInputExecutor implements CommandLineRunner {
 	
 	private void printUsage(JCommander jc){
 		JCommander importJc = jc.getCommands().get(IMPORT_COMMAND);
-		jc.usage(IMPORT_COMMAND);
 		importJc.usage(IMPORT_FILE_COMMAND);
 		importJc.usage(IMPORT_BATCH_COMMAND);
 	}
