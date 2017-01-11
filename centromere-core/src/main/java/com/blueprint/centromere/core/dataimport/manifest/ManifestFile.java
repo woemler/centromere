@@ -29,7 +29,7 @@ public class ManifestFile {
 
     private String path;
     private String type;
-    private LinkedHashMap<String, Object> attributes = new LinkedHashMap<>();
+    private LinkedHashMap<String, String> attributes = new LinkedHashMap<>();
 
     public String getPath() {
         return path;
@@ -47,11 +47,20 @@ public class ManifestFile {
         this.type = type;
     }
 
-    public LinkedHashMap<String, Object> getAttributes() {
+    public LinkedHashMap<String, String> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(LinkedHashMap<String, Object> attributes) {
+    public void setAttributes(LinkedHashMap<String, String> attributes) {
         this.attributes = attributes;
+    }
+
+    @Override 
+    public String toString() {
+        return "ManifestFile{" +
+            "path='" + path + '\'' +
+            ", type='" + type + '\'' +
+            ", attributes=" + attributes +
+            '}';
     }
 }

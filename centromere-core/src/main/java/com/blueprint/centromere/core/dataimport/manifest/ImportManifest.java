@@ -17,9 +17,12 @@
 package com.blueprint.centromere.core.dataimport.manifest;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * @author woemler
@@ -33,9 +36,9 @@ public class ImportManifest {
     private String notes;
     private String source;
     private String version;
-    private Date dateCreated;
-    private LinkedHashMap<String, Object> attributes = new LinkedHashMap<>();
-    private LinkedHashMap<String, ManifestFile> files = new LinkedHashMap<>();
+    @JsonProperty("date-created") private Date dateCreated;
+    private LinkedHashMap<String, String> attributes = new LinkedHashMap<>();
+    private List<ManifestFile> files = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -85,19 +88,34 @@ public class ImportManifest {
         this.dateCreated = dateCreated;
     }
 
-    public LinkedHashMap<String, Object> getAttributes() {
+    public LinkedHashMap<String, String> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(LinkedHashMap<String, Object> attributes) {
+    public void setAttributes(LinkedHashMap<String, String> attributes) {
         this.attributes = attributes;
     }
 
-    public LinkedHashMap<String, ManifestFile> getFiles() {
+    public List<ManifestFile> getFiles() {
         return files;
     }
 
-    public void setFiles(LinkedHashMap<String, ManifestFile> files) {
+    public void setFiles(
+        List<ManifestFile> files) {
         this.files = files;
+    }
+
+    @Override 
+    public String toString() {
+        return "ImportManifest{" +
+            "name='" + name + '\'' +
+            ", label='" + label + '\'' +
+            ", notes='" + notes + '\'' +
+            ", source='" + source + '\'' +
+            ", version='" + version + '\'' +
+            ", dateCreated=" + dateCreated +
+            ", attributes=" + attributes +
+            ", files=" + files +
+            '}';
     }
 }

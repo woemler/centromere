@@ -1,0 +1,17 @@
+<manifest>
+    <name>Test Manifest</name>
+    <label>test</label>
+    <notes>This is a test</notes>
+    <source>internal</source>
+    <version>1.0</version>
+    <date-created>2017-01-10</date-created>
+    <attributes>
+        <skip-invalid-records>true</skip-invalid-records>
+    </attributes>
+    <files>
+        <file> 
+            <path>../Homo_sapiens.gene_info</path>
+            <type>gene-info</type>
+        </file>
+    </files>
+</manifest>

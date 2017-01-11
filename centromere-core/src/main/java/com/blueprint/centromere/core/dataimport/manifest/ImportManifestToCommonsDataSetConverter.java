@@ -44,17 +44,16 @@ public class ImportManifestToCommonsDataSetConverter implements ManifestConverte
         dataSet.setSource(manifest.getSource());
         dataSet.setVersion(manifest.getVersion());
         dataSet.setDescription(manifest.getNotes());
-        for (Map.Entry<String, Object> entry: manifest.getAttributes().entrySet()){
-            dataSet.addAttribute(entry.getKey(), entry.getValue().toString());
+        for (Map.Entry<String, String> entry: manifest.getAttributes().entrySet()){
+            dataSet.addAttribute(entry.getKey(), entry.getValue());
         }
         List<DataFile> dataFiles = new ArrayList<>();
-        for (Map.Entry<String, ManifestFile> entry: manifest.getFiles().entrySet()){
-            ManifestFile file = entry.getValue();
+        for (ManifestFile file: manifest.getFiles()){
             DataFile dataFile = new DataFile();
-            dataFile.setFilePath(entry.getKey());
+            dataFile.setFilePath(file.getPath());
             dataFile.setDataType(file.getType());
-            for (Map.Entry<String, Object> attribute: file.getAttributes().entrySet()){
-                dataFile.addAttribute(attribute.getKey(), attribute.getValue().toString());
+            for (Map.Entry<String, String> attribute: file.getAttributes().entrySet()){
+                dataFile.addAttribute(attribute.getKey(), attribute.getValue());
             }
             dataFiles.add(dataFile);
         }

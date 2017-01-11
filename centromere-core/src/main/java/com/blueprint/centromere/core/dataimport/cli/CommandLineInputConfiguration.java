@@ -49,4 +49,9 @@ public class CommandLineInputConfiguration {
 		return new FileImportExecutor();
 	}
 	
+	@Bean
+	public ManifestImportExecutor manifestImportExecutor(){
+		return new ManifestImportExecutor();
+	}
+	
 }
