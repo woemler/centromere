@@ -18,7 +18,6 @@ package com.blueprint.centromere.core.ws;
 
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.Evaluation;
-import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
@@ -32,10 +31,11 @@ import java.util.regex.Pattern;
 
 /**
  * POJO that describes a model query parameter, used when reflecting {@link Model}
- *   classes and mapping HTTP requests to {@link QueryCriteria}.
+ *   classes and mapping HTTP requests to repositories.
  * 
  * @author woemler
  */
+@Deprecated
 public class QueryParameterDescriptor {
 	
 	private String paramName;

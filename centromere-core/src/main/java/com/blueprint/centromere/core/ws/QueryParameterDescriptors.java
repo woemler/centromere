@@ -22,6 +22,7 @@ import java.util.List;
 /**
  * @author woemler
  */
+@Deprecated
 public class QueryParameterDescriptors {
 
     private List<QueryParameterDescriptor> descriptors = new ArrayList<>();

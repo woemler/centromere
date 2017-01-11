@@ -48,6 +48,7 @@ import java.util.List;
  *
  * @author woemler
  */
+@Deprecated
 public class QueryUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(QueryUtil.class);

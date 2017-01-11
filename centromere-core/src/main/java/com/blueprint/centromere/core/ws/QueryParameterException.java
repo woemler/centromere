@@ -21,7 +21,7 @@ package com.blueprint.centromere.core.ws;
  *   execution.
  * 
  * @author woemler
- * @since 0.4.datatables-buttons
+ * @since 0.4.0
  */
 public class QueryParameterException extends RuntimeException {
 

@@ -17,7 +17,6 @@
 package com.blueprint.centromere.core.dataimport;
 
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.repository.RepositoryOperations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.repository.CrudRepository;
@@ -47,23 +46,13 @@ public class RepositoryRecordWriter<T extends Model<?>> implements RecordWriter<
 	}
 
 	/**
-	 * Writes the input {@link Model} record to the target {@link RepositoryOperations} implementation,
+	 * Writes the input {@link Model} record to the target Repository implementation,
 	 *   using the appropriate operation.
 	 * @param entity
 	 */ 
 	@SuppressWarnings("unchecked")
 	public void writeRecord(T entity) throws DataImportException {
 		repository.save(entity);
-//		if (writeMode.equals(WriteMode.INSERT)){
-//			repository.insert(entity);
-//		} else if (writeMode.equals(WriteMode.UPDATE)){
-//			repository.update(entity);
-//		} else if (writeMode.equals(WriteMode.UPSERT)){
-//			repository.save(entity);
-//		} else {
-//			throw new DataImportException("Invalid write mode selected: " + writeMode.toString());
-//		}
-		
 	}
 
 	public CrudRepository<T, ?> getRepository() {

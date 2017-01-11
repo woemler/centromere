@@ -26,6 +26,7 @@ import java.util.List;
  * 
 * @author woemler
 */
+@Deprecated
 public enum Evaluation {
 	EQUALS,
 	IN,

@@ -39,6 +39,7 @@ import java.util.*;
 
 /**
  * @author woemler
+ * @since 0.5.0
  */
 @NoRepositoryBean
 public interface BaseRepository<T extends Model<ID>, ID extends Serializable>
