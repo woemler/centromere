@@ -17,7 +17,7 @@
 package com.blueprint.centromere.core.commons.repositories;
 
 import com.blueprint.centromere.core.commons.models.DataFile;
-import com.blueprint.centromere.core.repository.BaseRepository;
+import com.blueprint.centromere.core.model.ModelRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.UUID;
  * @author woemler
  */
 @RepositoryRestResource(path = "datafiles", collectionResourceRel = "dataFiles")
-public interface DataFileRepository extends BaseRepository<DataFile, UUID> {
+public interface DataFileRepository extends ModelRepository<DataFile, UUID> {
 	List<DataFile> findByFilePath(String filePath);
 	List<DataFile> findByDataType(String dataType);
 	List<DataFile> findByDataSetId(UUID dataSetId);

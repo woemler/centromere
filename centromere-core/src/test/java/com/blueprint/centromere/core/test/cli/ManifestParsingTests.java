@@ -52,18 +52,18 @@ public class ManifestParsingTests {
 	@Before
 	public void setup(){
 	}
-	
+
 	private void testManifestObject(ImportManifest manifest){
 		Assert.notNull(manifest);
 		System.out.println(manifest.toString());
-		Assert.isTrue("Test Manifest".equals(manifest.getName()));
-		Assert.isTrue("test".equals(manifest.getLabel()));
-		Assert.isTrue("This is a test".equals(manifest.getNotes()));
-		Assert.isTrue("internal".equals(manifest.getSource()));
-		Assert.isTrue("1.0".equals(manifest.getVersion()));
-		Assert.notNull(manifest.getDateCreated());
-		Assert.notNull(manifest.getAttributes());
-		Assert.notEmpty(manifest.getAttributes());
+        Assert.notNull(manifest.getAttributes());
+        Assert.notEmpty(manifest.getAttributes());
+		Assert.isTrue("Test Manifest".equals(manifest.getAttributes().get("name")));
+		Assert.isTrue("test".equals(manifest.getAttributes().get("label")));
+		Assert.isTrue("This is a test".equals(manifest.getAttributes().get("notes")));
+		Assert.isTrue("internal".equals(manifest.getAttributes().get("source")));
+		Assert.isTrue("1.0".equals(manifest.getAttributes().get("version")));
+		Assert.notNull(manifest.getAttributes().get("date-created"));
 		Assert.isTrue(manifest.getAttributes().containsKey("skip-invalid-records"));
 		Assert.isTrue("true".equals(manifest.getAttributes().get("skip-invalid-records")));
 		Assert.notNull(manifest.getFiles());

@@ -17,7 +17,7 @@
 package com.blueprint.centromere.core.commons.repositories;
 
 import com.blueprint.centromere.core.commons.models.Subject;
-import com.blueprint.centromere.core.repository.BaseRepository;
+import com.blueprint.centromere.core.model.ModelRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
@@ -30,7 +30,7 @@ import java.util.UUID;
  */
 @RepositoryRestResource(path = "subjects", collectionResourceRel = "subjects")
 public interface SubjectRepository
-		extends BaseRepository<Subject, UUID>,
+		extends ModelRepository<Subject, UUID>,
 		MetadataOperations<Subject>,
  		AttributeOperations<Subject> {
 	

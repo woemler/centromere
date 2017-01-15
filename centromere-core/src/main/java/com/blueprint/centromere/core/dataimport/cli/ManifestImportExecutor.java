@@ -72,14 +72,7 @@ public class ManifestImportExecutor {
 		}
 		
 		// Set environemntal properties from manifest options.
-		Map<String,String> attributes = manifest.getAttributes();
-		attributes.put("manifest.name", manifest.getName());
-		attributes.put("manifest.label", manifest.getLabel());
-		attributes.put("manifest.notes", manifest.getNotes());
-		attributes.put("manifest.source", manifest.getSource());
-		attributes.put("manifest.version", manifest.getVersion());
-		attributes.put("manifest.date-created", manifest.getDateCreated().toString());
-		setEnvironmentProperties(attributes);
+		setEnvironmentProperties(manifest.getAttributes());
 		
 		// Import each file
 		for (ManifestFile mf: manifest.getFiles()){

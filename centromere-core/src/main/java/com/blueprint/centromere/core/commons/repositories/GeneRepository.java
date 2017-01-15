@@ -17,7 +17,7 @@
 package com.blueprint.centromere.core.commons.repositories;
 
 import com.blueprint.centromere.core.commons.models.Gene;
-import com.blueprint.centromere.core.repository.BaseRepository;
+import com.blueprint.centromere.core.model.ModelRepository;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.Predicate;
@@ -36,7 +36,7 @@ import java.util.UUID;
  */
 @RepositoryRestResource(path = "genes", collectionResourceRel = "genes")
 public interface GeneRepository extends
-		BaseRepository<Gene, UUID>,
+		ModelRepository<Gene, UUID>,
 		MetadataOperations<Gene>,
 		AttributeOperations<Gene> {
 

@@ -16,12 +16,26 @@
 
 package com.blueprint.centromere.core.test.ws;
 
+import com.blueprint.centromere.core.commons.models.DataFile;
+import com.blueprint.centromere.core.commons.models.DataSet;
 import com.blueprint.centromere.core.commons.models.Gene;
+import com.blueprint.centromere.core.commons.models.GeneExpression;
+import com.blueprint.centromere.core.commons.models.Sample;
+import com.blueprint.centromere.core.commons.models.Subject;
+import com.blueprint.centromere.core.commons.repositories.DataFileRepository;
+import com.blueprint.centromere.core.commons.repositories.DataSetRepository;
 import com.blueprint.centromere.core.commons.repositories.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repositories.GeneRepository;
+import com.blueprint.centromere.core.commons.repositories.SampleRepository;
+import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.test.jpa.EmbeddedH2DataSourceConfig;
+import com.blueprint.centromere.core.test.model.DataFileGenerator;
+import com.blueprint.centromere.core.test.model.DataSetGenerator;
 import com.blueprint.centromere.core.test.model.EntrezGeneDataGenerator;
+import com.blueprint.centromere.core.test.model.ExpressionDataGenerator;
+import com.blueprint.centromere.core.test.model.SampleDataGenerator;
+import com.blueprint.centromere.core.test.model.SubjectDataGenerator;
 import com.blueprint.centromere.core.ws.config.SpringWebCustomization;
 import com.blueprint.centromere.core.ws.config.WebSecurityConfig;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -66,8 +80,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class DefaultControllerTests {
 	
 	private static final String BASE_URL = "/api/genes";
+	private static final String EXPRESSION_URL = "/api/geneexpression";
 	
 	@Autowired private WebApplicationContext context;
+	@Autowired private SampleRepository sampleRepository;
+	@Autowired private SubjectRepository subjectRepository;
+	@Autowired private DataFileRepository dataFileRepository;
+	@Autowired private DataSetRepository dataSetRepository;
 	@Autowired private GeneRepository geneRepository;
 	@Autowired private GeneExpressionRepository geneExpressionRepository;
 	
@@ -78,8 +97,24 @@ public class DefaultControllerTests {
 	public void setup() throws Exception {
 		mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
 		geneExpressionRepository.deleteAll();
+		sampleRepository.deleteAll();
+		subjectRepository.deleteAll();
+		dataFileRepository.deleteAll();
+		dataSetRepository.deleteAll();
 		geneRepository.deleteAll();
-		geneRepository.save(EntrezGeneDataGenerator.generateData());
+
+		List<DataSet> dataSets = DataSetGenerator.generateData();
+		dataSetRepository.save(dataSets);
+		List<DataFile> dataFiles = DataFileGenerator.generateData(dataSets);
+		dataFileRepository.save(dataFiles);
+		List<Subject> subjects = SubjectDataGenerator.generateData();
+		subjectRepository.save(subjects);
+		List<Sample> samples = SampleDataGenerator.generateData(subjects, dataSets.get(0));
+		sampleRepository.save(samples);
+		List<Gene> genes = EntrezGeneDataGenerator.generateData();
+		geneRepository.save(genes);
+		List<GeneExpression> data = ExpressionDataGenerator.generateData(samples, genes, dataFiles);
+		geneExpressionRepository.save(data);
 	}
 	
 	@Test
@@ -273,6 +308,29 @@ public class DefaultControllerTests {
 	}
 
 	@Test
+    public void findByNumberEqualsTest() throws Exception {
+        mockMvc.perform(get(EXPRESSION_URL + "?value=1.23"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasKey("_embedded")))
+                .andExpect(jsonPath("$._embedded", hasKey("geneExpression")))
+                .andExpect(jsonPath("$._embedded.geneExpression", hasSize(1)))
+                .andExpect(jsonPath("$._embedded.geneExpression[0]", hasKey("value")))
+                .andExpect(jsonPath("$._embedded.geneExpression[0].value", is(1.23)));
+        // june oppllllle0000ppkt32ippp
+    }
+
+    @Test
+    public void findByNumberGreaterThanTest() throws Exception {
+        mockMvc.perform(get(EXPRESSION_URL + "?value=>5"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasKey("_embedded")))
+                .andExpect(jsonPath("$._embedded", hasKey("geneExpression")))
+                .andExpect(jsonPath("$._embedded.geneExpression", hasSize(3)))
+                .andExpect(jsonPath("$._embedded.geneExpression[0]", hasKey("value")))
+                .andExpect(jsonPath("$._embedded.geneExpression[0].value", greaterThan(5.0)));
+    }
+
+	@Test
 	public void findById() throws Exception {
 
 		List<Gene> genes = (List<Gene>) geneRepository.findAll();
@@ -360,6 +418,8 @@ public class DefaultControllerTests {
 
 	@Test
 	public void deleteTest() throws Exception {
+
+        geneExpressionRepository.deleteAll();
 
 		List<Gene> genes = geneRepository.findByPrimaryGeneSymbol("GeneA");
 		Assert.notNull(genes);

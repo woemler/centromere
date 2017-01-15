@@ -5,9 +5,7 @@
     <source>internal</source>
     <version>1.0</version>
     <date-created>2017-01-10</date-created>
-    <attributes>
-        <skip-invalid-records>true</skip-invalid-records>
-    </attributes>
+    <skip-invalid-records>true</skip-invalid-records>
     <files>
         <file> 
             <path>../Homo_sapiens.gene_info</path>

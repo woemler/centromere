@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors
+ * Copyright 2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.repository;
+package com.blueprint.centromere.core.model;
 
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.ws.QueryParameterException;
 import com.google.common.collect.Iterables;
 import com.querydsl.core.types.EntityPath;
+import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.ListPath;
 import com.querydsl.core.types.dsl.MapPath;
+import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.core.types.dsl.SimplePath;
 import com.querydsl.core.types.dsl.StringPath;
 import org.springframework.beans.BeanWrapper;
@@ -35,6 +37,8 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.io.Serializable;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -42,7 +46,7 @@ import java.util.*;
  * @since 0.5.0
  */
 @NoRepositoryBean
-public interface BaseRepository<T extends Model<ID>, ID extends Serializable>
+public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
 		extends PagingAndSortingRepository<T, ID>, QueryDslPredicateExecutor<T>, QuerydslBinderCustomizer {
 	
 	default long count(Predicate predicate){
@@ -78,7 +82,79 @@ public interface BaseRepository<T extends Model<ID>, ID extends Serializable>
 	@Override
 	@SuppressWarnings("unchecked")
 	default void customize(QuerydslBindings bindings, EntityPath entityPath){
-		
+
+//        bindings.bind(Number.class).all((path, numbers) -> {
+//            Number number = new ArrayList<Number>(numbers).get(0);
+//            if (path instanceof NumberPath){
+//                NumberPath p = (NumberPath) path;
+//
+//            } else {
+//                SimplePath p = (SimplePath) path;
+//                return p.eq(number);
+//            }
+//        });
+
+//        bindings.bind(Number.class).all((path, numbers) -> {
+//            System.out.println(String.format("Values: %s", numbers.toString()));
+//            List<Object> value = new ArrayList<>(numbers);
+//            List<Number> values;
+//            Object o = value.get(0);
+//            if (path instanceof MapPath) {
+//                // TODO
+//                return null;
+//            } else if (path instanceof ListPath){
+//                ListPath p = (ListPath) path;
+//                if (o instanceof List){
+//                    List<Object> l = (List<Object>) o;
+//                    return p.any().in(l);
+//                } else {
+//                    return p.any().in(o);
+//                }
+//            } else {
+//                NumberPath p = (NumberPath) path;
+//                if (o instanceof Number) {
+//                    Number n = (Number) o;
+//                    return p.eq(n);
+//                } else if (o instanceof String){
+//                    try {
+//                        String s = (String) o;
+//                        List<Number> nl = new ArrayList<>();
+//                        if (s.startsWith(">")) {
+//                            Number n = NumberFormat.getInstance().parse(s.replaceFirst(">", ""));
+//                            return p.gt(n);
+//                        } else if (s.startsWith(">>")) {
+//                            Number n = NumberFormat.getInstance().parse(s.replaceFirst(">>", ""));
+//                            return p.goe(n);
+//                        } else if (s.startsWith("<")) {
+//                            Number n = NumberFormat.getInstance().parse(s.replaceFirst("<<", ""));
+//                            return p.lt(n);
+//                        } else if (s.startsWith("<<")) {
+//                            Number n = NumberFormat.getInstance().parse(s.replaceFirst("<<", ""));
+//                            return p.loe(n);
+//                        } else if (s.startsWith("<>")) {
+//                            for (String ns : s.replaceFirst("<>", "").split(",")) {
+//                                nl.add(NumberFormat.getInstance().parse(ns));
+//                            }
+//                            if (nl.size() != 2) throw new IllegalArgumentException("The 'between' evaluation takes exactly two arguments.");
+//                            return p.between(nl.get(0), nl.get(1));
+//                        } else if (s.startsWith("><")) {
+//                            for (String ns : s.replaceFirst("><", "").split(",")) {
+//                                nl.add(NumberFormat.getInstance().parse(ns));
+//                            }
+//                            if (nl.size() != 2) throw new IllegalArgumentException("The 'outside' evaluation takes exactly two arguments.");
+//                            return p.notBetween(nl.get(0), nl.get(1));
+//                        } else {
+//                            return p.eq(NumberFormat.getInstance().parse(s));
+//                        }
+//                    } catch (ParseException e){
+//                        throw new IllegalArgumentException(e.getMessage());
+//                    }
+//                } else {
+//                    return ((SimplePath) path).eq(o);
+//                }
+//            }
+//        });
+
 		// String properties
 		bindings.bind(String.class).all((path, strings) -> {
 			List<Object> value = new ArrayList<>(strings);
@@ -99,7 +175,7 @@ public interface BaseRepository<T extends Model<ID>, ID extends Serializable>
 					throw new IllegalArgumentException("Cannot determine map key from non-string parameter object.");
 				}
 			} else if (path instanceof ListPath){
-				ListPath p = (ListPath) path; 
+				ListPath p = (ListPath) path;
 				if (o instanceof List){
 					List<Object> l = (List<Object>) o;
 					return p.any().in(l);
@@ -108,8 +184,8 @@ public interface BaseRepository<T extends Model<ID>, ID extends Serializable>
 				}
 			} else {
 				if (o instanceof String){
-					String s = (String) o; 
-					StringPath p = (StringPath) path; 
+					String s = (String) o;
+					StringPath p = (StringPath) path;
 					values = Arrays.asList(s.split(","));
 					if (values.size() > 1){
 						return p.in(values);

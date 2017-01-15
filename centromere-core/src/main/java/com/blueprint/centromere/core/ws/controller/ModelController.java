@@ -17,7 +17,7 @@
 package com.blueprint.centromere.core.ws.controller;
 
 import com.blueprint.centromere.core.commons.repositories.MetadataOperations;
-import com.blueprint.centromere.core.repository.BaseRepository;
+import com.blueprint.centromere.core.model.ModelRepository;
 import com.querydsl.core.types.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,8 +133,8 @@ public class ModelController {
         TypeInformation<?> typeInfo = ClassTypeInformation.from(model);
         
         Object repo = repositories.getRepositoryFor(model);
-        if (repo == null || !(repo instanceof BaseRepository)) throw new ResourceNotFoundException();
-        BaseRepository repository = (BaseRepository) repo;
+        if (repo == null || !(repo instanceof ModelRepository)) throw new ResourceNotFoundException();
+        ModelRepository repository = (ModelRepository) repo;
 
         Class<? extends QuerydslBinderCustomizer<?>> customizer = null;
         Method method = this.getClass().getMethod("distinct", RootResourceInformation.class, MultiValueMap.class);

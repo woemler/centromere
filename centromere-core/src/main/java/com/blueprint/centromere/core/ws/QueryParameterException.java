@@ -19,6 +19,7 @@ package com.blueprint.centromere.core.ws;
 /**
  * Generic exception to alert mishandling of query parameter generation, mapping, conversion, or 
  *   execution.
+ *   TODO: Replace with existing exception
  * 
  * @author woemler
  * @since 0.4.0

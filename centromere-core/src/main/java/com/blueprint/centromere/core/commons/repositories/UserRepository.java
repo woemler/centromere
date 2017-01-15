@@ -17,7 +17,7 @@
 package com.blueprint.centromere.core.commons.repositories;
 
 import com.blueprint.centromere.core.commons.models.User;
-import com.blueprint.centromere.core.repository.BaseRepository;
+import com.blueprint.centromere.core.model.ModelRepository;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.Predicate;
@@ -25,7 +25,6 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.core.types.dsl.StringPath;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -36,7 +35,7 @@ import java.util.UUID;
  * @since 0.5.0
  */
 @RepositoryRestResource(path = "users", collectionResourceRel = "users", exported = false)
-public interface UserRepository extends BaseRepository<User, UUID>, UserDetailsService {
+public interface UserRepository extends ModelRepository<User, UUID>, UserDetailsService {
 
 	@Override 
 	default User loadUserByUsername(String username) throws UsernameNotFoundException {
