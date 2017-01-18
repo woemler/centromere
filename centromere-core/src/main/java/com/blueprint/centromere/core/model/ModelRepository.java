@@ -16,15 +16,12 @@
 
 package com.blueprint.centromere.core.model;
 
-import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.ws.QueryParameterException;
 import com.google.common.collect.Iterables;
 import com.querydsl.core.types.EntityPath;
-import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.ListPath;
 import com.querydsl.core.types.dsl.MapPath;
-import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.core.types.dsl.SimplePath;
 import com.querydsl.core.types.dsl.StringPath;
 import org.springframework.beans.BeanWrapper;
@@ -37,8 +34,6 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.io.Serializable;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -47,8 +42,9 @@ import java.util.*;
  */
 @NoRepositoryBean
 public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
-		extends PagingAndSortingRepository<T, ID>, QueryDslPredicateExecutor<T>, QuerydslBinderCustomizer {
-	
+		extends PagingAndSortingRepository<T, ID>, QueryDslPredicateExecutor<T>,
+        QuerydslBinderCustomizer {
+
 	default long count(Predicate predicate){
 		return Iterables.size(findAll(predicate));	
 	}
@@ -82,78 +78,6 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
 	@Override
 	@SuppressWarnings("unchecked")
 	default void customize(QuerydslBindings bindings, EntityPath entityPath){
-
-//        bindings.bind(Number.class).all((path, numbers) -> {
-//            Number number = new ArrayList<Number>(numbers).get(0);
-//            if (path instanceof NumberPath){
-//                NumberPath p = (NumberPath) path;
-//
-//            } else {
-//                SimplePath p = (SimplePath) path;
-//                return p.eq(number);
-//            }
-//        });
-
-//        bindings.bind(Number.class).all((path, numbers) -> {
-//            System.out.println(String.format("Values: %s", numbers.toString()));
-//            List<Object> value = new ArrayList<>(numbers);
-//            List<Number> values;
-//            Object o = value.get(0);
-//            if (path instanceof MapPath) {
-//                // TODO
-//                return null;
-//            } else if (path instanceof ListPath){
-//                ListPath p = (ListPath) path;
-//                if (o instanceof List){
-//                    List<Object> l = (List<Object>) o;
-//                    return p.any().in(l);
-//                } else {
-//                    return p.any().in(o);
-//                }
-//            } else {
-//                NumberPath p = (NumberPath) path;
-//                if (o instanceof Number) {
-//                    Number n = (Number) o;
-//                    return p.eq(n);
-//                } else if (o instanceof String){
-//                    try {
-//                        String s = (String) o;
-//                        List<Number> nl = new ArrayList<>();
-//                        if (s.startsWith(">")) {
-//                            Number n = NumberFormat.getInstance().parse(s.replaceFirst(">", ""));
-//                            return p.gt(n);
-//                        } else if (s.startsWith(">>")) {
-//                            Number n = NumberFormat.getInstance().parse(s.replaceFirst(">>", ""));
-//                            return p.goe(n);
-//                        } else if (s.startsWith("<")) {
-//                            Number n = NumberFormat.getInstance().parse(s.replaceFirst("<<", ""));
-//                            return p.lt(n);
-//                        } else if (s.startsWith("<<")) {
-//                            Number n = NumberFormat.getInstance().parse(s.replaceFirst("<<", ""));
-//                            return p.loe(n);
-//                        } else if (s.startsWith("<>")) {
-//                            for (String ns : s.replaceFirst("<>", "").split(",")) {
-//                                nl.add(NumberFormat.getInstance().parse(ns));
-//                            }
-//                            if (nl.size() != 2) throw new IllegalArgumentException("The 'between' evaluation takes exactly two arguments.");
-//                            return p.between(nl.get(0), nl.get(1));
-//                        } else if (s.startsWith("><")) {
-//                            for (String ns : s.replaceFirst("><", "").split(",")) {
-//                                nl.add(NumberFormat.getInstance().parse(ns));
-//                            }
-//                            if (nl.size() != 2) throw new IllegalArgumentException("The 'outside' evaluation takes exactly two arguments.");
-//                            return p.notBetween(nl.get(0), nl.get(1));
-//                        } else {
-//                            return p.eq(NumberFormat.getInstance().parse(s));
-//                        }
-//                    } catch (ParseException e){
-//                        throw new IllegalArgumentException(e.getMessage());
-//                    }
-//                } else {
-//                    return ((SimplePath) path).eq(o);
-//                }
-//            }
-//        });
 
 		// String properties
 		bindings.bind(String.class).all((path, strings) -> {
