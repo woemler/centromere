@@ -17,8 +17,7 @@
 package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
-
-import org.springframework.core.annotation.Order;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.*;
@@ -35,9 +34,10 @@ import java.util.UUID;
  */
 @Entity
 @Document
+@Table(indexes = { @Index(name = "SAMPLES_IDX_01", columnList = "name", unique = true) })
 public class Sample extends AbstractModel implements Attributes {
 
-	private String name;
+	@Indexed(unique = true) private String name;
 	private String sampleType;
 	private String tissue;
 	private String histology;

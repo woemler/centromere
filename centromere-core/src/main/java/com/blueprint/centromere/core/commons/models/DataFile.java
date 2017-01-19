@@ -17,17 +17,10 @@
 package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
-
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OrderColumn;
-
+import javax.persistence.*;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,11 +31,15 @@ import java.util.UUID;
  */
 @Entity
 @Document
+@Table(indexes = { @Index(name = "DATA_FILE_IDX_01", columnList = "dataType") })
 public class DataFile extends AbstractModel implements Attributes {
 	
 	private String filePath;
-	private String dataType;
+	
+	@Indexed private String dataType;
+	
 	private Date dateCreated;
+	
 	private Date dateUpdated;
 
 	@ManyToOne
@@ -55,6 +52,8 @@ public class DataFile extends AbstractModel implements Attributes {
 	@ElementCollection(fetch = FetchType.EAGER)
 	@OrderColumn
 	private Map<String, String> attributes = new HashMap<>();
+	
+	/* Getters and Setters */ 
 
 	public String getFilePath() {
 		return filePath;

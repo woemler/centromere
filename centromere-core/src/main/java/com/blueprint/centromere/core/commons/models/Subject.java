@@ -17,17 +17,10 @@
 package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
-
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,9 +35,10 @@ import java.util.Map;
  */
 @Entity
 @Document
+@Table(indexes = { @Index(name = "SUBJECT_IDX_01", columnList = "name", unique = true) })
 public class Subject extends AbstractModel implements Attributes {
 	
-	private String name;
+	@Indexed(unique = true) private String name;
 	private String species;
 	private String gender;
 	private String notes;

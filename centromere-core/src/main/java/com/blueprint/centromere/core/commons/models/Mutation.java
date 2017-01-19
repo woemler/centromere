@@ -16,13 +16,10 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-import com.blueprint.centromere.core.model.Model;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
-import java.io.Serializable;
 
 /**
  * @author woemler
@@ -34,13 +31,15 @@ public class Mutation extends Data {
 	private String chromosome;
 	private String referenceGenome;
 	private String strand;
-	private Integer startPosition;
-	private Integer stopPosition;
+	private Integer dnaStartPosition;
+	private Integer dnaStopPosition;
 	private String referenceAllele;
 	private String alternateAllele;
 	private String cDnaChange;
 	private String codonChange;
+	
 	private String proteinChange;
+	
 	private String mutationClassification;
 	private String mutationType;
 
@@ -68,20 +67,20 @@ public class Mutation extends Data {
 		this.strand = strand;
 	}
 
-	public Integer getStartPosition() {
-		return startPosition;
+	public Integer getDnaStartPosition() {
+		return dnaStartPosition;
 	}
 
-	public void setStartPosition(Integer startPosition) {
-		this.startPosition = startPosition;
+	public void setDnaStartPosition(Integer dnaStartPosition) {
+		this.dnaStartPosition = dnaStartPosition;
 	}
 
-	public Integer getStopPosition() {
-		return stopPosition;
+	public Integer getDnaStopPosition() {
+		return dnaStopPosition;
 	}
 
-	public void setStopPosition(Integer stopPosition) {
-		this.stopPosition = stopPosition;
+	public void setDnaStopPosition(Integer dnaStopPosition) {
+		this.dnaStopPosition = dnaStopPosition;
 	}
 
 	public String getReferenceAllele() {

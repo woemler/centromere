@@ -31,6 +31,7 @@ public class SegmentCopyNumber extends Data {
 	private Long segmentStart;
 	private Long segmentEnd;
 	private Integer probeCount;
+	private Double value; 
 
 	public String getChromosome() {
 		return chromosome;
@@ -62,5 +63,13 @@ public class SegmentCopyNumber extends Data {
 
 	public void setProbeCount(Integer probeCount) {
 		this.probeCount = probeCount;
+	}
+
+	public Double getValue() {
+		return value;
+	}
+
+	public void setValue(Double value) {
+		this.value = value;
 	}
 }

@@ -17,32 +17,29 @@
 package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
-import com.blueprint.centromere.core.model.Model;
-import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.OrderColumn;
-
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 /**
+ * Simple {@link UserDetails} implementation for data warehouse user metadata.  Exercise good security
+ *   practices: always hash passwords!  Do not store them in plain-text!
+ * 
  * @author woemler
  */
 @Entity
 @Document
+@Table(indexes = { @Index(name = "USERS_IDX_01", columnList = "username", unique = true) })
 public class User extends AbstractModel implements UserDetails {
 	
-	private String username;
+	@Indexed(unique = true) private String username;
 	private String password;
 	private boolean accountNonExpired = true;
 	private boolean accountNonLocked = true;
