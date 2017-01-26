@@ -23,13 +23,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.GenericFilterBean;
 
-import java.io.IOException;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 /**
  * Authenticates user requests using a previously generated {@link TokenDetails}.
@@ -59,6 +58,7 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
 			throw new RuntimeException("Expecting an HTTP request.");
 		}
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
+		System.out.println("Remote Host: " + httpRequest.getRemoteHost());
 
 		String authToken = httpRequest.getHeader("X-Auth-Token");
 		if (authToken == null){

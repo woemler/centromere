@@ -27,8 +27,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 import org.springframework.test.context.ActiveProfiles;
@@ -61,8 +59,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 		WebSecurityConfig.class
 })
 @ActiveProfiles({ "default", Profiles.WEB_PROFILE })
-@DataJpaTest
-@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 public class DefaultControllerRelationshipTests {
 
 	private static final String SUBJECT_URL = "/api/subjects";
@@ -82,18 +78,21 @@ public class DefaultControllerRelationshipTests {
 
 	@Before
 	public void setup() throws Exception {
-		doDelete();
-		doInsert();
+		if (!isConfigured) {
+			doDelete();
+			doInsert();
+			isConfigured = true;
+		}
 		mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
 	}
 	
 	private void doDelete(){
+		geneExpressionRepository.deleteAll();
+		geneRepository.deleteAll();
 		sampleRepository.deleteAll();
 		subjectRepository.deleteAll();
 		dataFileRepository.deleteAll();
 		dataSetRepository.deleteAll();
-		geneRepository.deleteAll();
-		geneExpressionRepository.deleteAll();
 	}
 	
 	private void doInsert() throws Exception{

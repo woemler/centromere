@@ -19,6 +19,8 @@ package com.blueprint.centromere.core.ws.config;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.core.ws.controller.SecurityControllers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -45,6 +47,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @ComponentScan(basePackageClasses = { SecurityControllers.class })
 @Profile({ Profiles.WEB_PROFILE })
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    
+    private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
@@ -67,23 +71,26 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         protected void configure(HttpSecurity http) throws Exception {
 
             String secureUrl = env.getRequiredProperty("centromere.security.secure-url");
+            logger.info(String.format("Configuring web security with OPEN READ and OPEN WRITE for " 
+                + "API root %s", secureUrl));
 
-            http.sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .addFilterBefore(authenticationTokenProcessingFilter(),
+            http
+                .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().addFilterBefore(authenticationTokenProcessingFilter(),
                     UsernamePasswordAuthenticationFilter.class)
-                .antMatcher(secureUrl)
-                .authorizeRequests()
-                .antMatchers(HttpMethod.GET, secureUrl).permitAll()
-                .antMatchers(HttpMethod.POST, secureUrl).permitAll()
-                .antMatchers(HttpMethod.PUT, secureUrl).permitAll()
-                .antMatchers(HttpMethod.DELETE, secureUrl).permitAll()
-                .antMatchers(HttpMethod.PATCH, secureUrl).permitAll()
-                .antMatchers(HttpMethod.OPTIONS, secureUrl).permitAll()
-                .antMatchers(HttpMethod.HEAD, secureUrl).permitAll()
-                .and()
-                .csrf().disable();
+                    .antMatcher(secureUrl)
+                    .authorizeRequests()
+                        .anyRequest().permitAll()
+//                        .antMatchers(HttpMethod.GET, secureUrl).permitAll()
+//                        .antMatchers(HttpMethod.POST, secureUrl).permitAll()
+//                        .antMatchers(HttpMethod.PUT, secureUrl).permitAll()
+//                        .antMatchers(HttpMethod.DELETE, secureUrl).permitAll()
+//                        .antMatchers(HttpMethod.PATCH, secureUrl).permitAll()
+//                        .antMatchers(HttpMethod.OPTIONS, secureUrl).permitAll()
+//                        .antMatchers(HttpMethod.HEAD, secureUrl).permitAll()
+                .and().csrf()
+                    .disable();
 
         }
     }
@@ -99,23 +106,25 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         protected void configure(HttpSecurity http) throws Exception {
 
             String secureUrl = env.getRequiredProperty("centromere.security.secure-url");
+            logger.info(String.format("Configuring web security with OPEN READ and RESTRICTED WRITE " 
+                + "for API root %s", secureUrl));
 
-            http.sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .addFilterBefore(authenticationTokenProcessingFilter(),
+            http
+                .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().addFilterBefore(authenticationTokenProcessingFilter(),
                     UsernamePasswordAuthenticationFilter.class)
-                .antMatcher(secureUrl)
-                .authorizeRequests()
-                .antMatchers(HttpMethod.GET, secureUrl).permitAll()
-                .antMatchers(HttpMethod.POST, secureUrl).fullyAuthenticated()
-                .antMatchers(HttpMethod.PUT, secureUrl).fullyAuthenticated()
-                .antMatchers(HttpMethod.DELETE, secureUrl).fullyAuthenticated()
-                .antMatchers(HttpMethod.PATCH, secureUrl).fullyAuthenticated()
-                .antMatchers(HttpMethod.OPTIONS, secureUrl).permitAll()
-                .antMatchers(HttpMethod.HEAD, secureUrl).permitAll()
-                .and()
-                .csrf().disable();
+                    .antMatcher(secureUrl)
+                    .authorizeRequests()
+                        .antMatchers(HttpMethod.GET, secureUrl).permitAll()
+                        .antMatchers(HttpMethod.POST, secureUrl).fullyAuthenticated()
+                        .antMatchers(HttpMethod.PUT, secureUrl).fullyAuthenticated()
+                        .antMatchers(HttpMethod.DELETE, secureUrl).fullyAuthenticated()
+                        .antMatchers(HttpMethod.PATCH, secureUrl).fullyAuthenticated()
+                        .antMatchers(HttpMethod.OPTIONS, secureUrl).permitAll()
+                        .antMatchers(HttpMethod.HEAD, secureUrl).permitAll()
+                .and().csrf()
+                    .disable();
 
         }
     }
@@ -131,23 +140,25 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         protected void configure(HttpSecurity http) throws Exception {
 
             String secureUrl = env.getRequiredProperty("centromere.security.secure-url");
+            logger.info(String.format("Configuring web security with RESTRICTED READ and RESTRICTED " 
+                + "WRITE for API root: %s", secureUrl));
 
-            http.sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .addFilterBefore(authenticationTokenProcessingFilter(),
+            http
+                .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().addFilterBefore(authenticationTokenProcessingFilter(),
                     UsernamePasswordAuthenticationFilter.class)
-                .antMatcher(secureUrl)
-                .authorizeRequests()
-                .antMatchers(HttpMethod.GET, secureUrl).fullyAuthenticated()
-                .antMatchers(HttpMethod.POST, secureUrl).fullyAuthenticated()
-                .antMatchers(HttpMethod.PUT, secureUrl).fullyAuthenticated()
-                .antMatchers(HttpMethod.DELETE, secureUrl).fullyAuthenticated()
-                .antMatchers(HttpMethod.PATCH, secureUrl).fullyAuthenticated()
-                .antMatchers(HttpMethod.OPTIONS, secureUrl).fullyAuthenticated()
-                .antMatchers(HttpMethod.HEAD, secureUrl).fullyAuthenticated()
-                .and()
-                .csrf().disable();
+                    .antMatcher(secureUrl)
+                    .authorizeRequests()
+                        .antMatchers(HttpMethod.GET, secureUrl).fullyAuthenticated()
+                        .antMatchers(HttpMethod.POST, secureUrl).fullyAuthenticated()
+                        .antMatchers(HttpMethod.PUT, secureUrl).fullyAuthenticated()
+                        .antMatchers(HttpMethod.DELETE, secureUrl).fullyAuthenticated()
+                        .antMatchers(HttpMethod.PATCH, secureUrl).fullyAuthenticated()
+                        .antMatchers(HttpMethod.OPTIONS, secureUrl).fullyAuthenticated()
+                        .antMatchers(HttpMethod.HEAD, secureUrl).fullyAuthenticated()
+                .and().csrf()
+                    .disable();
 
         }
     }
@@ -158,15 +169,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
-            http.authorizeRequests()
-                .anyRequest().permitAll()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .httpBasic()
-                .and()
-                .csrf().disable();
+            http
+                .authorizeRequests()
+                    .anyRequest().permitAll()
+                .and().sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and().httpBasic()
+                .and().csrf()
+                    .disable();
         }
     }
 

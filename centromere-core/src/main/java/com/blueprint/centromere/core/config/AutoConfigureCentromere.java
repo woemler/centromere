@@ -71,10 +71,4 @@ public @interface AutoConfigureCentromere {
 	 */
 	Security webSecurity() default Security.NONE;
 	
-//	@AliasFor(annotation = ComponentScan.class, attribute = "basePackages")
-//	String[] basePackages() default {};
-//	
-//	@AliasFor(annotation = ComponentScan.class, attribute = "basePackageClasses")
-//	Class<? extends Model<?>>[] modelClasses() default {};
-	
 }

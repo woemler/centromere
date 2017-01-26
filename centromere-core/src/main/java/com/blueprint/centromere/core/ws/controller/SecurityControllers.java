@@ -17,7 +17,6 @@
 package com.blueprint.centromere.core.ws.controller;
 
 import com.blueprint.centromere.core.commons.models.User;
-import com.blueprint.centromere.core.commons.repositories.UserRepository;
 import com.blueprint.centromere.core.ws.security.BasicTokenUtils;
 import com.blueprint.centromere.core.ws.security.TokenDetails;
 import org.slf4j.Logger;
@@ -40,7 +39,7 @@ public class SecurityControllers {
 	public static class UserAuthenticationController {
 
 		@Autowired private BasicTokenUtils tokenUtils;
-		@Autowired private UserRepository userRepository;
+		
 		private static final Logger logger = LoggerFactory.getLogger(UserAuthenticationController.class);
 
 		@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
