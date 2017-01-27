@@ -17,6 +17,8 @@
 package com.blueprint.centromere.core.test.ws;
 
 import com.blueprint.centromere.core.config.AutoConfigureCentromere;
+import com.blueprint.centromere.core.config.Schema;
+import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.core.ws.CentromereWebInitializer;
 
 /**
@@ -26,6 +28,13 @@ public class SpringBootApplicationConfigurations {
 	
 	@AutoConfigureCentromere
 	public static class DefaultSpringBootWebConfig extends CentromereWebInitializer {
+		public static void main(String[] args) {
+			CentromereWebInitializer.run(DefaultSpringBootWebConfig.class, args);
+		}
+	}
+
+	@AutoConfigureCentromere(schema = Schema.DEFAULT, webSecurity = Security.SECURE_READ_WRITE)
+	public static class SecuredSpringBootWebConfig extends CentromereWebInitializer {
 		public static void main(String[] args) {
 			CentromereWebInitializer.run(DefaultSpringBootWebConfig.class, args);
 		}

@@ -22,34 +22,28 @@ import com.blueprint.centromere.core.ws.security.TokenDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author woemler
  */
-public class SecurityControllers {
+@RestController
+public class UserAuthenticationController {
 
-	@Controller
-	public static class UserAuthenticationController {
+	@Autowired private BasicTokenUtils tokenUtils;
 
-		@Autowired private BasicTokenUtils tokenUtils;
-		
-		private static final Logger logger = LoggerFactory.getLogger(UserAuthenticationController.class);
+	private static final Logger logger = LoggerFactory.getLogger(UserAuthenticationController.class);
 
-		@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-		public ResponseEntity<TokenDetails> createToken(@AuthenticationPrincipal User user){
-			Assert.notNull(user, "Unable to authenticate user!");
-			TokenDetails tokenDetails = tokenUtils.createTokenAndDetails(user);
-			logger.info(String.format("Successfully generated authentication token for user: %s", user.getUsername()));
-			return new ResponseEntity<>(tokenDetails, HttpStatus.OK);
-		}
-
+	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+	public TokenDetails createToken(@AuthenticationPrincipal User user){
+		Assert.notNull(user, "Unable to authenticate user!");
+		TokenDetails tokenDetails = tokenUtils.createTokenAndDetails(user);
+		logger.info(String.format("Successfully generated authentication token for user: %s", user.getUsername()));
+		return tokenDetails;
 	}
 	
 }

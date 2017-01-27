@@ -16,28 +16,13 @@
 
 package com.blueprint.centromere.core.test.ws;
 
-import com.blueprint.centromere.core.commons.models.DataFile;
-import com.blueprint.centromere.core.commons.models.DataSet;
-import com.blueprint.centromere.core.commons.models.Gene;
-import com.blueprint.centromere.core.commons.models.GeneExpression;
-import com.blueprint.centromere.core.commons.models.Sample;
-import com.blueprint.centromere.core.commons.models.Subject;
-import com.blueprint.centromere.core.commons.repositories.DataFileRepository;
-import com.blueprint.centromere.core.commons.repositories.DataSetRepository;
-import com.blueprint.centromere.core.commons.repositories.GeneExpressionRepository;
-import com.blueprint.centromere.core.commons.repositories.GeneRepository;
-import com.blueprint.centromere.core.commons.repositories.SampleRepository;
-import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
+import com.blueprint.centromere.core.commons.models.*;
+import com.blueprint.centromere.core.commons.repositories.*;
 import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.core.test.jpa.EmbeddedH2DataSourceConfig;
-import com.blueprint.centromere.core.test.model.DataFileGenerator;
-import com.blueprint.centromere.core.test.model.DataSetGenerator;
-import com.blueprint.centromere.core.test.model.EntrezGeneDataGenerator;
-import com.blueprint.centromere.core.test.model.ExpressionDataGenerator;
-import com.blueprint.centromere.core.test.model.SampleDataGenerator;
-import com.blueprint.centromere.core.test.model.SubjectDataGenerator;
-import com.blueprint.centromere.core.ws.config.SpringWebCustomization;
-import com.blueprint.centromere.core.ws.config.WebSecurityConfig;
+import com.blueprint.centromere.core.test.model.*;
+import com.blueprint.centromere.core.ws.config.WebApplicationConfig;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
@@ -47,7 +32,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -72,11 +56,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 @SpringBootTest(classes = {
 		EmbeddedH2DataSourceConfig.class, 
-		RepositoryRestMvcConfiguration.class,
-		SpringWebCustomization.WebServicesConfig.class,
-		WebSecurityConfig.class
+		WebApplicationConfig.class
 })
-@ActiveProfiles(value = {"default", Profiles.WEB_PROFILE})
+@ActiveProfiles(value = { Profiles.WEB_PROFILE, Security.NONE_PROFILE })
 public class DefaultControllerTests {
 	
 	private static final String BASE_URL = "/api/genes";

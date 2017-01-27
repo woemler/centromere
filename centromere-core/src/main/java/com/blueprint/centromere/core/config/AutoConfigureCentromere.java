@@ -18,11 +18,9 @@ package com.blueprint.centromere.core.config;
 
 import com.blueprint.centromere.core.dataimport.cli.CommandLineInputConfiguration;
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.ws.config.SpringWebCustomization;
-import com.blueprint.centromere.core.ws.config.WebSecurityConfig;
+import com.blueprint.centromere.core.ws.config.WebApplicationConfig;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 
 import java.lang.annotation.*;
 
@@ -39,9 +37,9 @@ import java.lang.annotation.*;
 @Configuration
 @Import({
 		ProfileConfiguration.class,
-		RepositoryRestMvcConfiguration.class,
-		SpringWebCustomization.WebServicesConfig.class,
-		WebSecurityConfig.class,
+		//RepositoryRestMvcConfiguration.class,
+		WebApplicationConfig.class,
+		//WebSecurityConfig.class,
 		CommandLineInputConfiguration.class
 })
 public @interface AutoConfigureCentromere {

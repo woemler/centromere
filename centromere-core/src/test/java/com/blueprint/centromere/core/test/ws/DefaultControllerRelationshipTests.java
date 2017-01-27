@@ -21,14 +21,12 @@ import com.blueprint.centromere.core.commons.repositories.*;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.test.jpa.EmbeddedH2DataSourceConfig;
 import com.blueprint.centromere.core.test.model.*;
-import com.blueprint.centromere.core.ws.config.SpringWebCustomization;
-import com.blueprint.centromere.core.ws.config.WebSecurityConfig;
+import com.blueprint.centromere.core.ws.config.WebApplicationConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -54,9 +52,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebAppConfiguration
 @SpringBootTest(classes = {
 		EmbeddedH2DataSourceConfig.class, 
-		RepositoryRestMvcConfiguration.class,
-		SpringWebCustomization.WebServicesConfig.class,
-		WebSecurityConfig.class
+		WebApplicationConfig.class
 })
 @ActiveProfiles({ "default", Profiles.WEB_PROFILE })
 public class DefaultControllerRelationshipTests {

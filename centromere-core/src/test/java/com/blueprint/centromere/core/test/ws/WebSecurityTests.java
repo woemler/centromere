@@ -21,8 +21,7 @@ import com.blueprint.centromere.core.commons.repositories.UserRepository;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.core.test.jpa.EmbeddedH2DataSourceConfig;
-import com.blueprint.centromere.core.ws.config.SpringWebCustomization;
-import com.blueprint.centromere.core.ws.config.WebSecurityConfig;
+import com.blueprint.centromere.core.ws.config.WebApplicationConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.Before;
@@ -31,12 +30,10 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
-import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -44,8 +41,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static com.jayway.jsonassert.impl.matcher.IsMapContainingKey.hasKey;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -54,12 +50,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author woemler
  */
 @RunWith(SpringRunner.class)
-@WebAppConfiguration
+//@WebAppConfiguration
 @SpringBootTest(classes = {
 		EmbeddedH2DataSourceConfig.class, 
-		RepositoryRestMvcConfiguration.class,
-		SpringWebCustomization.WebServicesConfig.class,
-		WebSecurityConfig.class
+		WebApplicationConfig.class
 })
 @ActiveProfiles(value = {Profiles.WEB_PROFILE, Security.SECURE_READ_WRITE_PROFILE})
 public class WebSecurityTests {
@@ -87,6 +81,12 @@ public class WebSecurityTests {
 			userRepository.save(user);
 			isConfigured = true;
 		}
+	}
+	
+	@Test
+	public void authenticationEndpointTest() throws Exception {
+		mockMvc.perform(head("/authenticate"))
+				.andExpect(status().isOk());
 	}
 	
 	@Test
