@@ -19,11 +19,11 @@ package com.blueprint.centromere.core.ws.controller;
 import com.blueprint.centromere.core.commons.repositories.MetadataOperations;
 import com.blueprint.centromere.core.model.ModelRepository;
 import com.blueprint.centromere.core.ws.QueryParameterException;
-import com.blueprint.centromere.core.ws.controller.query.QueryPath;
+import com.blueprint.centromere.core.ws.controller.query.QueryCriteria;
 import com.blueprint.centromere.core.ws.controller.query.QueryUtil;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.Expressions;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,7 +175,6 @@ public class ModelController {
 
         logger.info(String.format("Generating dynamic query for model: %s", model.getName()));
         BooleanBuilder builder = new BooleanBuilder();
-        Map<String, QueryPath> pathMap = QueryUtil.getModelQueryPaths(model);
 
         for (Map.Entry<String, String[]> param: request.getParameterMap().entrySet()){
 
@@ -183,22 +182,18 @@ public class ModelController {
                     param.getKey(), Arrays.asList(param.getValue()).toString()));
 
             if (param.getValue().length == 0 || param.getValue()[0].trim().equals("")) continue;
-            
-            String key = param.getKey();
-            List<String> values = Arrays.asList(param.getValue()[0].split(",")); // Ignore secondary values
-            QueryPath queryPath = QueryUtil.getQueryPathFromFieldName(key, pathMap);
-            
-            if (queryPath == null) throw new QueryParameterException(String.format("Invalid query parameter: %s", key));
 
-            
+            // Is the param name a valid model field?
+              // Is it a direct match to field name?
+                // return default criteria path
+              // Is it a suffixed field name?
+                // return evaluation criteria
 
-            if (descriptors.matches(param.getKey())){
-                QueryParameterDescriptor descriptor = descriptors.get(param.getKey());
-                logger.info(String.format("Matched descriptor: %s", descriptor.toString()));
-                Predicate predicate = QueryUtil.getParameterPredicate(param.getKey(),
-                        param.getValue()[0], descriptor, conversionService);
-                if (predicate != null) builder.and(predicate);
-            }
+            QueryCriteria criteria = QueryUtil.getCriteriaFromParameter(param.getKey(), model);
+            if (criteria == null) throw new QueryParameterException(
+                    String.format("Invalid query parameter: %s", param.getKey()));
+
+            // Convert parameter value in to target type.
         }
 
         return builder.getValue();

@@ -16,72 +16,146 @@
 
 package com.blueprint.centromere.core.ws.controller.query;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.reflect.TypeResolver;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.StringPath;
-import org.springframework.core.GenericTypeResolver;
+import com.querydsl.core.types.dsl.PathBuilder;
+
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Date;
+
 
 /**
  * @author woemler
  */
 public class QueryUtil {
-	
-	public static QueryPath getQueryPathFromFieldName(String name, Map<String, QueryPath> map){
-		if (map.containsKey(name)) return map.get(name);
-		Evaluation evaluation = Evaluation.guessEvaluation(name);
-		if (!evaluation.equals(Evaluation.EQUALS)){
-			return map.get(name.replace(Evaluation.getSuffix(evaluation), ""));
+
+    public static QueryCriteria getCriteriaFromParameter(String parameter, Class<?> model){
+
+        PathBuilder<?> pathBuilder = new PathBuilder<>(model, model.getSimpleName());
+        //Path root = Expressions.path(model, model.getSimpleName());
+
+        for (Field field: model.getDeclaredFields()){
+
+            String name = field.getName();
+            Evaluation evaluation;
+            Class<?> type = field.getType();
+            Path path;
+
+            // Skippable fields
+            if (field.isSynthetic()) continue;
+            if (field.isAnnotationPresent(RestResource.class)){
+                RestResource annotation = field.getAnnotation(RestResource.class);
+                if (!annotation.exported()) continue;
+            }
+
+            // Field name and parameter name match
+            if (parameter.equals(name)){
+                evaluation = Evaluation.EQUALS;
+            }
+            // Parameter name is field name with suffix
+            else if (parameterMatchesFieldEvaluation(parameter, name)
+                    && isNonStandardEvaluation(parameter)){
+                evaluation = guessEvaluation(parameter);
+            } else {
+                continue;
+            }
+
+            // Determine the field type
+            TypeDescriptor typeDescriptor = TypeDescriptor.valueOf(type);
+
+            if (typeDescriptor.isMap()) {
+                Class<?> keyType = typeDescriptor.getMapKeyTypeDescriptor().getType();
+                TypeDescriptor mapValueDescriptor = typeDescriptor.getMapValueTypeDescriptor();
+                Class<?> valueType = mapValueDescriptor.isCollection()
+                        ? mapValueDescriptor.getElementTypeDescriptor().getType()
+                        : mapValueDescriptor.getType();
+                path = pathBuilder.getMap(name, keyType, valueType);
+
+            } else if  (typeDescriptor.isCollection()) {
+                Class<?> valueType = typeDescriptor.getElementTypeDescriptor().getType();
+                path = pathBuilder.getList(name, valueType);
+            } else {
+                if (type.isAssignableFrom(String.class)){
+                    path = pathBuilder.getString(name);
+                } else if (type.isAssignableFrom(Number.class)){
+                    path = pathBuilder.getNumber(name, (Class) type);
+                } else if (type.isAssignableFrom(Date.class)){
+                    path = pathBuilder.getDate(name, (Class<? extends Date>) type);
+                } else if (type.isAssignableFrom(Boolean.class)){
+                    path = pathBuilder.getBoolean(name);
+                } else {
+                    path = pathBuilder.getSimple(name, type);
+                }
+            }
+
+            QueryCriteria queryCriteria = new QueryCriteria();
+            queryCriteria.setName(name);
+            queryCriteria.setPath(path);
+            queryCriteria.setEvaluation(evaluation);
+            queryCriteria.setModel(model);
+            queryCriteria.setType(type);
+
+            return queryCriteria;
+
+        }
+
+        return null;
+    }
+
+    private static boolean isNonStandardEvaluation(String s){
+        return !guessEvaluation(s).equals(Evaluation.EQUALS);
+    }
+
+    private static boolean parameterMatchesFieldEvaluation(String param, String field){
+        Evaluation evaluation = guessEvaluation(param);
+        String suffix = Evaluation.getSuffix(evaluation);
+        return param.replaceFirst(suffix, "").equals(field);
+    }
+
+	private static Evaluation guessEvaluation(String name){
+		if (name.endsWith(Evaluation.EQUALS_SUFFIX)){
+			return Evaluation.EQUALS;
+		} else if (name.endsWith(Evaluation.NOT_IN_SUFFIX)){
+			return Evaluation.NOT_IN;
+		} else if (name.endsWith(Evaluation.IN_SUFFIX)){
+			return Evaluation.IN;
+		} else if (name.endsWith(Evaluation.NOT_LIKE_SUFFIX)){
+			return Evaluation.NOT_LIKE;
+		} else if (name.endsWith(Evaluation.LIKE_SUFFIX)){
+			return Evaluation.LIKE;
+		} else if (name.endsWith(Evaluation.STARTS_WITH_SUFFIX)){
+			return Evaluation.STARTS_WITH;
+		} else if (name.endsWith(Evaluation.ENDS_WITH_SUFFIX)){
+			return Evaluation.ENDS_WITH;
+		} else if (name.endsWith(Evaluation.GREATER_THAN_EQUALS_SUFFIX)){
+			return Evaluation.GREATER_THAN_EQUALS;
+		} else if (name.endsWith(Evaluation.GREATER_THAN_SUFFIX)){
+			return Evaluation.GREATER_THAN;
+		} else if (name.endsWith(Evaluation.LESS_THAN_EQUALS_SUFFIX)){
+			return Evaluation.LESS_THAN_EQUALS;
+		} else if (name.endsWith(Evaluation.LESS_THAN_SUFFIX)){
+			return Evaluation.LESS_THAN;
+		} else if (name.endsWith(Evaluation.BETWEEN_SUFFIX)){
+			return Evaluation.BETWEEN;
+		} else if (name.endsWith(Evaluation.BETWEEN_INCLUSIVE_SUFFIX)){
+			return Evaluation.BETWEEN_INCLUSIVE;
+		} else if (name.endsWith(Evaluation.OUTSIDE_SUFFIX)){
+			return Evaluation.OUTSIDE;
+		} else if (name.endsWith(Evaluation.OUTSIDE_INCLUSIVE_SUFFIX)){
+			return Evaluation.OUTSIDE_INCLUSIVE;
+		} else if (name.endsWith(Evaluation.IS_NULL_SUFFIX)){
+			return Evaluation.IS_NULL;
+		} else if (name.endsWith(Evaluation.NOT_NULL_SUFFIX)){
+			return Evaluation.NOT_NULL;
+		} else if (name.endsWith(Evaluation.IS_TRUE_SUFFIX)){
+			return Evaluation.IS_TRUE;
+		} else if (name.endsWith(Evaluation.IS_FALSE_SUFFIX)){
+			return Evaluation.IS_FALSE;
 		} else {
-			return null;
+			return Evaluation.EQUALS;
 		}
-	}
-	
-	public static Map<String, QueryPath> getModelQueryPaths(Class<?> model){
-		Map<String, QueryPath> pathMap = new HashMap<>();
-		for (Field field: model.getDeclaredFields()){
-
-			Path root = Expressions.path(model, model.getSimpleName());
-			Class<?> type = field.getType();
-			TypeDescriptor typeDescriptor = TypeDescriptor.valueOf(type);
-			String name = field.getName();
-			QueryPath queryPath = null;
-			
-			// Skippable fields
-			if (field.isSynthetic()) continue;
-			if (field.isAnnotationPresent(RestResource.class)){
-				RestResource annotation = field.getAnnotation(RestResource.class);
-				if (!annotation.exported()) continue;
-			}
-
-			
-			
-			if (typeDescriptor.isMap()) {
-				
-			} else if  (typeDescriptor.isCollection()) {
-				
-			} else {
-				if (type.isAssignableFrom(String.class)){
-					StringPath path = Expressions.stringPath(root, name);
-					queryPath = new QueryPath(name, path, type, model);
-					
-				}
-			}
-			
-			if (queryPath != null){
-				pathMap.put(name, queryPath);
-			}
-			
-		}
-		
-		
 	}
 	
 	

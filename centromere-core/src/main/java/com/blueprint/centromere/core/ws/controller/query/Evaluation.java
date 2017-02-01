@@ -119,50 +119,6 @@ public enum Evaluation {
 		}
 	}
 
-	public static Evaluation guessEvaluation(String name){
-		if (name.endsWith(EQUALS_SUFFIX)){
-			return EQUALS;
-		} else if (name.endsWith(NOT_IN_SUFFIX)){
-			return NOT_IN;
-		} else if (name.endsWith(IN_SUFFIX)){
-			return IN;
-		} else if (name.endsWith(NOT_LIKE_SUFFIX)){
-			return NOT_LIKE;
-		} else if (name.endsWith(LIKE_SUFFIX)){
-			return LIKE;
-		} else if (name.endsWith(STARTS_WITH_SUFFIX)){
-			return STARTS_WITH;
-		} else if (name.endsWith(ENDS_WITH_SUFFIX)){
-			return ENDS_WITH;
-		} else if (name.endsWith(GREATER_THAN_EQUALS_SUFFIX)){
-			return GREATER_THAN_EQUALS;
-		} else if (name.endsWith(GREATER_THAN_SUFFIX)){
-			return GREATER_THAN;
-		} else if (name.endsWith(LESS_THAN_EQUALS_SUFFIX)){
-			return LESS_THAN_EQUALS;
-		} else if (name.endsWith(LESS_THAN_SUFFIX)){
-			return LESS_THAN;
-		} else if (name.endsWith(BETWEEN_SUFFIX)){
-			return BETWEEN;
-		} else if (name.endsWith(BETWEEN_INCLUSIVE_SUFFIX)){
-			return BETWEEN_INCLUSIVE;
-		} else if (name.endsWith(OUTSIDE_SUFFIX)){
-			return OUTSIDE;
-		} else if (name.endsWith(OUTSIDE_INCLUSIVE_SUFFIX)){
-			return OUTSIDE_INCLUSIVE;
-		} else if (name.endsWith(IS_NULL_SUFFIX)){
-			return IS_NULL;
-		} else if (name.endsWith(NOT_NULL_SUFFIX)){
-			return NOT_NULL;
-		} else if (name.endsWith(IS_TRUE_SUFFIX)){
-			return IS_TRUE;
-		} else if (name.endsWith(IS_FALSE_SUFFIX)){
-			return IS_FALSE;
-		} else {
-			return EQUALS;
-		}
-	}
-
 	public static String getSuffix(Evaluation evaluation){
 		if (evaluation.equals(EQUALS)){
 			return EQUALS_SUFFIX;

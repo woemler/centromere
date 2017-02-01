@@ -21,29 +21,49 @@ import com.querydsl.core.types.Path;
 /**
  * @author woemler
  */
-public class QueryPath {
+public class QueryCriteria {
 	
-	private String fieldName;
+	private String name;
 	private Path path;
 	private Class<?> type;
 	private Class<?> model;
+	private Object value;
+    private Evaluation evaluation;
 
-	public QueryPath() {
+	public QueryCriteria() {
 	}
 
-	public QueryPath(String fieldName, Path path, Class<?> type, Class<?> model) {
-		this.fieldName = fieldName;
-		this.path = path;
-		this.type = type;
-		this.model = model;
+    public QueryCriteria(String name, Path path, Class<?> type, Class<?> model, Object value, Evaluation evaluation) {
+        this.name = name;
+        this.path = path;
+        this.type = type;
+        this.model = model;
+        this.value = value;
+        this.evaluation = evaluation;
+    }
+
+    public Object getValue() {
+        return value;
+    }
+
+    public void setValue(Object value) {
+        this.value = value;
+    }
+
+    public Evaluation getEvaluation() {
+        return evaluation;
+    }
+
+    public void setEvaluation(Evaluation evaluation) {
+        this.evaluation = evaluation;
+    }
+
+    public String getName() {
+		return name;
 	}
 
-	public String getFieldName() {
-		return fieldName;
-	}
-
-	public void setFieldName(String fieldName) {
-		this.fieldName = fieldName;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public Path getPath() {
