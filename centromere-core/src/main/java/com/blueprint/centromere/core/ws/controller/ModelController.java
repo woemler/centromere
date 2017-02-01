@@ -18,19 +18,27 @@ package com.blueprint.centromere.core.ws.controller;
 
 import com.blueprint.centromere.core.commons.repositories.MetadataOperations;
 import com.blueprint.centromere.core.model.ModelRepository;
+import com.blueprint.centromere.core.ws.QueryParameterException;
+import com.blueprint.centromere.core.ws.controller.query.QueryPath;
+import com.blueprint.centromere.core.ws.controller.query.QueryUtil;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.Expressions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.querydsl.binding.*;
 import org.springframework.data.repository.support.Repositories;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.core.mapping.ResourceMetadata;
 import org.springframework.data.rest.core.mapping.SearchResourceMappings;
 import org.springframework.data.rest.webmvc.*;
+import org.springframework.data.rest.webmvc.support.DefaultedPageable;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.data.util.ClassTypeInformation;
 import org.springframework.data.util.TypeInformation;
@@ -49,6 +57,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -96,28 +105,10 @@ public class ModelController {
         return new ResponseEntity<>(resources, HttpStatus.OK);
     }
 
-//    @SuppressWarnings("unchecked")
-//    @RequestMapping(value = BASE_URL+"/distinct", method = RequestMethod.GET)
-//    public HttpEntity distinct(
-//        @QuerydslPredicate RootResourceInformation resourceInformation,
-//        @RequestParam String field,
-//        HttpServletRequest request
-//    ) throws ResourceNotFoundException {
-//
-//        Class<?> model = resourceInformation.getDomainType();
-//        if (model == null) throw new ResourceNotFoundException();
-//        Object repo = repositories.getRepositoryFor(model);
-//        if (repo == null || !(repo instanceof BaseRepository)) throw new ResourceNotFoundException();
-//        BaseRepository repository = (BaseRepository) repo;
-//        Predicate predicate = getPredicateFromRequest(model, request);
-//        Set<Object> distinct = repository.distinct(field, predicate);
-//        return new ResponseEntity<>(distinct, HttpStatus.OK);
-//
-//    }
-
     @SuppressWarnings("unchecked")
     @RequestMapping(value = BASE_URL+"/distinct", method = RequestMethod.GET)
-    public HttpEntity distinct(@QuerydslPredicate RootResourceInformation resourceInformation,
+    public HttpEntity distinct(
+        @QuerydslPredicate RootResourceInformation resourceInformation,
         @RequestParam MultiValueMap<String, String> parameters
     ) throws ResourceNotFoundException, NoSuchMethodException {
         
@@ -153,6 +144,74 @@ public class ModelController {
         return new ResponseEntity<>(distinct, HttpStatus.OK);
 
     }
+
+    @RequestMapping(value = BASE_URL+"/query", method = RequestMethod.GET)
+    public HttpEntity dynamic(
+        @QuerydslPredicate RootResourceInformation resourceInformation,
+        DefaultedPageable pageable,
+        Sort sort,
+        PersistentEntityResourceAssembler assembler,
+        HttpServletRequest request
+    ) throws ResourceNotFoundException, HttpRequestMethodNotSupportedException {
+        
+        
+        Class<?> model = resourceInformation.getDomainType();
+        if (model == null) throw new ResourceNotFoundException();
+        Object repo = repositories.getRepositoryFor(model);
+        if (repo == null || !(repo instanceof QueryDslPredicateExecutor)) throw new ResourceNotFoundException();
+        QueryDslPredicateExecutor repository = (QueryDslPredicateExecutor) repo;
+        Predicate predicate = getPredicateFromRequest(model, request);
+
+        if (pageable.getPageable() != null){
+            Page<?> page = repository.findAll(predicate, pageable.getPageable());
+            return new ResponseEntity<>(page, HttpStatus.OK);
+        } else {
+            Iterable<?> results = repository.findAll(predicate, sort);
+            return new ResponseEntity<>(results, HttpStatus.OK);
+        }
+    }
+
+    protected Predicate getPredicateFromRequest(Class<?> model, HttpServletRequest request) {
+
+        logger.info(String.format("Generating dynamic query for model: %s", model.getName()));
+        BooleanBuilder builder = new BooleanBuilder();
+        Map<String, QueryPath> pathMap = QueryUtil.getModelQueryPaths(model);
+
+        for (Map.Entry<String, String[]> param: request.getParameterMap().entrySet()){
+
+            logger.info(String.format("Inspecting query parameter: key=%s  value=%s",
+                    param.getKey(), Arrays.asList(param.getValue()).toString()));
+
+            if (param.getValue().length == 0 || param.getValue()[0].trim().equals("")) continue;
+            
+            String key = param.getKey();
+            List<String> values = Arrays.asList(param.getValue()[0].split(",")); // Ignore secondary values
+            QueryPath queryPath = QueryUtil.getQueryPathFromFieldName(key, pathMap);
+            
+            if (queryPath == null) throw new QueryParameterException(String.format("Invalid query parameter: %s", key));
+
+            
+
+            if (descriptors.matches(param.getKey())){
+                QueryParameterDescriptor descriptor = descriptors.get(param.getKey());
+                logger.info(String.format("Matched descriptor: %s", descriptor.toString()));
+                Predicate predicate = QueryUtil.getParameterPredicate(param.getKey(),
+                        param.getValue()[0], descriptor, conversionService);
+                if (predicate != null) builder.and(predicate);
+            }
+        }
+
+        return builder.getValue();
+
+    }
+    
+    protected boolean hasEvaluationPrefix(String path){
+        if (path.endsWith("StartsWith") || toString().endsWith("EndsWith")){
+            return true;
+        } else {
+            return false;
+        }
+    } 
     
 //    // TODO: Do we still need this?
 //    @RequestMapping(value = BASE_URL+"/query", method = RequestMethod.GET)

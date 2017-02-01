@@ -44,7 +44,6 @@ public class EntrezGeneInfoReader extends StandardRecordFileReader<Gene>
 		for (String alias: bits[4].split("\\|")){
 			gene.addAlias(alias);
 		}
-		//Map<String, String> dbXrefs = new HashMap<>();
 		for (String ref : bits[5].split("\\|")) {
 			String[] r = ref.split(":");
 			gene.addExternalReference(r[0], r[r.length - 1]);
