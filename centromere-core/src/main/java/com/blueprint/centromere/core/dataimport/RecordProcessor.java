@@ -28,7 +28,7 @@ import org.springframework.validation.Validator;
  * @author woemler
  */
 public interface RecordProcessor<T extends Model<?>> 
-		extends DataImportComponent, ModelSupport<T>, InitializingBean {
+		extends DataImportComponent, ModelSupport<T> {
 
 	/**
 	 * Executes the pipeline and processes the input through the individual components.

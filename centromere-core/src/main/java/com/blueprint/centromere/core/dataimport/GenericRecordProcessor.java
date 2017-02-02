@@ -55,13 +55,12 @@ public class GenericRecordProcessor<T extends Model<?>>
 	private static final Logger logger = LoggerFactory.getLogger(GenericRecordProcessor.class);
 
 	/**
-	 * Performs configuration steps after bean creation.  Assigns options and metadata objects to the 
-	 *   individual processing components that are expecting them.
+	 * Performs configuration steps prior to each execution of {@link #run(Object...)}.  Assigns
+	 *   options and metadata objects to the individual processing components that are expecting them.
 	 */
-	@PostConstruct
 	@SuppressWarnings("unchecked")
 	@Override
-	public void afterPropertiesSet(){
+	public void doBefore(Object... args){
 		Assert.notNull(environment, "Environment must not be null.");
 		if (this.getClass().isAnnotationPresent(DataTypes.class)){
 			DataTypes dataTypes = this.getClass().getAnnotation(DataTypes.class);

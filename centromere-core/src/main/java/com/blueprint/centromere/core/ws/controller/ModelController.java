@@ -19,6 +19,7 @@ package com.blueprint.centromere.core.ws.controller;
 import com.blueprint.centromere.core.commons.repositories.MetadataOperations;
 import com.blueprint.centromere.core.model.ModelRepository;
 import com.blueprint.centromere.core.ws.QueryParameterException;
+import com.blueprint.centromere.core.ws.controller.query.Evaluation;
 import com.blueprint.centromere.core.ws.controller.query.QueryCriteria;
 import com.blueprint.centromere.core.ws.controller.query.QueryUtil;
 import com.querydsl.core.BooleanBuilder;
@@ -145,69 +146,62 @@ public class ModelController {
 
     }
 
-    @RequestMapping(value = BASE_URL+"/query", method = RequestMethod.GET)
-    public HttpEntity dynamic(
-        @QuerydslPredicate RootResourceInformation resourceInformation,
-        DefaultedPageable pageable,
-        Sort sort,
-        PersistentEntityResourceAssembler assembler,
-        HttpServletRequest request
-    ) throws ResourceNotFoundException, HttpRequestMethodNotSupportedException {
-        
-        
-        Class<?> model = resourceInformation.getDomainType();
-        if (model == null) throw new ResourceNotFoundException();
-        Object repo = repositories.getRepositoryFor(model);
-        if (repo == null || !(repo instanceof QueryDslPredicateExecutor)) throw new ResourceNotFoundException();
-        QueryDslPredicateExecutor repository = (QueryDslPredicateExecutor) repo;
-        Predicate predicate = getPredicateFromRequest(model, request);
-
-        if (pageable.getPageable() != null){
-            Page<?> page = repository.findAll(predicate, pageable.getPageable());
-            return new ResponseEntity<>(page, HttpStatus.OK);
-        } else {
-            Iterable<?> results = repository.findAll(predicate, sort);
-            return new ResponseEntity<>(results, HttpStatus.OK);
-        }
-    }
-
-    protected Predicate getPredicateFromRequest(Class<?> model, HttpServletRequest request) {
-
-        logger.info(String.format("Generating dynamic query for model: %s", model.getName()));
-        BooleanBuilder builder = new BooleanBuilder();
-
-        for (Map.Entry<String, String[]> param: request.getParameterMap().entrySet()){
-
-            logger.info(String.format("Inspecting query parameter: key=%s  value=%s",
-                    param.getKey(), Arrays.asList(param.getValue()).toString()));
-
-            if (param.getValue().length == 0 || param.getValue()[0].trim().equals("")) continue;
-
-            // Is the param name a valid model field?
-              // Is it a direct match to field name?
-                // return default criteria path
-              // Is it a suffixed field name?
-                // return evaluation criteria
-
-            QueryCriteria criteria = QueryUtil.getCriteriaFromParameter(param.getKey(), model);
-            if (criteria == null) throw new QueryParameterException(
-                    String.format("Invalid query parameter: %s", param.getKey()));
-
-            // Convert parameter value in to target type.
-        }
-
-        return builder.getValue();
-
-    }
+//    @RequestMapping(value = BASE_URL+"/query", method = RequestMethod.GET)
+//    public HttpEntity dynamic(
+//        @QuerydslPredicate RootResourceInformation resourceInformation,
+//        DefaultedPageable pageable,
+//        Sort sort,
+//        PersistentEntityResourceAssembler assembler,
+//        HttpServletRequest request
+//    ) throws ResourceNotFoundException, HttpRequestMethodNotSupportedException {
+//
+//
+//        Class<?> model = resourceInformation.getDomainType();
+//        if (model == null) throw new ResourceNotFoundException();
+//        Object repo = repositories.getRepositoryFor(model);
+//        if (repo == null || !(repo instanceof QueryDslPredicateExecutor)) throw new ResourceNotFoundException();
+//        QueryDslPredicateExecutor repository = (QueryDslPredicateExecutor) repo;
+//        Predicate predicate = getPredicateFromRequest(model, request);
+//
+//        if (pageable.getPageable() != null){
+//            Page<?> page = repository.findAll(predicate, pageable.getPageable());
+//            return new ResponseEntity<>(page, HttpStatus.OK);
+//        } else {
+//            Iterable<?> results = repository.findAll(predicate, sort);
+//            return new ResponseEntity<>(results, HttpStatus.OK);
+//        }
+//    }
+//
+//    protected Predicate getPredicateFromRequest(Class<?> model, HttpServletRequest request) {
+//
+//        logger.info(String.format("Generating dynamic query for model: %s", model.getName()));
+//        BooleanBuilder builder = new BooleanBuilder();
+//
+//        for (Map.Entry<String, String[]> param: request.getParameterMap().entrySet()){
+//
+//            logger.info(String.format("Inspecting query parameter: key=%s  value=%s",
+//                    param.getKey(), Arrays.asList(param.getValue()).toString()));
+//
+//            if (param.getValue().length == 0 || param.getValue()[0].trim().equals("")) continue;
+//
+//            // Is the param name a valid model field?
+//              // Is it a direct match to field name?
+//                // return default criteria path
+//              // Is it a suffixed field name?
+//                // return evaluation criteria
+//
+//            QueryCriteria criteria = QueryUtil.getCriteriaFromParameter(param.getKey(), model);
+//            if (criteria == null) throw new QueryParameterException(
+//                    String.format("Invalid query parameter: %s", param.getKey()));
+//
+//            // Convert parameter value in to target type.
+//        }
+//
+//        return builder.getValue();
+//
+//    }
     
-    protected boolean hasEvaluationPrefix(String path){
-        if (path.endsWith("StartsWith") || toString().endsWith("EndsWith")){
-            return true;
-        } else {
-            return false;
-        }
-    } 
-    
+
 //    // TODO: Do we still need this?
 //    @RequestMapping(value = BASE_URL+"/query", method = RequestMethod.GET)
 //    public HttpEntity dynamic(@QuerydslPredicate RootResourceInformation resourceInformation,
