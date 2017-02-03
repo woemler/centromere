@@ -53,7 +53,7 @@
     </distributionManagement>
 
     <properties>
-        <spring.platform.version>Athens-RELEASE</spring.platform.version>
+        <spring.platform.version>Athens-SR3</spring.platform.version>
     </properties>
 
     <dependencyManagement>

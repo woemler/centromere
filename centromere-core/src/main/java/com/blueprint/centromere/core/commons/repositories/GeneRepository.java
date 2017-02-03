@@ -36,7 +36,7 @@ import java.util.UUID;
  */
 @RepositoryRestResource(path = "genes", collectionResourceRel = "genes")
 public interface GeneRepository extends
-		ModelRepository<Gene, UUID>,
+		ModelRepository<Gene, String>,
 		MetadataOperations<Gene>,
 		AttributeOperations<Gene> {
 

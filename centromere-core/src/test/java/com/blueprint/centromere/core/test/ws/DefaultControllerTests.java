@@ -42,7 +42,6 @@ import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -320,9 +319,9 @@ public class DefaultControllerTests {
 		Gene gene = genes.get(0);
 		Assert.notNull(gene);
 		Assert.isTrue("1".equals(gene.getPrimaryReferenceId()));
-		UUID uuid = gene.getId();
+		String id = gene.getId();
 
-		mockMvc.perform(get(BASE_URL + "/" + uuid.toString()))
+		mockMvc.perform(get(BASE_URL + "/" + id))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasKey("primaryReferenceId")))
 				.andExpect(jsonPath("$.primaryReferenceId", is("1")))

@@ -24,7 +24,6 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * @author woemler
@@ -47,7 +46,7 @@ public class DataFile extends AbstractModel implements Attributes {
 	private DataSet dataSet;
 
 	@Column(updatable = false, insertable = false)
-	private UUID dataSetId;
+	private String dataSetId;
 
 	@ElementCollection(fetch = FetchType.EAGER)
 	@OrderColumn
@@ -95,11 +94,11 @@ public class DataFile extends AbstractModel implements Attributes {
 		this.dataSet = dataSet;
 	}
 
-	public UUID getDataSetId() {
+	public String getDataSetId() {
 		return dataSetId;
 	}
 
-	public void setDataSetId(UUID dataSetId) {
+	public void setDataSetId(String dataSetId) {
 		this.dataSetId = dataSetId;
 	}
 

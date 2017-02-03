@@ -30,6 +30,7 @@ import java.io.Serializable;
  * @author woemler
  * @since 0.4.3
  */
+@Deprecated
 public class RecordProcessorFactory<P extends RecordProcessor<T>, T extends Model<ID>, ID extends Serializable> {
 	
 	private final P processor;
@@ -85,7 +86,6 @@ public class RecordProcessorFactory<P extends RecordProcessor<T>, T extends Mode
 	public P getProcessor() throws Exception {
 		Assert.notNull(processor.getReader(), "RecordReader must not be null.");
 		Assert.notNull(processor.getWriter(), "RecordWriter must not be null.");
-		processor.afterPropertiesSet();
 		return processor;
 	}
 	

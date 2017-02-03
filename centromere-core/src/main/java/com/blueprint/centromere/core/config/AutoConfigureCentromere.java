@@ -37,9 +37,7 @@ import java.lang.annotation.*;
 @Configuration
 @Import({
 		ProfileConfiguration.class,
-		//RepositoryRestMvcConfiguration.class,
 		WebApplicationConfig.class,
-		//WebSecurityConfig.class,
 		CommandLineInputConfiguration.class
 })
 public @interface AutoConfigureCentromere {

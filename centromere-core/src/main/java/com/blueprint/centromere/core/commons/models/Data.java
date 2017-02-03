@@ -22,7 +22,6 @@ import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
-import java.util.UUID;
 
 /**
  * 
@@ -37,21 +36,21 @@ public abstract class Data extends AbstractModel {
 	private Sample sample;
 
 	@Column(updatable = false, insertable = false)
-	private UUID sampleId;
+	private String sampleId;
 
 	@ManyToOne
 	@JoinColumn(name = "dataFileId")
 	private DataFile dataFile;
 
 	@Column(updatable = false, insertable = false)
-	private UUID dataFileId;
+	private String dataFileId;
 
 	@ManyToOne
 	@JoinColumn(name = "geneId")
 	private Gene gene;
 
 	@Column(updatable = false, insertable = false)
-	private UUID geneId;
+	private String geneId;
 
 	public Sample getSample() {
 		return sample;
@@ -61,11 +60,11 @@ public abstract class Data extends AbstractModel {
 		this.sample = sample;
 	}
 
-	public UUID getSampleId() {
+	public String getSampleId() {
 		return sampleId;
 	}
 
-	public void setSampleId(UUID sampleId) {
+	public void setSampleId(String sampleId) {
 		this.sampleId = sampleId;
 	}
 
@@ -77,11 +76,11 @@ public abstract class Data extends AbstractModel {
 		this.dataFile = dataFile;
 	}
 
-	public UUID getDataFileId() {
+	public String getDataFileId() {
 		return dataFileId;
 	}
 
-	public void setDataFileId(UUID dataFileId) {
+	public void setDataFileId(String dataFileId) {
 		this.dataFileId = dataFileId;
 	}
 
@@ -93,11 +92,11 @@ public abstract class Data extends AbstractModel {
 		this.gene = gene;
 	}
 
-	public UUID getGeneId() {
+	public String getGeneId() {
 		return geneId;
 	}
 
-	public void setGeneId(UUID geneId) {
+	public void setGeneId(String geneId) {
 		this.geneId = geneId;
 	}
 }

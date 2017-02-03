@@ -28,14 +28,12 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import java.util.UUID;
-
 /**
  * @author woemler
  * @since 0.5.0
  */
 @RepositoryRestResource(path = "users", collectionResourceRel = "users", exported = false)
-public interface UserRepository extends ModelRepository<User, UUID>, UserDetailsService {
+public interface UserRepository extends ModelRepository<User, String>, UserDetailsService {
 
 	@Override 
 	default User loadUserByUsername(String username) throws UsernameNotFoundException {

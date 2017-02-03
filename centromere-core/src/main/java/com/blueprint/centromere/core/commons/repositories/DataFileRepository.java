@@ -27,7 +27,7 @@ import java.util.UUID;
  * @author woemler
  */
 @RepositoryRestResource(path = "datafiles", collectionResourceRel = "dataFiles")
-public interface DataFileRepository extends ModelRepository<DataFile, UUID> {
+public interface DataFileRepository extends ModelRepository<DataFile, String> {
 	List<DataFile> findByFilePath(String filePath);
 	List<DataFile> findByDataType(String dataType);
 	List<DataFile> findByDataSetId(UUID dataSetId);

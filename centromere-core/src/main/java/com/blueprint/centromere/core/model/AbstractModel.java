@@ -16,32 +16,43 @@
 
 package com.blueprint.centromere.core.model;
 
-import com.fasterxml.uuid.EthernetAddress;
-import com.fasterxml.uuid.Generators;
+import org.hibernate.annotations.GenericGenerator;
 
-import org.springframework.data.rest.core.annotation.RestResource;
-
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import java.util.UUID;
 
 /**
  * @author woemler
  */
 @MappedSuperclass
-public abstract class AbstractModel implements Model<UUID> {
+public abstract class AbstractModel implements Model<String> {
 	
-	@Id private UUID id;
+	@Id
+	@GeneratedValue(generator = "uuid")
+	@GenericGenerator(name = "uuid", strategy	=	"uuid2")
+	private String id;
 
-	public AbstractModel() {
-		this.id = Generators.timeBasedGenerator(EthernetAddress.fromInterface()).generate();
-	}
+//	public AbstractModel() {
+//		this.id = Generators.timeBasedGenerator(EthernetAddress.fromInterface()).generate();
+//	}
+//
+//	@Override public UUID getId() {
+//		return id;
+//	}
+//
+//	public void setId(UUID id) {
+//		this.id = id;
+//	}
 
-	@Override public UUID getId() {
+
+
+	@Override 
+	public String getId() {
 		return id;
 	}
 
-	public void setId(UUID id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 }

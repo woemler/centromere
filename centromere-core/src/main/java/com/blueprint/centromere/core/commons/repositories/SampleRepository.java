@@ -30,7 +30,7 @@ import java.util.UUID;
  */
 @RepositoryRestResource(path = "samples", collectionResourceRel = "samples")
 public interface SampleRepository extends
-		ModelRepository<Sample, UUID>,
+		ModelRepository<Sample, String>,
 		MetadataOperations<Sample>,
 		AttributeOperations<Sample> {
 	

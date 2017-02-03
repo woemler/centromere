@@ -21,13 +21,12 @@ import com.blueprint.centromere.core.model.ModelRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author woemler
  */
 @RepositoryRestResource(path = "transcriptexpression", collectionResourceRel = "transcriptExpression")
-public interface TranscriptExpressionRepository extends ModelRepository<TranscriptExpression, UUID>,
+public interface TranscriptExpressionRepository extends ModelRepository<TranscriptExpression, String>,
 		DataOperations<TranscriptExpression> {
 	List<TranscriptExpression> findByTranscriptAccession(String transcriptAccession);
 }

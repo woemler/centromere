@@ -18,9 +18,9 @@ package com.blueprint.centromere.core.config;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -33,11 +33,30 @@ public class ProfileConfiguration {
 	public static class DefaultModelConfiguration {
 	}
 
-	@Profile({ Database.GENERIC_JPA_PROFILE, Schema.DEFAULT_PROFILE })
+	@Profile({ Schema.DEFAULT_PROFILE })
 	@Configuration
-	@EnableJpaRepositories(basePackages = { "com.blueprint.centromere.core.commons.repositories" })
-	@EnableTransactionManagement
-	public static class DefaultJpaConfiguration {
+	public static class DefaultSchemaConfiguration {
+		
+		@Profile({ Database.GENERIC_JPA_PROFILE, Database.MYSQL_PROFILE })
+		@Configuration
+		@EnableJpaRepositories(basePackages = { "com.blueprint.centromere.core.commons.repositories" })
+		@EnableTransactionManagement
+		public static class DefaultJpaSchemaConfiguration { }
+
+		@Profile({ Database.MONGODB_PROFILE })
+		@Configuration
+		@EnableMongoRepositories(basePackages = { "com.blueprint.centromere.core.commons.repositories" })
+		public static class DefaultMongoSchemaConfiguration { }
+
+		@Profile({ Profiles.CLI_PROFILE })
+		@Configuration
+		@ComponentScan(basePackages = { 
+				"com.blueprint.centromere.core.commons.readers", 
+				"com.blueprint.centromere.core.commons.processors" 
+		})
+		public static class CommandLineComponentConfiguration { }
+		
 	}
+	
 	
 }

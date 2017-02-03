@@ -23,14 +23,13 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author woemler
  */
 @RepositoryRestResource(path = "subjects", collectionResourceRel = "subjects")
 public interface SubjectRepository
-		extends ModelRepository<Subject, UUID>,
+		extends ModelRepository<Subject, String>,
 		MetadataOperations<Subject>,
  		AttributeOperations<Subject> {
 	

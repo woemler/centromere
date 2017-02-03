@@ -20,12 +20,10 @@ import com.blueprint.centromere.core.commons.models.GeneCopyNumber;
 import com.blueprint.centromere.core.model.ModelRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-import java.util.UUID;
-
 /**
  * @author woemler
  */
 @RepositoryRestResource(path = "genecopynumber", collectionResourceRel = "geneCopyNumber")
-public interface GeneCopyNumberRepository extends ModelRepository<GeneCopyNumber, UUID>,
+public interface GeneCopyNumberRepository extends ModelRepository<GeneCopyNumber, String>,
 		DataOperations<GeneCopyNumber> {
 }

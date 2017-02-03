@@ -16,22 +16,16 @@
 
 package com.blueprint.centromere.core.commons.repositories;
 
-import com.google.common.reflect.TypeToken;
-
-import com.blueprint.centromere.core.commons.models.DataFile;
-import com.blueprint.centromere.core.commons.models.Sample;
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.model.ModelSupport;
+import com.google.common.reflect.TypeToken;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.PathBuilder;
-
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,7 +34,7 @@ import java.util.UUID;
  * @since 0.5.0
  */
 @SuppressWarnings("unchecked")
-public interface DataOperations<T extends Model<UUID>> {
+public interface DataOperations<T extends Model<?>> {
 
 	default List<T> findByDataFileId(UUID dataFileId){
 		TypeToken<T> type = new TypeToken<T>(getClass()) {};

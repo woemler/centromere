@@ -21,13 +21,12 @@ import com.blueprint.centromere.core.model.ModelRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author woemler
  */
 @RepositoryRestResource(path = "datasets", collectionResourceRel = "dataSets")
-public interface DataSetRepository extends ModelRepository<DataSet, UUID> {
+public interface DataSetRepository extends ModelRepository<DataSet, String> {
 	List<DataSet> findByName(String name);
 	List<DataSet> findBySource(String source);
 }
