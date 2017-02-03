@@ -15,6 +15,10 @@ Centromere aims to make the task of storing and working with processed genomic d
     - Automatic API documentation.
     - Basic security and user-authentication.
     - Response object field dfiltering and formatting.
+    
+## Important Note
+
+The current development build of Centromere (0.5.0-SNAPSHOT) significantly overhauls the codebase, eliminating excess dependencies and streamlining the process to deployment.  If you are new to Centromere, I highly recommend waiting for the 0.5.0 release before getting started.  This is expected to be complete Q1 2017.  For a brief description of the current development road map, please see the `roadmap.md` document.
 
 ## Quick Start
 
@@ -28,91 +32,10 @@ Centromere has the following requirements:
 
 #### Create a new project with Maven and Spring Boot
 
-A [starter project can be found here](#), which includes all of the required dependencies and a template for creating a new Centromere application.  Artifacts for Centromere release builds are available from the Maven Central Repository:
-
-```xml
-<dependency>
-    <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-core</artifactId>
-    <version>0.4.2</version>
-</dependency>
-
-<dependency>
-    <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-data-import-cli</artifactId>
-    <version>0.4.2</version>
-</dependency>
-
-<dependency>
-    <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-mongodb</artifactId>
-    <version>0.4.2</version>
-</dependency>
-
-<dependency>
-    <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-jpa</artifactId>
-    <version>0.4.2</version>
-</dependency>
-
-<dependency>
-    <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-sql</artifactId>
-    <version>0.4.2</version>
-</dependency>
-
-<dependency>
-    <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-web</artifactId>
-    <version>0.4.2</version>
-</dependency>
-```
-
-##### 
-
+*Instructions for using the starter project will go here*
 
 ## Documentation
-Detailed documentation for Centromere and its modules can be **[found in the wiki](https://github.com/blueprintmedicines/centromere/wiki)**.  
-
-## Modules
-
-#### Centromere Core
-
-The core module, containing common dependencies classes for creating data model, repository, and data import component classes.
-
-#### Centromere Commons
-
-Support for common bioinformatics data types and utilities.  Includes data model classes, custom repository implementations, and data import components.
-
-#### Centromere Data Import CLI
-
-Utility classes for creating command line import tools.  Builds on the data import components in the `centromere-core` module and adds some default behaviors for a command line interface.
-
-#### Centromere MongoDB, JPA, and SQL
-
-Database-specific implementations of the core repository interfaces and data import classes.  MongoDB is the preferred database technology, but MySQL is currently supported at an experimental level.
-
-#### Centromere Web
-
-The web module contains all components of the REST web services, including security and API documentation tools.
-
-## Quick Start
-
-Centromere requires Java JDK 8 or newer and Maven 2 or newer.
-
-### Development Builds
-
-For working with development builds, clone the repository and build using Maven:
- 
- ```
- > cd centromere-parent
- > mvn -U clean install -Dgpg.skip
- ```
-
-
-## Demo
-
-A demo implementation of a Centromere data warehouse and web API is available as both a [live demo](https://centromere.herokuapp.com/index.html) and a [GitHub repository](https://github.com/blueprintmedicines/centromere-demo).  This demo utilizes a small data set of cancer genomic data from the TCGA to showcase the features of Centromere's web service and data import utilities.
+*Link to updated docs will go here.*  
 
 ## Contact
 
@@ -121,7 +44,7 @@ For questions about Centromere, or if you are interested in contributing, please
 
 ## License
 
-Copyright 2016 William Oemler, Blueprint Medicines
+Copyright 2017 William Oemler, Blueprint Medicines
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

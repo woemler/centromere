@@ -17,18 +17,64 @@
 package com.blueprint.centromere.core.commons.repositories;
 
 import com.blueprint.centromere.core.commons.models.Gene;
-import com.blueprint.centromere.core.repository.RepositoryOperations;
-import org.springframework.data.repository.NoRepositoryBean;
+import com.blueprint.centromere.core.model.ModelRepository;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Ops;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.MapPath;
+import com.querydsl.core.types.dsl.PathBuilder;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author woemler
  */
-@NoRepositoryBean
-public interface GeneRepository<T extends Gene<ID>, ID extends Serializable> 
-		extends RepositoryOperations<T, ID>, GeneOperations<T, ID> {
-	List<T> findByPrimaryReferenceId(String primaryReferenceId);
-	List<T> findByPrimaryGeneSymbol(String primaryGeneSymbol);
+@RepositoryRestResource(path = "genes", collectionResourceRel = "genes")
+public interface GeneRepository extends
+		ModelRepository<Gene, String>,
+		MetadataOperations<Gene>,
+		AttributeOperations<Gene> {
+
+	List<Gene> findByPrimaryReferenceId(@Param("refId") String refId);
+	List<Gene> findByPrimaryGeneSymbol(@Param("symbol") String symbol);
+	List<Gene> findByAliases(@Param("alias") String alias);
+
+	default List<Gene> findByExternalReference(@Param("source") String source, @Param("value") String value){
+		PathBuilder<Gene> pathBuilder = new PathBuilder<>(Gene.class, "gene");
+		MapPath<String, String, PathBuilder<String>> mapPath
+				= pathBuilder.getMap("externalReferences", String.class, String.class);
+		Expression<String> constant = Expressions.constant(value);
+		Predicate predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE, mapPath.get(source), constant);
+		return (List<Gene>) this.findAll(predicate);
+	}
+
+	@Override
+	default List<Gene> guess(@Param("keyword") String keyword){
+
+		List<Gene> genes = new ArrayList<>();
+
+		PathBuilder<Gene> pathBuilder = new PathBuilder<>(Gene.class, "gene");
+		Expression constant = Expressions.constant(keyword);
+
+		Predicate predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE,
+				pathBuilder.getString("primaryReferenceId"), constant);
+		genes.addAll((List<Gene>) findAll(predicate));
+
+		predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE,
+				pathBuilder.getString("primaryGeneSymbol"), constant);
+		genes.addAll((List<Gene>) findAll(predicate));
+
+		predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE,
+				pathBuilder.getList("aliases", String.class).any(), constant);
+		genes.addAll((List<Gene>) findAll(predicate));
+
+		return genes;
+
+	}
+
 }

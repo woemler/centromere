@@ -16,6 +16,11 @@
 
 package com.blueprint.centromere.core.dataimport;
 
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.EnvironmentAware;
+
+import javax.annotation.PostConstruct;
+
 /**
  * Ensures that data import component classes have flexible setup and teardown methods that run
  *   before and after the main import methods.
@@ -23,7 +28,7 @@ package com.blueprint.centromere.core.dataimport;
  * @author woemler
  * @since 0.4.1
  */
-public interface DataImportComponent {
+public interface DataImportComponent extends EnvironmentAware, InitializingBean {
 
 	/**
 	 * To be executed before the main component method is first called.  Can be configured to handle 
@@ -32,7 +37,7 @@ public interface DataImportComponent {
 	 * @param args an array of objects of any type.
 	 * @throws DataImportException
 	 */
-	void doBefore(Object... args) throws DataImportException;
+	default void doBefore(Object... args) throws DataImportException { }
 
 	/**
 	 * To be executed after the main component method is called for the last time.  Can be configured 
@@ -41,5 +46,14 @@ public interface DataImportComponent {
 	 * @param args an array of objects of any type.
 	 * @throws DataImportException
 	 */
-	void doAfter(Object... args) throws DataImportException;
+	default void doAfter(Object... args) throws DataImportException { }
+
+	/**
+	 * Empty default implementation.  The purpose of extending {@link InitializingBean} is to trigger
+	 *   bean post-processing by a {@link org.springframework.beans.factory.config.BeanPostProcessor}.
+	 * 
+	 * @throws Exception
+	 */
+	@PostConstruct
+	default void afterPropertiesSet() throws Exception { }
 }

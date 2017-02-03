@@ -17,18 +17,18 @@
 package com.blueprint.centromere.core.commons.repositories;
 
 import com.blueprint.centromere.core.commons.models.DataFile;
-import com.blueprint.centromere.core.repository.RepositoryOperations;
-import org.springframework.data.repository.NoRepositoryBean;
+import com.blueprint.centromere.core.model.ModelRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author woemler
  */
-@NoRepositoryBean
-public interface DataFileRepository<T extends DataFile<ID>, ID extends Serializable>
-		extends RepositoryOperations<T, ID>, DataFileOperations<T, ID>{
-	List<T> findByFilePath(String filePath);
-	List<T> findByDataType(String dataType);
+@RepositoryRestResource(path = "datafiles", collectionResourceRel = "dataFiles")
+public interface DataFileRepository extends ModelRepository<DataFile, String> {
+	List<DataFile> findByFilePath(String filePath);
+	List<DataFile> findByDataType(String dataType);
+	List<DataFile> findByDataSetId(UUID dataSetId);
 }

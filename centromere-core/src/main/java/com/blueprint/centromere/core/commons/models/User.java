@@ -16,29 +16,38 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.AbstractModel;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.MappedSuperclass;
-import java.io.Serializable;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 /**
+ * Simple {@link UserDetails} implementation for data warehouse user metadata.  Exercise good security
+ *   practices: always hash passwords!  Do not store them in plain-text!
+ * 
  * @author woemler
  */
-@MappedSuperclass
-public abstract class User<ID extends Serializable> implements Model<ID>, UserDetails {
+@Entity
+@Document
+@Table(indexes = { @Index(name = "USERS_IDX_01", columnList = "username", unique = true) })
+public class User extends AbstractModel implements UserDetails {
 	
-	private String username;
+	@Indexed(unique = true) private String username;
 	private String password;
 	private boolean accountNonExpired = true;
 	private boolean accountNonLocked = true;
 	private boolean enabled = false;
 	private boolean credentialsNonExpired = true;
+
+	@ElementCollection(fetch = FetchType.EAGER)
+	@OrderColumn
 	private List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
 	@Override 

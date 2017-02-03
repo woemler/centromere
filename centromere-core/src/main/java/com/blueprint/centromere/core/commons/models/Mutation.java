@@ -16,28 +16,126 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-import com.blueprint.centromere.core.model.Model;
 
-import javax.persistence.MappedSuperclass;
-import java.io.Serializable;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.persistence.Entity;
 
 /**
  * @author woemler
  */
-@MappedSuperclass
-public abstract class Mutation<ID extends Serializable> implements Model<ID> {
+@Entity
+@Document
+public class Mutation extends Data {
 	
 	private String chromosome;
 	private String referenceGenome;
 	private String strand;
-	private Integer startPosition;
-	private Integer stopPosition;
+	private Integer dnaStartPosition;
+	private Integer dnaStopPosition;
 	private String referenceAllele;
 	private String alternateAllele;
 	private String cDnaChange;
 	private String codonChange;
+	
 	private String proteinChange;
+	
 	private String mutationClassification;
 	private String mutationType;
-	
+
+	public String getChromosome() {
+		return chromosome;
+	}
+
+	public void setChromosome(String chromosome) {
+		this.chromosome = chromosome;
+	}
+
+	public String getReferenceGenome() {
+		return referenceGenome;
+	}
+
+	public void setReferenceGenome(String referenceGenome) {
+		this.referenceGenome = referenceGenome;
+	}
+
+	public String getStrand() {
+		return strand;
+	}
+
+	public void setStrand(String strand) {
+		this.strand = strand;
+	}
+
+	public Integer getDnaStartPosition() {
+		return dnaStartPosition;
+	}
+
+	public void setDnaStartPosition(Integer dnaStartPosition) {
+		this.dnaStartPosition = dnaStartPosition;
+	}
+
+	public Integer getDnaStopPosition() {
+		return dnaStopPosition;
+	}
+
+	public void setDnaStopPosition(Integer dnaStopPosition) {
+		this.dnaStopPosition = dnaStopPosition;
+	}
+
+	public String getReferenceAllele() {
+		return referenceAllele;
+	}
+
+	public void setReferenceAllele(String referenceAllele) {
+		this.referenceAllele = referenceAllele;
+	}
+
+	public String getAlternateAllele() {
+		return alternateAllele;
+	}
+
+	public void setAlternateAllele(String alternateAllele) {
+		this.alternateAllele = alternateAllele;
+	}
+
+	public String getcDnaChange() {
+		return cDnaChange;
+	}
+
+	public void setcDnaChange(String cDnaChange) {
+		this.cDnaChange = cDnaChange;
+	}
+
+	public String getCodonChange() {
+		return codonChange;
+	}
+
+	public void setCodonChange(String codonChange) {
+		this.codonChange = codonChange;
+	}
+
+	public String getProteinChange() {
+		return proteinChange;
+	}
+
+	public void setProteinChange(String proteinChange) {
+		this.proteinChange = proteinChange;
+	}
+
+	public String getMutationClassification() {
+		return mutationClassification;
+	}
+
+	public void setMutationClassification(String mutationClassification) {
+		this.mutationClassification = mutationClassification;
+	}
+
+	public String getMutationType() {
+		return mutationType;
+	}
+
+	public void setMutationType(String mutationType) {
+		this.mutationType = mutationType;
+	}
 }

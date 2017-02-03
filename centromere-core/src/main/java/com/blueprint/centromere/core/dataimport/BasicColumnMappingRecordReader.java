@@ -16,8 +16,6 @@
 
 package com.blueprint.centromere.core.dataimport;
 
-import com.blueprint.centromere.core.model.Alias;
-import com.blueprint.centromere.core.model.Aliases;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
 import org.slf4j.Logger;
@@ -28,7 +26,8 @@ import org.springframework.core.convert.support.DefaultConversionService;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Generic {@link RecordReader} implementation that will use data file column headers to try to map
@@ -39,9 +38,8 @@ import java.util.*;
  * @since 0.4.3
  */
 public class BasicColumnMappingRecordReader<T extends Model<?>> extends AbstractRecordFileReader<T>
-		implements ImportOptionsAware, ModelSupport<T> {
+		implements ModelSupport<T> {
 	
-	private BasicImportOptions options = new BasicImportOptions();
 	private Class<T> model;
 	private Map<String, Class<?>> fieldTypeMap = new HashMap<>(); // map of actual field name and types
 	private Map<String, String> fieldNameMap = new HashMap<>(); // map of aliases and actual field names
@@ -92,17 +90,6 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 				String fieldName = field.getName();
 				fieldTypeMap.put(fieldName, field.getType());
 				fieldNameMap.put(fieldName, fieldName);
-				if (field.isAnnotationPresent(Aliases.class)){
-					Aliases aliases = field.getAnnotation(Aliases.class);
-					if (aliases != null && aliases.value().length > 0){
-						for (Alias alias: aliases.value()){
-							fieldNameMap.put(alias.value(), fieldName);
-						}
-					}
-				} else if (field.isAnnotationPresent(Alias.class)){
-					Alias alias = field.getAnnotation(Alias.class);
-					fieldNameMap.put(alias.value(), fieldName);
-				}
 			}
 			current = current.getSuperclass();
 		}
@@ -196,18 +183,6 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	public void doBefore(Object... args) throws DataImportException {
 		super.doBefore(args);
 		headerFlag = true;
-	}
-
-	public BasicImportOptions getImportOptions() {
-		return options;
-	}
-
-	public void setImportOptions(ImportOptions options) {
-		this.options = new BasicImportOptions(options);
-	}
-
-	public void setImportOptions(BasicImportOptions options) {
-		this.options = options;
 	}
 
 	@Override 

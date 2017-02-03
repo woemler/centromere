@@ -16,17 +16,53 @@
 
 package com.blueprint.centromere.core.commons.repositories;
 
-import com.blueprint.centromere.core.commons.models.DataFile;
-import com.blueprint.centromere.core.commons.models.Sample;
 import com.blueprint.centromere.core.model.Model;
+import com.google.common.reflect.TypeToken;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Ops;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.PathBuilder;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
-import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author woemler
+ * @since 0.5.0
  */
+@SuppressWarnings("unchecked")
 public interface DataOperations<T extends Model<?>> {
-	<S extends DataFile<I>, I extends Serializable> List<T> findByDataFileId(I dataFileId);
-	<S extends Sample<I>, I extends Serializable> List<T> findBySampleId(I sampleId);
+
+	default List<T> findByDataFileId(UUID dataFileId){
+		TypeToken<T> type = new TypeToken<T>(getClass()) {};
+		Class<T> model = (Class<T>) type.getRawType();
+		PathBuilder<T> pathBuilder = new PathBuilder<>(model, model.getSimpleName().toLowerCase());
+		Path path = pathBuilder.get("dataFileId");
+		Expression constant = Expressions.constant(dataFileId);
+		Predicate predicate = Expressions.predicate(Ops.EQ, path, constant);
+		return (List<T>) ((QueryDslPredicateExecutor) this).findAll(predicate);
+	}
+
+	default List<T> findBySampleId(UUID sampleId){
+		TypeToken<T> type = new TypeToken<T>(getClass()) {};
+		Class<T> model = (Class<T>) type.getRawType();
+		PathBuilder<T> pathBuilder = new PathBuilder<>(model, model.getSimpleName().toLowerCase());
+		Path path = pathBuilder.get("sampleId");
+		Expression constant = Expressions.constant(sampleId);
+		Predicate predicate = Expressions.predicate(Ops.EQ, path, constant);
+		return (List<T>) ((QueryDslPredicateExecutor) this).findAll(predicate);
+	}
+
+	default List<T> findByGeneId(UUID geneId){
+		TypeToken<T> type = new TypeToken<T>(getClass()) {};
+		Class<T> model = (Class<T>) type.getRawType();
+		PathBuilder<T> pathBuilder = new PathBuilder<>(model, model.getSimpleName().toLowerCase());
+		Path path = pathBuilder.get("geneId");
+		Expression constant = Expressions.constant(geneId);
+		Predicate predicate = Expressions.predicate(Ops.EQ, path, constant);
+		return (List<T>) ((QueryDslPredicateExecutor) this).findAll(predicate);
+	}
 }

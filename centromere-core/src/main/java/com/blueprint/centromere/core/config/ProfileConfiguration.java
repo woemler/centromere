@@ -18,27 +18,45 @@ package com.blueprint.centromere.core.config;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * @author woemler
  */
 public class ProfileConfiguration {
 	
-	@Profile({ "default", Profiles.SCHEMA_CUSTOM })
+	@Profile({ "default", Schema.CUSTOM_PROFILE })
 	@Configuration
-	public static class DefaultModelConfiguration extends ModelComponentRegistrationConfigurer {
+	public static class DefaultModelConfiguration {
 	}
-	
-	@Profile({ Profiles.SCHEMA_MONGODB_DEFAULT})
+
+	@Profile({ Schema.DEFAULT_PROFILE })
 	@Configuration
-	@ComponentScan(basePackages = { "org.oncoblocks.centromere.mongodb" },
-			includeFilters = @ComponentScan.Filter(type = FilterType.REGEX, 
-					pattern =  ".+?DefaultMongoRepositoryConfig.DefaultSpringDataConfig.*"), useDefaultFilters = false)
-	@ModelScan(basePackages = { "org.oncoblocks.centromere.mongodb.commons.models" })
-	public static class DefaultMongoDbConfiguration extends ModelComponentRegistrationConfigurer {
+	public static class DefaultSchemaConfiguration {
+		
+		@Profile({ Database.GENERIC_JPA_PROFILE, Database.MYSQL_PROFILE })
+		@Configuration
+		@EnableJpaRepositories(basePackages = { "com.blueprint.centromere.core.commons.repositories" })
+		@EnableTransactionManagement
+		public static class DefaultJpaSchemaConfiguration { }
+
+		@Profile({ Database.MONGODB_PROFILE })
+		@Configuration
+		@EnableMongoRepositories(basePackages = { "com.blueprint.centromere.core.commons.repositories" })
+		public static class DefaultMongoSchemaConfiguration { }
+
+		@Profile({ Profiles.CLI_PROFILE })
+		@Configuration
+		@ComponentScan(basePackages = { 
+				"com.blueprint.centromere.core.commons.readers", 
+				"com.blueprint.centromere.core.commons.processors" 
+		})
+		public static class CommandLineComponentConfiguration { }
 		
 	}
+	
 	
 }

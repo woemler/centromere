@@ -17,18 +17,16 @@
 package com.blueprint.centromere.core.commons.repositories;
 
 import com.blueprint.centromere.core.commons.models.DataSet;
-import com.blueprint.centromere.core.repository.RepositoryOperations;
-import org.springframework.data.repository.NoRepositoryBean;
+import com.blueprint.centromere.core.model.ModelRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author woemler
  */
-@NoRepositoryBean
-public interface DataSetRepository<T extends DataSet<ID>, ID extends Serializable>
-		extends RepositoryOperations<T, ID>, DataSetOperations<T, ID> {
-	List<T> findByName(String name);
-	List<T> findBySource(String source);
+@RepositoryRestResource(path = "datasets", collectionResourceRel = "dataSets")
+public interface DataSetRepository extends ModelRepository<DataSet, String> {
+	List<DataSet> findByName(String name);
+	List<DataSet> findBySource(String source);
 }

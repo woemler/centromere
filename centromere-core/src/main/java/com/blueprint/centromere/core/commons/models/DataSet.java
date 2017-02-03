@@ -16,12 +16,15 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-import com.blueprint.centromere.core.model.Ignored;
-import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.AbstractModel;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.MappedSuperclass;
-import java.io.Serializable;
-import java.util.Collection;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Model representation of an annotated set of data, which may be compromised of multiple data types
@@ -29,19 +32,25 @@ import java.util.Collection;
  * 
  * @author woemler
  */
-@MappedSuperclass
-public abstract class DataSet<ID extends Serializable> implements Model<ID> {
+@Entity
+@Document
+@Table(indexes = { @Index(name = "DATA_SET_IDX_01", unique = true, columnList = "name") })
+public class DataSet extends AbstractModel implements Attributes {
 	
-	private String name;
-	
+	@Indexed(unique = true) private String name;
 	private String source;
-	
 	private String version;
-	
-	@Ignored
 	private String description;
-	
-	abstract public Collection<?> getDataFileIds();
+
+	@OneToMany(mappedBy = "dataSet", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	private List<DataFile> dataFiles = new ArrayList<>();
+
+	@OneToMany(mappedBy = "dataSet", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	private List<Sample> samples = new ArrayList<>();
+
+	@ElementCollection(fetch = FetchType.EAGER)
+	@OrderColumn
+	private Map<String, String> attributes = new HashMap<>();
 
 	public String getName() {
 		return name;
@@ -73,5 +82,50 @@ public abstract class DataSet<ID extends Serializable> implements Model<ID> {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public List<DataFile> getDataFiles() {
+		return dataFiles;
+	}
+
+	public void setDataFiles(List<DataFile> dataFiles) {
+		this.dataFiles = dataFiles;
+	}
+
+	public List<Sample> getSamples() {
+		return samples;
+	}
+
+	public void setSamples(List<Sample> samples) {
+		this.samples = samples;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(Map<String, String> attributes) {
+		this.attributes = attributes;
+	}
+
+	@Override
+	public void addAttribute(String name, String value) {
+		attributes.put(name, value);
+	}
+
+	@Override
+	public void addAttributes(Map<String, String> attributes) {
+		this.attributes.putAll(attributes);
+	}
+
+	@Override
+	public boolean hasAttribute(String name) {
+		return attributes.containsKey(name);
+	}
+
+	@Override
+	public String getAttribute(String name) {
+		return attributes.containsKey(name) ? attributes.get(name) : null;
 	}
 }

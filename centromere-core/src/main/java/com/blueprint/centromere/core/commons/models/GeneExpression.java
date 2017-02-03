@@ -16,26 +16,17 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-import com.blueprint.centromere.core.model.Alias;
-import com.blueprint.centromere.core.model.Aliases;
-import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.repository.Evaluation;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.Serializable;
+import javax.persistence.Entity;
 
 /**
  * @author woemler
  */
-public abstract class GeneExpression<ID extends Serializable> implements Model<ID>, GeneData {
+@Entity
+@Document
+public class GeneExpression extends Data {
 	
-	@Aliases({
-			@Alias(value = "value.gt", evaluation = Evaluation.GREATER_THAN),
-			@Alias(value = "value.gte", evaluation = Evaluation.GREATER_THAN_EQUALS),
-			@Alias(value = "value.lt", evaluation = Evaluation.LESS_THAN),
-			@Alias(value = "value.lte", evaluation = Evaluation.LESS_THAN_EQUALS),
-			@Alias(value = "value.out", evaluation = Evaluation.OUTSIDE),
-			@Alias(value = "value.bt", evaluation = Evaluation.BETWEEN)
-	})
 	private Double value;
 
 	public Double getValue() {
@@ -45,4 +36,5 @@ public abstract class GeneExpression<ID extends Serializable> implements Model<I
 	public void setValue(Double value) {
 		this.value = value;
 	}
+
 }

@@ -16,12 +16,13 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-import com.blueprint.centromere.core.model.Alias;
-import com.blueprint.centromere.core.model.Ignored;
-import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.AbstractModel;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.MappedSuperclass;
-import java.io.Serializable;
+import javax.persistence.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Model for representing a single biological sample taken from a {@link Subject} for experimentation.
@@ -30,26 +31,60 @@ import java.io.Serializable;
  * 
  * @author woemler
  */
-@MappedSuperclass
-public abstract class Sample<ID extends Serializable> implements Model<ID>, Attributes, SimpleAliases {
-	
-	private String name;
-	
-	@Alias("type")
+@Entity
+@Document
+@Table(indexes = { @Index(name = "SAMPLES_IDX_01", columnList = "name", unique = true) })
+public class Sample extends AbstractModel implements Attributes {
+
+	@Indexed(unique = true) private String name;
 	private String sampleType;
-	
 	private String tissue;
-	
 	private String histology;
-	
-	@Ignored
 	private String notes;
+
+	@ElementCollection(fetch = FetchType.EAGER)
+	@OrderColumn
+	private Map<String, String> attributes = new HashMap<>();
 	
-	
-	abstract public Object getSubjectId();
-	abstract public <S extends Subject<?>> void setSubjectMetadata(S subject);
-	
-	
+	@ManyToOne
+	@JoinColumn(name = "subjectId")
+	private Subject subject;
+
+	@Column(updatable = false, insertable = false)
+	private String subjectId;
+
+	@ManyToOne
+	@JoinColumn(name = "dataSetId")
+	private DataSet dataSet;
+
+	@Column(updatable = false, insertable = false)
+	private String dataSetId;
+
+	public Subject getSubject() {
+		return subject;
+	}
+
+	public void setSubject(Subject subject) {
+		this.subject = subject;
+	}
+
+	public String getSubjectId() {
+		return subjectId;
+	}
+
+	public void setSubjectId(String subjectId) {
+		this.subjectId = subjectId;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(Map<String, String> attributes) {
+		this.attributes = attributes;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -88,5 +123,41 @@ public abstract class Sample<ID extends Serializable> implements Model<ID>, Attr
 
 	public void setNotes(String notes) {
 		this.notes = notes;
+	}
+
+	public DataSet getDataSet() {
+		return dataSet;
+	}
+
+	public void setDataSet(DataSet dataSet) {
+		this.dataSet = dataSet;
+	}
+
+	public String getDataSetId() {
+		return dataSetId;
+	}
+
+	public void setDataSetId(String dataSetId) {
+		this.dataSetId = dataSetId;
+	}
+
+	@Override
+	public void addAttribute(String name, String value) {
+		attributes.put(name, value);
+	}
+
+	@Override
+	public void addAttributes(Map<String, String> attributes) {
+		this.attributes.putAll(attributes);
+	}
+
+	@Override
+	public boolean hasAttribute(String name) {
+		return attributes.containsKey(name);
+	}
+
+	@Override
+	public String getAttribute(String name) {
+		return attributes.containsKey(name) ? attributes.get(name) : null;
 	}
 }

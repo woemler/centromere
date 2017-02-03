@@ -19,6 +19,8 @@ package com.blueprint.centromere.core.dataimport;
 import com.blueprint.centromere.core.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 
 import java.io.BufferedReader;
@@ -35,6 +37,7 @@ import java.io.IOException;
 public abstract class AbstractRecordFileReader<T extends Model<?>> implements RecordReader<T> {
 	
 	private BufferedReader reader;
+	private Environment environment;
 	private static final Logger logger = LoggerFactory.getLogger(AbstractRecordFileReader.class);
 
 	/**
@@ -46,14 +49,16 @@ public abstract class AbstractRecordFileReader<T extends Model<?>> implements Re
 	@Override
 	public void doBefore(Object... args) throws DataImportException{
 		this.close();
-		try {
-			Assert.notEmpty(args, "One or more arguments is required.");
-			Assert.isTrue(args[0] instanceof String, "The first argument must be a String.");
-		} catch (IllegalArgumentException e){
-			e.printStackTrace();
-			throw new DataImportException(e.getMessage());
+		Assert.isTrue(args.length > 0, "Must be at least one argument.");
+		String path;
+		if (args[0] instanceof String){
+			path = (String) args[0];
+		} else if (args[0] instanceof File){
+			path = ((File) args[0]).getAbsolutePath();
+		} else {
+			throw new DataImportException("No valid file or file path submitted.");
 		}
-		this.open((String) args[0]);
+		this.open(path);
 	}
 
 	/**
@@ -77,14 +82,14 @@ public abstract class AbstractRecordFileReader<T extends Model<?>> implements Re
 			try {
 				file = new File(ClassLoader.getSystemClassLoader().getResource(inputFilePath).getPath());
 			} catch (NullPointerException e){
-				throw new DataImportException(String.format("Cannot locate dataimport file: %s", inputFilePath));
+				throw new DataImportException(String.format("Cannot locate file: %s", inputFilePath));
 			}
 		}
 		try {
 			reader = new BufferedReader(new FileReader(file));
 		} catch (IOException e){
 			e.printStackTrace();
-			throw new DataImportException(String.format("Cannot read dataimport file: %s", inputFilePath));
+			throw new DataImportException(String.format("Cannot read file: %s", inputFilePath));
 		}
 	}
 
@@ -104,5 +109,14 @@ public abstract class AbstractRecordFileReader<T extends Model<?>> implements Re
 	protected BufferedReader getReader() {
 		return reader;
 	}
-	
+
+	public Environment getEnvironment() {
+		return environment;
+	}
+
+	@Autowired
+	@Override 
+	public void setEnvironment(Environment environment) {
+		this.environment = environment;
+	}
 }

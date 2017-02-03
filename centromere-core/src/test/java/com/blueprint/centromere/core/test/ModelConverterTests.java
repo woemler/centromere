@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.test;
 
-import com.blueprint.centromere.core.test.model.Gene;
+import com.blueprint.centromere.core.commons.models.Gene;
 import com.blueprint.centromere.core.util.JsonModelConverter;
 import com.blueprint.centromere.core.util.KeyValueMapModelConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,23 +33,23 @@ import java.util.Map;
  * @author woemler
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { TestConfig.class })
+@ContextConfiguration
 public class ModelConverterTests {
 	
 	@Test
 	public void jsonConverterTest() throws Exception {
-		String json = "{\"entrezGeneId\": 1, \"primaryGeneSymbol\": \"ABC\", \"taxId\": 9606}";
+		String json = "{\"primaryReferenceId\": 1, \"primaryGeneSymbol\": \"ABC\", \"taxId\": 9606}";
 		JsonModelConverter converter = new JsonModelConverter(Gene.class);
 		Gene gene = (Gene) converter.convert(json);
 		Assert.notNull(gene);
-		Assert.isTrue(gene.getEntrezGeneId() == 1L);
+		Assert.isTrue("1".equals(gene.getPrimaryReferenceId()));
 		Assert.isTrue("ABC".equals(gene.getPrimaryGeneSymbol()));
 		Assert.isNull(gene.getChromosome());
 	}
 	
 	@Test
 	public void badJsonConversiontest() throws Exception {
-		String json = "{\"entrezGeneId\": 1, \"primaryGeneSymbol\": \"ABC\", \"badField\": 0}";
+		String json = "{\"primaryReferenceId\": 1, \"primaryGeneSymbol\": \"ABC\", \"badField\": 0}";
 		JsonModelConverter converter = new JsonModelConverter(new ObjectMapper(), Gene.class);
 		Gene gene = (Gene) converter.convert(json);
 		Assert.isNull(gene);
@@ -58,13 +58,13 @@ public class ModelConverterTests {
 	@Test
 	public void mapConversionTest() throws Exception {
 		Map<String, String> map = new HashMap<>();
-		map.put("entrezGeneId", "1");
+		map.put("primaryReferenceId", "1");
 		map.put("primaryGeneSymbol", "ABC");
 		map.put("taxId", "9606");
 		KeyValueMapModelConverter converter = new KeyValueMapModelConverter(Gene.class);
 		Gene gene = (Gene) converter.convert(map);
 		Assert.notNull(gene);
-		Assert.isTrue(gene.getEntrezGeneId() == 1L);
+		Assert.isTrue("1".equals(gene.getPrimaryReferenceId()));
 		Assert.isTrue("ABC".equals(gene.getPrimaryGeneSymbol()));
 		Assert.isNull(gene.getChromosome());
 	}
@@ -72,7 +72,7 @@ public class ModelConverterTests {
 	@Test
 	public void badMapConversionTest() throws Exception {
 		Map<String, String> map = new HashMap<>();
-		map.put("entrezGeneId", "1");
+		map.put("primaryReferenceId", "1");
 		map.put("primaryGeneSymbol", "ABC");
 		map.put("badField", "0");
 		KeyValueMapModelConverter converter = new KeyValueMapModelConverter(new ObjectMapper(), Gene.class);

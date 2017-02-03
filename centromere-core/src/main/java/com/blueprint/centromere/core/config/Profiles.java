@@ -18,42 +18,44 @@ package com.blueprint.centromere.core.config;
 
 /**
  * @author woemler
+ * @since 0.5.0
  */
 public class Profiles {
 	
-	public static final String SCHEMA_CUSTOM = "schema_custom";
-	public static final String SCHEMA_MONGODB_DEFAULT = "schema_mongodb";
-	public static final String SCHEMA_MYSQL_DEFAULT = "schema_mysql";
+	public enum ApplicationMode {
+		WEB,
+		CLI
+	}
+	
+	public static final String WEB_PROFILE = "mode_web";
+	public static final String CLI_PROFILE = "mode_cli";
+	
+	public static String getApplicationModeProfile(ApplicationMode mode){
+		switch (mode){
+			case WEB:
+				return WEB_PROFILE;
+			case CLI:
+				return CLI_PROFILE;
+			default:
+				return null;
+		}
+	}
 
-	public static final String DB_CUSTOM = "db_custom";
-	public static final String DB_MONGODB = "db_mongodb";
-	public static final String DB_MYSQL = "db_mysql";
+	public static String[] getApplicationProfiles(Database database, Schema schema, Security security){
+		String dbProfile = Database.getProfile(database);
+		String schemaProfile = Schema.getProfile(schema);
+		String securityProfile = Security.getProfile(security);
+		return new String[]{dbProfile, schemaProfile, securityProfile};
+	}
 
 	public static String[] getApplicationProfiles(Database database, Schema schema){
-		String dbProfile;
-		String schemaProfile;
-		switch (database){
-			case MONGODB:
-				dbProfile = DB_MONGODB;
-				break;
-			default:
-				dbProfile = DB_CUSTOM;
-		}
-		if (schema.equals(Schema.CUSTOM)){
-			schemaProfile = SCHEMA_CUSTOM;
-		} else if (schema.equals(Schema.DEFAULT)){
-			if (database.equals(Database.MONGODB)) {
-				schemaProfile = SCHEMA_MONGODB_DEFAULT;
-			} else if (database.equals(Database.MYSQL)){
-				schemaProfile = SCHEMA_MYSQL_DEFAULT;
-			} else {
-				schemaProfile = SCHEMA_MONGODB_DEFAULT;
-			}
-		} else {
-			throw new ConfigurationException(String.format("The configured profiles are incompatible: database=%s  schema=%s",
-					database.toString(), schema.toString()));
-		}
+		String dbProfile = Database.getProfile(database);
+		String schemaProfile = Schema.getProfile(schema);
 		return new String[]{dbProfile, schemaProfile};
+	}
+
+	public static String[] getApplicationProfiles(AutoConfigureCentromere annotation){
+		return getApplicationProfiles(annotation.database(), annotation.schema(), annotation.webSecurity());
 	}
 	
 }

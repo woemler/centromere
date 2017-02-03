@@ -20,31 +20,20 @@ import com.blueprint.centromere.core.commons.models.Gene;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.StandardRecordFileReader;
 import com.blueprint.centromere.core.model.ModelSupport;
-import org.springframework.util.Assert;
 
 /**
  * @author woemler
  */
-public class EntrezGeneInfoReader<T extends Gene<?>> extends StandardRecordFileReader<T>
-		implements ModelSupport<T> {
+public class EntrezGeneInfoReader extends StandardRecordFileReader<Gene>
+		implements ModelSupport<Gene> {
 
-	private Class<T> model;
+	private Class<Gene> model = Gene.class;
 
-	public EntrezGeneInfoReader(Class<T> model) {
-		this.model = model;
-	}
-	
-	@SuppressWarnings("unchecked")
-	protected T getModelInstance() throws Exception{
-		Assert.notNull(model, "Model class type must not be null.");
-		return model.newInstance();
-	}
-
-	protected T getRecordFromLine(String line) throws DataImportException {
+	protected Gene getRecordFromLine(String line) throws DataImportException {
 		String[] bits = line.split("\\t");
-		T gene;
+		Gene gene;
 		try {
-			gene = getModelInstance();
+			gene = new Gene();
 		} catch (Exception e){
 			e.printStackTrace();
 			throw new DataImportException(String.format("Cannot create instance of model class: %s", model.getName()));
@@ -55,7 +44,6 @@ public class EntrezGeneInfoReader<T extends Gene<?>> extends StandardRecordFileR
 		for (String alias: bits[4].split("\\|")){
 			gene.addAlias(alias);
 		}
-		//Map<String, String> dbXrefs = new HashMap<>();
 		for (String ref : bits[5].split("\\|")) {
 			String[] r = ref.split(":");
 			gene.addExternalReference(r[0], r[r.length - 1]);
@@ -74,12 +62,12 @@ public class EntrezGeneInfoReader<T extends Gene<?>> extends StandardRecordFileR
 	}
 
 	@Override
-	public Class<T> getModel() {
+	public Class<Gene> getModel() {
 		return model;
 	}
 
 	@Override 
-	public void setModel(Class<T> model) {
+	public void setModel(Class<Gene> model) {
 		this.model = model;
 	}
 }

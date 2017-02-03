@@ -32,14 +32,14 @@ public interface Attributes {
 	 * @param name attribute name
 	 * @param value attribute value
 	 */
-	void addAttribute(String name, Object value);
+	void addAttribute(String name, String value);
 
 	/**
 	 * Adds multiple attribute mappings at once.
 	 * 
 	 * @param attributes Map of key-value attributes
 	 */
-	void addAttributes(Map<String,Object> attributes);
+	void addAttributes(Map<String,String> attributes);
 
 	/**
 	 * Tests whether an attribute has been registered.
@@ -55,12 +55,12 @@ public interface Attributes {
 	 * @param name attribute name
 	 * @return attribute value.
 	 */
-	Object getAttribute(String name);
+	String getAttribute(String name);
 
 	/**
 	 * Returns all of the registered attributes as a {@link Map}.
 	 * 
 	 * @return attribute map.
 	 */
-	Map<String, Object> getAttributeMap();
+	Map<String, String> getAttributes();
 }

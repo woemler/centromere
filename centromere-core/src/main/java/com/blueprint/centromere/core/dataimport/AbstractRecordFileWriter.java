@@ -19,6 +19,8 @@ package com.blueprint.centromere.core.dataimport;
 import com.blueprint.centromere.core.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 
 import java.io.FileWriter;
@@ -33,6 +35,7 @@ import java.io.IOException;
 public abstract class AbstractRecordFileWriter<T extends Model<?>> implements RecordWriter<T> {
 	
 	private FileWriter writer;
+	private Environment environment;
 	private static final Logger logger = LoggerFactory.getLogger(AbstractRecordFileWriter.class);
 
 	/**
@@ -99,5 +102,11 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>> implements Re
 	
 	protected String cleanFilePath(String path){
 		return path.replaceAll("\\s+", "_");
+	}
+
+	@Override 
+	@Autowired
+	public void setEnvironment(Environment environment) {
+		this.environment = environment;
 	}
 }

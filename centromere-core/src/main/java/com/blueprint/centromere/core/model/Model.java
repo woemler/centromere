@@ -16,8 +16,6 @@
 
 package com.blueprint.centromere.core.model;
 
-import org.springframework.hateoas.Identifiable;
-
 import java.io.Serializable;
 
 /**
@@ -28,5 +26,6 @@ import java.io.Serializable;
  * @author woemler
  */
 @Filterable
-public interface Model<ID extends Serializable> extends Identifiable<ID> {
+public interface Model<ID extends Serializable> /*extends Identifiable<ID>*/ {
+	ID getId();
 }

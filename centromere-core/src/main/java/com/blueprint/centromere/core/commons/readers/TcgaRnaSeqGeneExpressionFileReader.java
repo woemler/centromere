@@ -24,12 +24,15 @@ import com.blueprint.centromere.core.commons.repositories.GeneRepository;
 import com.blueprint.centromere.core.commons.repositories.SampleRepository;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.SampleAware;
+import com.blueprint.centromere.core.config.ApplicationProperties;
 import com.blueprint.centromere.core.dataimport.*;
 import com.blueprint.centromere.core.model.ModelSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
@@ -44,21 +47,24 @@ import java.util.Map;
  * @author woemler
  * @since 0.4.3
  */
-public class TcgaRnaSeqGeneExpressionFileReader<T extends GeneExpression<?>> 
-		extends MultiRecordLineFileReader<T> 
-		implements InitializingBean, ImportOptionsAware, ModelSupport<T>, DataFileAware, SampleAware {
+public class TcgaRnaSeqGeneExpressionFileReader
+		extends MultiRecordLineFileReader<GeneExpression>
+		implements EnvironmentAware, ModelSupport<GeneExpression>,
+			DataFileAware, SampleAware {
 
 	private SampleRepository sampleRepository;
 	private GeneRepository geneRepository;
-	private BasicImportOptions options;
 	private DataFile dataFile;
 	private Map<String, Sample> sampleMap;
-	private Class<T> model;
+	private Class<GeneExpression> model;
+	private Environment environment;
 	
 	private static final Logger logger = LoggerFactory.getLogger(TcgaRnaSeqGeneExpressionFileReader.class);
-	
-	@PostConstruct
-	public void afterPropertiesSet(){
+
+	@Override 
+	public void doBefore(Object... args) throws DataImportException {
+		super.doBefore(args);
+		sampleMap = new HashMap<>();
 		Assert.notNull(sampleRepository, "SampleRepository must not be null.");
 		Assert.notNull(geneRepository, "GeneRepository must not be null.");
 		Assert.notNull(dataFile, "DataFile cannot be null.");
@@ -66,20 +72,13 @@ public class TcgaRnaSeqGeneExpressionFileReader<T extends GeneExpression<?>>
 	}
 
 	@Override 
-	public void doBefore(Object... args) throws DataImportException {
-		super.doBefore(args);
-		sampleMap = new HashMap<>();
-		afterPropertiesSet();
-	}
-
-	@Override 
-	protected List<T> getRecordsFromLine(String line) throws DataImportException {
-		List<T> records = new ArrayList<>();
+	protected List<GeneExpression> getRecordsFromLine(String line) throws DataImportException {
+		List<GeneExpression> records = new ArrayList<>();
 		String[] bits = line.trim().split(this.getDelimiter());
 		if (bits.length > 1){
 			Gene gene = getGene(bits[0]);
 			if (gene == null){
-				if (options.isSkipInvalidGenes()){
+				if (environment.getRequiredProperty(ApplicationProperties.SKIP_INVALID_GENES, Boolean.class)){
 					logger.warn(String.format("Skipping line due to invalid gene: %s", line));
 					return new ArrayList<>();
 				} else {
@@ -87,9 +86,9 @@ public class TcgaRnaSeqGeneExpressionFileReader<T extends GeneExpression<?>>
 				}
 			}
 			for (int i = 1; i < bits.length; i++){
-				T record;
+				GeneExpression record;
 				try {
-					record = this.getModel().newInstance();
+					record = new GeneExpression();
 				} catch (Exception e){
 					throw new DataImportException(String.format("Unable to create instance of model object: %s"
 							, model.getName()));
@@ -98,14 +97,14 @@ public class TcgaRnaSeqGeneExpressionFileReader<T extends GeneExpression<?>>
 				if (sampleMap.containsKey(this.getHeaders().get(i))){
 					sample = sampleMap.get(this.getHeaders().get(i));
 				} else {
-					List<Sample> samples = sampleRepository.guessSample(this.getHeaders().get(i));
+					List<Sample> samples = sampleRepository.guess(this.getHeaders().get(i));
 					if (samples != null && !samples.isEmpty()){
 						sample = samples.get(0);
 						sampleMap.put(this.getHeaders().get(i), sample);
 					}
 				}
 				if (sample == null){
-					if (options.isSkipInvalidSamples()){
+					if (environment.getRequiredProperty(ApplicationProperties.SKIP_INVALID_SAMPLES, Boolean.class)){
 						logger.warn(String.format("Skipping record due to invalid sample: %s", 
 								this.getHeaders().get(i)));
 						continue;
@@ -116,16 +115,16 @@ public class TcgaRnaSeqGeneExpressionFileReader<T extends GeneExpression<?>>
 				try {
 					record.setValue(Double.parseDouble(bits[i]));
 				} catch (NumberFormatException e){
-					if (options.isSkipInvalidRecords()){
+					if (environment.getRequiredProperty(ApplicationProperties.SKIP_INVALID_RECORDS, Boolean.class)){
 						logger.warn(String.format("Invalid record, cannot parse value: %s", bits[i]));
 						continue;
 					} else {
 						throw new DataImportException(String.format("Cannot parse value: %s", bits[i]));
 					}
 				}
-				record.setDataFileMetadata(dataFile);
-				record.setGeneMetadata(gene);
-				record.setSampleMetadata(sample);
+				record.setDataFile(dataFile);
+				record.setGene(gene);
+				record.setSample(sample);
 				records.add(record);
 			}
 			
@@ -139,10 +138,10 @@ public class TcgaRnaSeqGeneExpressionFileReader<T extends GeneExpression<?>>
 		if (b.length > 1){
 			List<Gene> genes = null;
 			if (!b[0].equals("?")){
-				genes = geneRepository.guessGene(b[0]);
+				genes = geneRepository.guess(b[0]);
 			} 
 			if (genes == null || genes.isEmpty()){
-				genes = geneRepository.guessGene(b[1]);
+				genes = geneRepository.guess(b[1]);
 			}
 			if (genes.size() > 0){
 				gene = genes.get(0);
@@ -166,14 +165,6 @@ public class TcgaRnaSeqGeneExpressionFileReader<T extends GeneExpression<?>>
 		this.geneRepository = geneRepository;
 	}
 
-	public BasicImportOptions getImportOptions() {
-		return options;
-	}
-
-	public void setImportOptions(ImportOptions options) {
-		this.options = (BasicImportOptions) options;
-	}
-
 	public DataFile getDataFile() {
 		return dataFile;
 	}
@@ -183,12 +174,12 @@ public class TcgaRnaSeqGeneExpressionFileReader<T extends GeneExpression<?>>
 	}
 
 	@Override 
-	public Class<T> getModel() {
+	public Class<GeneExpression> getModel() {
 		return model;
 	}
 
 	@Override 
-	public void setModel(Class<T> model) {
+	public void setModel(Class<GeneExpression> model) {
 		this.model = model;
 	}
 
@@ -197,4 +188,9 @@ public class TcgaRnaSeqGeneExpressionFileReader<T extends GeneExpression<?>>
 		return new ArrayList<>(sampleMap.values());
 	}
 
+    @Override
+    @Autowired
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+    }
 }

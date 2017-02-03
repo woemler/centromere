@@ -24,7 +24,7 @@ import com.blueprint.centromere.core.commons.models.DataFile;
  * 
  * @author woemler
  */
-public interface DataFileAware<T extends DataFile<?>> {
-	T getDataFile();
-	void setDataFile(T dataFile);
+public interface DataFileAware {
+	DataFile getDataFile();
+	void setDataFile(DataFile dataFile);
 }

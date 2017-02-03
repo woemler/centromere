@@ -17,11 +17,13 @@
 package com.blueprint.centromere.core.dataimport;
 
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.repository.RepositoryOperations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.data.repository.CrudRepository;
 
 /**
  * Simple implementation of {@link RecordWriter}, that writes all records directly to the database
- *   using a {@link RepositoryOperations} implementation.  Can be configured to write using an
+ *   using a {@link CrudRepository} implementation.  Can be configured to write using an
  *   insert, update, or upsert (save) operation.
  * 
  * @author woemler
@@ -30,62 +32,36 @@ public class RepositoryRecordWriter<T extends Model<?>> implements RecordWriter<
 	
 	public enum WriteMode { INSERT, UPDATE, UPSERT }
 	
-	private final RepositoryOperations<T, ?> repository;
+	private final CrudRepository<T, ?> repository;
 	private WriteMode writeMode = WriteMode.INSERT;
+	private Environment environment;
 
-	public RepositoryRecordWriter(RepositoryOperations<T, ?> repository) {
+	public RepositoryRecordWriter(CrudRepository<T, ?> repository) {
 		this.repository = repository;
 	}
 
-	public RepositoryRecordWriter(RepositoryOperations<T, ?> repository, WriteMode writeMode) {
+	public RepositoryRecordWriter(CrudRepository<T, ?> repository, WriteMode writeMode) {
 		this.repository = repository;
 		this.writeMode = writeMode;
 	}
 
 	/**
-	 * Writes the input {@link Model} record to the target {@link RepositoryOperations} implementation,
+	 * Writes the input {@link Model} record to the target Repository implementation,
 	 *   using the appropriate operation.
 	 * @param entity
 	 */ 
 	@SuppressWarnings("unchecked")
 	public void writeRecord(T entity) throws DataImportException {
-		if (writeMode.equals(WriteMode.INSERT)){
-			repository.insert(entity);
-		} else if (writeMode.equals(WriteMode.UPDATE)){
-			repository.update(entity);
-		} else if (writeMode.equals(WriteMode.UPSERT)){
-			repository.save(entity);
-		} else {
-			throw new DataImportException("Invalid write mode selected: " + writeMode.toString());
-		}
-		
+		repository.save(entity);
 	}
 
-	public RepositoryOperations<T, ?> getRepository() {
+	public CrudRepository<T, ?> getRepository() {
 		return repository;
 	}
 
-	/**
-	 * To be executed before the main component method is first called.  Can be configured to handle
-	 * a variety of tasks using flexible input parameters.
-	 *
-	 * @param args an array of objects of any type.
-	 * @throws DataImportException
-	 */
 	@Override 
-	public void doBefore(Object... args) throws DataImportException {
-		
-	}
-
-	/**
-	 * To be executed after the main component method is called for the last time.  Can be configured
-	 * to handle a variety of tasks using flexible input parameters.
-	 *
-	 * @param args an array of objects of any type.
-	 * @throws DataImportException
-	 */
-	@Override 
-	public void doAfter(Object... args) throws DataImportException {
-
+	@Autowired
+	public void setEnvironment(Environment environment) {
+		this.environment = environment;
 	}
 }

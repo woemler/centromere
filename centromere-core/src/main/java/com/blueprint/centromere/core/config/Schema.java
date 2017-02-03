@@ -17,11 +17,26 @@
 package com.blueprint.centromere.core.config;
 
 /**
+ *
+ *
  * @author woemler
+ * @since 0.5.0
  */
 public enum Schema {
 	CUSTOM,
-	DEFAULT,
-	TCGA
+	DEFAULT
 	;
+
+	public static final String CUSTOM_PROFILE = "schema_custom";
+	public static final String DEFAULT_PROFILE = "schema_default";
+
+	public static String getProfile(Schema schema){
+		switch (schema){
+			case DEFAULT:
+				return DEFAULT_PROFILE;
+			default:
+				return CUSTOM_PROFILE;
+		}
+	}
+
 }

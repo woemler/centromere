@@ -30,7 +30,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @JacksonAnnotationsInside
-@JsonFilter("fieldFilter")
+//@JsonFilter("fieldFilter") //TODO JsonFIlter handling for standard SDR endpoints
 @Inherited
 public @interface Filterable {
 }

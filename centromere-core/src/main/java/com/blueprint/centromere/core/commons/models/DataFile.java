@@ -16,26 +16,43 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-import com.blueprint.centromere.core.model.Alias;
-import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.AbstractModel;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.MappedSuperclass;
-import java.io.Serializable;
+import javax.persistence.*;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author woemler
  */
-@MappedSuperclass
-public abstract class DataFile<ID extends Serializable> implements Model<ID> {
+@Entity
+@Document
+@Table(indexes = { @Index(name = "DATA_FILE_IDX_01", columnList = "dataType") })
+public class DataFile extends AbstractModel implements Attributes {
 	
 	private String filePath;
-	@Alias("type") private String dataType;
-	private Date dateCreated;
-	private Date dateUpdated;
 	
-	abstract public Object getDataSetId();
-	abstract public <S extends DataSet<?>> void setDataSetMetadata(S dataSet);
+	@Indexed private String dataType;
+	
+	private Date dateCreated;
+	
+	private Date dateUpdated;
+
+	@ManyToOne
+	@JoinColumn(name = "dataSetId")
+	private DataSet dataSet;
+
+	@Column(updatable = false, insertable = false)
+	private String dataSetId;
+
+	@ElementCollection(fetch = FetchType.EAGER)
+	@OrderColumn
+	private Map<String, String> attributes = new HashMap<>();
+	
+	/* Getters and Setters */ 
 
 	public String getFilePath() {
 		return filePath;
@@ -67,5 +84,50 @@ public abstract class DataFile<ID extends Serializable> implements Model<ID> {
 
 	public void setDateUpdated(Date dateUpdated) {
 		this.dateUpdated = dateUpdated;
+	}
+
+	public DataSet getDataSet() {
+		return dataSet;
+	}
+
+	public void setDataSet(DataSet dataSet) {
+		this.dataSet = dataSet;
+	}
+
+	public String getDataSetId() {
+		return dataSetId;
+	}
+
+	public void setDataSetId(String dataSetId) {
+		this.dataSetId = dataSetId;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		return attributes;
+	}
+
+	public void setAttributes(Map<String, String> attributes) {
+		this.attributes = attributes;
+	}
+
+	@Override
+	public void addAttribute(String name, String value) {
+		attributes.put(name, value);
+	}
+
+	@Override
+	public void addAttributes(Map<String, String> attributes) {
+		this.attributes.putAll(attributes);
+	}
+
+	@Override
+	public boolean hasAttribute(String name) {
+		return attributes.containsKey(name);
+	}
+
+	@Override
+	public String getAttribute(String name) {
+		return attributes.containsKey(name) ? attributes.get(name) : null;
 	}
 }

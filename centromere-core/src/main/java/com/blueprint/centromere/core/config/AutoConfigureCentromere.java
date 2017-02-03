@@ -16,11 +16,11 @@
 
 package com.blueprint.centromere.core.config;
 
+import com.blueprint.centromere.core.dataimport.cli.CommandLineInputConfiguration;
 import com.blueprint.centromere.core.model.Model;
-import org.springframework.context.annotation.ComponentScan;
+import com.blueprint.centromere.core.ws.config.WebApplicationConfig;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
 
@@ -35,11 +35,11 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Inherited
 @Configuration
-@ComponentScan(basePackages = { "org.oncoblocks.centromere.web.config" })
-@Import({ 
-		ProfileConfiguration.class
+@Import({
+		ProfileConfiguration.class,
+		WebApplicationConfig.class,
+		CommandLineInputConfiguration.class
 })
-@ModelScan
 public @interface AutoConfigureCentromere {
 
 	/**
@@ -53,17 +53,18 @@ public @interface AutoConfigureCentromere {
 	/**
 	 * Allows selection fo a default set of {@link Model} classes,
 	 *   which will be registered in the application.  Defaults to {@code CUSTOM}, which assumes that
-	 *   model registration will be handled by the user, or with the {@link #basePackages()} or 
-	 *   {@link #modelClasses()} methods.
+	 *   model creation and repository instantiation will be handled by the user.
 	 * 
 	 * @return
 	 */
 	Schema schema() default Schema.CUSTOM;
-	
-	@AliasFor(annotation = ModelScan.class, attribute = "basePackages")
-	String[] basePackages() default {};
-	
-	@AliasFor(annotation = ModelScan.class, attribute = "modelClasses")
-	Class<? extends Model<?>>[] modelClasses() default {};
+
+	/**
+	 * Sets the level of security to be automaticaly configured within the web services context.
+	 *   Defaults to NONE, which is no security.
+	 *
+	 * @return
+	 */
+	Security webSecurity() default Security.NONE;
 	
 }

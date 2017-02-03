@@ -16,10 +16,12 @@
 
 package com.blueprint.centromere.core.dataimport;
 
-import com.google.common.reflect.TypeToken;
 import com.blueprint.centromere.core.model.Model;
+import com.google.common.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.DataBinder;
@@ -34,45 +36,32 @@ import java.util.List;
 /**
  * Basic {@link RecordProcessor} implementation, which can be used to handle most file import jobs.
  *   The {@code doBefore} and {@code doAfter} methods can be overridden to handle data set or data
- *   file metadata persistence, pre/post-processing, or other maintenance tasks.  Uses a basic
- *   {@link BasicImportOptions} instance to set import parameters, and identify the directory to store
- *   all temporary files.
+ *   file metadata persistence, pre/post-processing, or other maintenance tasks. 
  * 
  * @author woemler
  */
 public class GenericRecordProcessor<T extends Model<?>> 
-		implements RecordProcessor<T>, ImportOptionsAware, DataTypeSupport {
+		implements RecordProcessor<T>, DataTypeSupport {
 
 	private Class<T> model;
 	private RecordReader<T> reader;
 	private Validator validator;
 	private RecordWriter<T> writer;
 	private RecordImporter importer;
-	private BasicImportOptions options = new BasicImportOptions();
+	private Environment environment;
 	private List<String> supportedDataTypes = new ArrayList<>();
 	private boolean isConfigured = false;
 	private boolean isInFailedState = false;
 	private static final Logger logger = LoggerFactory.getLogger(GenericRecordProcessor.class);
 
 	/**
-	 * To be executed before the main component method is first called.  Can be configured to handle
-	 * a variety of tasks using flexible input parameters.
-	 *
-	 * @param args an array of objects of any type.
-	 * @throws DataImportException
+	 * Performs configuration steps prior to each execution of {@link #run(Object...)}.  Assigns
+	 *   options and metadata objects to the individual processing components that are expecting them.
 	 */
-	@Override 
-	public void doBefore(Object... args) throws DataImportException {
-	}
-
-	/**
-	 * Performs configuration steps after bean creation.  Assigns options and metadata objects to the 
-	 *   individual processing components that are expecting them.
-	 */
-	@PostConstruct
 	@SuppressWarnings("unchecked")
 	@Override
-	public void afterPropertiesSet(){
+	public void doBefore(Object... args){
+		Assert.notNull(environment, "Environment must not be null.");
 		if (this.getClass().isAnnotationPresent(DataTypes.class)){
 			DataTypes dataTypes = this.getClass().getAnnotation(DataTypes.class);
 			if (dataTypes.value() != null && dataTypes.value().length > 0){
@@ -82,28 +71,16 @@ public class GenericRecordProcessor<T extends Model<?>>
 		if (model == null){
 			this.model = (Class<T>) new TypeToken<T>(getClass()) {}.getRawType();
 		}
-		if (writer != null && writer instanceof ImportOptionsAware) {
-			((ImportOptionsAware) writer).setImportOptions(options);
+		if (writer != null) {
+			writer.setEnvironment(environment);
 		}
-		if (reader != null && reader instanceof ImportOptionsAware) {
-			((ImportOptionsAware) reader).setImportOptions(options);
+		if (reader != null) {
+			reader.setEnvironment(environment);
 		}
-		if (importer != null && importer instanceof ImportOptionsAware) {
-			((ImportOptionsAware) importer).setImportOptions(options);
+		if (importer != null) {
+			importer.setEnvironment(environment);
 		}
 		isConfigured = true;
-	}
-
-	/**
-	 * To be executed after the main component method is called for the last time.  Can be configured
-	 * to handle a variety of tasks using flexible input parameters.
-	 *
-	 * @param args an array of objects of any type.
-	 * @throws DataImportException
-	 */
-	@Override 
-	public void doAfter(Object... args) throws DataImportException {
-		
 	}
 
 	/**
@@ -112,7 +89,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 	 * @throws DataImportException
 	 */
 	public void run(Object... args) throws DataImportException {
-		if (!isConfigured) logger.warn("Processor configuration method has not run!");
+		if (!isConfigured) logger.warn("Processor configuration method has not run!"); // TODO: Should this return or throw exception?
 		if (isInFailedState) {
 			logger.warn("Record processor is in failed state and is aborting run.");
 			return;
@@ -140,7 +117,10 @@ public class GenericRecordProcessor<T extends Model<?>>
 				BindingResult bindingResult = dataBinder.getBindingResult();
 				if (bindingResult.hasErrors()){
 					logger.warn(String.format("Record failed validation: %s", record.toString()));
-					if (!options.isSkipInvalidRecords()){
+					if (Boolean.parseBoolean(environment.getRequiredProperty("skip-invalid-records"))){
+						record = reader.readRecord();
+						continue;
+					} else {
 						throw new DataImportException(bindingResult.toString());
 					}
 				}
@@ -168,8 +148,14 @@ public class GenericRecordProcessor<T extends Model<?>>
 	 * @return
 	 */
 	private String getTempFilePath(String inputFilePath){
-		File tempDir = new File(options.getTempDirectoryPath());
-		//String fileName = new File(inputFilePath).getName() + ".tmp";
+		File tempDir;
+		if (!environment.containsProperty("centromere.import.temp-dir") 
+				|| environment.getRequiredProperty("centromere.import.temp-dir") == null 
+				|| "".equals(environment.getRequiredProperty("centromere.import.temp-dir"))){
+			tempDir = new File(System.getProperty("java.io.tmpdir"));
+		} else {
+			tempDir = new File(environment.getRequiredProperty("centromere.import.temp-dir"));
+		}
 		String fileName = "centromere.import.tmp";
 		File tempFile = new File(tempDir, fileName);
 		return tempFile.getPath();
@@ -231,16 +217,10 @@ public class GenericRecordProcessor<T extends Model<?>>
 		this.importer = importer;
 	}
 
-	public ImportOptions getImportOptions() {
-		return options;
-	}
-
-	public void setImportOptions(ImportOptions options) {
-		this.options = new BasicImportOptions(options);
-	}
-	
-	public void setImportOptions(BasicImportOptions options){
-		this.options = options;
+	@Autowired
+	@Override 
+	public void setEnvironment(Environment environment) {
+		this.environment = environment;
 	}
 
 	public boolean isInFailedState() {
