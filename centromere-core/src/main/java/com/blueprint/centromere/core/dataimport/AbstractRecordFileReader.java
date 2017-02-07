@@ -39,6 +39,7 @@ public abstract class AbstractRecordFileReader<T extends Model<?>> implements Re
 	private BufferedReader reader;
 	private Environment environment;
 	private static final Logger logger = LoggerFactory.getLogger(AbstractRecordFileReader.class);
+	private Class<T> model;
 
 	/**
 	 * Closes any open readers and opens the new target file.
@@ -119,4 +120,14 @@ public abstract class AbstractRecordFileReader<T extends Model<?>> implements Re
 	public void setEnvironment(Environment environment) {
 		this.environment = environment;
 	}
+
+    @Override
+    public Class<T> getModel() {
+        return model;
+    }
+
+    @Override
+    public void setModel(Class<T> model) {
+        this.model = model;
+    }
 }

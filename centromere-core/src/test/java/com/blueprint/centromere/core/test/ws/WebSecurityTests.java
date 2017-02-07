@@ -50,21 +50,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author woemler
  */
 @RunWith(SpringRunner.class)
-//@WebAppConfiguration
 @SpringBootTest(classes = {
-		EmbeddedH2DataSourceConfig.class, 
-		WebApplicationConfig.class
+	EmbeddedH2DataSourceConfig.class,
+	WebApplicationConfig.class
 })
 @ActiveProfiles(value = {Profiles.WEB_PROFILE, Security.SECURE_READ_WRITE_PROFILE})
 public class WebSecurityTests {
 	
 	@Autowired private WebApplicationContext context;
 	@Autowired private UserRepository userRepository;
-	@Autowired private Environment env;
 	@Autowired private FilterChainProxy springSecurityFilterChain;
 	
 	private MockMvc mockMvc;
-	private final ObjectMapper objectMapper = new ObjectMapper();
 	private static boolean isConfigured = false;
 	
 	@Before

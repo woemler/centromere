@@ -33,6 +33,7 @@ public class RecordCollectionReader<T extends Model<?>> implements RecordReader<
 	
 	private final List<T> records = new ArrayList<>();
 	private Environment environment;
+	private Class<T> model;
 
 	public RecordCollectionReader(List<T> records) {
 		this.records.addAll(records);
@@ -48,6 +49,14 @@ public class RecordCollectionReader<T extends Model<?>> implements RecordReader<
 	public void setEnvironment(Environment environment) {
 		this.environment = environment;
 	}
-	
-	
+
+    @Override
+    public Class<T> getModel() {
+        return model;
+    }
+
+    @Override
+    public void setModel(Class<T> model) {
+        this.model = model;
+    }
 }

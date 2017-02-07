@@ -57,8 +57,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author woemler
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration
 //@WebAppConfiguration
 //@SpringBootTest(classes = {
 //		EmbeddedH2DataSourceConfig.class,

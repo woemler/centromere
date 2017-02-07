@@ -1,0 +1,19 @@
+Hybridization REF	tcga-2y-a9gv	tcga-2y-a9h6	tcga-2y-a9h7	tcga-4r-aa8i	tcga-bc-a110
+Composite Element REF	value	value	value	value	value
+years_to_birth	54	68	81	66	51
+vital_status	1	0	0	1	1
+days_to_death	2532	NA	NA	262	2116
+days_to_last_followup	NA	357	1168	NA	NA
+tumor_tissue_site	liver	liver	liver	liver	liver
+pathologic_stage	stage i	stage i	stage i	stage ii	NA
+pathology_T_stage	t1	t1	t1	t2	t1
+pathology_N_stage	nx	nx	n0	nx	nx
+pathology_M_stage	mx	mx	mx	mx	mx
+gender	female	female	female	male	female
+date_of_initial_pathologic_diagnosis	2007	2011	2011	2013	2003
+days_to_last_known_alive	NA	NA	NA	NA	NA
+radiation_therapy	no	no	no	no	no
+histological_type	hepatocellular carcinoma	hepatocellular carcinoma	hepatocellular carcinoma	hepatocellular carcinoma	hepatocellular carcinoma
+residual_tumor	r0	r0	r0	r0	r0
+race	white	white	white	white	black or african american
+ethnicity	not hispanic or latino	not hispanic or latino	not hispanic or latino	not hispanic or latino	not hispanic or latino
