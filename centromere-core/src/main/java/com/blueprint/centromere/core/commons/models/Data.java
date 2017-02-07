@@ -24,6 +24,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 
 /**
+ * Base class for modeling processed genomic data.  Assumes that each record has an associated 
+ *   {@link DataFile}, {@link Sample}, and {@link Gene}.
  * 
  * @author woemler
  * @since 0.4.3

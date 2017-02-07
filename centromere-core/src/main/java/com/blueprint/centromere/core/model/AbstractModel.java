@@ -33,20 +33,6 @@ public abstract class AbstractModel implements Model<String> {
 	@GenericGenerator(name = "uuid", strategy	=	"uuid2")
 	private String id;
 
-//	public AbstractModel() {
-//		this.id = Generators.timeBasedGenerator(EthernetAddress.fromInterface()).generate();
-//	}
-//
-//	@Override public UUID getId() {
-//		return id;
-//	}
-//
-//	public void setId(UUID id) {
-//		this.id = id;
-//	}
-
-
-
 	@Override 
 	public String getId() {
 		return id;

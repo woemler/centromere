@@ -16,6 +16,8 @@ Centromere aims to make the task of storing and working with processed genomic d
     - Basic security and user-authentication.
     - Response object field dfiltering and formatting.
     
+Centromere is built using the [Spring IO Platform](https://spring.io/platform), and leverages tools such as Spring Data, Spring Data REST, and Spring Security to deliver enterprise-grade data management solutions.    
+
 ## Important Note
 
 The current development build of Centromere (0.5.0-SNAPSHOT) significantly overhauls the codebase, eliminating excess dependencies and streamlining the process to deployment.  If you are new to Centromere, I highly recommend waiting for the 0.5.0 release before getting started.  This is expected to be complete Q1 2017.  For a brief description of the current development road map, please see the `roadmap.md` document.

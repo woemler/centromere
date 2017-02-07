@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.converter.HttpMessageNotWritableException;
@@ -63,7 +62,7 @@ public class FilteringJackson2HttpMessageConverter extends MappingJackson2HttpMe
 				jsonGenerator.writeRaw(")]}', ");
 			}
 
-			if (object instanceof ResponseEnvelope) {
+			if (object.getClass().isAssignableFrom(ResourceSupport.class)) {
 				
 				ResponseEnvelope envelope = (ResponseEnvelope) object;
 				Object entity = envelope.getEntity();

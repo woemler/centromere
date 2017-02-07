@@ -42,11 +42,11 @@ public class EntrezGeneInfoReader extends StandardRecordFileReader<Gene>
 		gene.setPrimaryReferenceId(bits[1]);
 		gene.setPrimaryGeneSymbol(bits[2]);
 		for (String alias: bits[4].split("\\|")){
-			gene.addAlias(alias);
+			if (!alias.replaceAll("-", "").equals("")) gene.addAlias(alias);
 		}
 		for (String ref : bits[5].split("\\|")) {
 			String[] r = ref.split(":");
-			gene.addExternalReference(r[0], r[r.length - 1]);
+			if (!r[0].replaceAll("-", "").equals("")) gene.addExternalReference(r[0], r[r.length - 1]);
 		}
 		gene.setChromosome(bits[6]);
 		gene.setChromosomeLocation(bits[7]);

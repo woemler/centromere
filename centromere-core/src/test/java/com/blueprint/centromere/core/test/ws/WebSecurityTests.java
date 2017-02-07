@@ -22,8 +22,8 @@ import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.core.test.jpa.EmbeddedH2DataSourceConfig;
 import com.blueprint.centromere.core.ws.config.WebApplicationConfig;
-import com.jayway.jsonpath.JsonPath;
-
+import com.blueprint.centromere.core.ws.security.BasicTokenUtils;
+import com.blueprint.centromere.core.ws.security.TokenDetails;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,17 +34,11 @@ import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 
-import static com.jayway.jsonassert.impl.matcher.IsMapContainingKey.hasKey;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -61,6 +55,7 @@ public class WebSecurityTests {
 	@Autowired private WebApplicationContext context;
 	@Autowired private UserRepository userRepository;
 	@Autowired private FilterChainProxy springSecurityFilterChain;
+	@Autowired private BasicTokenUtils tokenUtils;
 	
 	private MockMvc mockMvc;
 	private static boolean isConfigured = false;
@@ -81,55 +76,73 @@ public class WebSecurityTests {
 		}
 	}
 	
-	@Test
-	public void authenticationEndpointTest() throws Exception {
-		mockMvc.perform(head("/authenticate"))
-				.andExpect(status().isOk());
-	}
+//	@Test
+//	public void authenticationEndpointTest() throws Exception {
+//		mockMvc.perform(head("/authenticate"))
+//				.andExpect(status().isOk());
+//	}
 	
 	@Test
 	public void nonAuthenticatedGetRequestTest() throws Exception {
 		mockMvc.perform(get("/api/genes"))
 				.andExpect(status().isForbidden());
 	}
-	
-	@Test 
-	public void invalidUserAuthenticationTest() throws Exception {
-		mockMvc.perform(post("/authenticate")
-				.with(httpBasic("not", "correct")))
-				.andExpect(status().isUnauthorized());
-	}
 
 	@Test
-	public void invalidPasswordAuthenticationTest() throws Exception {
-		mockMvc.perform(post("/authenticate")
-				.with(httpBasic("user", "notpassword")))
-				.andExpect(status().isUnauthorized());
-	}
-
-	@Test
-	public void validPasswordAuthenticationTest() throws Exception {
-		mockMvc.perform(post("/authenticate")
-				.with(httpBasic("user", "password")))
-				.andDo(print())
-				.andExpect(status().isOk());
-	}
-
-	@Test
-	public void userAuthenticationTest() throws Exception {
-		MvcResult result = mockMvc.perform(post("/authenticate")
-				.with(httpBasic("user", "password")))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$", hasKey("token")))
-				.andReturn();
-
-		String json = result.getResponse().getContentAsString();
-		System.out.println(json);
-		String token = JsonPath.read(json, "$.token");
-
+	public void validTokenRequestTest() throws Exception {
+		User user = userRepository.loadUserByUsername("user");
+		Assert.notNull(user);
+		Assert.isTrue("user".equals(user.getUsername()));
+		TokenDetails tokenDetails = tokenUtils.createTokenAndDetails(user);
 		mockMvc.perform(get("/api/genes")
-				.header("X-Auth-Token", token))
+				.header("X-Auth-Token", tokenDetails.getToken()))
 				.andExpect(status().isOk());
 	}
+
+	@Test
+	public void badTokenTest() throws Exception {
+		mockMvc.perform(get("/api/genes")
+				.header("X-Auth-Token", "user:23459837145:gwerhg97wr9tgwg"))
+				.andExpect(status().isForbidden());
+	}
+	
+//	@Test 
+//	public void invalidUserAuthenticationTest() throws Exception {
+//		mockMvc.perform(post("/authenticate")
+//				.with(httpBasic("not", "correct")))
+//				.andExpect(status().isUnauthorized());
+//	}
+
+//	@Test
+//	public void invalidPasswordAuthenticationTest() throws Exception {
+//		mockMvc.perform(post("/authenticate")
+//				.with(httpBasic("user", "notpassword")))
+//				.andExpect(status().isUnauthorized());
+//	}
+//
+//	@Test
+//	public void validPasswordAuthenticationTest() throws Exception {
+//		mockMvc.perform(post("/authenticate")
+//				.with(httpBasic("user", "password")))
+//				.andDo(print())
+//				.andExpect(status().isOk());
+//	}
+//
+//	@Test
+//	public void userAuthenticationTest() throws Exception {
+//		MvcResult result = mockMvc.perform(post("/authenticate")
+//				.with(httpBasic("user", "password")))
+//				.andExpect(status().isOk())
+//				.andExpect(jsonPath("$", hasKey("token")))
+//				.andReturn();
+//
+//		String json = result.getResponse().getContentAsString();
+//		System.out.println(json);
+//		String token = JsonPath.read(json, "$.token");
+//
+//		mockMvc.perform(get("/api/genes")
+//				.header("X-Auth-Token", token))
+//				.andExpect(status().isOk());
+//	}
 	
 }

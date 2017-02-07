@@ -61,6 +61,7 @@ public class WebApplicationConfig {
 	
 	@Bean
 	public RepositoryRestConfigurer springDataRestCustomConfig(){
+		
 		return new RepositoryRestConfigurerAdapter(){
 
 			@Autowired private Environment env;
@@ -78,16 +79,21 @@ public class WebApplicationConfig {
 			}
 			
 		};
+		
 	}
 	
 	@Bean
 	public WebMvcConfigurer springMvcCustomConfig(){
+		
 		return new WebMvcConfigurerAdapter() {
+			
 			@Override 
 			public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
 				converters.addAll(httpMessageConverters());
 			}
+			
 		};
+		
 	}
 	
 	static List<HttpMessageConverter<?>> httpMessageConverters(){
@@ -96,16 +102,24 @@ public class WebApplicationConfig {
 		
 		FilteringJackson2HttpMessageConverter jsonConverter
 				= new FilteringJackson2HttpMessageConverter();
-		jsonConverter.setSupportedMediaTypes(Arrays.asList(MediaType.APPLICATION_JSON,
-				MediaType.APPLICATION_JSON_UTF8, RestMediaTypes.ALPS_JSON, RestMediaTypes.HAL_JSON,
-				RestMediaTypes.JSON_PATCH_JSON, RestMediaTypes.MERGE_PATCH_JSON,
-				RestMediaTypes.SPRING_DATA_COMPACT_JSON, RestMediaTypes.SPRING_DATA_VERBOSE_JSON));
+		jsonConverter.setSupportedMediaTypes(Arrays.asList(
+				MediaType.APPLICATION_JSON,
+				MediaType.APPLICATION_JSON_UTF8, 
+				RestMediaTypes.ALPS_JSON, 
+				RestMediaTypes.HAL_JSON,
+				RestMediaTypes.JSON_PATCH_JSON, 
+				RestMediaTypes.MERGE_PATCH_JSON,
+				RestMediaTypes.SPRING_DATA_COMPACT_JSON, 
+				RestMediaTypes.SPRING_DATA_VERBOSE_JSON
+		));
 		converters.add(jsonConverter);
 
 		FilteringTextMessageConverter filteringTextMessageConverter =
 				new FilteringTextMessageConverter(new MediaType("text", "plain", Charset.forName("utf-8")));
 		filteringTextMessageConverter.setSupportedMediaTypes(Arrays.asList(
-				new MediaType("text", "plain", Charset.forName("utf-8")), MediaType.TEXT_PLAIN));
+				new MediaType("text", "plain", Charset.forName("utf-8")), 
+				MediaType.TEXT_PLAIN
+		));
 		filteringTextMessageConverter.setDelimiter("\t");
 		converters.add(filteringTextMessageConverter);
 		

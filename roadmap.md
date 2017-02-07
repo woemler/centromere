@@ -18,6 +18,7 @@
 	- HAL and non-HAL response
 - Response object field filtering (0.5.x)
 - API documentation with Spring REST Docs (0.5.0)
+- Support for static web content (0.5.x)
 
 ## Data Import
 
