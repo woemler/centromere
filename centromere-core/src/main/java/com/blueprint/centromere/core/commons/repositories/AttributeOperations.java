@@ -16,11 +16,9 @@
 
 package com.blueprint.centromere.core.commons.repositories;
 
-import com.google.common.reflect.TypeResolver;
 import com.google.common.reflect.TypeToken;
 
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.model.ModelSupport;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.Predicate;

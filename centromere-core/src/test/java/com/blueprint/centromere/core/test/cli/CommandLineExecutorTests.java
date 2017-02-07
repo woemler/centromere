@@ -25,6 +25,7 @@ import com.blueprint.centromere.core.dataimport.cli.CommandLineInputConfiguratio
 import com.blueprint.centromere.core.dataimport.cli.CommandLineInputExecutor;
 import com.blueprint.centromere.core.dataimport.cli.ModelProcessorBeanRegistry;
 import com.blueprint.centromere.core.test.jpa.EmbeddedH2DataSourceConfig;
+
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;

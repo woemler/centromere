@@ -18,7 +18,10 @@ package com.blueprint.centromere.core.dataimport;
 
 import com.blueprint.centromere.core.model.Model;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * Identifies an annotated {@link RecordProcessor} as the primary handler of the specified data types.

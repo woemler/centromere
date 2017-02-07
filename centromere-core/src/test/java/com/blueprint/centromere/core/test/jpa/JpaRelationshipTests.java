@@ -16,13 +16,33 @@
 
 package com.blueprint.centromere.core.test.jpa;
 
-import com.blueprint.centromere.core.commons.models.*;
-import com.blueprint.centromere.core.commons.repositories.*;
-import com.blueprint.centromere.core.test.model.*;
+import com.blueprint.centromere.core.commons.models.DataFile;
+import com.blueprint.centromere.core.commons.models.DataSet;
+import com.blueprint.centromere.core.commons.models.Gene;
+import com.blueprint.centromere.core.commons.models.GeneExpression;
+import com.blueprint.centromere.core.commons.models.Sample;
+import com.blueprint.centromere.core.commons.models.Subject;
+import com.blueprint.centromere.core.commons.repositories.DataFileRepository;
+import com.blueprint.centromere.core.commons.repositories.DataSetRepository;
+import com.blueprint.centromere.core.commons.repositories.GeneExpressionRepository;
+import com.blueprint.centromere.core.commons.repositories.GeneRepository;
+import com.blueprint.centromere.core.commons.repositories.SampleRepository;
+import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
+import com.blueprint.centromere.core.test.model.DataFileGenerator;
+import com.blueprint.centromere.core.test.model.DataSetGenerator;
+import com.blueprint.centromere.core.test.model.EntrezGeneDataGenerator;
+import com.blueprint.centromere.core.test.model.ExpressionDataGenerator;
+import com.blueprint.centromere.core.test.model.SampleDataGenerator;
+import com.blueprint.centromere.core.test.model.SubjectDataGenerator;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.*;
+import com.querydsl.core.types.dsl.CollectionPath;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.core.types.dsl.SimplePath;
+import com.querydsl.core.types.dsl.StringPath;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

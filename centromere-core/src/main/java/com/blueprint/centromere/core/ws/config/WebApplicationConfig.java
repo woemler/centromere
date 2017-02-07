@@ -20,8 +20,15 @@ import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.ws.controller.ModelController;
 import com.blueprint.centromere.core.ws.controller.UserAuthenticationController;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.env.Environment;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.RestMediaTypes;

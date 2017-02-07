@@ -18,6 +18,7 @@ package com.blueprint.centromere.core.commons.repositories;
 
 import com.blueprint.centromere.core.commons.models.SegmentCopyNumber;
 import com.blueprint.centromere.core.model.ModelRepository;
+
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 /**

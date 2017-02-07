@@ -18,7 +18,6 @@ package com.blueprint.centromere.core.commons.support;
 
 import com.blueprint.centromere.core.commons.models.Sample;
 
-import java.util.Collection;
 import java.util.List;
 
 /**

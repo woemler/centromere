@@ -18,7 +18,7 @@ package com.blueprint.centromere.core.dataimport;
 
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
-import org.springframework.beans.factory.InitializingBean;
+
 import org.springframework.validation.Validator;
 
 /**

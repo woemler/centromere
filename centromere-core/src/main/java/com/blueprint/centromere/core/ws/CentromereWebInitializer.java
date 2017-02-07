@@ -16,9 +16,11 @@
 
 package com.blueprint.centromere.core.ws;
 
+import com.google.common.collect.ObjectArrays;
+
 import com.blueprint.centromere.core.config.AutoConfigureCentromere;
 import com.blueprint.centromere.core.config.Profiles;
-import com.google.common.collect.ObjectArrays;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;

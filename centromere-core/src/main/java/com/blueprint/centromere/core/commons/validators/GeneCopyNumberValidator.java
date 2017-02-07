@@ -17,6 +17,7 @@
 package com.blueprint.centromere.core.commons.validators;
 
 import com.blueprint.centromere.core.commons.models.GeneCopyNumber;
+
 import org.springframework.validation.Errors;
 
 /**

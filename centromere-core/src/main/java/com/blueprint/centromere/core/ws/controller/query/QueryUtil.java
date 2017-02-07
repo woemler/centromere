@@ -16,18 +16,6 @@
 
 package com.blueprint.centromere.core.ws.controller.query;
 
-import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.PathBuilder;
-
-import org.springframework.core.convert.TypeDescriptor;
-import org.springframework.data.rest.core.annotation.RestResource;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.util.Date;
-
-
 /**
  * @author woemler
  */

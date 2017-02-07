@@ -18,6 +18,7 @@ package com.blueprint.centromere.core.test.commons;
 
 import com.blueprint.centromere.core.commons.models.Gene;
 import com.blueprint.centromere.core.commons.readers.EntrezGeneInfoReader;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.core.io.ClassPathResource;

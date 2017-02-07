@@ -16,44 +16,6 @@
 
 package com.blueprint.centromere.core.test.ws;
 
-import com.blueprint.centromere.core.commons.models.Gene;
-import com.blueprint.centromere.core.commons.repositories.GeneExpressionRepository;
-import com.blueprint.centromere.core.commons.repositories.GeneRepository;
-import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.test.jpa.EmbeddedH2DataSourceConfig;
-import com.blueprint.centromere.core.test.model.EntrezGeneDataGenerator;
-import com.blueprint.centromere.core.ws.config.WebApplicationConfig;
-import com.blueprint.centromere.core.ws.controller.query.Evaluation;
-import com.blueprint.centromere.core.ws.controller.query.QueryCriteria;
-import com.blueprint.centromere.core.ws.controller.query.QueryUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.querydsl.core.types.dsl.ListPath;
-import com.querydsl.core.types.dsl.MapPath;
-import com.querydsl.core.types.dsl.StringPath;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.util.Assert;
-import org.springframework.web.context.WebApplicationContext;
-
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 /**
  * @author woemler
  */

@@ -16,10 +16,6 @@
 
 package com.blueprint.centromere.core.test.model;
 
-import com.blueprint.centromere.core.model.Model;
-
-import java.util.List;
-
 /**
  * @author woemler
  */

@@ -17,6 +17,7 @@
 package com.blueprint.centromere.core.test.dataimport;
 
 import com.blueprint.centromere.core.commons.models.Gene;
+
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;

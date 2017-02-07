@@ -16,19 +16,22 @@
 
 package com.blueprint.centromere.core.ws.security;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.filter.GenericFilterBean;
+
+import java.io.IOException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 
 /**
  * Authenticates user requests using a previously generated {@link TokenDetails}.
@@ -55,7 +58,7 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
 			FilterChain chain) throws IOException, ServletException {
 
 		if (!(request instanceof HttpServletRequest)){
-			throw new RuntimeException("Expecting an HTTP request.");
+			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Expecting an HTTP request.");
 		}
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		System.out.println("Remote Host: " + httpRequest.getRemoteHost());

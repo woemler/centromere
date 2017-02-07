@@ -16,14 +16,16 @@
 
 package com.blueprint.centromere.core.commons.repositories;
 
-import com.blueprint.centromere.core.model.Model;
 import com.google.common.reflect.TypeToken;
+
+import com.blueprint.centromere.core.model.Model;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.PathBuilder;
+
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
 import java.util.List;

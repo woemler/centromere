@@ -16,12 +16,28 @@
 
 package com.blueprint.centromere.core.test.ws;
 
-import com.blueprint.centromere.core.commons.models.*;
-import com.blueprint.centromere.core.commons.repositories.*;
+import com.blueprint.centromere.core.commons.models.DataFile;
+import com.blueprint.centromere.core.commons.models.DataSet;
+import com.blueprint.centromere.core.commons.models.Gene;
+import com.blueprint.centromere.core.commons.models.GeneExpression;
+import com.blueprint.centromere.core.commons.models.Sample;
+import com.blueprint.centromere.core.commons.models.Subject;
+import com.blueprint.centromere.core.commons.repositories.DataFileRepository;
+import com.blueprint.centromere.core.commons.repositories.DataSetRepository;
+import com.blueprint.centromere.core.commons.repositories.GeneExpressionRepository;
+import com.blueprint.centromere.core.commons.repositories.GeneRepository;
+import com.blueprint.centromere.core.commons.repositories.SampleRepository;
+import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.test.jpa.EmbeddedH2DataSourceConfig;
-import com.blueprint.centromere.core.test.model.*;
+import com.blueprint.centromere.core.test.model.DataFileGenerator;
+import com.blueprint.centromere.core.test.model.DataSetGenerator;
+import com.blueprint.centromere.core.test.model.EntrezGeneDataGenerator;
+import com.blueprint.centromere.core.test.model.ExpressionDataGenerator;
+import com.blueprint.centromere.core.test.model.SampleDataGenerator;
+import com.blueprint.centromere.core.test.model.SubjectDataGenerator;
 import com.blueprint.centromere.core.ws.config.WebApplicationConfig;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +56,10 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
