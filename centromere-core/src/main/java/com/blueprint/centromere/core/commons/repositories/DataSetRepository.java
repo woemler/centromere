@@ -28,6 +28,6 @@ import java.util.List;
  */
 @RepositoryRestResource(path = "datasets", collectionResourceRel = "dataSets")
 public interface DataSetRepository extends ModelRepository<DataSet, String> {
-	List<DataSet> findByName(String name);
+	DataSet findOneByName(String name);
 	List<DataSet> findBySource(String source);
 }

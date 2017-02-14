@@ -61,7 +61,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void doBefore(Object... args){
+	public void doBefore(Object... args) throws DataImportException{
 		Assert.notNull(environment, "Environment must not be null.");
 		if (this.getClass().isAnnotationPresent(DataTypes.class)){
 			DataTypes dataTypes = this.getClass().getAnnotation(DataTypes.class);
@@ -103,8 +103,9 @@ public class GenericRecordProcessor<T extends Model<?>>
 			throw new DataImportException(e.getMessage());
 		}
 		String inputFilePath = (String) args[0];
-		reader.doBefore(inputFilePath);
-		writer.doBefore(this.getTempFilePath(inputFilePath));
+		reader.doBefore(args);
+		writer.doBefore(args);
+        if (importer != null) importer.doBefore(args);
 		if (isInFailedState) {
 			logger.warn("Record processor is in failed state and is aborting run.");
 			return;
@@ -133,10 +134,11 @@ public class GenericRecordProcessor<T extends Model<?>>
 			logger.warn("Record processor is in failed state and is aborting run.");
 			return;
 		}
-		writer.doAfter();
-		reader.doAfter();
+		writer.doAfter(args);
+		reader.doAfter(args);
 		if (importer != null) {
 			importer.importFile(this.getTempFilePath(inputFilePath));
+            importer.doAfter(args);
 		}
 	}
 

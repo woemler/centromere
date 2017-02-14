@@ -40,10 +40,13 @@ import javax.persistence.Table;
  */
 @Entity
 @Document
-@Table(indexes = { @Index(name = "DATA_FILE_IDX_01", columnList = "dataType") })
+@Table(indexes = {
+    @Index(name = "DATA_FILE_IDX_01", columnList = "dataType") ,
+    @Index(name = "DATA_FILE_IDX_02", columnList = "filePath", unique = true)
+})
 public class DataFile extends AbstractModel implements Attributes {
 	
-	private String filePath;
+	@Indexed(unique = true) private String filePath;
 	
 	@Indexed private String dataType;
 	

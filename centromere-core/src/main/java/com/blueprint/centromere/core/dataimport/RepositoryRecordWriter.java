@@ -21,6 +21,10 @@ import com.blueprint.centromere.core.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.util.Assert;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Simple implementation of {@link RecordWriter}, that writes all records directly to the database
@@ -34,16 +38,19 @@ public class RepositoryRecordWriter<T extends Model<?>> implements RecordWriter<
 	public enum WriteMode { INSERT, UPDATE, UPSERT }
 	
 	private final CrudRepository<T, ?> repository;
+	private Integer batchSize = 1;
 	private WriteMode writeMode = WriteMode.INSERT;
 	private Environment environment;
+    private List<T> records = new ArrayList<>();
 
 	public RepositoryRecordWriter(CrudRepository<T, ?> repository) {
 		this.repository = repository;
 	}
 
-	public RepositoryRecordWriter(CrudRepository<T, ?> repository, WriteMode writeMode) {
+	public RepositoryRecordWriter(CrudRepository<T, ?> repository, Integer batchSize) {
 		this.repository = repository;
-		this.writeMode = writeMode;
+        Assert.isTrue(batchSize > 0, "Batch size must be a positive integer.");
+        this.batchSize = batchSize;
 	}
 
 	/**
@@ -53,10 +60,23 @@ public class RepositoryRecordWriter<T extends Model<?>> implements RecordWriter<
 	 */ 
 	@SuppressWarnings("unchecked")
 	public void writeRecord(T entity) throws DataImportException {
-		repository.save(entity);
+        if (batchSize > 1){
+            records.add(entity);
+            if (records.size() >= batchSize) {
+                repository.save(records);
+                records = new ArrayList<>();
+            }
+        } else {
+            repository.save(entity);
+        }
 	}
 
-	public CrudRepository<T, ?> getRepository() {
+    @Override
+    public void doBefore(Object... args) throws DataImportException {
+        if (records.size() > 0) repository.save(records);
+    }
+
+    public CrudRepository<T, ?> getRepository() {
 		return repository;
 	}
 

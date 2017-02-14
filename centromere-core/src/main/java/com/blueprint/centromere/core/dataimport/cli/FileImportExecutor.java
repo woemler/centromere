@@ -40,9 +40,9 @@ public class FileImportExecutor {
 		}
 		logger.info(String.format("Running file import: data-type=%s  file=%s", dataType, filePath));
 		RecordProcessor processor = processorRegistry.getByDataType(dataType);
-		processor.doBefore(filePath);
-		processor.run(filePath);
-		processor.doAfter();
+		processor.doBefore(filePath, dataType);
+		processor.run(filePath, dataType);
+		processor.doAfter(filePath, dataType);
 	}
 
 	@Autowired

@@ -29,7 +29,7 @@ import java.util.UUID;
  */
 @RepositoryRestResource(path = "datafiles", collectionResourceRel = "dataFiles")
 public interface DataFileRepository extends ModelRepository<DataFile, String> {
-	List<DataFile> findByFilePath(String filePath);
+	DataFile findOneByFilePath(String filePath);
 	List<DataFile> findByDataType(String dataType);
-	List<DataFile> findByDataSetId(UUID dataSetId);
+	List<DataFile> findByDataSetId(String dataSetId);
 }
