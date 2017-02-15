@@ -41,7 +41,7 @@ public class RepositoryRecordWriter<T extends Model<?>> implements RecordWriter<
 	private Integer batchSize = 1;
 	private WriteMode writeMode = WriteMode.INSERT;
 	private Environment environment;
-    private List<T> records = new ArrayList<>();
+	private List<T> records = new ArrayList<>();
 
 	public RepositoryRecordWriter(CrudRepository<T, ?> repository) {
 		this.repository = repository;
@@ -51,6 +51,11 @@ public class RepositoryRecordWriter<T extends Model<?>> implements RecordWriter<
 		this.repository = repository;
         Assert.isTrue(batchSize > 0, "Batch size must be a positive integer.");
         this.batchSize = batchSize;
+	}
+
+	@Override
+	public void doBefore(Object... args) throws DataImportException {
+		records = new ArrayList<>();
 	}
 
 	/**
@@ -71,14 +76,14 @@ public class RepositoryRecordWriter<T extends Model<?>> implements RecordWriter<
         }
 	}
 
-    @Override
-    public void doBefore(Object... args) throws DataImportException {
-        if (records.size() > 0) repository.save(records);
-    }
-
-    public CrudRepository<T, ?> getRepository() {
-		return repository;
+	@Override
+	public void doAfter(Object... args) throws DataImportException {
+			if (records.size() > 0) repository.save(records);
 	}
+
+	public CrudRepository<T, ?> getRepository() {
+	return repository;
+}
 
 	@Override 
 	@Autowired

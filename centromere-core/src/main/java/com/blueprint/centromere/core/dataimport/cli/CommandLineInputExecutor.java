@@ -62,6 +62,7 @@ public class CommandLineInputExecutor implements CommandLineRunner {
 	private int processArguments(String... args) throws Exception {
 		
 		JCommander jc = new JCommander();
+		jc.setAcceptUnknownOptions(true);
 		ImportCommandArguments importCommandArguments = new ImportCommandArguments();
 		ImportFileCommandArguments importFileCommandArguments = new ImportFileCommandArguments();
 		ImportManifestCommandArguments importManifestCommandArguments = new ImportManifestCommandArguments();

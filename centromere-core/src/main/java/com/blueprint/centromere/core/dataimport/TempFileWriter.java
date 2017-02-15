@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 William Oemler, Blueprint Medicines
+ * Copyright 2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,24 @@
 
 package com.blueprint.centromere.core.dataimport;
 
+import java.io.File;
+
 /**
- * Defines basic connection information necessary for accessing a database.  Designed for use with 
- *   {@link RecordImporter} implementations that use specific CLT database import utilities.
- *   TODO: Find better existing class to handle this, preferably without storing the password as plain text.
- * 
  * @author woemler
  */
-@Deprecated
-public interface DatabaseCredentials {
-	String getUsername();
-	String getPassword();
-	String getHost();
-	String getPort();
-	String getDatabase();
+public interface TempFileWriter {
+
+  /**
+   * Generates a file name and path for temporary files to be written by the writer component.  Allows
+   *   the component and external objects to reference a temporary file.
+   * 
+   * @param inputFilePath
+   * @return
+   */
+  default String getTempFilePath(String inputFilePath){
+    File tempDir = new File(System.getProperty("java.io.tmpdir"));
+    File tempFile = new File(tempDir, inputFilePath + ".tmp");
+    return tempFile.getAbsolutePath();
+  }
+  
 }

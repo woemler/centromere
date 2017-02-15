@@ -19,6 +19,7 @@ package com.blueprint.centromere.core.commons.models;
 import com.blueprint.centromere.core.model.AbstractModel;
 
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
@@ -61,6 +62,7 @@ public class Subject extends AbstractModel implements Attributes {
 	private Map<String, String> attributes = new HashMap<>();
 	
 	@OneToMany(mappedBy = "subject", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	@DBRef
 	private List<Sample> samples = new ArrayList<>();
 
 	public String getName() {

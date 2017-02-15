@@ -29,9 +29,9 @@ public abstract class DataValidator implements Validator {
 	@Override 
 	public void validate(Object o, Errors errors) {
 		Data data = (Data) o;
-		if (data.getDataFileId() == null) errors.reject("dataFileId", "dataFileId.empty");
+		//if (data.getDataFileId() == null) errors.reject("dataFileId", "dataFileId.empty");
 		//if (data.getGeneId() == null) errors.reject("geneId", "geneId.empty");
-		if (data.getSampleId() == null) errors.reject("sampleId", "sampleId.empty");
+		//if (data.getSampleId() == null) errors.reject("sampleId", "sampleId.empty");
 	}
 	
 }

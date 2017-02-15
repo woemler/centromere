@@ -121,7 +121,7 @@ public class ModelProcessorBeanRegistry implements BeanPostProcessor, Applicatio
 	 */
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		logger.info(String.format("Checking bean: %s", beanName));
+		logger.debug(String.format("Checking bean: %s", beanName));
 		if (RecordProcessor.class.isInstance(bean)){
 			this.registerBean((RecordProcessor) bean);
 		}

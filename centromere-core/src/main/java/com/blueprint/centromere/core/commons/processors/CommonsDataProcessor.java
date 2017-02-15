@@ -27,16 +27,13 @@ import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.GenericRecordProcessor;
 import com.blueprint.centromere.core.model.Model;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.util.Assert;
-
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 
 /**
  * @author woemler
@@ -46,9 +43,8 @@ public abstract class CommonsDataProcessor<T extends Model<?>> extends GenericRe
 
     private static final Logger logger = LoggerFactory.getLogger(CommonsDataProcessor.class);
 
-    @Autowired private Environment environment;
-    @Autowired private DataSetRepository dataSetRepository;
-    @Autowired private DataFileRepository dataFileRepository;
+    private DataSetRepository dataSetRepository;
+    private DataFileRepository dataFileRepository;
 
     private Boolean isSkippable = false;
     private DataSet dataSet;
@@ -75,24 +71,24 @@ public abstract class CommonsDataProcessor<T extends Model<?>> extends GenericRe
             File file = new File(filePath);
             Assert.isTrue(file.isFile() && file.canRead(), String.format("Input file is not readable: %s", filePath));
 
-            Assert.isTrue(!environment.containsProperty("dataSet.name"), "DataSet name must be set as environment property for data file processing.");
+            Assert.isTrue(this.getEnvironment().containsProperty("dataSet.name"), "DataSet name must be set as environment property for data file processing.");
         } catch (IllegalArgumentException e){
             throw new DataImportException(e.getMessage());
         }
 
-        String dataSetName = environment.getRequiredProperty("dataSet.name");
+        String dataSetName = this.getEnvironment().getRequiredProperty("dataSet.name");
         dataSet = dataSetRepository.findOneByName(dataSetName);
         if (dataSet == null){
             dataSet = new DataSet();
             dataSet.setName(dataSetName);
-            if (environment.containsProperty("dataSet.source")){
-                dataSet.setSource(environment.getRequiredProperty("dataSet.source"));
+            if (this.getEnvironment().containsProperty("dataSet.source")){
+                dataSet.setSource(this.getEnvironment().getRequiredProperty("dataSet.source"));
             }
-            if (environment.containsProperty("dataSet.version")){
-                dataSet.setVersion(environment.getRequiredProperty("dataSet.version"));
+            if (this.getEnvironment().containsProperty("dataSet.version")){
+                dataSet.setVersion(this.getEnvironment().getRequiredProperty("dataSet.version"));
             }
-            if (environment.containsProperty("dataSet.description")){
-                dataSet.setDescription(environment.getRequiredProperty("dataSet.description"));
+            if (this.getEnvironment().containsProperty("dataSet.description")){
+                dataSet.setDescription(this.getEnvironment().getRequiredProperty("dataSet.description"));
             }
             dataSetRepository.save(dataSet);
         }
@@ -105,8 +101,8 @@ public abstract class CommonsDataProcessor<T extends Model<?>> extends GenericRe
             dataFile.setFilePath(filePath);
             dataFile.setDateCreated(new Date());
             dataFile.setDateUpdated(new Date());
-        } else if (environment.containsProperty("centromere.import.skip-existing-files")
-                && environment.getRequiredProperty("centromere.import.skip-existing-files", Boolean.class)){
+        } else if (this.getEnvironment().containsProperty("centromere.import.skip-existing-files")
+                && this.getEnvironment().getRequiredProperty("centromere.import.skip-existing-files", Boolean.class)){
             isSkippable = true;
             logger.info(String.format("DataFile record for the current file exists, and will not be overwritten: %s", filePath));
         }
@@ -180,5 +176,17 @@ public abstract class CommonsDataProcessor<T extends Model<?>> extends GenericRe
 
     protected void setDataFile(DataFile dataFile) {
         this.dataFile = dataFile;
+    }
+
+    @Autowired
+    public void setDataSetRepository(
+        DataSetRepository dataSetRepository) {
+        this.dataSetRepository = dataSetRepository;
+    }
+
+    @Autowired
+    public void setDataFileRepository(
+        DataFileRepository dataFileRepository) {
+        this.dataFileRepository = dataFileRepository;
     }
 }

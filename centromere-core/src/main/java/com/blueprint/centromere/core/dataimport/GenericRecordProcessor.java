@@ -16,10 +16,11 @@
 
 package com.blueprint.centromere.core.dataimport;
 
-import com.google.common.reflect.TypeToken;
-
 import com.blueprint.centromere.core.model.Model;
-
+import com.google.common.reflect.TypeToken;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +29,6 @@ import org.springframework.util.Assert;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Validator;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Basic {@link RecordProcessor} implementation, which can be used to handle most file import jobs.
@@ -90,6 +86,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 	 * @throws DataImportException
 	 */
 	public void run(Object... args) throws DataImportException {
+	  Integer count = 0;
 		if (!isConfigured) logger.warn("Processor configuration method has not run!"); // TODO: Should this return or throw exception?
 		if (isInFailedState) {
 			logger.warn("Record processor is in failed state and is aborting run.");
@@ -129,6 +126,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 			}
 			writer.writeRecord(record);
 			record = reader.readRecord();
+			count++;
 		}
 		if (isInFailedState) {
 			logger.warn("Record processor is in failed state and is aborting run.");
@@ -137,31 +135,16 @@ public class GenericRecordProcessor<T extends Model<?>>
 		writer.doAfter(args);
 		reader.doAfter(args);
 		if (importer != null) {
-			importer.importFile(this.getTempFilePath(inputFilePath));
-            importer.doAfter(args);
+		  if (writer instanceof TempFileWriter){
+		    String tempFilePath = ((TempFileWriter) writer).getTempFilePath(inputFilePath);
+        importer.importFile(tempFilePath);
+        importer.doAfter(args);
+      } else {
+        logger.warn("RecordWriter instance does not implement TempFileWriter interface, cannot get" 
+            + " temp file path from component."); 
+      }
 		}
-	}
-
-
-	/**
-	 * Returns the path of the temporary file to be written, if necessary.  Uses the input file's name
-	 *   and the pre-determined temp file directory to generate the name, so as to overwrite previous
-	 *   jobs' temp file.
-	 * @param inputFilePath
-	 * @return
-	 */
-	private String getTempFilePath(String inputFilePath){
-		File tempDir;
-		if (!environment.containsProperty("centromere.import.temp-dir") 
-				|| environment.getRequiredProperty("centromere.import.temp-dir") == null 
-				|| "".equals(environment.getRequiredProperty("centromere.import.temp-dir"))){
-			tempDir = new File(System.getProperty("java.io.tmpdir"));
-		} else {
-			tempDir = new File(environment.getRequiredProperty("centromere.import.temp-dir"));
-		}
-		String fileName = "centromere.import.tmp";
-		File tempFile = new File(tempDir, fileName);
-		return tempFile.getPath();
+		logger.info(String.format("Successfully processed %d records from file: %s", count, inputFilePath));
 	}
 
 	public boolean isSupportedDataType(String dataType) {
@@ -226,7 +209,11 @@ public class GenericRecordProcessor<T extends Model<?>>
 		this.environment = environment;
 	}
 
-	public boolean isInFailedState() {
+  protected Environment getEnvironment() {
+    return environment;
+  }
+
+  public boolean isInFailedState() {
 		return isInFailedState;
 	}
 

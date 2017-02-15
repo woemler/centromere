@@ -24,8 +24,8 @@ import com.blueprint.centromere.core.commons.repositories.SampleRepository;
 import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
 import com.blueprint.centromere.core.commons.validators.GeneExpressionValidator;
 import com.blueprint.centromere.core.dataimport.DataTypes;
-import com.blueprint.centromere.core.dataimport.RepositoryRecordWriter;
-
+import com.blueprint.centromere.core.dataimport.DelimtedTextFileWriter;
+import com.blueprint.centromere.core.dataimport.MySqlImportFileImporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -39,16 +39,35 @@ public class TcgaGeneExpressionProcessor extends CommonsDataProcessor<GeneExpres
 
     @Autowired
     public TcgaGeneExpressionProcessor(
-            SampleRepository sampleRepository,
-            SubjectRepository subjectRepository,
-            GeneRepository geneRepository,
-            GeneExpressionRepository geneExpressionRepository,
-            Environment environment
+        SampleRepository sampleRepository,
+        SubjectRepository subjectRepository,
+        GeneRepository geneRepository,
+        GeneExpressionRepository geneExpressionRepository,
+        Environment environment
     ) {
-        this.setReader(new TcgaRnaSeqGeneExpressionFileReader(sampleRepository, subjectRepository,
-                geneRepository, environment));
-        this.setValidator(new GeneExpressionValidator());
-        this.setWriter(new RepositoryRecordWriter<>(geneExpressionRepository, 1000));
-        this.setModel(GeneExpression.class);
+      
+      this.setEnvironment(environment);
+      
+      this.setReader(new TcgaRnaSeqGeneExpressionFileReader(sampleRepository, subjectRepository, 
+          geneRepository, environment));
+      
+      this.setValidator(new GeneExpressionValidator());
+      
+      DelimtedTextFileWriter writer = new DelimtedTextFileWriter<>();
+      writer.setEnvironment(environment);
+      this.setWriter(writer);
+      
+      // TODO: generic factory for importer creation to support MySQL/MongoDB/etc
+      MySqlImportFileImporter importer = new MySqlImportFileImporter(
+          environment.getRequiredProperty("centromere.db.host"),
+          environment.getRequiredProperty("centromere.db.user"),
+          environment.getRequiredProperty("centromere.db.password"),
+          environment.getRequiredProperty("centromere.db.name")
+      );
+      importer.setEnvironment(environment);
+      this.setImporter(importer);
+      
+      //this.setWriter(new RepositoryRecordWriter<>(geneExpressionRepository, 1000));
+      this.setModel(GeneExpression.class);
     }
 }

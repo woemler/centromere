@@ -19,6 +19,7 @@ package com.blueprint.centromere.core.commons.models;
 import com.blueprint.centromere.core.model.AbstractModel;
 
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
@@ -52,9 +53,11 @@ public class DataSet extends AbstractModel implements Attributes {
 	private String description;
 
 	@OneToMany(mappedBy = "dataSet", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	@DBRef
 	private List<DataFile> dataFiles = new ArrayList<>();
 
 	@OneToMany(mappedBy = "dataSet", cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @DBRef
 	private List<Sample> samples = new ArrayList<>();
 
 	@ElementCollection(fetch = FetchType.EAGER)

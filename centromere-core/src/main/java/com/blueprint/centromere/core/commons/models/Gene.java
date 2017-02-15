@@ -37,7 +37,7 @@ import javax.persistence.Table;
  * @author woemler
  */
 @Entity
-@Document
+@Document(collection = "genes")
 @Table(indexes = {
 		@Index(name = "GENES_IDX_01", columnList = "primaryReferenceId", unique = true),
 		@Index(name = "GENES_IDX_02", columnList = "primaryGeneSymbol")
@@ -184,5 +184,22 @@ public class Gene extends AbstractModel implements Attributes {
 
 	public void addAlias(String alias){
 		if (!aliases.contains(alias)) this.aliases.add(alias);
+	}
+
+	@Override
+	public String toString() {
+		return "Gene{" +
+				"primaryReferenceId='" + primaryReferenceId + '\'' +
+				", primaryGeneSymbol='" + primaryGeneSymbol + '\'' +
+				", taxId=" + taxId +
+				", chromosome='" + chromosome + '\'' +
+				", chromosomeLocation='" + chromosomeLocation + '\'' +
+				", geneType='" + geneType + '\'' +
+				", description='" + description + '\'' +
+				", referenceSource='" + referenceSource + '\'' +
+				", aliases=" + aliases +
+				", attributes=" + attributes +
+				", externalReferences=" + externalReferences +
+				'}';
 	}
 }

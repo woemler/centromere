@@ -18,6 +18,7 @@ package com.blueprint.centromere.core.dataimport;
 
 import com.blueprint.centromere.core.model.Model;
 
+import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +34,13 @@ import java.io.IOException;
  * 
  * @author woemler
  */
-public abstract class AbstractRecordFileWriter<T extends Model<?>> implements RecordWriter<T> {
+public abstract class AbstractRecordFileWriter<T extends Model<?>> 
+		implements RecordWriter<T>, TempFileWriter {
+  
+  private static final Logger logger = LoggerFactory.getLogger(AbstractRecordFileWriter.class);
 	
 	private FileWriter writer;
 	private Environment environment;
-	private static final Logger logger = LoggerFactory.getLogger(AbstractRecordFileWriter.class);
 
 	/**
 	 * Opens a new output file for writing.
@@ -50,11 +53,14 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>> implements Re
 		try {
 			Assert.notEmpty(args, "One or more arguments is required.");
 			Assert.isTrue(args[0] instanceof String, "The first argument must be a String.");
+			Assert.notNull(environment, "Environment not set.");
 		} catch (IllegalArgumentException e){
 			e.printStackTrace();
 			throw new DataImportException(e.getMessage());
 		}
-		this.open((String) args[0]);
+		String tempFilePath = getTempFilePath((String) args[0]);
+		this.open(tempFilePath);
+		logger.info(String.format("Writing records to file: %s", tempFilePath));
 	}
 
 	/**
@@ -96,6 +102,28 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>> implements Re
 			logger.debug(e.getMessage());
 		}
 	}
+
+  /**
+   * Returns the path of the temporary file to be written, if necessary.  Uses the input file's name
+   *   and the pre-determined temp file directory to generate the name, so as to overwrite previous
+   *   jobs' temp file.
+   * @param inputFilePath
+   * @return
+   */
+  @Override
+  public String getTempFilePath(String inputFilePath){
+    File tempDir;
+    if (!environment.containsProperty("centromere.import.temp-dir")
+        || environment.getRequiredProperty("centromere.import.temp-dir") == null
+        || "".equals(environment.getRequiredProperty("centromere.import.temp-dir"))){
+      tempDir = new File(System.getProperty("java.io.tmpdir"));
+    } else {
+      tempDir = new File(environment.getRequiredProperty("centromere.import.temp-dir"));
+    }
+    String fileName = "centromere.import.tmp";
+    File tempFile = new File(tempDir, fileName);
+    return tempFile.getPath();
+  }
 
 	protected FileWriter getWriter() {
 		return writer;

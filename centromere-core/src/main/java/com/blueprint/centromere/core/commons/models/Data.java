@@ -22,6 +22,7 @@ import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 /**
  * Base class for modeling processed genomic data.  Assumes that each record has an associated 
@@ -35,6 +36,7 @@ public abstract class Data extends AbstractModel {
 
 	@ManyToOne
 	@JoinColumn(name = "sampleId")
+	@DBRef(lazy = true)
 	private Sample sample;
 
 	@Column(updatable = false, insertable = false)
@@ -42,6 +44,7 @@ public abstract class Data extends AbstractModel {
 
 	@ManyToOne
 	@JoinColumn(name = "dataFileId")
+	@DBRef(lazy = true)
 	private DataFile dataFile;
 
 	@Column(updatable = false, insertable = false)
@@ -49,6 +52,7 @@ public abstract class Data extends AbstractModel {
 
 	@ManyToOne
 	@JoinColumn(name = "geneId")
+	@DBRef(lazy = true)
 	private Gene gene;
 
 	@Column(updatable = false, insertable = false)
