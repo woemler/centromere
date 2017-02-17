@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors
+ * Copyright 2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,18 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.test.ws;
+package com.blueprint.centromere.core.test;
+
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.blueprint.centromere.core.commons.models.DataFile;
 import com.blueprint.centromere.core.commons.models.DataSet;
@@ -42,11 +53,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -57,69 +69,25 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.List;
-
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 /**
  * @author woemler
  */
-@RunWith(SpringRunner.class)
-@WebAppConfiguration
-@SpringBootTest(classes = {
-		EmbeddedH2DataSourceConfig.class, 
-		WebApplicationConfig.class
-})
-@ActiveProfiles(value = { Profiles.WEB_PROFILE, Security.NONE_PROFILE })
-public class DefaultControllerTests {
+
+public abstract class AbstractControllerTests {
 	
 	private static final String BASE_URL = "/api/genes";
 	private static final String EXPRESSION_URL = "/api/geneexpression";
 	
-	@Autowired private WebApplicationContext context;
-	@Autowired private SampleRepository sampleRepository;
-	@Autowired private SubjectRepository subjectRepository;
-	@Autowired private DataFileRepository dataFileRepository;
-	@Autowired private DataSetRepository dataSetRepository;
-	@Autowired private GeneRepository geneRepository;
-	@Autowired private GeneExpressionRepository geneExpressionRepository;
+	private SampleRepository sampleRepository;
+	private SubjectRepository subjectRepository;
+	private DataFileRepository dataFileRepository;
+	private DataSetRepository dataSetRepository;
+	private GeneRepository geneRepository;
+	private GeneExpressionRepository geneExpressionRepository;
 	
 	private MockMvc mockMvc;
-	private final ObjectMapper objectMapper = new ObjectMapper();
-	
-	@Before
-	public void setup() throws Exception {
-		mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-		geneExpressionRepository.deleteAll();
-		sampleRepository.deleteAll();
-		subjectRepository.deleteAll();
-		dataFileRepository.deleteAll();
-		dataSetRepository.deleteAll();
-		geneRepository.deleteAll();
+	private ObjectMapper objectMapper;
 
-		List<DataSet> dataSets = DataSetGenerator.generateData();
-		dataSetRepository.save(dataSets);
-		List<DataFile> dataFiles = DataFileGenerator.generateData(dataSets);
-		dataFileRepository.save(dataFiles);
-		List<Subject> subjects = SubjectDataGenerator.generateData();
-		subjectRepository.save(subjects);
-		List<Sample> samples = SampleDataGenerator.generateData(subjects, dataSets.get(0));
-		sampleRepository.save(samples);
-		List<Gene> genes = EntrezGeneDataGenerator.generateData();
-		geneRepository.save(genes);
-		List<GeneExpression> data = ExpressionDataGenerator.generateData(samples, genes, dataFiles);
-		geneExpressionRepository.save(data);
-	}
-	
 	@Test
 	public void findAllTest() throws Exception {
 		mockMvc.perform(get(BASE_URL))
@@ -443,5 +411,82 @@ public class DefaultControllerTests {
 //				.andExpect(status().isOk())
 //				.andDo(print());
 //	}
-	
+
+
+  public SampleRepository getSampleRepository() {
+    return sampleRepository;
+  }
+
+  @Autowired
+  public void setSampleRepository(
+      SampleRepository sampleRepository) {
+    this.sampleRepository = sampleRepository;
+  }
+
+  public SubjectRepository getSubjectRepository() {
+    return subjectRepository;
+  }
+
+  @Autowired
+  public void setSubjectRepository(
+      SubjectRepository subjectRepository) {
+    this.subjectRepository = subjectRepository;
+  }
+
+  public DataFileRepository getDataFileRepository() {
+    return dataFileRepository;
+  }
+
+  @Autowired
+  public void setDataFileRepository(
+      DataFileRepository dataFileRepository) {
+    this.dataFileRepository = dataFileRepository;
+  }
+
+  public DataSetRepository getDataSetRepository() {
+    return dataSetRepository;
+  }
+
+  @Autowired
+  public void setDataSetRepository(
+      DataSetRepository dataSetRepository) {
+    this.dataSetRepository = dataSetRepository;
+  }
+
+  public GeneRepository getGeneRepository() {
+    return geneRepository;
+  }
+
+  @Autowired
+  public void setGeneRepository(
+      GeneRepository geneRepository) {
+    this.geneRepository = geneRepository;
+  }
+
+  public GeneExpressionRepository getGeneExpressionRepository() {
+    return geneExpressionRepository;
+  }
+
+  @Autowired
+  public void setGeneExpressionRepository(
+      GeneExpressionRepository geneExpressionRepository) {
+    this.geneExpressionRepository = geneExpressionRepository;
+  }
+
+  public MockMvc getMockMvc() {
+    return mockMvc;
+  }
+
+  public void setMockMvc(MockMvc mockMvc) {
+    this.mockMvc = mockMvc;
+  }
+
+  public ObjectMapper getObjectMapper() {
+    return objectMapper;
+  }
+
+  @Autowired @Qualifier("objectMapper")
+  public void setObjectMapper(ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
+  }
 }

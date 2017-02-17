@@ -21,8 +21,8 @@
                 -+syo-.`  `-:::::-                
                     ..----:::::-.                 
                          ````                     
-==================================================
+====================================================
 Centromere: Genomics Data Warehouse and Web Services
 https://github.com/blueprintmedicines/centromere
 contact: woemler@blueprintmedicines.com
-==================================================
+====================================================
