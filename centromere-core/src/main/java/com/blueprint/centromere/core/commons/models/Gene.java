@@ -18,9 +18,6 @@ package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
 
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,15 +34,14 @@ import javax.persistence.Table;
  * @author woemler
  */
 @Entity
-@Document(collection = "genes")
 @Table(indexes = {
 		@Index(name = "GENES_IDX_01", columnList = "primaryReferenceId", unique = true),
 		@Index(name = "GENES_IDX_02", columnList = "primaryGeneSymbol")
 })
 public class Gene extends AbstractModel implements Attributes {
 
-	@Indexed(unique = true) private String primaryReferenceId;
-	@Indexed private String primaryGeneSymbol;
+	private String primaryReferenceId;
+	private String primaryGeneSymbol;
 	private Integer taxId;
 	private String chromosome;
 	private String chromosomeLocation;

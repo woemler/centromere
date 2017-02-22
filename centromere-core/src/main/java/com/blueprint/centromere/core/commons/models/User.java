@@ -18,8 +18,6 @@ package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
 
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,11 +40,10 @@ import javax.persistence.Table;
  * @author woemler
  */
 @Entity
-@Document
 @Table(indexes = { @Index(name = "USERS_IDX_01", columnList = "username", unique = true) })
 public class User extends AbstractModel implements UserDetails {
 	
-	@Indexed(unique = true) private String username;
+	private String username;
 	private String password;
 	private boolean accountNonExpired = true;
 	private boolean accountNonLocked = true;

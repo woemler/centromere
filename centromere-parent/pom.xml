@@ -17,6 +17,9 @@
     
     <modules>
         <module>../centromere-core</module>
+      <module>../centromere-cli</module>
+        <module>../centromere-ws</module>
+      <module>../centromere-tests</module>
     </modules>
 
     <licenses>

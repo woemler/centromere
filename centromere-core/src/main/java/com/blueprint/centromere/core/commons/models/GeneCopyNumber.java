@@ -16,14 +16,11 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import javax.persistence.Entity;
 
 /**
  * @author woemler
  */
-@Document
 @Entity
 public class GeneCopyNumber extends Data {
 	

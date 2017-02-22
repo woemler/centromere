@@ -18,10 +18,6 @@ package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
 
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,11 +40,10 @@ import javax.persistence.Table;
  * @author woemler
  */
 @Entity
-@Document
 @Table(indexes = { @Index(name = "SUBJECT_IDX_01", columnList = "name", unique = true) })
 public class Subject extends AbstractModel implements Attributes {
 	
-	@Indexed(unique = true) private String name;
+	private String name;
 	private String species;
 	private String gender;
 	private String notes;
@@ -62,7 +57,6 @@ public class Subject extends AbstractModel implements Attributes {
 	private Map<String, String> attributes = new HashMap<>();
 	
 	@OneToMany(mappedBy = "subject", cascade = CascadeType.REMOVE, orphanRemoval = true)
-	@DBRef
 	private List<Sample> samples = new ArrayList<>();
 
 	public String getName() {

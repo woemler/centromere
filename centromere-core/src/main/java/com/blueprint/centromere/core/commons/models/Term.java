@@ -18,8 +18,6 @@ package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import javax.persistence.Entity;
 
 /**
@@ -29,7 +27,6 @@ import javax.persistence.Entity;
  * @author woemler
  */
 @Entity
-@Document
 public class Term extends AbstractModel {
 	
 	private String term;

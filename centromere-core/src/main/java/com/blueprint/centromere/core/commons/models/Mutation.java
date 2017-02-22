@@ -16,16 +16,12 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import javax.persistence.Entity;
 
 /**
  * @author woemler
  */
 @Entity
-@Document
 public class Mutation extends Data {
 	
 	private String chromosome;

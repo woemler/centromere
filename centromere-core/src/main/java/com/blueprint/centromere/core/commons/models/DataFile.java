@@ -18,10 +18,6 @@ package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
 
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,16 +36,15 @@ import javax.persistence.Table;
  * @author woemler
  */
 @Entity
-@Document
 @Table(indexes = {
     @Index(name = "DATA_FILE_IDX_01", columnList = "dataType") ,
     @Index(name = "DATA_FILE_IDX_02", columnList = "filePath", unique = true)
 })
 public class DataFile extends AbstractModel implements Attributes {
 	
-	@Indexed(unique = true) private String filePath;
+	private String filePath;
 	
-	@Indexed private String dataType;
+	private String dataType;
 	
 	private Date dateCreated;
 	
@@ -57,7 +52,6 @@ public class DataFile extends AbstractModel implements Attributes {
 
 	@ManyToOne
 	@JoinColumn(name = "dataSetId")
-	@DBRef
 	private DataSet dataSet;
 
 	@Column(updatable = false, insertable = false)

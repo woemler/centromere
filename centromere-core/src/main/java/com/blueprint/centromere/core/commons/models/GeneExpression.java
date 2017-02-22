@@ -16,15 +16,12 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import javax.persistence.Entity;
 
 /**
  * @author woemler
  */
 @Entity
-@Document
 public class GeneExpression extends Data {
 	
 	private Double value;

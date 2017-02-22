@@ -16,9 +16,9 @@
 
 package com.blueprint.centromere.core.model;
 
+import com.blueprint.centromere.core.exceptions.QueryParameterException;
 import com.google.common.collect.Iterables;
 
-import com.blueprint.centromere.core.ws.QueryParameterException;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.ListPath;

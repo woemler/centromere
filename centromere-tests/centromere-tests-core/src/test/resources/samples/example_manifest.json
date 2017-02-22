@@ -1,0 +1,18 @@
+{
+  "name": "Test Manifest",
+  "label": "test",
+  "notes": "This is a test",
+  "source": "internal",
+  "version": "1.0",
+  "date-created": "2017-01-10",
+  "skip-invalid-records": true,
+  "files": [
+    {
+      "path": "../Homo_sapiens.gene_info",
+      "type": "gene-info"
+    }
+  ]
+}
+
+
+

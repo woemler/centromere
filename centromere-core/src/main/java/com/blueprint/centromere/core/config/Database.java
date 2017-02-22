@@ -22,20 +22,16 @@ package com.blueprint.centromere.core.config;
  */
 public enum Database {
 	CUSTOM,
-	MONGODB,
 	GENERIC_JPA,
 	MYSQL
 	;
 
 	public static final String CUSTOM_PROFILE = "db_custom";
-	public static final String MONGODB_PROFILE = "db_mongodb";
 	public static final String GENERIC_JPA_PROFILE = "db_jpa";
 	public static final String MYSQL_PROFILE = "db_mysql";
 
 	public static String getProfile(Database database){
 		switch (database){
-			case MONGODB:
-				return MONGODB_PROFILE;
 			case MYSQL:
 				return MYSQL_PROFILE;
 			case GENERIC_JPA:

@@ -20,7 +20,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -42,11 +41,6 @@ public class ProfileConfiguration {
 		@EnableJpaRepositories(basePackages = { "com.blueprint.centromere.core.commons.repositories" })
 		@EnableTransactionManagement
 		public static class DefaultJpaSchemaConfiguration { }
-
-		@Profile({ Database.MONGODB_PROFILE })
-		@Configuration
-		@EnableMongoRepositories(basePackages = { "com.blueprint.centromere.core.commons.repositories" })
-		public static class DefaultMongoSchemaConfiguration { }
 
 		@Profile({ Profiles.CLI_PROFILE })
 		@Configuration

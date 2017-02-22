@@ -16,9 +16,7 @@
 
 package com.blueprint.centromere.core.config;
 
-import com.blueprint.centromere.core.dataimport.cli.CommandLineInputConfiguration;
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.ws.config.WebApplicationConfig;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -40,11 +38,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Inherited
 @Configuration
-@Import({
-		ProfileConfiguration.class,
-		WebApplicationConfig.class,
-		CommandLineInputConfiguration.class
-})
+@Import({ ProfileConfiguration.class })
 public @interface AutoConfigureCentromere {
 
 	/**
