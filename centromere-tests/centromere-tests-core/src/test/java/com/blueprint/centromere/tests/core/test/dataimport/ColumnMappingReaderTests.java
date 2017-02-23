@@ -39,7 +39,7 @@ import java.util.List;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class ColumnMappingReaderTest {
+public class ColumnMappingReaderTests {
 	
 	private Resource exampleFile = new ClassPathResource("samples/example_mapped_data.txt");
 	

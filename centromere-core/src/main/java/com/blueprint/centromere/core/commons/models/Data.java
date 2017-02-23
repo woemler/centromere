@@ -19,6 +19,7 @@ package com.blueprint.centromere.core.commons.models;
 import com.blueprint.centromere.core.model.AbstractModel;
 
 import javax.persistence.Column;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
@@ -33,21 +34,21 @@ import javax.persistence.MappedSuperclass;
 @MappedSuperclass
 public abstract class Data extends AbstractModel {
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "sampleId")
 	private Sample sample;
 
 	@Column(updatable = false, insertable = false)
 	private String sampleId;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "dataFileId")
 	private DataFile dataFile;
 
 	@Column(updatable = false, insertable = false)
 	private String dataFileId;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "geneId")
 	private Gene gene;
 

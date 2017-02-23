@@ -138,4 +138,8 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
 	public void setEnvironment(Environment environment) {
 		this.environment = environment;
 	}
+
+	protected Environment getEnvironment() {
+		return environment;
+	}
 }

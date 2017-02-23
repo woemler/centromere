@@ -17,10 +17,16 @@
 package com.blueprint.centromere.core.dataimport;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
+import org.springframework.util.Assert;
 
 /**
  * Runs {@code mysqlimport} and imports the supplied file through using the command line tool.
@@ -33,8 +39,10 @@ public class MySqlImportFileImporter implements RecordImporter {
   private static final Logger logger = LoggerFactory.getLogger(MySqlImportFileImporter.class);
   
   private boolean stopOnError = true;
-  private boolean dropCollection = false;
-  private String columns;
+  private boolean dropTable = false;
+  private String delimiter = "\t";
+  private Integer skipLines = 1;
+  private List<String> columns;
   private Environment environment;
   private final String host;
   private final String username;
@@ -50,7 +58,7 @@ public class MySqlImportFileImporter implements RecordImporter {
   }
 
   public MySqlImportFileImporter(String host, String username,
-      String password, String database, String columns) {
+      String password, String database, List<String> columns) {
     this.columns = columns;
     this.host = host;
     this.username = username;
@@ -62,22 +70,24 @@ public class MySqlImportFileImporter implements RecordImporter {
   public void importFile(String filePath) throws DataImportException {
 
     Process process;
-
+    
+    String columnString = getColumnString(filePath);
     StringBuilder sb = new StringBuilder("mysqlimport --local ");
     if (!stopOnError) sb.append(" --force ");
-    if (dropCollection) sb.append(" --delete ");
-    if (columns != null) sb.append(String.format(" -c %s ", columns));
+    if (dropTable) sb.append(" --delete ");
+    if (columns != null) sb.append(String.format(" -c %s ", columnString));
+    if (skipLines != null && skipLines > 0) sb.append(String.format(" --ignore-lines=%d ", skipLines));
     sb.append(String.format(" -u %s ", username));
     sb.append(String.format(" -p%s ", password));
     sb.append(String.format(" -h %s ", host));
     sb.append(String.format(" %s %s ", database, filePath));
     String command = sb.toString();
-    logger.debug(String.format("CENTROMERE: Executing mysqlimport with command: %s", command));
+    logger.info(String.format("Executing mysqlimport with command: %s", command));
 
     String[] commands = new String[]{ "/bin/bash", "-c", command }; // TODO: Support for Windows and other shells
     try {
 
-      logger.debug(String.format("CENTROMERE: Importing file to MySQL: %s", filePath));
+      logger.debug(String.format("Importing file to MySQL: %s", filePath));
       process = Runtime.getRuntime().exec(commands);
 
 
@@ -105,7 +115,7 @@ public class MySqlImportFileImporter implements RecordImporter {
 
       Integer exitValue = process.exitValue();
       if (exitValue != 0){
-        throw new DataImportException(String.format("MongoImport failure for temp file: %s \n%s",
+        throw new DataImportException(String.format("MySQLImport failure for temp file: %s \n%s",
             filePath, errorBuilder.toString()));
       }
 
@@ -115,13 +125,75 @@ public class MySqlImportFileImporter implements RecordImporter {
     }
     logger.debug(String.format("CENTROMERE: MongoImport complete: %s", filePath));
   }
+  
+  private String getColumnString(String filePath) throws DataImportException{
+    
+    if (columns == null || columns.isEmpty()){
+      columns = new ArrayList<>();
+      File file = new File(filePath);
+      Assert.isTrue(file.isFile(), "Target is not a file: " + filePath);
+      Assert.isTrue(file.canRead(), "File is not readable: " + filePath);
+      String line;
+      BufferedReader reader = null;
+      try {
+        reader = new BufferedReader(new FileReader(file));
+        line = reader.readLine();
+      } catch (IOException e){
+        e.printStackTrace();
+        throw new DataImportException(e.getMessage());
+      } finally {
+        if (reader != null) {
+          try {
+            reader.close();
+          } catch (IOException ex){
+            ex.printStackTrace();
+            throw new DataImportException(ex.getMessage());
+          }
+        }
+      }
+      Assert.notNull(line, "File is empty.");
+      for (String bit: line.trim().split(delimiter)){
+        columns.add(bit);
+      }
+    }
+    
+    StringBuilder s = new StringBuilder();
+    boolean flag = false;
+    for (String column: columns){
+      if (flag) s.append(",");
+      s.append(column);
+      flag = true;
+    }
+    return s.toString();
+  }
+  
+  private List<String> getModelColumns(Class<?> model){
+    Assert.notNull(model, "Model must not be null if columns are not set.");
+    return null;
+  }
 
   @Override
   public void setEnvironment(Environment environment) {
     this.environment = environment;
   }
 
-  public void setColumns(String columns) {
+  public void setColumns(List<String> columns) {
     this.columns = columns;
+  }
+
+  public void setSkipLines(Integer skipLines) {
+    this.skipLines = skipLines;
+  }
+
+  public void setStopOnError(boolean stopOnError) {
+    this.stopOnError = stopOnError;
+  }
+
+  public void setDropTable(boolean dropTable) {
+    this.dropTable = dropTable;
+  }
+
+  public void setDelimiter(String delimiter) {
+    this.delimiter = delimiter;
   }
 }
