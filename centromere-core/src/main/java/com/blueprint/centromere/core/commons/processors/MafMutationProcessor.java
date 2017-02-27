@@ -16,16 +16,12 @@
 
 package com.blueprint.centromere.core.commons.processors;
 
-import com.blueprint.centromere.core.commons.models.GeneExpression;
-import com.blueprint.centromere.core.commons.readers.TcgaRnaSeqGeneExpressionFileReader;
-import com.blueprint.centromere.core.commons.repositories.GeneExpressionRepository;
+import com.blueprint.centromere.core.commons.models.Mutation;
+import com.blueprint.centromere.core.commons.readers.MafReader;
 import com.blueprint.centromere.core.commons.repositories.GeneRepository;
-import com.blueprint.centromere.core.commons.repositories.SampleRepository;
-import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
 import com.blueprint.centromere.core.commons.validators.GeneExpressionValidator;
 import com.blueprint.centromere.core.dataimport.DataTypes;
-import com.blueprint.centromere.core.dataimport.DelimtedTextFileWriter;
 import com.blueprint.centromere.core.dataimport.MySQLImportTempFileWriter;
 import com.blueprint.centromere.core.dataimport.MySqlImportFileImporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,27 +31,26 @@ import org.springframework.stereotype.Component;
 /**
  * @author woemler
  */
-@DataTypes({ "tcga_gene_expression" })
+@DataTypes({ "maf_mutation" })
 @Component
-public class TcgaGeneExpressionProcessor extends CommonsDataProcessor<GeneExpression> {
+public class MafMutationProcessor extends CommonsDataProcessor<Mutation> {
 
     @Autowired
-    public TcgaGeneExpressionProcessor(
+    public MafMutationProcessor(
         TcgaSupport tcgaSupport,
         GeneRepository geneRepository,
         Environment environment
     ) {
-      
+
       this.setEnvironment(environment);
 
-      TcgaRnaSeqGeneExpressionFileReader reader =
-          new TcgaRnaSeqGeneExpressionFileReader(geneRepository, tcgaSupport);
+      MafReader reader = new MafReader(geneRepository, tcgaSupport);
       reader.setEnvironment(environment);
       this.setReader(reader);
       
       this.setValidator(new GeneExpressionValidator());
       
-      MySQLImportTempFileWriter<GeneExpression> writer = new MySQLImportTempFileWriter<>(GeneExpression.class);
+      MySQLImportTempFileWriter<Mutation> writer = new MySQLImportTempFileWriter<>(Mutation.class);
       writer.setEnvironment(environment);
       this.setWriter(writer);
 
@@ -68,6 +63,6 @@ public class TcgaGeneExpressionProcessor extends CommonsDataProcessor<GeneExpres
       importer.setEnvironment(environment);
       this.setImporter(importer);
 
-      this.setModel(GeneExpression.class);
+      this.setModel(Mutation.class);
     }
 }

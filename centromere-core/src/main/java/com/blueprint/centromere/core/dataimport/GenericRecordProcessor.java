@@ -209,7 +209,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 		this.environment = environment;
 	}
 
-  protected Environment getEnvironment() {
+  public Environment getEnvironment() {
     return environment;
   }
 

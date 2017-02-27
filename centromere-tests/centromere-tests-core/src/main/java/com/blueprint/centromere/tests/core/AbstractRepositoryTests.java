@@ -57,6 +57,12 @@ public abstract class AbstractRepositoryTests {
     }
 
     @Test
+    public void findOneByBadIdTest(){
+      Gene gene = geneRepository.findOne("abc");
+      Assert.isNull(gene);
+    }
+
+    @Test
     public void findByIdTest(){
 
         List<Gene> genes = (List<Gene>) geneRepository.findAll();

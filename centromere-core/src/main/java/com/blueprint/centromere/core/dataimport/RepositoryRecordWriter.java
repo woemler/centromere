@@ -90,4 +90,9 @@ public class RepositoryRecordWriter<T extends Model<?>> implements RecordWriter<
 	public void setEnvironment(Environment environment) {
 		this.environment = environment;
 	}
+
+	@Override
+	public Environment getEnvironment() {
+		return environment;
+	}
 }

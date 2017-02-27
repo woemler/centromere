@@ -19,6 +19,8 @@ package com.blueprint.centromere.core.dataimport;
 import com.blueprint.centromere.core.model.Model;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Standard text file reader that assumes that a single record is extractable from a single line.  
@@ -41,10 +43,14 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 			String line = this.getReader().readLine();
 			while (line != null) {
 				if (!isSkippableLine(line)) {
-					T record = getRecordFromLine(line);
-					if (record != null){
-						return record;
-					}
+				  if (isHeaderLine(line)){
+            parseHeader(line);
+          } else {
+            T record = getRecordFromLine(line);
+            if (record != null) {
+              return record;
+            }
+          }
 				}
 				line = this.getReader().readLine();
 			}
@@ -53,6 +59,10 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 		}
 		return null;
 	}
+
+	protected void parseHeader(String line){
+
+  }
 
 	/**
 	 * Parses a line of text and returns a single model record.  Should return null if the line does 
@@ -70,5 +80,9 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 	 * @return
 	 */
 	abstract protected boolean isSkippableLine(String line);
+
+	protected boolean isHeaderLine(String line){
+		return false;
+	}
 	
 }

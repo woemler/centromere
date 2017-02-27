@@ -20,14 +20,8 @@ import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.GeneratedValue;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Transient;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.util.Assert;
@@ -63,7 +57,7 @@ public class DelimtedTextFileWriter<T extends Model<?>> extends AbstractRecordFi
   public void doBefore(Object... args) throws DataImportException {
     super.doBefore(args);
     Assert.notNull(model, "Model must not be null.");
-    columns = getWritableFieldNames(model, ignoredFields);
+    columns = ModelReflectionUtils.getPersistableNonEntityFieldNames(model, ignoredFields);
     fields = columns;
   }
 
@@ -115,53 +109,6 @@ public class DelimtedTextFileWriter<T extends Model<?>> extends AbstractRecordFi
       e.printStackTrace();
       throw new DataImportException(e.getMessage());
     }
-  }
-
-  /**
-   * Returns a list of field names used to access field values in a model wrapped with {@link BeanWrapper}.
-   *   Allows specified fields to be skipped.
-   * 
-   * @param model model class
-   * @param ignoredFields field to be ignored
-   * @return list of fields
-   */
-  protected List<String> getWritableFieldNames(Class<?> model, List<String> ignoredFields){
-    List<String> columns = new ArrayList<>();
-    Class<?> currentClass = model;
-    while (currentClass.getSuperclass() != null){
-      for (Field field : currentClass.getDeclaredFields()) {
-        if (isSkippableField(field, ignoredFields)) continue; // skip these fields
-        columns.add(field.getName());
-      }
-      currentClass = currentClass.getSuperclass();
-    }
-    return columns;
-  }
-
-  /**
-   * Returns a list of field names used to access field values in a model wrapped with {@link BeanWrapper}.
-   *
-   * @param model model class
-   * @return list of fields
-   */
-  protected List<String> getWritableFieldNames(Class<?> model){
-    return getWritableFieldNames(model, new ArrayList<>());
-  }
-
-  protected boolean isSkippableField(Field field, List<String> ignoredFields){
-    return field.isSynthetic()
-        || ignoredFields.contains(field.getName())
-        || field.isAnnotationPresent(Transient.class)
-        || field.isAnnotationPresent(ManyToOne.class)
-        || field.isAnnotationPresent(OneToOne.class)
-        || field.isAnnotationPresent(OneToMany.class)
-        || field.isAnnotationPresent(org.springframework.data.annotation.Id.class)
-        || field.isAnnotationPresent(javax.persistence.Id.class)
-        || field.isAnnotationPresent(GeneratedValue.class);
-  }
-
-  protected boolean isSkippableField(Field field){
-    return isSkippableField(field, new ArrayList<>());
   }
 
   public String getDelimiter() {

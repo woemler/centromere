@@ -119,10 +119,8 @@ public class JpaRelationshipTests {
 	@Test
 	@Transactional(readOnly = true)
 	public void oneToManyRelationshipTest(){
-		List<Subject> subjects = subjectRepository.findByName("SubjectA");
-		Assert.notNull(subjects);
-		Assert.notEmpty(subjects);
-		Subject subject = subjects.get(0);
+		Subject subject = subjectRepository.findOneByName("SubjectA");
+		Assert.notNull(subject);
 		Assert.notNull(subject.getId());
 		Assert.notNull(subject.getSamples());
 		Assert.notEmpty(subject.getSamples());

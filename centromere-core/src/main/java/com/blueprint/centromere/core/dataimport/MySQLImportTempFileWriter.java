@@ -59,7 +59,7 @@ public class MySQLImportTempFileWriter<T extends Model<?>> extends DelimtedTextF
     Class<?> currentClass = model;
     while (currentClass.getSuperclass() != null){
       for (Field field : currentClass.getDeclaredFields()) {
-        if (isSkippableField(field, ignoredFields)) continue; // skip these fields
+        if (!ModelReflectionUtils.isPersistableNonEntityField(field, ignoredFields)) continue; // skip these fields
         String name = field.getName();
         if (field.isAnnotationPresent(Column.class)){
           Column column = field.getAnnotation(Column.class);

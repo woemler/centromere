@@ -16,6 +16,8 @@
 
 package com.blueprint.centromere.core.config;
 
+import com.blueprint.centromere.core.commons.support.TcgaSupport;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -35,6 +37,11 @@ public class ProfileConfiguration {
 	@Profile({ Schema.DEFAULT_PROFILE })
 	@Configuration
 	public static class DefaultSchemaConfiguration {
+
+		@Bean
+    public TcgaSupport tcgaSupport(){
+		  return new TcgaSupport();
+    }
 		
 		@Profile({ Database.GENERIC_JPA_PROFILE, Database.MYSQL_PROFILE })
 		@Configuration

@@ -51,13 +51,18 @@ public class RecordCollectionReader<T extends Model<?>> implements RecordReader<
 		this.environment = environment;
 	}
 
-    @Override
-    public Class<T> getModel() {
-        return model;
-    }
+	@Override
+	public Environment getEnvironment() {
+		return environment;
+	}
 
-    @Override
-    public void setModel(Class<T> model) {
-        this.model = model;
-    }
+	@Override
+	public Class<T> getModel() {
+			return model;
+	}
+
+	@Override
+	public void setModel(Class<T> model) {
+			this.model = model;
+	}
 }

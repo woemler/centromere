@@ -177,6 +177,11 @@ public class MySqlImportFileImporter implements RecordImporter {
     this.environment = environment;
   }
 
+  @Override
+  public Environment getEnvironment() {
+    return environment;
+  }
+
   public void setColumns(List<String> columns) {
     this.columns = columns;
   }

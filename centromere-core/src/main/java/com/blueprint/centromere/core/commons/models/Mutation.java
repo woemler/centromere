@@ -19,6 +19,8 @@ package com.blueprint.centromere.core.commons.models;
 import javax.persistence.Entity;
 
 /**
+ * TODO: add reference transcript and alternate transcript mutations
+ *
  * @author woemler
  */
 @Entity

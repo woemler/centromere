@@ -35,7 +35,7 @@ public interface SampleRepository extends
 		MetadataOperations<Sample>,
 		AttributeOperations<Sample> {
 	
-	List<Sample> findByName(@Param("name") String name);
+	Sample findOneByName(@Param("name") String name);
 	List<Sample> findBySampleType(@Param("type") String sampleType);
 	List<Sample> findByTissue(@Param("tissue") String tissue);
 	List<Sample> findByHistology(@Param("histology") String histology);
@@ -44,7 +44,7 @@ public interface SampleRepository extends
 	@Override
 	default List<Sample> guess(@Param("keyword") String keyword){
 		List<Sample> samples = new ArrayList<>();
-		samples.addAll(findByName(keyword));
+		samples.add(findOneByName(keyword));
 		samples.addAll(findByTissue(keyword));
 		samples.addAll(findByHistology(keyword));
 		samples.addAll(findBySampleType(keyword));

@@ -34,13 +34,13 @@ public interface SubjectRepository
 		MetadataOperations<Subject>,
  		AttributeOperations<Subject> {
 	
-	List<Subject> findByName(@Param("name") String name);
+	Subject findOneByName(@Param("name") String name);
 	List<Subject> findBySpecies(@Param("species") String species);
 	
 	@Override
 	default List<Subject> guess(@Param("keyword") String keyword){
 		List<Subject> subjects = new ArrayList<>();
-		subjects.addAll(findByName(keyword));
+		subjects.add(findOneByName(keyword));
 		return subjects;
 	}
 	

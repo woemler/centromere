@@ -45,6 +45,7 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	private Map<String, Class<?>> fieldTypeMap = new HashMap<>(); // map of actual field name and types
 	private Map<String, String> fieldNameMap = new HashMap<>(); // map of aliases and actual field names
 	private Map<Integer, String> columnIndexMap = new HashMap<>(); // map of column indexes to mapped model field names
+	private Map<String, String> columnMappings = new HashMap<>();
 	private boolean headerFlag = true;
 	private String delimiter = "\\t";
 	private ConversionService conversionService = new DefaultConversionService();
@@ -116,7 +117,7 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	}
 
 	/**
-	 * Attemptes to match a file column header to an available {@link Model} attribute name or alias.
+	 * Attempts to match a file column header to an available {@link Model} attribute name or alias.
 	 *   If no match can be made, or the header is empty, a null value is returned.
 	 * 
 	 * @param headerName parsed header name
@@ -211,4 +212,8 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 			ConversionService conversionService) {
 		this.conversionService = conversionService;
 	}
+
+  public void setColumnMappings(Map<String, String> columnMappings) {
+    this.columnMappings = columnMappings;
+  }
 }

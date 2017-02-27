@@ -16,6 +16,7 @@
 
 package com.blueprint.centromere.core.commons.readers;
 
+import com.blueprint.centromere.core.commons.support.TcgaSupport;
 import com.blueprint.centromere.core.commons.models.DataFile;
 import com.blueprint.centromere.core.commons.models.Gene;
 import com.blueprint.centromere.core.commons.models.GeneExpression;
@@ -33,8 +34,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -52,26 +53,19 @@ public class TcgaRnaSeqGeneExpressionFileReader
 
 	private static final Logger logger = LoggerFactory.getLogger(TcgaRnaSeqGeneExpressionFileReader.class);
 
-	private final SampleRepository sampleRepository;
 	private final GeneRepository geneRepository;
-	private final SubjectRepository subjectRepository;
+	private final TcgaSupport tcgaSupport;
 	private DataFile dataFile;
-	private final Environment environment;
 	private Map<String, Sample> sampleMap;
 	private Map<String, Gene> geneMap;
-	private Class<GeneExpression> model;
-	private final Pattern pattern = Pattern.compile("(tcga-[a-zA-Z0-9]+-[a-zA-Z0-9]+)-.+", Pattern.CASE_INSENSITIVE);
+	private Class<GeneExpression> model = GeneExpression.class;
 
 	public TcgaRnaSeqGeneExpressionFileReader(
-      SampleRepository sampleRepository,
-      SubjectRepository subjectRepository,
       GeneRepository geneRepository,
-      Environment environment
+      TcgaSupport tcgaSupport
 	){
-    this.sampleRepository = sampleRepository;
-    this.subjectRepository = subjectRepository;
     this.geneRepository = geneRepository;
-    this.environment = environment;
+    this.tcgaSupport = tcgaSupport;
 	}
 
 	@Override
@@ -91,30 +85,22 @@ public class TcgaRnaSeqGeneExpressionFileReader
 		String[] bits = line.trim().split(this.getDelimiter());
 		if (bits.length > 1){
 			Gene gene = getGene(bits[0]);
-			if (gene == null){
-				if (environment.getRequiredProperty(ApplicationProperties.SKIP_INVALID_GENES, Boolean.class)){
-					logger.debug(String.format("Skipping line due to invalid gene: %s", line));
-					return new ArrayList<>();
-				} else {
-					throw new DataImportException(String.format("Invalid gene in line: %s", line));
-				}
+			if (this.isInvalidGene(gene)){
+				logger.debug(String.format("Skipping line due to invalid gene: %s", line));
+        return new ArrayList<>();
 			}
 			for (int i = 1; i < bits.length; i++){
 				GeneExpression record  = new GeneExpression();
 				Sample sample = getSample(i);
-				if (sample == null){
-					if (environment.getRequiredProperty(ApplicationProperties.SKIP_INVALID_SAMPLES, Boolean.class)){
-						logger.debug(String.format("Skipping record due to invalid sample: %s", 
-								this.getHeaders().get(i)));
-						continue;
-					} else {
-						throw new DataImportException(String.format("Invalid sample: %s", this.getHeaders().get(i)));
-					}
+				if (this.isInvalidSample(sample)){
+          logger.debug(String.format("Skipping record due to invalid sample: %s",
+              this.getHeaders().get(i)));
+          continue;
 				}
 				try {
 					record.setValue(Double.parseDouble(bits[i]));
 				} catch (NumberFormatException e){
-					if (environment.getRequiredProperty(ApplicationProperties.SKIP_INVALID_RECORDS, Boolean.class)){
+					if (this.isSkipInvalidRecords()){
 						logger.warn(String.format("Invalid record, cannot parse value: %s", bits[i]));
 						continue;
 					} else {
@@ -137,31 +123,10 @@ public class TcgaRnaSeqGeneExpressionFileReader
 		if (sampleMap.containsKey(sampleName)){
 			sample = sampleMap.get(sampleName);
 		} else {
-			List<Sample> samples = sampleRepository.findByName(sampleName);
-			if (samples != null && !samples.isEmpty()){
-					sample = samples.get(0);
-			} else {
-				Matcher matcher = pattern.matcher(sampleName);
-				if (matcher.matches()){
-					String subjectName = matcher.group(1);
-					List<Subject> subjects = subjectRepository.findByName(subjectName);
-					if (subjects != null && !subjects.isEmpty()) {
-						Subject subject = subjects.get(0);
-						sample = new Sample();
-						sample.setName(sampleName);
-						sample.setDataSet(dataFile.getDataSet());
-						sample.setSubject(subject);
-						sample.setTissue(subject.getAttribute("tumor_tissue_site"));
-						sample.setHistology(subject.getAttribute("histological_type"));
-						sampleRepository.save(sample);
-						sampleMap.put(sampleName, sample);
-					} else {
-						logger.warn("Sample has no associated Subject record: " + sampleName);
-						return null;
-					}
-				} else {
-					logger.warn("Unable to extract subject name from header: " + sampleName);
-				}
+			sample = tcgaSupport.findSample(sampleName);
+			if (sample == null){
+			  Hibernate.initialize(dataFile.getDataSet());
+				sample = tcgaSupport.createSample(sampleName, dataFile.getDataSet());
 			}
 		}
 		return sample;
