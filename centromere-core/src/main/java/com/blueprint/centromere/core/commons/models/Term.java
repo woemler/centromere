@@ -17,8 +17,7 @@
 package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
-
-import javax.persistence.Entity;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Model for representing controlled and/or indexed terms.  Can be used for reference ontologies, 
@@ -26,7 +25,7 @@ import javax.persistence.Entity;
  * 
  * @author woemler
  */
-@Entity
+@Document
 public class Term extends AbstractModel {
 	
 	private String term;

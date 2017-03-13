@@ -17,20 +17,12 @@
 package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.persistence.CascadeType;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Index;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
-import javax.persistence.Table;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Model representation of an annotated set of data, which may be compromised of multiple data types
@@ -38,8 +30,7 @@ import javax.persistence.Table;
  * 
  * @author woemler
  */
-@Entity
-@Table(indexes = { @Index(name = "DATA_SET_IDX_01", unique = true, columnList = "name") })
+@Document
 public class DataSet extends AbstractModel implements Attributes {
 	
 	private String name;
@@ -47,14 +38,16 @@ public class DataSet extends AbstractModel implements Attributes {
 	private String version;
 	private String description;
 
-	@OneToMany(mappedBy = "dataSet", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	@DBRef(lazy = true)
 	private List<DataFile> dataFiles = new ArrayList<>();
+	
+	private List<String> dataFileIds = new ArrayList<>();
 
-	@OneToMany(mappedBy = "dataSet", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	@DBRef(lazy = true)
   private List<Sample> samples = new ArrayList<>();
-
-	@ElementCollection(fetch = FetchType.EAGER)
-	@OrderColumn
+	
+	private List<String> sampleIds = new ArrayList<>();
+	
 	private Map<String, String> attributes = new HashMap<>();
 
 	public String getName() {
@@ -95,6 +88,10 @@ public class DataSet extends AbstractModel implements Attributes {
 
 	public void setDataFiles(List<DataFile> dataFiles) {
 		this.dataFiles = dataFiles;
+		this.dataFileIds = new ArrayList<>();
+		for (DataFile dataFile: dataFiles){
+		  dataFileIds.add(dataFile.getId());
+    }
 	}
 
 	public List<Sample> getSamples() {
@@ -103,6 +100,10 @@ public class DataSet extends AbstractModel implements Attributes {
 
 	public void setSamples(List<Sample> samples) {
 		this.samples = samples;
+		this.sampleIds = new ArrayList<>();
+		for (Sample sample: samples){
+		  sampleIds.add(sample.getId());
+    }
 	}
 
 	@Override
@@ -133,4 +134,20 @@ public class DataSet extends AbstractModel implements Attributes {
 	public String getAttribute(String name) {
 		return attributes.containsKey(name) ? attributes.get(name) : null;
 	}
+
+  public List<String> getDataFileIds() {
+    return dataFileIds;
+  }
+
+  public void setDataFileIds(List<String> dataFileIds) {
+    this.dataFileIds = dataFileIds;
+  }
+
+  public List<String> getSampleIds() {
+    return sampleIds;
+  }
+
+  public void setSampleIds(List<String> sampleIds) {
+    this.sampleIds = sampleIds;
+  }
 }

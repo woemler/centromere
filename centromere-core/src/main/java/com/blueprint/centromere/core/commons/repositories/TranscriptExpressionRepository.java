@@ -17,7 +17,7 @@
 package com.blueprint.centromere.core.commons.repositories;
 
 import com.blueprint.centromere.core.commons.models.TranscriptExpression;
-import com.blueprint.centromere.core.model.ModelRepository;
+import com.blueprint.centromere.core.repository.ModelRepository;
 
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 

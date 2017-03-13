@@ -16,12 +16,12 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-import javax.persistence.Entity;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * @author woemler
  */
-@Entity
+@Document
 public class SegmentCopyNumber extends Data {
 	
 	private String chromosome;

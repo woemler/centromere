@@ -34,6 +34,7 @@ import com.blueprint.centromere.core.commons.repositories.GeneExpressionReposito
 import com.blueprint.centromere.core.commons.repositories.GeneRepository;
 import com.blueprint.centromere.core.commons.repositories.SampleRepository;
 import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
+import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
@@ -50,20 +51,20 @@ import org.springframework.util.Assert;
  * @author woemler
  */
 
-public abstract class AbstractControllerTests {
+public abstract class AbstractControllerTests extends AbstractRepositoryTests {
 	
 	private static final String BASE_URL = "/api/genes";
 	private static final String EXPRESSION_URL = "/api/geneexpression";
 	
-	private SampleRepository sampleRepository;
-	private SubjectRepository subjectRepository;
-	private DataFileRepository dataFileRepository;
-	private DataSetRepository dataSetRepository;
-	private GeneRepository geneRepository;
-	private GeneExpressionRepository geneExpressionRepository;
+	@Autowired private SampleRepository sampleRepository;
+	@Autowired private SubjectRepository subjectRepository;
+	@Autowired private DataFileRepository dataFileRepository;
+	@Autowired private DataSetRepository dataSetRepository;
+	@Autowired private GeneRepository geneRepository;
+	@Autowired private GeneExpressionRepository geneExpressionRepository;
+	@Autowired @Qualifier("objectMapper") private ObjectMapper objectMapper;
 	
 	private MockMvc mockMvc;
-	private ObjectMapper objectMapper;
 
 	@Test
 	public void findAllTest() throws Exception {
@@ -390,80 +391,11 @@ public abstract class AbstractControllerTests {
 //	}
 
 
-  public SampleRepository getSampleRepository() {
-    return sampleRepository;
-  }
-
-  @Autowired
-  public void setSampleRepository(
-      SampleRepository sampleRepository) {
-    this.sampleRepository = sampleRepository;
-  }
-
-  public SubjectRepository getSubjectRepository() {
-    return subjectRepository;
-  }
-
-  @Autowired
-  public void setSubjectRepository(
-      SubjectRepository subjectRepository) {
-    this.subjectRepository = subjectRepository;
-  }
-
-  public DataFileRepository getDataFileRepository() {
-    return dataFileRepository;
-  }
-
-  @Autowired
-  public void setDataFileRepository(
-      DataFileRepository dataFileRepository) {
-    this.dataFileRepository = dataFileRepository;
-  }
-
-  public DataSetRepository getDataSetRepository() {
-    return dataSetRepository;
-  }
-
-  @Autowired
-  public void setDataSetRepository(
-      DataSetRepository dataSetRepository) {
-    this.dataSetRepository = dataSetRepository;
-  }
-
-  public GeneRepository getGeneRepository() {
-    return geneRepository;
-  }
-
-  @Autowired
-  public void setGeneRepository(
-      GeneRepository geneRepository) {
-    this.geneRepository = geneRepository;
-  }
-
-  public GeneExpressionRepository getGeneExpressionRepository() {
-    return geneExpressionRepository;
-  }
-
-  @Autowired
-  public void setGeneExpressionRepository(
-      GeneExpressionRepository geneExpressionRepository) {
-    this.geneExpressionRepository = geneExpressionRepository;
-  }
-
   public MockMvc getMockMvc() {
     return mockMvc;
   }
 
   public void setMockMvc(MockMvc mockMvc) {
     this.mockMvc = mockMvc;
-  }
-
-  public ObjectMapper getObjectMapper() {
-    return objectMapper;
-  }
-
-  @Autowired @Qualifier("objectMapper")
-  public void setObjectMapper(ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
   }
 }

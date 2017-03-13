@@ -17,27 +17,16 @@
 package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Index;
-import javax.persistence.OrderColumn;
-import javax.persistence.Table;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * @author woemler
  */
-@Entity
-@Table(indexes = {
-		@Index(name = "GENES_IDX_01", columnList = "primaryReferenceId", unique = true),
-		@Index(name = "GENES_IDX_02", columnList = "primaryGeneSymbol")
-})
+@Document
 public class Gene extends AbstractModel implements Attributes {
 
 	private String primaryReferenceId;
@@ -49,16 +38,8 @@ public class Gene extends AbstractModel implements Attributes {
 	private String description;
 	private String referenceSource;
 
-	@ElementCollection(fetch = FetchType.EAGER)
-	@OrderColumn
 	private List<String> aliases = new ArrayList<>();
-
-	@ElementCollection(fetch = FetchType.EAGER)
-	@OrderColumn
 	private Map<String, String> attributes = new HashMap<>();
-
-	@ElementCollection(fetch = FetchType.EAGER)
-	@OrderColumn
 	private Map<String, String> externalReferences = new HashMap<>();
 
 	public String getPrimaryReferenceId() {

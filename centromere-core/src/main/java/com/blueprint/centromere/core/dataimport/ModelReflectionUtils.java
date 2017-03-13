@@ -19,12 +19,8 @@ package com.blueprint.centromere.core.dataimport;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.GeneratedValue;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Transient;
 import org.springframework.beans.BeanWrapper;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 /**
  * Utility methods used for data import classes that depend upon {@link com.blueprint.centromere.core.model.Model}
@@ -36,7 +32,7 @@ import org.springframework.beans.BeanWrapper;
 public class ModelReflectionUtils {
 
   /**
-   * Tests whether a given field is persistable, but is not a related {@link javax.persistence.Entity}
+   * Tests whether a given field is persistable, but is not a related {@link org.springframework.data.mongodb.core.mapping.Document}
    *   object.  Allows supplying a list of extra fields to be ignored.
    *
    * @param field reflected field.
@@ -46,15 +42,11 @@ public class ModelReflectionUtils {
   public static boolean isPersistableNonEntityField(Field field, List<String> ignoredFields){
     return field.isSynthetic()
         || ignoredFields.contains(field.getName())
-        || field.isAnnotationPresent(Transient.class)
-        || field.isAnnotationPresent(ManyToOne.class)
-        || field.isAnnotationPresent(OneToOne.class)
-        || field.isAnnotationPresent(OneToMany.class)
-        || field.isAnnotationPresent(GeneratedValue.class);
+        || field.isAnnotationPresent(DBRef.class);
   }
 
   /**
-   * Tests whether a given field is persistable, but is not a related {@link javax.persistence.Entity}
+   * Tests whether a given field is persistable, but is not a related {@link org.springframework.data.mongodb.core.mapping.Document}
    *   object.
    *
    * @param field reflected field.

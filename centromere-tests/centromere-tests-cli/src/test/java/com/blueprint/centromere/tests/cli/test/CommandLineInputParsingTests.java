@@ -23,8 +23,7 @@ import com.blueprint.centromere.cli.CommandLineInputExecutor;
 import com.blueprint.centromere.cli.ImportCommandArguments;
 import com.blueprint.centromere.cli.ImportFileCommandArguments;
 import com.blueprint.centromere.cli.ImportManifestCommandArguments;
-import com.blueprint.centromere.tests.core.config.EmbeddedH2DataSourceConfig;
-
+import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -37,7 +36,7 @@ import org.springframework.util.Assert;
  * @author woemler
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { EmbeddedH2DataSourceConfig.class })
+@SpringBootTest(classes = { EmbeddedMongoConfig.class })
 @FixMethodOrder
 public class CommandLineInputParsingTests {
 	

@@ -24,21 +24,27 @@ package com.blueprint.centromere.core.config;
  */
 public class ApplicationProperties {
 
-    private static final String CENTROMERE_PREFIX = "centromere.";
-    private static final String APP_PREFIX = CENTROMERE_PREFIX + "app.";
-    private static final String API_PREFIX = CENTROMERE_PREFIX + "api.";
-    private static final String IMPORT_PREFIX = CENTROMERE_PREFIX + "import.";
-    private static final String SECURITY_PREFIX = CENTROMERE_PREFIX + "security.";
-    private static final String DB_PREFIX = CENTROMERE_PREFIX + "db.";
-    private static final String LOGGING_PREFIX = CENTROMERE_PREFIX + "logging.";
-    private static final String WEB_PREFIX = CENTROMERE_PREFIX + "web.";
+  private static final String CENTROMERE_PREFIX = "centromere.";
+  private static final String APP_PREFIX = CENTROMERE_PREFIX + "app.";
+  private static final String API_PREFIX = CENTROMERE_PREFIX + "api.";
+  private static final String IMPORT_PREFIX = CENTROMERE_PREFIX + "import.";
+  private static final String SECURITY_PREFIX = CENTROMERE_PREFIX + "security.";
+  private static final String DB_PREFIX = CENTROMERE_PREFIX + "db.";
+  private static final String LOGGING_PREFIX = CENTROMERE_PREFIX + "logging.";
+  private static final String WEB_PREFIX = CENTROMERE_PREFIX + "web.";
 
-    public static final String APP_VERSION = APP_PREFIX + "version";
+  public static final String APP_VERSION = APP_PREFIX + "version";
 
-    public static final String SKIP_INVALID_RECORDS = IMPORT_PREFIX + "skip-invalid-records";
-    public static final String SKIP_INVALID_SAMPLES = IMPORT_PREFIX + "skip-invalid-samples";
-    public static final String SKIP_INVALID_GENES = IMPORT_PREFIX + "skip-invalid-genes";
-    public static final String SKIP_INVALID_FILES = IMPORT_PREFIX + "skip-invalid-files";
-    public static final String SKIP_EXISTING_FILES = IMPORT_PREFIX + "skip-existing-files";
+  public static final String SKIP_INVALID_RECORDS = IMPORT_PREFIX + "skip-invalid-records";
+  public static final String SKIP_INVALID_SAMPLES = IMPORT_PREFIX + "skip-invalid-samples";
+  public static final String SKIP_INVALID_GENES = IMPORT_PREFIX + "skip-invalid-genes";
+  public static final String SKIP_INVALID_FILES = IMPORT_PREFIX + "skip-invalid-files";
+  public static final String SKIP_EXISTING_FILES = IMPORT_PREFIX + "skip-existing-files";
+  
+  public static final String DB_HOST = DB_PREFIX + "host";
+  public static final String DB_NAME = DB_PREFIX + "name";
+  public static final String DB_PORT = DB_PREFIX + "port";
+  public static final String DB_USER = DB_PREFIX + "username";
+  public static final String DB_PASSWORD = DB_PREFIX + "password";
 
 }

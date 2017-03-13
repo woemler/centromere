@@ -20,11 +20,11 @@ import com.blueprint.centromere.cli.CommandLineInputConfiguration;
 import com.blueprint.centromere.cli.manifest.ImportManifest;
 import com.blueprint.centromere.cli.manifest.ManifestFile;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.tests.core.config.EmbeddedH2DataSourceConfig;
+import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
+import java.io.File;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -35,14 +35,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.Assert;
 
-import java.io.File;
-
 /**
  * @author woemler
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { 
-		EmbeddedH2DataSourceConfig.class,
+		EmbeddedMongoConfig.class,
 		CommandLineInputConfiguration.class,
 		CommandLineTestConfig.class
 })

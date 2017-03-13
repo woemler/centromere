@@ -25,9 +25,8 @@ import com.blueprint.centromere.core.commons.repositories.GeneExpressionReposito
 import com.blueprint.centromere.core.commons.repositories.GeneRepository;
 import com.blueprint.centromere.core.config.ProfileConfiguration;
 import com.blueprint.centromere.core.config.Profiles;
-
 import com.blueprint.centromere.core.config.Schema;
-import com.blueprint.centromere.tests.core.config.EmbeddedH2DataSourceConfig;
+import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -46,7 +45,7 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { 
-		EmbeddedH2DataSourceConfig.class,
+		EmbeddedMongoConfig.class,
 		CommandLineInputConfiguration.class,
 		CommandLineTestConfig.class,
 		ProfileConfiguration.class

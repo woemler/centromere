@@ -13,8 +13,7 @@ import com.blueprint.centromere.core.commons.repositories.GeneRepository;
 import com.blueprint.centromere.core.commons.repositories.SampleRepository;
 import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
 import com.blueprint.centromere.core.dataimport.DelimtedTextFileWriter;
-import com.blueprint.centromere.core.dataimport.MySQLImportTempFileWriter;
-import com.blueprint.centromere.tests.core.config.EmbeddedH2DataSourceConfig;
+import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
 import com.blueprint.centromere.tests.core.model.DataFileGenerator;
 import com.blueprint.centromere.tests.core.model.DataSetGenerator;
 import com.blueprint.centromere.tests.core.model.EntrezGeneDataGenerator;
@@ -34,7 +33,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author woemler
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { EmbeddedH2DataSourceConfig.class })
+@SpringBootTest(classes = { EmbeddedMongoConfig.class })
 public class TempFileWriterTests {
 
   @Autowired private SampleRepository sampleRepository;
@@ -85,18 +84,18 @@ public class TempFileWriterTests {
     writer.doAfter();
   }
   
-  @Test
-  public void mysqlImportTempWriterTest() throws Exception {
-    MySQLImportTempFileWriter<GeneExpression> writer = new MySQLImportTempFileWriter<>(GeneExpression.class);
-    writer.setEnvironment(environment);
-    String path = writer.getTempFilePath("/path/to/fake/file.txt");
-    System.out.println(String.format("Writing temp file: %s", path));
-    writer.doBefore(path);
-    for (GeneExpression data: geneExpressionRepository.findAll()){
-      writer.writeRecord(data);
-    }
-    writer.doAfter();
-  }
+//  @Test
+//  public void mysqlImportTempWriterTest() throws Exception {
+//    MySQLImportTempFileWriter<GeneExpression> writer = new MySQLImportTempFileWriter<>(GeneExpression.class);
+//    writer.setEnvironment(environment);
+//    String path = writer.getTempFilePath("/path/to/fake/file.txt");
+//    System.out.println(String.format("Writing temp file: %s", path));
+//    writer.doBefore(path);
+//    for (GeneExpression data: geneExpressionRepository.findAll()){
+//      writer.writeRecord(data);
+//    }
+//    writer.doAfter();
+//  }
 //
 //  @Test
 //  public void mysqlImportTest() throws Exception {

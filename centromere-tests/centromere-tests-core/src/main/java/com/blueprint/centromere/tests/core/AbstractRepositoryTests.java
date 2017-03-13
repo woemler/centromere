@@ -16,455 +16,368 @@
 
 package com.blueprint.centromere.tests.core;
 
+import com.blueprint.centromere.core.commons.models.DataFile;
+import com.blueprint.centromere.core.commons.models.DataSet;
 import com.blueprint.centromere.core.commons.models.Gene;
+import com.blueprint.centromere.core.commons.models.GeneExpression;
+import com.blueprint.centromere.core.commons.models.Sample;
+import com.blueprint.centromere.core.commons.models.Subject;
+import com.blueprint.centromere.core.commons.repositories.DataFileRepository;
+import com.blueprint.centromere.core.commons.repositories.DataSetRepository;
+import com.blueprint.centromere.core.commons.repositories.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repositories.GeneRepository;
-import com.blueprint.centromere.tests.core.model.EntrezGeneDataGenerator;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Ops;
-import com.querydsl.core.types.Path;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.ListPath;
-import com.querydsl.core.types.dsl.MapPath;
-import com.querydsl.core.types.dsl.PathBuilder;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.util.Assert;
-
+import com.blueprint.centromere.core.commons.repositories.SampleRepository;
+import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
-import java.util.Set;
+import org.junit.Before;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author woemler
  */
 public abstract class AbstractRepositoryTests {
 
-    @Autowired private GeneRepository geneRepository;
-    private final Class<Gene> model = Gene.class;
-    private final EntrezGeneDataGenerator dataGenerator = new EntrezGeneDataGenerator();
-
-    @Before
-    public void setup() throws Exception {
-        geneRepository.deleteAll();
-        geneRepository.save(dataGenerator.generateData());
-    }
-
-    @Test
-    public void findOneByBadIdTest(){
-      Gene gene = geneRepository.findOne("abc");
-      Assert.isNull(gene);
-    }
-
-    @Test
-    public void findByIdTest(){
-
-        List<Gene> genes = (List<Gene>) geneRepository.findAll();
-
-        Gene gene = geneRepository.findOne(genes.get(0).getId());
-        Assert.notNull(gene);
-        Assert.isTrue(gene.getPrimaryReferenceId().equals("1"));
-        Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
-        Assert.notNull(gene.getAliases());
-        Assert.notEmpty(gene.getAliases());
-        Assert.isTrue(gene.getAliases().size() == 1);
-        System.out.println("PKID: " + gene.getId().toString());
-
-    }
-
-    @Test
-    public void findAllTest(){
-
-        List<Gene> genes = (List<Gene>) geneRepository.findAll();
-        Assert.notNull(genes);
-        Assert.notEmpty(genes);
-        Assert.isTrue(genes.size() == 5);
-
-        Gene gene = genes.get(0);
-        Assert.notNull(gene);
-        Assert.isTrue(gene.getPrimaryReferenceId().equals("1"));
-        Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
-        Assert.notNull(gene.getAliases());
-        Assert.notEmpty(gene.getAliases());
-        Assert.isTrue(gene.getAliases().size() == 1);
-        System.out.println(gene.toString());
-
-    }
-
-    @Test
-    public void countTest(){
-        long count = geneRepository.count();
-        Assert.notNull(count);
-        Assert.isTrue(count == 5L);
-    }
-
-    @Test
-    public void filteredCountTest(){
-        Path<Gene> entity = Expressions.path(model, model.getSimpleName().toLowerCase());
-        Path<String> attribute = Expressions.stringPath(entity, "geneType");
-        Expression<String> variable = Expressions.constant("protein-coding");
-        Predicate predicate = Expressions.predicate(Ops.EQ, attribute, variable);
-        long count = geneRepository.count(predicate);
-        Assert.notNull(count);
-        Assert.isTrue(count == 3L);
-    }
-
-    @Test
-    public void findBySimpleCriteriaTest(){
-
-        Path<Gene> entity = Expressions.path(model, model.getSimpleName().toLowerCase());
-        Path<String> attribute = Expressions.stringPath(entity, "primaryGeneSymbol");
-        Expression<String> variable = Expressions.constant("GeneB");
-        Predicate predicate = Expressions.predicate(Ops.EQ, attribute, variable);
-
-        List<Gene> genes = (List<Gene>) geneRepository.findAll(predicate);
-        Assert.notNull(genes);
-        Assert.notEmpty(genes);
-        Assert.isTrue(genes.size() == 1);
-
-        Gene gene = genes.get(0);
-        Assert.notNull(gene);
-        Assert.isTrue(gene.getPrimaryReferenceId().equals("2"));
-        Assert.isTrue("GeneB".equals(gene.getPrimaryGeneSymbol()));
-
-    }
-
-    @Test
-    public void findByMultipleCriteriaTest(){
-
-        BooleanBuilder builder = new BooleanBuilder();
-        Path<Gene> entity = Expressions.path(model, model.getSimpleName().toLowerCase());
-        Path<String> attribute1 = Expressions.stringPath(entity, "geneType");
-        Expression<String> variable1 = Expressions.constant("protein-coding");
-        Predicate predicate1 = Expressions.predicate(Ops.EQ, attribute1, variable1);
-        Path<String> attribute2 = Expressions.stringPath(entity, "chromosome");
-        Expression<String> variable2 = Expressions.constant("5");
-        Predicate predicate2 = Expressions.predicate(Ops.EQ, attribute2, variable2);
-        builder.and(predicate1).and(predicate2);
-
-        List<Gene> genes = (List<Gene>) geneRepository.findAll(builder.getValue());
-        Assert.notNull(genes);
-        Assert.notEmpty(genes);
-        Assert.isTrue(genes.size() == 1);
-
-        Gene gene = genes.get(0);
-        Assert.notNull(gene);
-        Assert.isTrue(gene.getPrimaryReferenceId().equals("2"));
-        Assert.isTrue("GeneB".equals(gene.getPrimaryGeneSymbol()));
-
-    }
-
-    @Test
-    public void findByNestedArrayCriteriaTest(){
-
-        PathBuilder<Gene> pathBuilder = new PathBuilder<>(model, model.getSimpleName().toLowerCase());
-        ListPath<String, PathBuilder<String>> attribute = pathBuilder.getList("aliases", String.class);
-        Expression<String> variable = Expressions.constant("DEF");
-        Predicate predicate = Expressions.predicate(Ops.EQ, attribute.any(), variable);
-
-        List<Gene> genes = (List<Gene>) geneRepository.findAll(predicate);
-        Assert.notNull(genes);
-        Assert.notEmpty(genes);
-        Assert.isTrue(genes.size() == 1);
-
-        Gene gene = genes.get(0);
-        Assert.notNull(gene);
-        Assert.isTrue(gene.getPrimaryReferenceId().equals("2"));
-        Assert.isTrue("GeneB".equals(gene.getPrimaryGeneSymbol()));
-        Assert.isTrue("DEF".equals(gene.getAliases().get(0)));
-
-    }
-
-    @Test
-    public void findByNestedObjectCriteriaTest(){
-
-        PathBuilder<Gene> pathBuilder = new PathBuilder<>(model, model.getSimpleName().toLowerCase());
-        MapPath<String, String, PathBuilder<String>> attribute
-                = pathBuilder.getMap("attributes", String.class, String.class);
-        Expression<String> variable = Expressions.constant("Y");
-        Predicate predicate = Expressions.predicate(Ops.EQ, attribute.get("isKinase"), variable);
-
-        List<Gene> genes = (List<Gene>) geneRepository.findAll(predicate);
-        Assert.notNull(genes);
-        Assert.notEmpty(genes);
-        Assert.isTrue(genes.size() == 2);
-
-        Gene gene = genes.get(0);
-        Assert.notNull(gene);
-        Assert.isTrue(gene.getPrimaryReferenceId().equals("1"));
-        Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
-        Assert.isTrue(gene.getAttributes().size() == 1);
-        Assert.isTrue(gene.getAttributes().containsKey("isKinase"));
-        Assert.isTrue("Y".equals(gene.getAttributes().get("isKinase")));
-
-    }
-
-    @Test
-    public void findSortedTest(){
-
-        Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "primaryReferenceId"));
-        List<Gene> genes = (List<Gene>) geneRepository.findAll(sort);
-        Assert.notNull(genes);
-        Assert.notEmpty(genes);
-        Assert.isTrue(genes.size() == 5);
-        Assert.isTrue(genes.get(0).getPrimaryReferenceId().equals("5"));
-
-    }
-
-
-    @Test
-    public void findAndSortTest(){
-
-        Path<Gene> entity = Expressions.path(model, model.getSimpleName().toLowerCase());
-        Path<String> attribute = Expressions.stringPath(entity, "geneType");
-        Expression<String> variable = Expressions.constant("protein-coding");
-        Predicate predicate = Expressions.predicate(Ops.EQ, attribute, variable);
-
-        Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "primaryReferenceId"));
-        List<Gene> genes = (List<Gene>) geneRepository.findAll(predicate, sort);
-        Assert.notNull(genes);
-        Assert.notEmpty(genes);
-        Assert.isTrue(genes.size() == 3);
-        Assert.isTrue(genes.get(0).getPrimaryReferenceId().equals("4"));
-    }
-
-    @Test
-    public void findPagedTest(){
-
-        PageRequest pageRequest = new PageRequest(1, 2);
-        Page<Gene> page = geneRepository.findAll(pageRequest);
-        Assert.notNull(page);
-        Assert.isTrue(page.getTotalPages() == 3);
-        Assert.isTrue(page.getTotalElements() == 5);
-
-        List<Gene> genes = page.getContent();
-        Assert.notNull(genes);
-        Assert.notEmpty(genes);
-        Assert.isTrue(genes.size() == 2);
-
-        Gene gene = genes.get(0);
-        Assert.notNull(gene);
-        Assert.isTrue(gene.getPrimaryReferenceId().equals("3"));
-
-    }
-
-    @Test
-    public void findByCriteriaPagedTest(){
-
-        Path<Gene> entity = Expressions.path(model, model.getSimpleName().toLowerCase());
-        Path<String> attribute = Expressions.stringPath(entity, "geneType");
-        Expression<String> variable = Expressions.constant("protein-coding");
-        Predicate predicate = Expressions.predicate(Ops.EQ, attribute, variable);
-
-        PageRequest pageRequest = new PageRequest(1, 2);
-        Page<Gene> page = geneRepository.findAll(predicate, pageRequest);
-        Assert.notNull(page);
-        Assert.isTrue(page.getTotalElements() == 3);
-        Assert.isTrue(page.getTotalPages() == 2);
-
-        List<Gene> genes = page.getContent();
-        Assert.notNull(genes);
-        Assert.notEmpty(genes);
-        Assert.isTrue(genes.size() == 1);
-
-        Gene gene = genes.get(0);
-        Assert.notNull(gene);
-        Assert.isTrue(gene.getPrimaryReferenceId().equals("4"));
-
-    }
-
-    @Test
-    public void insertTest(){
-        Gene gene = new Gene();
-        gene.setPrimaryReferenceId("100");
-        gene.setPrimaryGeneSymbol("TEST");
-        gene.setTaxId(9606);
-        gene.setChromosome("1");
-        gene.setGeneType("protein-coding");
-        geneRepository.save(gene);
-
-        Gene created = geneRepository.findByPrimaryReferenceId("100").get(0);
-        Assert.notNull(created);
-        Assert.isTrue(created.getPrimaryReferenceId().equals("100"));
-        Assert.isTrue("TEST".equals(created.getPrimaryGeneSymbol()));
-
-        geneRepository.delete(created);
-
-    }
-
-    @Test
-    public void insertMultipleTest(){
-        List<Gene> genes = new ArrayList<>();
-        Gene gene1 = new Gene();
-        gene1.setPrimaryReferenceId("100");
-        gene1.setPrimaryGeneSymbol("TEST");
-        gene1.setTaxId(9606);
-        gene1.setChromosome("1");
-        gene1.setGeneType("protein-coding");
-        genes.add(gene1);
-        Gene gene2 = new Gene();
-        gene2.setPrimaryReferenceId("101");
-        gene2.setPrimaryGeneSymbol("TEST2");
-        gene2.setTaxId(9606);
-        gene2.setChromosome("12");
-        gene2.setGeneType("pseudo");
-        genes.add(gene2);
-        geneRepository.save(genes);
-        genes = geneRepository.findByPrimaryReferenceId("100");
-        Assert.notNull(genes);
-        Assert.notEmpty(genes);
-        Gene gene = genes.get(0);
-        Assert.notNull(gene);
-        genes = geneRepository.findByPrimaryReferenceId("101");
-        Assert.notNull(genes);
-        Assert.notEmpty(genes);
-        gene = genes.get(0);
-        Assert.notNull(gene);
-        Assert.isTrue(geneRepository.count() == 7L);
-    }
-
-    @Test
-    public void updateTest(){
-
-        Gene gene = new Gene();
-        gene.setPrimaryReferenceId("100");
-        gene.setPrimaryGeneSymbol("TEST");
-        gene.setTaxId(9606);
-        gene.setChromosome("1");
-        gene.setGeneType("protein-coding");
-        geneRepository.save(gene);
-
-        gene.setPrimaryGeneSymbol("TEST_TEST");
-        gene.setGeneType("pseudogene");
-        geneRepository.save(gene);
-
-        List<Gene> genes = geneRepository.findByPrimaryReferenceId("100");
-        Assert.notNull(genes);
-        Assert.notEmpty(genes);
-        Gene updated = genes.get(0);
-        Assert.notNull(updated);
-        Assert.isTrue("TEST_TEST".equals(updated.getPrimaryGeneSymbol()));
-        Assert.isTrue("pseudogene".equals(updated.getGeneType()));
-
-    }
-
-    @Test
-    public void updateMultipleTest(){
-        List<Gene> genes = new ArrayList<>();
-        Gene gene1 = new Gene();
-        gene1.setPrimaryReferenceId("100");
-        gene1.setPrimaryGeneSymbol("TEST");
-        gene1.setTaxId(9606);
-        gene1.setChromosome("1");
-        gene1.setGeneType("protein-coding");
-        genes.add(gene1);
-        Gene gene2 = new Gene();
-        gene2.setPrimaryReferenceId("101");
-        gene2.setPrimaryGeneSymbol("TEST2");
-        gene2.setTaxId(9606);
-        gene2.setChromosome("12");
-        gene2.setGeneType("pseudo");
-        genes.add(gene2);
-        geneRepository.save(genes);
-        Assert.isTrue(geneRepository.count() == 7L);
-
-        genes = new ArrayList<>();
-        gene1.setGeneType("TEST");
-        gene2.setGeneType("TEST");
-        genes.add(gene1);
-        genes.add(gene2);
-        geneRepository.save(genes);
-
-        genes = geneRepository.findByPrimaryReferenceId("100");
-        Assert.notNull(genes);
-        Assert.notEmpty(genes);
-        Gene gene = genes.get(0);
-        Assert.notNull(gene);
-        Assert.isTrue("TEST".equals(gene.getGeneType()));
-        genes = geneRepository.findByPrimaryReferenceId("101");
-        Assert.notNull(genes);
-        Assert.notEmpty(genes);
-        gene = genes.get(0);
-        Assert.notNull(gene);
-        Assert.isTrue("TEST".equals(gene.getGeneType()));
-    }
-
-    @Test
-    public void deleteTest(){
-
-        Gene gene = new Gene();
-        gene.setPrimaryReferenceId("100");
-        gene.setPrimaryGeneSymbol("TEST");
-        gene.setTaxId(9606);
-        gene.setChromosome("1");
-        gene.setGeneType("protein-coding");
-        geneRepository.save(gene);
-
-        List<Gene> genes = geneRepository.findByPrimaryReferenceId("100");
-        Assert.notNull(genes);
-        Assert.notEmpty(genes);
-        Gene created = genes.get(0);
-        Assert.notNull(created);
-        Assert.isTrue(created.getPrimaryReferenceId().equals("100"));
-
-        geneRepository.delete(created);
-        genes = geneRepository.findByPrimaryReferenceId("100");
-        Assert.notNull(genes);
-        Assert.isTrue(genes.isEmpty());
-
-    }
-
-    @Test
-    public void distinctTest(){
-        Set<Object> geneSymbols = geneRepository.distinct("primaryGeneSymbol");
-        Assert.notNull(geneSymbols);
-        Assert.notEmpty(geneSymbols);
-        Assert.isTrue(geneSymbols.size() == 5);
-        Assert.isTrue(geneSymbols.contains("GeneA"));
-
-    }
-
-    @Test
-    public void distinctQueryTest(){
-        Path<Gene> entity = Expressions.path(model, model.getSimpleName().toLowerCase());
-        Path<String> attribute = Expressions.stringPath(entity, "geneType");
-        Expression<String> variable = Expressions.constant("protein-coding");
-        Predicate predicate = Expressions.predicate(Ops.EQ, attribute, variable);
-        Set<Object> geneSymbols = geneRepository.distinct("primaryGeneSymbol", predicate);
-        Assert.notNull(geneSymbols);
-        Assert.notEmpty(geneSymbols);
-        Assert.isTrue(geneSymbols.size() == 3);
-        Assert.isTrue(geneSymbols.contains("GeneD"));
-
-    }
-
-
-    @Test
-    public void guessGeneTest() throws Exception {
-
-        List<Gene> genes = (List<Gene>) geneRepository.guess("GeneA");
-        Assert.notNull(genes);
-        Assert.notEmpty(genes);
-
-        Gene gene = genes.get(0);
-        Assert.isTrue(gene.getPrimaryReferenceId().equals("1"));
-
-        genes = (List<Gene>) geneRepository.guess("MNO");
-        Assert.notNull(genes);
-        Assert.notEmpty(genes);
-
-        gene = genes.get(0);
-        Assert.isTrue(gene.getPrimaryReferenceId().equals("5"));
-
-        genes = (List<Gene>) geneRepository.guess("XYZ");
-        Assert.isTrue(genes.size() == 0);
-
-    }
+  @Autowired private GeneRepository geneRepository;
+  @Autowired private DataSetRepository dataSetRepository;
+  @Autowired private DataFileRepository dataFileRepository;
+  @Autowired private SubjectRepository subjectRepository;
+  @Autowired private SampleRepository sampleRepository;
+  @Autowired private GeneExpressionRepository geneExpressionRepository;
+
+  @Before
+  public void setup() throws Exception {
+      
+    geneRepository.deleteAll();
+    dataSetRepository.deleteAll();
+    dataFileRepository.deleteAll();
+    subjectRepository.deleteAll();
+    sampleRepository.deleteAll();
+    geneExpressionRepository.deleteAll();
+    
+    // Genes
+
+    List<Gene> genes = new ArrayList<>();
+
+    Gene geneA = new Gene();
+    geneA.setPrimaryReferenceId("1");
+    geneA.setPrimaryGeneSymbol("GeneA");
+    geneA.setTaxId(9606);
+    geneA.setChromosome("1");
+    geneA.setDescription("Test Gene A");
+    geneA.setGeneType("protein-coding");
+    geneA.addAttribute("isKinase","Y");
+    geneA.addAlias("ABC");
+    genes.add(geneA);
+
+    Gene geneB = new Gene();
+    geneB.setPrimaryReferenceId("2");
+    geneB.setPrimaryGeneSymbol("GeneB");
+    geneB.setTaxId(9606);
+    geneB.setChromosome("5");
+    geneB.setDescription("Test Gene B");
+    geneB.setGeneType("protein-coding");
+    geneB.addAttribute("isKinase", "N");
+    geneB.addAlias("DEF");
+    genes.add(geneB);
+
+    Gene geneC = new Gene();
+    geneC.setPrimaryReferenceId("3");
+    geneC.setPrimaryGeneSymbol("GeneC");
+    geneC.setTaxId(9606);
+    geneC.setChromosome("9");
+    geneC.setDescription("Test Gene C");
+    geneC.setGeneType("pseudo");
+    geneC.addAttribute("isKinase", "N");
+    geneC.addAlias("GHI");
+    genes.add(geneC);
+
+    Gene geneD = new Gene();
+    geneD.setPrimaryReferenceId("4");
+    geneD.setPrimaryGeneSymbol("GeneD");
+    geneD.setTaxId(9606);
+    geneD.setChromosome("X");
+    geneD.setDescription("Test Gene D");
+    geneD.setGeneType("protein-coding");
+    geneD.addAttribute("isKinase", "Y");
+    geneD.addAlias("JKL");
+    genes.add(geneD);
+
+    Gene geneE = new Gene();
+    geneE.setPrimaryReferenceId("5");
+    geneE.setPrimaryGeneSymbol("GeneE");
+    geneE.setTaxId(9606);
+    geneE.setChromosome("13");
+    geneE.setDescription("Test Gene E");
+    geneE.setGeneType("pseudo");
+    geneE.addAttribute("isKinase", "N");
+    geneE.addAlias("MNO");
+    genes.add(geneE);
+    
+    geneRepository.insert(genes);
+    
+    // Data Sets
+
+    List<DataSet> dataSets = new ArrayList<>();
+
+    DataSet dataSetA = new DataSet();
+    dataSetA.setName("DataSetA");
+    dataSetA.setSource("Internal");
+    dataSetA.setVersion("1.0");
+    dataSetA.setDescription("This is an example data set.");
+    dataSets.add(dataSetA);
+
+    DataSet dataSetB = new DataSet();
+    dataSetB.setName("DataSetB");
+    dataSetB.setSource("External");
+    dataSetB.setVersion("1.0");
+    dataSetB.setDescription("This is an example data set.");
+    dataSets.add(dataSetB);
+
+    DataSet dataSetC = new DataSet();
+    dataSetC.setName("DataSetC");
+    dataSetC.setSource("Internal");
+    dataSetC.setVersion("2.0");
+    dataSetC.setDescription("This is an example data set.");
+    dataSets.add(dataSetC);
+
+    DataSet dataSetD = new DataSet();
+    dataSetD.setName("DataSetD");
+    dataSetD.setSource("External");
+    dataSetD.setVersion("1.0");
+    dataSetD.setDescription("This is an example data set.");
+    dataSets.add(dataSetD);
+
+    DataSet dataSetE = new DataSet();
+    dataSetE.setName("DataSetE");
+    dataSetE.setSource("Internal");
+    dataSetE.setVersion("1.0");
+    dataSetE.setDescription("This is an example data set.");
+    dataSets.add(dataSetE);
+    
+    dataSetRepository.insert(dataSets);
+    
+    // Data Files
+
+    List<DataFile> dataFiles = new ArrayList<>();
+
+    DataFile dataFileA = new DataFile();
+    dataFileA.setFilePath("/path/to/fileA");
+    dataFileA.setDataType("GCT RNA-Seq gene expression");
+    dataFileA.setDateCreated(new Date());
+    dataFileA.setDateUpdated(new Date());
+    dataFileA.setDataSet(dataSetA);
+    dataFiles.add(dataFileA);
+
+    DataFile dataFileB = new DataFile();
+    dataFileB.setFilePath("/path/to/fileB");
+    dataFileB.setDataType("GCT RNA-Seq transcript expression");
+    dataFileB.setDateCreated(new Date());
+    dataFileB.setDateUpdated(new Date());
+    dataFileB.setDataSet(dataSetA);
+    dataFiles.add(dataFileB);
+
+    DataFile dataFileC = new DataFile();
+    dataFileC.setFilePath("/path/to/fileC");
+    dataFileC.setDataType("MAF mutations");
+    dataFileC.setDateCreated(new Date());
+    dataFileC.setDateUpdated(new Date());
+    dataFileC.setDataSet(dataSetA);
+    dataFiles.add(dataFileC);
+
+    DataFile dataFileD = new DataFile();
+    dataFileD.setFilePath("/path/to/fileD");
+    dataFileD.setDataType("Gene copy number");
+    dataFileD.setDateCreated(new Date());
+    dataFileD.setDateUpdated(new Date());
+    dataFileD.setDataSet(dataSetB);
+    dataFiles.add(dataFileD);
+
+    DataFile dataFileE = new DataFile();
+    dataFileE.setFilePath("/path/to/fileE");
+    dataFileE.setDataType("Segment copy number");
+    dataFileE.setDateCreated(new Date());
+    dataFileE.setDateUpdated(new Date());
+    dataFileE.setDataSet(dataSetB);
+    dataFiles.add(dataFileE);
+    
+    dataFileRepository.insert(dataFiles);
+    
+    dataSetA.setDataFiles(Arrays.asList(dataFileA, dataFileB, dataFileC));
+    dataSetB.setDataFiles(Arrays.asList(dataFileD, dataFileE));
+    dataSetRepository.update(dataSetA);
+    dataSetRepository.update(dataSetB);
+    
+    // Subjects
+
+    List<Subject> subjects = new ArrayList<>();
+
+    Subject subjectA = new Subject();
+    subjectA.setName("SubjectA");
+    subjectA.setSpecies("Human");
+    subjectA.setGender("M");
+    subjectA.setNotes("This is an example subject");
+    subjectA.addAlias("subject_a");
+    subjectA.addAttribute("tag", "tagA");
+    subjects.add(subjectA);
+
+    Subject subjectB = new Subject();
+    subjectB.setName("SubjectB");
+    subjectB.setSpecies("Human");
+    subjectB.setGender("F");
+    subjectB.setNotes("This is an example subject");
+    subjectB.addAlias("subject_b");
+    subjectB.addAttribute("tag", "tagA");
+    subjects.add(subjectB);
+
+    Subject subjectC = new Subject();
+    subjectC.setName("SubjectC");
+    subjectC.setSpecies("Mouse");
+    subjectC.setGender("M");
+    subjectC.setNotes("This is an example subject");
+    subjectC.addAlias("subject_c");
+    subjectC.addAttribute("tag", "tagB");
+    subjects.add(subjectC);
+
+    Subject subjectD = new Subject();
+    subjectD.setName("SubjectD");
+    subjectD.setSpecies("Human");
+    subjectD.setGender("U");
+    subjectD.setNotes("This is an example subject");
+    subjectD.addAlias("subject_d");
+    subjectD.addAttribute("tag", "tagB");
+    subjects.add(subjectD);
+
+    Subject subjectE = new Subject();
+    subjectE.setName("SubjectE");
+    subjectE.setSpecies("Mouse");
+    subjectE.setGender("F");
+    subjectE.setNotes("This is an example subject");
+    subjectE.addAlias("subject_e");
+    subjectE.addAttribute("tag", "tagA");
+    subjects.add(subjectE);
+    
+    subjectRepository.insert(subjects);
+    
+    // Samples
+
+    List<Sample> samples = new ArrayList<>();
+
+    Sample sampleA = new Sample();
+    sampleA.setName("SampleA");
+    sampleA.setTissue("Lung");
+    sampleA.setHistology("carcinoma");
+    sampleA.setSampleType("cell line");
+    sampleA.setNotes("This is an example sample.");
+    sampleA.addAttribute("tag", "tagA");
+    sampleA.setSubject(subjectA);
+    sampleA.setDataSet(dataSetA);
+    samples.add(sampleA);
+
+    Sample sampleB = new Sample();
+    sampleB.setName("SampleB");
+    sampleB.setTissue("Liver");
+    sampleB.setHistology("carcinoma");
+    sampleB.setSampleType("cell line");
+    sampleB.setNotes("This is an example sample.");
+    sampleB.addAttribute("tag", "tagB");
+    sampleB.setSubject(subjectA);
+    sampleB.setDataSet(dataSetA);
+    samples.add(sampleB);
+
+    Sample sampleC = new Sample();
+    sampleC.setName("SampleC");
+    sampleC.setTissue("Liver");
+    sampleC.setHistology("carcinoma: HCC");
+    sampleC.setSampleType("PDX");
+    sampleC.setNotes("This is an example sample.");
+    sampleC.addAttribute("tag", "tagA");
+    sampleC.setSubject(subjectA);
+    sampleC.setDataSet(dataSetA);
+    samples.add(sampleC);
+
+    Sample sampleD = new Sample();
+    sampleD.setName("SampleD");
+    sampleD.setTissue("Breast");
+    sampleD.setHistology("ductal carcinoma");
+    sampleD.setSampleType("cell line");
+    sampleD.setNotes("This is an example sample.");
+    sampleD.addAttribute("tag", "tagA");
+    sampleD.setSubject(subjectB);
+    sampleD.setDataSet(dataSetA);
+    samples.add(sampleD);
+
+    Sample sampleE = new Sample();
+    sampleE.setName("SampleE");
+    sampleE.setTissue("Breast");
+    sampleE.setHistology("ductal carcinoma");
+    sampleE.setSampleType("PDX");
+    sampleE.setNotes("This is an example sample.");
+    sampleE.addAttribute("tag", "tagB");
+    sampleE.setSubject(subjectB);
+    sampleE.setDataSet(dataSetA);
+    samples.add(sampleE);
+    
+    sampleRepository.insert(samples);
+    
+    subjectA.setSamples(Arrays.asList(sampleA, sampleB, sampleC));
+    subjectB.setSamples(Arrays.asList(sampleD, sampleE));
+    subjectRepository.update(subjectA);
+    subjectRepository.update(subjectB);
+    
+    dataSetA.setSamples(samples);
+    dataSetRepository.update(dataSetA);
+    
+    // Gene Expression
+
+    List<GeneExpression> data = new ArrayList<>();
+
+    GeneExpression geneExpression = new GeneExpression();
+    geneExpression.setSample(sampleA);
+    geneExpression.setGene(geneA);
+    geneExpression.setDataFile(dataFileA);
+    geneExpression.setValue(1.23);
+    data.add(geneExpression);
+
+    geneExpression = new GeneExpression();
+    geneExpression.setSample(sampleA);
+    geneExpression.setGene(geneB);
+    geneExpression.setDataFile(dataFileA);
+    geneExpression.setValue(2.34);
+    data.add(geneExpression);
+
+    geneExpression = new GeneExpression();
+    geneExpression.setSample(sampleA);
+    geneExpression.setGene(geneC);
+    geneExpression.setDataFile(dataFileA);
+    geneExpression.setValue(4.56);
+    data.add(geneExpression);
+
+    geneExpression = new GeneExpression();
+    geneExpression.setSample(sampleB);
+    geneExpression.setGene(geneA);
+    geneExpression.setDataFile(dataFileA);
+    geneExpression.setValue(6.78);
+    data.add(geneExpression);
+
+    geneExpression = new GeneExpression();
+    geneExpression.setSample(sampleB);
+    geneExpression.setGene(geneB);
+    geneExpression.setDataFile(dataFileA);
+    geneExpression.setValue(9.10);
+    data.add(geneExpression);
+
+    geneExpression = new GeneExpression();
+    geneExpression.setSample(sampleB);
+    geneExpression.setGene(geneC);
+    geneExpression.setDataFile(dataFileA);
+    geneExpression.setValue(12.34);
+    data.add(geneExpression);
+    
+    geneExpressionRepository.insert(data);
+    
+  }
 
 }

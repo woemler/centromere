@@ -29,7 +29,6 @@ import com.blueprint.centromere.core.model.ModelSupport;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,7 +124,6 @@ public class MafReader extends StandardRecordFileReader<Mutation>
       return sampleMap.get(sampleName);
     }
 
-    Hibernate.initialize(dataFile.getDataSet());
     Sample sample = tcgaSupport.findSample(sampleName);
     if (sample == null) {
       sample = tcgaSupport.createSample(sampleName, dataFile.getDataSet());

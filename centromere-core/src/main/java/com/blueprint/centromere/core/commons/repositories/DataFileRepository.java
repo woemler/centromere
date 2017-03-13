@@ -17,12 +17,11 @@
 package com.blueprint.centromere.core.commons.repositories;
 
 import com.blueprint.centromere.core.commons.models.DataFile;
-import com.blueprint.centromere.core.model.ModelRepository;
+import com.blueprint.centromere.core.repository.ModelRepository;
 
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author woemler

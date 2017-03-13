@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors
+ * Copyright 2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,33 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.commons.models;
-
-import org.springframework.data.mongodb.core.mapping.Document;
+package com.blueprint.centromere.core.repository;
 
 /**
  * @author woemler
+ * @since 0.5.0
  */
-@Document
-public class GeneCopyNumber extends Data {
-	
-	private Double value;
-
-	public Double getValue() {
-		return value;
-	}
-
-	public void setValue(Double value) {
-		this.value = value;
-	}
+public enum Evaluation {
+  EQUALS,
+  IN,
+  NOT_EQUALS,
+  NOT_IN,
+  LIKE,
+  NOT_LIKE,
+  STARTS_WITH,
+  ENDS_WITH,
+  GREATER_THAN,
+  LESS_THAN,
+  GREATER_THAN_EQUALS,
+  LESS_THAN_EQUALS,
+  BETWEEN,
+  BETWEEN_INCLUSIVE,
+  OUTSIDE,
+  OUTSIDE_INCLUSIVE,
+  IS_NULL,
+  NOT_NULL,
+  IS_TRUE,
+  IS_FALSE
+  ;
+  
 }

@@ -17,20 +17,18 @@
 package com.blueprint.centromere.ws.controller;
 
 import com.blueprint.centromere.core.commons.repositories.MetadataOperations;
-import com.blueprint.centromere.core.model.ModelRepository;
-import com.querydsl.core.types.Predicate;
-
+import com.blueprint.centromere.core.repository.ModelRepository;
+import com.blueprint.centromere.core.repository.QueryCriteria;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
-import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.data.querydsl.binding.QuerydslBindingsFactory;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
-import org.springframework.data.querydsl.binding.QuerydslPredicateBuilder;
 import org.springframework.data.repository.support.Repositories;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.core.mapping.ResourceMetadata;
@@ -42,8 +40,6 @@ import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.rest.webmvc.RootResourceInformation;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
-import org.springframework.data.util.ClassTypeInformation;
-import org.springframework.data.util.TypeInformation;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
@@ -58,98 +54,68 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import javax.annotation.PostConstruct;
-
 /**
  * @author woemler
  */
 @RepositoryRestController
 public class ModelController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ModelController.class);
-    private static final String BASE_URL = "/{repository}";
+  private static final Logger logger = LoggerFactory.getLogger(ModelController.class);
+  private static final String BASE_URL = "/{repository}";
 
-    @Autowired private PagedResourcesAssembler pagedResourcesAssembler;
-    @Autowired private Repositories repositories;
-    @Autowired @Qualifier("defaultConversionService") private ConversionService conversionService;
-    @Autowired private RepositoryEntityLinks entityLinks;
-    @Autowired private RepositoryRestConfiguration config;
-    @Autowired private QuerydslBindingsFactory querydslBindingsFactory;
-    private QuerydslPredicateBuilder predicateBuilder;
-    
-    @PostConstruct
-    public void afterPropertiesSet(){
-        predicateBuilder = new QuerydslPredicateBuilder(conversionService, querydslBindingsFactory.getEntityPathResolver());
-    }
+  @Autowired private PagedResourcesAssembler pagedResourcesAssembler;
+  @Autowired private Repositories repositories;
+  @Autowired private RepositoryEntityLinks entityLinks;
+  @Autowired private RepositoryRestConfiguration config;
 
-    @SuppressWarnings("unchecked")
-    @RequestMapping(value = BASE_URL+"/guess", method = RequestMethod.GET)
-    public HttpEntity guess(
-        @QuerydslPredicate RootResourceInformation resourceInformation,
-        @RequestParam String keyword,
-        PersistentEntityResourceAssembler assembler
-    ) throws ResourceNotFoundException, HttpRequestMethodNotSupportedException {
 
-        Class<?> model = resourceInformation.getDomainType();
-        Object repo = repositories.getRepositoryFor(model);
-        if (repo == null || !(repo instanceof MetadataOperations)) throw new ResourceNotFoundException();
+  @SuppressWarnings("unchecked")
+  @RequestMapping(value = BASE_URL+"/guess", method = RequestMethod.GET)
+  public HttpEntity guess(
+      RootResourceInformation resourceInformation,
+      @RequestParam String keyword,
+      PersistentEntityResourceAssembler assembler
+  ) throws ResourceNotFoundException, HttpRequestMethodNotSupportedException {
 
-        List<Object> results = (List<Object>) ((MetadataOperations) repo).guess(keyword);
+      Class<?> model = resourceInformation.getDomainType();
+      Object repo = repositories.getRepositoryFor(model);
+      if (repo == null || !(repo instanceof MetadataOperations)) throw new ResourceNotFoundException();
 
-        Link baseLink = entityLinks.linkToPagedResource(resourceInformation.getDomainType(), null);
-        Resources<?> resources = toResources(results,resourceInformation.getDomainType(), assembler,  baseLink);
-        resources.add(getCollectionResourceLinks(resourceInformation));
+      List<Object> results = (List<Object>) ((MetadataOperations) repo).guess(keyword);
 
-        return new ResponseEntity<>(resources, HttpStatus.OK);
-    }
+      Link baseLink = entityLinks.linkToPagedResource(resourceInformation.getDomainType(), null);
+      Resources<?> resources = toResources(results,resourceInformation.getDomainType(), assembler,  baseLink);
+      resources.add(getCollectionResourceLinks(resourceInformation));
 
-    @SuppressWarnings("unchecked")
-    @RequestMapping(value = BASE_URL+"/distinct", method = RequestMethod.GET)
-    public HttpEntity distinct(
-        @QuerydslPredicate RootResourceInformation resourceInformation,
-        @RequestParam MultiValueMap<String, String> parameters
-    ) throws ResourceNotFoundException, NoSuchMethodException {
-        
-        if (!parameters.containsKey("field") || parameters.get("field").isEmpty() || 
-            parameters.get("field").get(0).trim().equals("")) {
-            throw new ResourceNotFoundException("Parameter 'field' not present.");
-        }
-        String field = parameters.get("field").get(0);
-        parameters.remove("field");
-        
-        Class<?> model = resourceInformation.getDomainType();
-        if (model == null) throw new ResourceNotFoundException();
-        TypeInformation<?> typeInfo = ClassTypeInformation.from(model);
-        
-        Object repo = repositories.getRepositoryFor(model);
-        if (repo == null || !(repo instanceof ModelRepository)) throw new ResourceNotFoundException();
-        ModelRepository repository = (ModelRepository) repo;
+      return new ResponseEntity<>(resources, HttpStatus.OK);
+  }
 
-        Class<? extends QuerydslBinderCustomizer<?>> customizer = null;
-        Method method = this.getClass().getMethod("distinct", RootResourceInformation.class, MultiValueMap.class);
-        for (Annotation[] annotations: method.getParameterAnnotations()){
-            for (Annotation annotation: annotations){
-                if (annotation instanceof QuerydslPredicate){
-                    customizer = (Class<? extends QuerydslBinderCustomizer<?>>) ((QuerydslPredicate) annotation).bindings();
-                }
-            }
-        }
-        
-        QuerydslBindings bindings = querydslBindingsFactory.createBindingsFor(customizer, typeInfo);
-        Predicate predicate = predicateBuilder.getPredicate(typeInfo, parameters, bindings);
-        Set<Object> distinct = repository.distinct(field, predicate);
-        
-        return new ResponseEntity<>(distinct, HttpStatus.OK);
+  @SuppressWarnings("unchecked")
+  @RequestMapping(value = BASE_URL+"/distinct", method = RequestMethod.GET)
+  public HttpEntity distinct(
+      @QuerydslPredicate RootResourceInformation resourceInformation,
+      @RequestParam MultiValueMap<String, String> parameters
+  ) throws ResourceNotFoundException, NoSuchMethodException {
+      
+      if (!parameters.containsKey("field") || parameters.get("field").isEmpty() || 
+          parameters.get("field").get(0).trim().equals("")) {
+          throw new ResourceNotFoundException("Parameter 'field' not present.");
+      }
+      String field = parameters.get("field").get(0);
+      parameters.remove("field");
+      
+      Class<?> model = resourceInformation.getDomainType();
+      if (model == null) throw new ResourceNotFoundException();
+      Object repo = repositories.getRepositoryFor(model);
+      if (repo == null || !(repo instanceof ModelRepository)) throw new ResourceNotFoundException();
+      ModelRepository repository = (ModelRepository) repo;
+      List<QueryCriteria> criterias = QueryUtils.getQueryCriteriaFromRequestParameters(model, parameters);
+      Set<Object> distinct =  repository.distinct(field, criterias);
+      
+      return new ResponseEntity<>(distinct, HttpStatus.OK);
 
-    }
+  }
+  
 
 //    @RequestMapping(value = BASE_URL+"/query", method = RequestMethod.GET)
 //    public HttpEntity dynamic(

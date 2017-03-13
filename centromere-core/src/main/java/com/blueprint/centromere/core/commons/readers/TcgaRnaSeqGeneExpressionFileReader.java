@@ -16,17 +16,13 @@
 
 package com.blueprint.centromere.core.commons.readers;
 
-import com.blueprint.centromere.core.commons.support.TcgaSupport;
 import com.blueprint.centromere.core.commons.models.DataFile;
 import com.blueprint.centromere.core.commons.models.Gene;
 import com.blueprint.centromere.core.commons.models.GeneExpression;
 import com.blueprint.centromere.core.commons.models.Sample;
-import com.blueprint.centromere.core.commons.models.Subject;
 import com.blueprint.centromere.core.commons.repositories.GeneRepository;
-import com.blueprint.centromere.core.commons.repositories.SampleRepository;
-import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
-import com.blueprint.centromere.core.config.ApplicationProperties;
+import com.blueprint.centromere.core.commons.support.TcgaSupport;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.MultiRecordLineFileReader;
 import com.blueprint.centromere.core.model.ModelSupport;
@@ -34,11 +30,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
-import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 
 /**
@@ -125,8 +118,7 @@ public class TcgaRnaSeqGeneExpressionFileReader
 		} else {
 			sample = tcgaSupport.findSample(sampleName);
 			if (sample == null){
-			  Hibernate.initialize(dataFile.getDataSet());
-				sample = tcgaSupport.createSample(sampleName, dataFile.getDataSet());
+			  sample = tcgaSupport.createSample(sampleName, dataFile.getDataSet());
 			}
 		}
 		return sample;

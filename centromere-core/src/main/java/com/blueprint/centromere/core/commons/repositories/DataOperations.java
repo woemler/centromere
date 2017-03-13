@@ -16,55 +16,34 @@
 
 package com.blueprint.centromere.core.commons.repositories;
 
-import com.google.common.reflect.TypeToken;
-
 import com.blueprint.centromere.core.model.Model;
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Ops;
-import com.querydsl.core.types.Path;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.PathBuilder;
-
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
-
+import com.blueprint.centromere.core.model.ModelSupport;
+import com.blueprint.centromere.core.repository.MongoOperationsAware;
 import java.util.List;
-import java.util.UUID;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 /**
  * @author woemler
  * @since 0.5.0
  */
 @SuppressWarnings("unchecked")
-public interface DataOperations<T extends Model<?>> {
+public interface DataOperations<T extends Model<?>> extends MongoOperationsAware, ModelSupport<T> {
 
-	default List<T> findByDataFileId(UUID dataFileId){
-		TypeToken<T> type = new TypeToken<T>(getClass()) {};
-		Class<T> model = (Class<T>) type.getRawType();
-		PathBuilder<T> pathBuilder = new PathBuilder<>(model, model.getSimpleName().toLowerCase());
-		Path path = pathBuilder.get("dataFileId");
-		Expression constant = Expressions.constant(dataFileId);
-		Predicate predicate = Expressions.predicate(Ops.EQ, path, constant);
-		return (List<T>) ((QueryDslPredicateExecutor) this).findAll(predicate);
+	default List<T> findByDataFileId(String dataFileId){
+		return getMongoOperations().find(new Query(Criteria.where("dataFileId").is(dataFileId)), this.getModel());
 	}
 
-	default List<T> findBySampleId(UUID sampleId){
-		TypeToken<T> type = new TypeToken<T>(getClass()) {};
-		Class<T> model = (Class<T>) type.getRawType();
-		PathBuilder<T> pathBuilder = new PathBuilder<>(model, model.getSimpleName().toLowerCase());
-		Path path = pathBuilder.get("sampleId");
-		Expression constant = Expressions.constant(sampleId);
-		Predicate predicate = Expressions.predicate(Ops.EQ, path, constant);
-		return (List<T>) ((QueryDslPredicateExecutor) this).findAll(predicate);
+	default List<T> findBySampleId(String sampleId){
+		return getMongoOperations().find(new Query(Criteria.where("sampleId").is(sampleId)), this.getModel());
 	}
 
-	default List<T> findByGeneId(UUID geneId){
-		TypeToken<T> type = new TypeToken<T>(getClass()) {};
-		Class<T> model = (Class<T>) type.getRawType();
-		PathBuilder<T> pathBuilder = new PathBuilder<>(model, model.getSimpleName().toLowerCase());
-		Path path = pathBuilder.get("geneId");
-		Expression constant = Expressions.constant(geneId);
-		Predicate predicate = Expressions.predicate(Ops.EQ, path, constant);
-		return (List<T>) ((QueryDslPredicateExecutor) this).findAll(predicate);
+	default List<T> findByGeneId(String geneId){
+		return getMongoOperations().find(new Query(Criteria.where("geneId").is(geneId)), this.getModel());
 	}
+
+	default List<T> findByDataSetId(String dataSetId){
+		return getMongoOperations().find(new Query(Criteria.where("dataSetId").is(dataSetId)), this.getModel());
+	}
+	
 }

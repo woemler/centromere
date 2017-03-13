@@ -17,12 +17,13 @@
 package com.blueprint.centromere.core.config;
 
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
+import com.blueprint.centromere.core.repository.MongoModelRepository;
+import com.blueprint.centromere.core.repository.MongoModelRepositoryFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 /**
  * @author woemler
@@ -43,11 +44,12 @@ public class ProfileConfiguration {
 		  return new TcgaSupport();
     }
 		
-		@Profile({ Database.GENERIC_JPA_PROFILE, Database.MYSQL_PROFILE })
+		@Profile({ Database.MONGODB_PROFILE, Database.EMBEDDED_MONGODB_PROFILE })
 		@Configuration
-		@EnableJpaRepositories(basePackages = { "com.blueprint.centromere.core.commons.repositories" })
-		@EnableTransactionManagement
-		public static class DefaultJpaSchemaConfiguration { }
+		@EnableMongoRepositories(basePackages = { "com.blueprint.centromere.core.commons.repositories" },
+				repositoryBaseClass = MongoModelRepository.class, 
+				repositoryFactoryBeanClass = MongoModelRepositoryFactoryBean.class)
+		public static class DefaultMongoSchemaConfiguration { }
 
 		@Profile({ Profiles.CLI_PROFILE })
 		@Configuration

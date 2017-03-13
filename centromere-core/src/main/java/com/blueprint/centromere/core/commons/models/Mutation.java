@@ -16,14 +16,14 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-import javax.persistence.Entity;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * TODO: add reference transcript and alternate transcript mutations
  *
  * @author woemler
  */
-@Entity
+@Document
 public class Mutation extends Data {
 	
 	private String chromosome;

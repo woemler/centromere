@@ -17,19 +17,11 @@
 package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
-
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OrderColumn;
-import javax.persistence.Table;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Model for representing a single biological sample taken from a {@link Subject} for experimentation.
@@ -38,32 +30,25 @@ import javax.persistence.Table;
  * 
  * @author woemler
  */
-@Entity
-@Table(indexes = { @Index(name = "SAMPLES_IDX_01", columnList = "name", unique = true) })
+@Document
 public class Sample extends AbstractModel implements Attributes {
 
-	private String name;
+	@Indexed(unique = true) private String name;
 	private String sampleType;
 	private String tissue;
 	private String histology;
 	private String notes;
 
-	@ElementCollection(fetch = FetchType.EAGER)
-	@OrderColumn
 	private Map<String, String> attributes = new HashMap<>();
 	
-	@ManyToOne
-	@JoinColumn(name = "subjectId")
-  private Subject subject;
+	@DBRef(lazy = true)
+	private Subject subject;
 
-	@Column(updatable = false, insertable = false)
 	private String subjectId;
 
-	@ManyToOne
-	@JoinColumn(name = "dataSetId")
+	@DBRef(lazy = true)
 	private DataSet dataSet;
 
-	@Column(updatable = false, insertable = false)
 	private String dataSetId;
 
 	public Subject getSubject() {
@@ -72,6 +57,7 @@ public class Sample extends AbstractModel implements Attributes {
 
 	public void setSubject(Subject subject) {
 		this.subject = subject;
+		this.subjectId = subject.getId();
 	}
 
 	public String getSubjectId() {
@@ -137,6 +123,7 @@ public class Sample extends AbstractModel implements Attributes {
 
 	public void setDataSet(DataSet dataSet) {
 		this.dataSet = dataSet;
+		this.dataSetId = dataSet.getId();
 	}
 
 	public String getDataSetId() {

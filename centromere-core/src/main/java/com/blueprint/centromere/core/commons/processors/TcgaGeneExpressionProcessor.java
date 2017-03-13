@@ -18,18 +18,15 @@ package com.blueprint.centromere.core.commons.processors;
 
 import com.blueprint.centromere.core.commons.models.GeneExpression;
 import com.blueprint.centromere.core.commons.readers.TcgaRnaSeqGeneExpressionFileReader;
-import com.blueprint.centromere.core.commons.repositories.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repositories.GeneRepository;
-import com.blueprint.centromere.core.commons.repositories.SampleRepository;
-import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
 import com.blueprint.centromere.core.commons.validators.GeneExpressionValidator;
 import com.blueprint.centromere.core.dataimport.DataTypes;
-import com.blueprint.centromere.core.dataimport.DelimtedTextFileWriter;
-import com.blueprint.centromere.core.dataimport.MySQLImportTempFileWriter;
-import com.blueprint.centromere.core.dataimport.MySqlImportFileImporter;
+import com.blueprint.centromere.core.dataimport.MongoImportTempFileImporter;
+import com.blueprint.centromere.core.dataimport.MongoImportTempFileWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,6 +40,7 @@ public class TcgaGeneExpressionProcessor extends CommonsDataProcessor<GeneExpres
     public TcgaGeneExpressionProcessor(
         TcgaSupport tcgaSupport,
         GeneRepository geneRepository,
+        MongoOperations mongoOperations,
         Environment environment
     ) {
       
@@ -55,17 +53,11 @@ public class TcgaGeneExpressionProcessor extends CommonsDataProcessor<GeneExpres
       
       this.setValidator(new GeneExpressionValidator());
       
-      MySQLImportTempFileWriter<GeneExpression> writer = new MySQLImportTempFileWriter<>(GeneExpression.class);
+      MongoImportTempFileWriter<GeneExpression> writer = new MongoImportTempFileWriter<>(mongoOperations);
       writer.setEnvironment(environment);
       this.setWriter(writer);
 
-      MySqlImportFileImporter importer = new MySqlImportFileImporter(
-          environment.getRequiredProperty("centromere.db.host"),
-          environment.getRequiredProperty("centromere.db.user"),
-          environment.getRequiredProperty("centromere.db.password"),
-          environment.getRequiredProperty("centromere.db.name")
-      );
-      importer.setEnvironment(environment);
+      MongoImportTempFileImporter<GeneExpression> importer = new MongoImportTempFileImporter<>(GeneExpression.class, environment);
       this.setImporter(importer);
 
       this.setModel(GeneExpression.class);

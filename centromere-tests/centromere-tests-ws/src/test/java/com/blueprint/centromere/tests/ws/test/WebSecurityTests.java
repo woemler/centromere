@@ -16,11 +16,18 @@
 
 package com.blueprint.centromere.tests.ws.test;
 
+import static com.jayway.jsonassert.impl.matcher.IsMapContainingKey.hasKey;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.blueprint.centromere.core.commons.models.User;
 import com.blueprint.centromere.core.commons.repositories.UserRepository;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.Security;
-import com.blueprint.centromere.tests.core.config.EmbeddedH2DataSourceConfig;
+import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
 import com.blueprint.centromere.tests.ws.test.WebSecurityTests.SpringBootSetup;
 import com.blueprint.centromere.ws.config.WebApplicationConfig;
 import com.blueprint.centromere.ws.security.BasicTokenUtils;
@@ -45,14 +52,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 
-import static com.jayway.jsonassert.impl.matcher.IsMapContainingKey.hasKey;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 /**
  * @author woemler
  */
@@ -70,7 +69,7 @@ public class WebSecurityTests {
 	private static boolean isConfigured = false;
 
 	@SpringBootApplication
-  @Import({ EmbeddedH2DataSourceConfig.class, WebApplicationConfig.class})
+  @Import({ EmbeddedMongoConfig.class, WebApplicationConfig.class})
 	public static class SpringBootSetup {
     public static void main(String[] args) {
       SpringApplication.run(SpringBootSetup.class, args);

@@ -17,12 +17,8 @@
 package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
-
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 /**
  * Base class for modeling processed genomic data.  Assumes that each record has an associated 
@@ -31,28 +27,30 @@ import javax.persistence.MappedSuperclass;
  * @author woemler
  * @since 0.4.3
  */
-@MappedSuperclass
 public abstract class Data extends AbstractModel {
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "sampleId")
+	@DBRef(lazy = true)
 	private Sample sample;
 
-	@Column(updatable = false, insertable = false)
+	@Indexed
 	private String sampleId;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "dataFileId")
+	@DBRef(lazy = true)
 	private DataFile dataFile;
 
-	@Column(updatable = false, insertable = false)
+	@Indexed
 	private String dataFileId;
+	
+	@DBRef(lazy = true)
+  private DataSet dataSet;
+	
+	@Indexed
+  private String dataSetId;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "geneId")
+	@DBRef(lazy = true)
 	private Gene gene;
 
-	@Column(updatable = false, insertable = false)
+	@Indexed
 	private String geneId;
 
 	public Sample getSample() {
@@ -61,6 +59,7 @@ public abstract class Data extends AbstractModel {
 
 	public void setSample(Sample sample) {
 		this.sample = sample;
+		this.sampleId = sample.getId();
 	}
 
 	public String getSampleId() {
@@ -77,6 +76,7 @@ public abstract class Data extends AbstractModel {
 
 	public void setDataFile(DataFile dataFile) {
 		this.dataFile = dataFile;
+		this.dataFileId = dataFile.getId();
 	}
 
 	public String getDataFileId() {
@@ -93,6 +93,7 @@ public abstract class Data extends AbstractModel {
 
 	public void setGene(Gene gene) {
 		this.gene = gene;
+		this.geneId = gene.getId();
 	}
 
 	public String getGeneId() {
@@ -102,4 +103,21 @@ public abstract class Data extends AbstractModel {
 	public void setGeneId(String geneId) {
 		this.geneId = geneId;
 	}
+
+  public DataSet getDataSet() {
+    return dataSet;
+  }
+
+  public void setDataSet(DataSet dataSet) {
+    this.dataSet = dataSet;
+    this.dataSetId = dataSet.getId();
+  }
+
+  public String getDataSetId() {
+    return dataSetId;
+  }
+
+  public void setDataSetId(String dataSetId) {
+    this.dataSetId = dataSetId;
+  }
 }

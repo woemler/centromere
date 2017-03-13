@@ -17,29 +17,17 @@
 package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OrderColumn;
-import javax.persistence.Table;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * @author woemler
  */
-@Entity
-@Table(indexes = {
-    @Index(name = "DATA_FILE_IDX_01", columnList = "dataType") ,
-    @Index(name = "DATA_FILE_IDX_02", columnList = "filePath", unique = true)
-})
+@Document
 public class DataFile extends AbstractModel implements Attributes {
 	
 	private String filePath;
@@ -50,15 +38,12 @@ public class DataFile extends AbstractModel implements Attributes {
 	
 	private Date dateUpdated;
 
-	@ManyToOne
-	@JoinColumn(name = "dataSetId")
+	@DBRef(lazy = true)
 	private DataSet dataSet;
 
-	@Column(updatable = false, insertable = false)
+	@Indexed
 	private String dataSetId;
-
-	@ElementCollection(fetch = FetchType.EAGER)
-	@OrderColumn
+	
 	private Map<String, String> attributes = new HashMap<>();
 	
 	/* Getters and Setters */ 
@@ -101,6 +86,7 @@ public class DataFile extends AbstractModel implements Attributes {
 
 	public void setDataSet(DataSet dataSet) {
 		this.dataSet = dataSet;
+		this.dataSetId = dataSet.getId();
 	}
 
 	public String getDataSetId() {

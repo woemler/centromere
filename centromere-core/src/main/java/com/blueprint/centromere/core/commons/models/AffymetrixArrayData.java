@@ -16,12 +16,10 @@
 
 package com.blueprint.centromere.core.commons.models;
 
-import javax.persistence.MappedSuperclass;
-
 /**
  * @author woemler
  */
-@MappedSuperclass
+
 public abstract class AffymetrixArrayData extends Data {
 	
 	private String probeSetId;

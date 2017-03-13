@@ -22,10 +22,11 @@ import com.blueprint.centromere.core.commons.repositories.GeneRepository;
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
 import com.blueprint.centromere.core.commons.validators.GeneExpressionValidator;
 import com.blueprint.centromere.core.dataimport.DataTypes;
-import com.blueprint.centromere.core.dataimport.MySQLImportTempFileWriter;
-import com.blueprint.centromere.core.dataimport.MySqlImportFileImporter;
+import com.blueprint.centromere.core.dataimport.MongoImportTempFileImporter;
+import com.blueprint.centromere.core.dataimport.MongoImportTempFileWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,6 +40,7 @@ public class MafMutationProcessor extends CommonsDataProcessor<Mutation> {
     public MafMutationProcessor(
         TcgaSupport tcgaSupport,
         GeneRepository geneRepository,
+        MongoOperations mongoOperations,
         Environment environment
     ) {
 
@@ -49,18 +51,11 @@ public class MafMutationProcessor extends CommonsDataProcessor<Mutation> {
       this.setReader(reader);
       
       this.setValidator(new GeneExpressionValidator());
-      
-      MySQLImportTempFileWriter<Mutation> writer = new MySQLImportTempFileWriter<>(Mutation.class);
-      writer.setEnvironment(environment);
-      this.setWriter(writer);
 
-      MySqlImportFileImporter importer = new MySqlImportFileImporter(
-          environment.getRequiredProperty("centromere.db.host"),
-          environment.getRequiredProperty("centromere.db.user"),
-          environment.getRequiredProperty("centromere.db.password"),
-          environment.getRequiredProperty("centromere.db.name")
-      );
-      importer.setEnvironment(environment);
+      MongoImportTempFileWriter<Mutation> writer = new MongoImportTempFileWriter<>(mongoOperations);
+      writer.setEnvironment(environment);
+
+      MongoImportTempFileImporter<Mutation> importer = new MongoImportTempFileImporter<>(Mutation.class, environment);
       this.setImporter(importer);
 
       this.setModel(Mutation.class);

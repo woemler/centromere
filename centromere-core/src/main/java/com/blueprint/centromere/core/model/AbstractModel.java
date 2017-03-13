@@ -16,22 +16,14 @@
 
 package com.blueprint.centromere.core.model;
 
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import org.springframework.data.annotation.Id;
 
 /**
  * @author woemler
  */
-@MappedSuperclass
 public abstract class AbstractModel implements Model<String> {
 	
-	@Id
-	@GeneratedValue(generator = "uuid")
-	@GenericGenerator(name = "uuid", strategy	=	"uuid2")
-	private String id;
+	@Id private String id;
 
 	@Override 
 	public String getId() {

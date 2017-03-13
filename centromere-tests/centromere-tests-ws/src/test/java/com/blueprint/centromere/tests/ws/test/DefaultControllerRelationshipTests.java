@@ -16,28 +16,23 @@
 
 package com.blueprint.centromere.tests.ws.test;
 
-import com.blueprint.centromere.core.commons.models.DataFile;
-import com.blueprint.centromere.core.commons.models.DataSet;
-import com.blueprint.centromere.core.commons.models.Gene;
-import com.blueprint.centromere.core.commons.models.GeneExpression;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.blueprint.centromere.core.commons.models.Sample;
 import com.blueprint.centromere.core.commons.models.Subject;
-import com.blueprint.centromere.core.commons.repositories.DataFileRepository;
-import com.blueprint.centromere.core.commons.repositories.DataSetRepository;
-import com.blueprint.centromere.core.commons.repositories.GeneExpressionRepository;
-import com.blueprint.centromere.core.commons.repositories.GeneRepository;
 import com.blueprint.centromere.core.commons.repositories.SampleRepository;
 import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.tests.core.config.EmbeddedH2DataSourceConfig;
-import com.blueprint.centromere.tests.core.model.DataFileGenerator;
-import com.blueprint.centromere.tests.core.model.DataSetGenerator;
-import com.blueprint.centromere.tests.core.model.EntrezGeneDataGenerator;
-import com.blueprint.centromere.tests.core.model.ExpressionDataGenerator;
-import com.blueprint.centromere.tests.core.model.SampleDataGenerator;
-import com.blueprint.centromere.tests.core.model.SubjectDataGenerator;
+import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
+import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
 import com.blueprint.centromere.ws.config.WebApplicationConfig;
-
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,27 +49,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.List;
-
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 /**
  * @author woemler
  */
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
 @SpringBootTest(classes = {
-		EmbeddedH2DataSourceConfig.class,
+		EmbeddedMongoConfig.class,
 		WebApplicationConfig.class
 })
 @ActiveProfiles({ "default", Profiles.WEB_PROFILE })
-public class DefaultControllerRelationshipTests {
+public class DefaultControllerRelationshipTests extends AbstractRepositoryTests {
 
 	private static final String SUBJECT_URL = "/api/subjects";
 	private static final String SAMPLE_URL = "/api/samples";
@@ -83,52 +68,14 @@ public class DefaultControllerRelationshipTests {
 	@Autowired private WebApplicationContext context;
 	@Autowired private SampleRepository sampleRepository;
 	@Autowired private SubjectRepository subjectRepository;
-	@Autowired private DataFileRepository dataFileRepository;
-	@Autowired private DataSetRepository dataSetRepository;
-	@Autowired private GeneRepository geneRepository;
-	@Autowired private GeneExpressionRepository geneExpressionRepository;
 
 	private MockMvc mockMvc;
-	private boolean isConfigured = false;
 
 	@Before
+	@Override
 	public void setup() throws Exception {
-		if (!isConfigured) {
-			doDelete();
-			doInsert();
-			isConfigured = true;
-		}
+		super.setup();
 		mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-	}
-	
-	private void doDelete(){
-		geneExpressionRepository.deleteAll();
-		geneRepository.deleteAll();
-		sampleRepository.deleteAll();
-		subjectRepository.deleteAll();
-		dataFileRepository.deleteAll();
-		dataSetRepository.deleteAll();
-	}
-	
-	private void doInsert() throws Exception{
-
-		List<DataSet> dataSets = DataSetGenerator.generateData();
-		dataSetRepository.save(dataSets);
-
-		List<DataFile> dataFiles = DataFileGenerator.generateData(dataSets);
-		dataFileRepository.save(dataFiles);
-
-		List<Subject> subjects = SubjectDataGenerator.generateData();
-		subjectRepository.save(subjects);
-
-		List<Sample> samples = SampleDataGenerator.generateData(subjects, dataSets.get(0));
-		sampleRepository.save(samples);
-
-		List<Gene> genes = EntrezGeneDataGenerator.generateData();
-		geneRepository.save(genes);
-
-		List<GeneExpression> data = ExpressionDataGenerator.generateData(samples, genes, dataFiles);
-		geneExpressionRepository.save(data);
 	}
 
 	@Test

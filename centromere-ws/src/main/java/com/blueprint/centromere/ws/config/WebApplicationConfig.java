@@ -20,7 +20,10 @@ import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.ws.controller.ModelController;
 import com.blueprint.centromere.ws.controller.UserAuthenticationController;
-
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -39,11 +42,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author woemler

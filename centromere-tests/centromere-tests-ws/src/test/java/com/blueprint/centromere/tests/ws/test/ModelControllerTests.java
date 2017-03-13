@@ -16,14 +16,19 @@
 
 package com.blueprint.centromere.tests.ws.test;
 
-import com.blueprint.centromere.core.commons.repositories.GeneExpressionRepository;
-import com.blueprint.centromere.core.commons.repositories.GeneRepository;
+import static org.hamcrest.Matchers.hasKey;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.tests.core.config.EmbeddedH2DataSourceConfig;
-import com.blueprint.centromere.tests.core.model.EntrezGeneDataGenerator;
+import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
+import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
 import com.blueprint.centromere.ws.config.WebApplicationConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,42 +41,31 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 /**
  * @author woemler
  */
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
 @SpringBootTest(classes = {
-		EmbeddedH2DataSourceConfig.class,
+		EmbeddedMongoConfig.class,
 		WebApplicationConfig.class
 })
 @ActiveProfiles({ "default", Profiles.WEB_PROFILE })
-public class ModelControllerTests {
+public class ModelControllerTests extends AbstractRepositoryTests {
 	
 	private static final String BASE_URL = "/api/genes";
 	
 	@Autowired private WebApplicationContext context;
-	@Autowired private GeneRepository geneRepository;
-	@Autowired private GeneExpressionRepository geneExpressionRepository;
 
 	private MockMvc mockMvc;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	
 	@Before
+  @Override
 	public void setup() throws Exception {
+		super.setup();
 		mockMvc = MockMvcBuilders.webAppContextSetup(context)
 				.build();
-		geneExpressionRepository.deleteAll();
-		geneRepository.deleteAll();
-		geneRepository.save(EntrezGeneDataGenerator.generateData());
 	}
 	
 	@Test

@@ -17,20 +17,13 @@
 package com.blueprint.centromere.core.commons.models;
 
 import com.blueprint.centromere.core.model.AbstractModel;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.persistence.CascadeType;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Index;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
-import javax.persistence.Table;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Model representation of an individual organism, such as a clinical subject or model animal.  A 
@@ -39,25 +32,22 @@ import javax.persistence.Table;
  * 
  * @author woemler
  */
-@Entity
-@Table(indexes = { @Index(name = "SUBJECT_IDX_01", columnList = "name", unique = true) })
+@Document
 public class Subject extends AbstractModel implements Attributes {
 	
-	private String name;
+	@Indexed(unique = true) private String name;
 	private String species;
 	private String gender;
 	private String notes;
 	
-	@ElementCollection(fetch = FetchType.EAGER)
-	@OrderColumn
 	private List<String> aliases = new ArrayList<>();
 
-	@ElementCollection(fetch = FetchType.EAGER)
-	@OrderColumn
 	private Map<String, String> attributes = new HashMap<>();
 	
-	@OneToMany(mappedBy = "subject", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	@DBRef(lazy = true)
 	private List<Sample> samples = new ArrayList<>();
+	
+	private List<String> sampleIds = new ArrayList<>();
 
 	public String getName() {
 		return name;
@@ -113,6 +103,10 @@ public class Subject extends AbstractModel implements Attributes {
 
 	public void setSamples(List<Sample> samples) {
 		this.samples = samples;
+		this.sampleIds = new ArrayList<>();
+		for (Sample sample: samples){
+		  this.sampleIds.add(sample.getId());
+    }
 	}
 
 	@Override
