@@ -47,6 +47,7 @@ import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,18 +77,15 @@ public class ModelController {
       @RequestParam String keyword,
       PersistentEntityResourceAssembler assembler
   ) throws ResourceNotFoundException, HttpRequestMethodNotSupportedException {
+    Class<?> model = resourceInformation.getDomainType();
+    Object repo = repositories.getRepositoryFor(model);
+    if (repo == null || !(repo instanceof MetadataOperations)) throw new ResourceNotFoundException();
+    List<Object> results = (List<Object>) ((MetadataOperations) repo).guess(keyword);
+    Link baseLink = entityLinks.linkToPagedResource(resourceInformation.getDomainType(), null);
+    Resources<?> resources = toResources(results, model, assembler,  baseLink);
+    resources.add(getCollectionResourceLinks(resourceInformation));
 
-      Class<?> model = resourceInformation.getDomainType();
-      Object repo = repositories.getRepositoryFor(model);
-      if (repo == null || !(repo instanceof MetadataOperations)) throw new ResourceNotFoundException();
-
-      List<Object> results = (List<Object>) ((MetadataOperations) repo).guess(keyword);
-
-      Link baseLink = entityLinks.linkToPagedResource(resourceInformation.getDomainType(), null);
-      Resources<?> resources = toResources(results,resourceInformation.getDomainType(), assembler,  baseLink);
-      resources.add(getCollectionResourceLinks(resourceInformation));
-
-      return new ResponseEntity<>(resources, HttpStatus.OK);
+    return new ResponseEntity<>(resources, HttpStatus.OK);
   }
 
   @SuppressWarnings("unchecked")
@@ -97,22 +95,22 @@ public class ModelController {
       @RequestParam MultiValueMap<String, String> parameters
   ) throws ResourceNotFoundException, NoSuchMethodException {
       
-      if (!parameters.containsKey("field") || parameters.get("field").isEmpty() || 
-          parameters.get("field").get(0).trim().equals("")) {
-          throw new ResourceNotFoundException("Parameter 'field' not present.");
-      }
-      String field = parameters.get("field").get(0);
-      parameters.remove("field");
-      
-      Class<?> model = resourceInformation.getDomainType();
-      if (model == null) throw new ResourceNotFoundException();
-      Object repo = repositories.getRepositoryFor(model);
-      if (repo == null || !(repo instanceof ModelRepository)) throw new ResourceNotFoundException();
-      ModelRepository repository = (ModelRepository) repo;
-      List<QueryCriteria> criterias = QueryUtils.getQueryCriteriaFromRequestParameters(model, parameters);
-      Set<Object> distinct =  repository.distinct(field, criterias);
-      
-      return new ResponseEntity<>(distinct, HttpStatus.OK);
+    if (!parameters.containsKey("field") || parameters.get("field").isEmpty() ||
+        parameters.get("field").get(0).trim().equals("")) {
+        throw new ResourceNotFoundException("Parameter 'field' not present.");
+    }
+    String field = parameters.get("field").get(0);
+    parameters.remove("field");
+
+    Class<?> model = resourceInformation.getDomainType();
+    if (model == null) throw new ResourceNotFoundException();
+    Object repo = repositories.getRepositoryFor(model);
+    if (repo == null || !(repo instanceof ModelRepository)) throw new ResourceNotFoundException();
+    ModelRepository repository = (ModelRepository) repo;
+    List<QueryCriteria> criterias = QueryUtils.getQueryCriteriaFromRequestParameters(model, parameters);
+    Set<Object> distinct =  repository.distinct(field, criterias);
+
+    return new ResponseEntity<>(distinct, HttpStatus.OK);
 
   }
   
@@ -224,38 +222,46 @@ public class ModelController {
 //
 //    }
     
-    @SuppressWarnings("unchecked")
-    protected Resources<?> toPagedResources(Page<?> page, Class<?> model, 
-        PersistentEntityResourceAssembler assembler, Link baseLink){
-        if (page.getContent().isEmpty()) return pagedResourcesAssembler.toEmptyResource(page, model, baseLink);
-        else if (baseLink != null) return pagedResourcesAssembler.toResource(page, assembler, baseLink);
-        else return pagedResourcesAssembler.toResource(page, assembler);
-    }
-    
-    @SuppressWarnings("unchecked")
-    protected Resources<?> toResources(Collection<?> records, Class<?> model, 
-        PersistentEntityResourceAssembler assembler, Link baseLink){
-        Link selfLink = new Link(ServletUriComponentsBuilder.fromCurrentRequest().build().toUriString());
-        if (records.isEmpty()) return new Resources<>(Collections.EMPTY_LIST, selfLink);
-        List<Resource<?>> resources = new ArrayList<>();
-        for (Object record: records){
-            if (record != null) {
-                resources.add(assembler.toResource(record));
-            }
-        }
-        return new Resources<>(resources, selfLink);
-    }
+  @SuppressWarnings("unchecked")
+  protected Resources<?> toPagedResources(
+      Page<?> page,
+      Class<?> model,
+      PersistentEntityResourceAssembler assembler,
+      Link baseLink
+  ){
+    if (page.getContent().isEmpty()) return pagedResourcesAssembler.toEmptyResource(page, model, baseLink);
+    else if (baseLink != null) return pagedResourcesAssembler.toResource(page, assembler, baseLink);
+    else return pagedResourcesAssembler.toResource(page, assembler);
+  }
 
-    protected List<Link> getCollectionResourceLinks(RootResourceInformation resourceInformation) {
-        ResourceMetadata metadata = resourceInformation.getResourceMetadata();
-        SearchResourceMappings searchMappings = metadata.getSearchResourceMappings();
-        List<Link> links = new ArrayList<>();
-        links.add(new Link(ProfileController.getPath(this.config, metadata), ProfileResourceProcessor.PROFILE_REL));
-        if (searchMappings.isExported()) {
-            links.add(entityLinks.linkFor(metadata.getDomainType()).slash(searchMappings.getPath())
-                .withRel(searchMappings.getRel()));
-        }
-        return links;
+  @SuppressWarnings("unchecked")
+  protected Resources<?> toResources(
+      Collection<?> records,
+      Class<?> model,
+      PersistentEntityResourceAssembler assembler,
+      Link baseLink
+  ){
+    Link selfLink = new Link(ServletUriComponentsBuilder.fromCurrentRequest().build().toUriString());
+    if (records.isEmpty()) return new Resources<>(Collections.EMPTY_LIST, selfLink);
+    List<Resource<?>> resources = new ArrayList<>();
+    for (Object record: records){
+      if (record != null) {
+        resources.add(assembler.toResource(record));
+      }
     }
+    return new Resources<>(resources, selfLink);
+  }
+
+  protected List<Link> getCollectionResourceLinks(RootResourceInformation resourceInformation) {
+    ResourceMetadata metadata = resourceInformation.getResourceMetadata();
+    SearchResourceMappings searchMappings = metadata.getSearchResourceMappings();
+    List<Link> links = new ArrayList<>();
+    links.add(new Link(ProfileController.getPath(this.config, metadata), ProfileResourceProcessor.PROFILE_REL));
+    if (searchMappings.isExported()) {
+      links.add(entityLinks.linkFor(metadata.getDomainType()).slash(searchMappings.getPath())
+          .withRel(searchMappings.getRel()));
+    }
+    return links;
+  }
 
 }

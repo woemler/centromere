@@ -45,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.util.Assert;
 
 /**
@@ -357,6 +358,7 @@ public abstract class AbstractControllerTests extends AbstractRepositoryTests {
 		mockMvc.perform(put(BASE_URL + "/{id}", gene.getId())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsBytes(gene)))
+				.andDo(MockMvcResultHandlers.print())
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasKey("primaryReferenceId")))
 				.andExpect(jsonPath("$.primaryReferenceId", is("1")))

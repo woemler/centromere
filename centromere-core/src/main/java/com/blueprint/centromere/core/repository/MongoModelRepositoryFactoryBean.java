@@ -32,6 +32,10 @@ import org.springframework.data.repository.core.support.RepositoryFactorySupport
 public class MongoModelRepositoryFactoryBean<R extends MongoRepository<T, ID>, T, ID extends Serializable> 
     extends MongoRepositoryFactoryBean<R, T, ID> {
 
+  public MongoModelRepositoryFactoryBean(Class<? extends R> repositoryInterface) {
+    super(repositoryInterface);
+  }
+
   @Override
   protected RepositoryFactorySupport getFactoryInstance(MongoOperations operations) {
     return new MongoModelRepositoryFactory<>(operations);

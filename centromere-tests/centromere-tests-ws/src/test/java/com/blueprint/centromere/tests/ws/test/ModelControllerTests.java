@@ -24,7 +24,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.blueprint.centromere.core.commons.repositories.GeneRepository;
 import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
 import com.blueprint.centromere.ws.config.WebApplicationConfig;
@@ -32,9 +34,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.data.mapping.context.MappingContext;
+import org.springframework.data.mapping.context.PersistentEntities;
+import org.springframework.data.util.TypeInformation;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -50,12 +58,16 @@ import org.springframework.web.context.WebApplicationContext;
 		EmbeddedMongoConfig.class,
 		WebApplicationConfig.class
 })
-@ActiveProfiles({ "default", Profiles.WEB_PROFILE })
+@ActiveProfiles({ Profiles.WEB_PROFILE, Security.NONE_PROFILE})
 public class ModelControllerTests extends AbstractRepositoryTests {
 	
 	private static final String BASE_URL = "/api/genes";
 	
 	@Autowired private WebApplicationContext context;
+	@Autowired private PersistentEntities entities;
+	@Autowired private ApplicationContext applicationContext;
+	@Autowired private GeneRepository geneRepository;
+
 
 	private MockMvc mockMvc;
 	private final ObjectMapper objectMapper = new ObjectMapper();
@@ -67,10 +79,19 @@ public class ModelControllerTests extends AbstractRepositoryTests {
 		mockMvc = MockMvcBuilders.webAppContextSetup(context)
 				.build();
 	}
+
+	@Test
+  public void test(){
+    for (MappingContext<?, ?> context : BeanFactoryUtils
+        .beansOfTypeIncludingAncestors(applicationContext, MappingContext.class).values()) {
+      System.out.println(context.toString());
+    }
+
+  }
 	
 	@Test
 	public void guessTest() throws Exception {
-		mockMvc.perform(get(BASE_URL + "/guess?keyword=abc"))
+		mockMvc.perform(get(BASE_URL + "/guess?keyword=ABC"))
 				.andExpect(status().isOk())
 				.andDo(print())
 				.andExpect(jsonPath("$", hasKey("_embedded")))

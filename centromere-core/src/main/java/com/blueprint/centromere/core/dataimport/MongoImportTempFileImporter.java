@@ -55,7 +55,7 @@ public class MongoImportTempFileImporter<T extends Model<?>> implements RecordIm
     String[] commands = new String[]{ "/bin/bash", "-c", buildImportCommand(filePath) }; // TODO: Support for Windows and other shells
     try {
 
-      logger.debug(String.format("[CENTROMERE] Importing file to MongoDB: %s", filePath));
+      logger.debug(String.format("Importing file to MongoDB: %s", filePath));
       for (String cmd: commands) {
         logger.debug(cmd);
       }

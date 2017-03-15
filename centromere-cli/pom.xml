@@ -11,7 +11,6 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>centromere-cli</artifactId>
-  <version>0.5.0-SNAPSHOT</version>
   <name>Centromere Command Line Interface</name>
   <packaging>jar</packaging>
 
@@ -51,17 +50,17 @@
     </repository>
   </distributionManagement>
 
-  <properties>
-    <centromere.version>0.5.0-SNAPSHOT</centromere.version>
-    <json-path.version>1.2.0</json-path.version>
-  </properties>
+  <!--<properties>-->
+    <!--<centromere.version>0.5.0-SNAPSHOT</centromere.version>-->
+    <!--<json-path.version>1.2.0</json-path.version>-->
+  <!--</properties>-->
 
   <dependencies>
 
     <dependency>
       <groupId>com.blueprint</groupId>
       <artifactId>centromere-core</artifactId>
-      <version>${centromere.version}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -77,44 +76,44 @@
 
     <!-- Testing -->
 
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.springframework.boot</groupId>-->
+      <!--<artifactId>spring-boot-starter-test</artifactId>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>com.h2database</groupId>-->
+      <!--<artifactId>h2</artifactId>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-test</artifactId>
-      <version>4.0.1.RELEASE</version>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.springframework.security</groupId>-->
+      <!--<artifactId>spring-security-test</artifactId>-->
+      <!--<version>4.0.1.RELEASE</version>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>com.jayway.jsonpath</groupId>
-      <artifactId>json-path</artifactId>
-      <version>${json-path.version}</version>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>com.jayway.jsonpath</groupId>-->
+      <!--<artifactId>json-path</artifactId>-->
+      <!--<version>${json-path.version}</version>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>com.jayway.jsonpath</groupId>
-      <artifactId>json-path-assert</artifactId>
-      <version>${json-path.version}</version>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>com.jayway.jsonpath</groupId>-->
+      <!--<artifactId>json-path-assert</artifactId>-->
+      <!--<version>${json-path.version}</version>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
 
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-tomcat</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.springframework.boot</groupId>-->
+      <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
 
   </dependencies>
 
