@@ -29,6 +29,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
+import org.springframework.data.mongodb.repository.support.QueryDslMongoRepository;
 import org.springframework.data.mongodb.repository.support.SimpleMongoRepository;
 
 /**
@@ -36,8 +37,8 @@ import org.springframework.data.mongodb.repository.support.SimpleMongoRepository
  * @since 0.5.0
  */
 public class MongoModelRepository<T extends Model<ID>, ID extends Serializable> 
-    extends SimpleMongoRepository<T, ID>
-    implements ModelRepository<T, ID>, MongoOperationsAware {
+    extends QueryDslMongoRepository<T, ID>
+    implements ModelRepository<T, ID> {
 
   private final MongoOperations mongoOperations;
   private final MongoEntityInformation<T, ID> metadata;
@@ -48,60 +49,6 @@ public class MongoModelRepository<T extends Model<ID>, ID extends Serializable>
     this.mongoOperations = mongoOperations;
     this.metadata = metadata;
     this.model = metadata.getJavaType();
-  }
-
-  /**
-   * Searches for all records that satisfy the requested criteria.
-   *
-   * @param queryCriterias {@link QueryCriteria}
-   * @return all matching {@code T} records.
-   */
-  @Override
-  public Iterable<T> find(Iterable<QueryCriteria> queryCriterias) {
-    Criteria criteria = getQueryFromQueryCriteria(queryCriterias);
-    Query query = new Query();
-    if (criteria != null){
-      query.addCriteria(criteria);
-    }
-    return mongoOperations.find(query, model);
-  }
-
-  /**
-   * Searches for all records that satisfy the requested criteria, and returns them in the
-   * requested order.
-   *
-   * @param queryCriterias {@link QueryCriteria}
-   * @param sort {@link Sort}
-   * @return all matching {@code T} records.
-   */
-  @Override
-  public Iterable<T> find(Iterable<QueryCriteria> queryCriterias, Sort sort) {
-    Criteria criteria = getQueryFromQueryCriteria(queryCriterias);
-    Query query = new Query();
-    if (criteria != null){
-      query.addCriteria(criteria);
-    }
-    return mongoOperations.find(query.with(sort), model);
-  }
-
-  /**
-   * Searches for all records that satisfy the requested criteria, and returns them as a paged
-   * collection.
-   *
-   * @param queryCriterias {@link QueryCriteria}
-   * @param pageable {@link Pageable}
-   * @return {@link Page} containing the desired set of records.
-   */
-  @Override
-  public Page<T> find(Iterable<QueryCriteria> queryCriterias, Pageable pageable) {
-    Criteria criteria = getQueryFromQueryCriteria(queryCriterias);
-    Query query = new Query();
-    if (criteria != null){
-      query.addCriteria(criteria);
-    }
-    List<T> entities = mongoOperations.find(query.with(pageable), model);
-    long count = count(queryCriterias);
-    return new PageImpl<>(entities, pageable, count);
   }
 
   /**
@@ -133,89 +80,6 @@ public class MongoModelRepository<T extends Model<ID>, ID extends Serializable>
       this.update(entity);
     }
     return entities;
-  }
-
-  @Override
-  public MongoOperations getMongoOperations() {
-    return mongoOperations;
-  }
-
-  protected Criteria getQueryFromQueryCriteria(Iterable<QueryCriteria> queryCriterias){
-    List<Criteria> criteriaList = new ArrayList<>();
-    for (QueryCriteria queryCriteria: queryCriterias){
-      Criteria criteria = null;
-      if (queryCriteria != null) {
-        switch (queryCriteria.getEvaluation()) {
-          case EQUALS:
-            criteria = new Criteria(queryCriteria.getKey()).is(queryCriteria.getValue());
-            break;
-          case NOT_EQUALS:
-            criteria = new Criteria(queryCriteria.getKey()).not().is(queryCriteria.getValue());
-            break;
-          case IN:
-            criteria = new Criteria(queryCriteria.getKey()).in((Collection) queryCriteria.getValue());
-            break;
-          case NOT_IN:
-            criteria = new Criteria(queryCriteria.getKey()).nin((Collection) queryCriteria.getValue());
-            break;
-          case IS_NULL:
-            criteria = new Criteria(queryCriteria.getKey()).is(null);
-            break;
-          case NOT_NULL:
-            criteria = new Criteria(queryCriteria.getKey()).not().is(null);
-            break;
-          case GREATER_THAN:
-            criteria = new Criteria(queryCriteria.getKey()).gt(queryCriteria.getValue());
-            break;
-          case GREATER_THAN_EQUALS:
-            criteria = new Criteria(queryCriteria.getKey()).gte(queryCriteria.getValue());
-            break;
-          case LESS_THAN:
-            criteria = new Criteria(queryCriteria.getKey()).lt(queryCriteria.getValue());
-            break;
-          case LESS_THAN_EQUALS:
-            criteria = new Criteria(queryCriteria.getKey()).lte(queryCriteria.getValue());
-            break;
-          case BETWEEN:
-            criteria = new Criteria().andOperator(
-                Criteria.where(queryCriteria.getKey()).gt(((List) queryCriteria.getValue()).get(0)),
-                Criteria.where(queryCriteria.getKey()).lt(((List) queryCriteria.getValue()).get(1)));
-            break;
-          case OUTSIDE:
-            criteria = new Criteria().orOperator(
-                Criteria.where(queryCriteria.getKey()).lt(((List) queryCriteria.getValue()).get(0)),
-                Criteria.where(queryCriteria.getKey()).gt(((List) queryCriteria.getValue()).get(1)));
-            break;
-          case BETWEEN_INCLUSIVE:
-            criteria = new Criteria().andOperator(
-                Criteria.where(queryCriteria.getKey()).gte(((List) queryCriteria.getValue()).get(0)),
-                Criteria.where(queryCriteria.getKey()).lte(((List) queryCriteria.getValue()).get(1)));
-            break;
-          case OUTSIDE_INCLUSIVE:
-            criteria = new Criteria().orOperator(
-                Criteria.where(queryCriteria.getKey()).lte(((List) queryCriteria.getValue()).get(0)),
-                Criteria.where(queryCriteria.getKey()).gte(((List) queryCriteria.getValue()).get(1)));
-            break;
-          case LIKE:
-            criteria = new Criteria(queryCriteria.getKey()).regex((String) queryCriteria.getValue());
-            break;
-          case NOT_LIKE:
-            // TODO
-            break;
-          case STARTS_WITH:
-            criteria = new Criteria(queryCriteria.getKey()).regex("^" + queryCriteria.getValue());
-            break;
-          case ENDS_WITH:
-            criteria = new Criteria(queryCriteria.getKey()).regex(queryCriteria.getValue() + "$");
-            break;
-          default:
-            criteria = new Criteria(queryCriteria.getKey()).is(queryCriteria.getValue());
-        }
-        criteriaList.add(criteria);
-      }
-    }
-    return criteriaList.size() > 0 ?
-        new Criteria().andOperator(criteriaList.toArray(new Criteria[]{})) : null;
   }
 
   /**

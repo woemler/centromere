@@ -18,9 +18,12 @@ package com.blueprint.centromere.core.commons.repositories;
 
 import com.blueprint.centromere.core.commons.models.User;
 import com.blueprint.centromere.core.repository.ModelRepository;
-import com.blueprint.centromere.core.repository.MongoOperationsAware;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Ops;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.core.types.dsl.StringPath;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,17 +33,16 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
  * @since 0.5.0
  */
 @RepositoryRestResource(path = "users", collectionResourceRel = "users", exported = false)
-public interface UserRepository extends ModelRepository<User, String>, UserDetailsService,
-    MongoOperationsAware {
+public interface UserRepository extends ModelRepository<User, String>, UserDetailsService {
 
 	@Override 
 	default User loadUserByUsername(String username) throws UsernameNotFoundException {
-		Query query = new Query(Criteria.where("username").is(username));
-		User user = getMongoOperations().findOne(query, getModel());
-		if (user == null){
-		  throw new UsernameNotFoundException("User not found: " + username);
-    }
+		PathBuilder<User> pathBuilder = new PathBuilder<>(User.class, "user");
+		StringPath stringPath = pathBuilder.getString("username");
+		Expression<String> constant = Expressions.constant(username);
+		Predicate predicate = Expressions.predicate(Ops.EQ, stringPath, constant);
+		User user = this.findOne(predicate);
+		if (user == null) throw new UsernameNotFoundException(String.format("Cannot find user: %s", username));
 		return user;
-		
 	}
 }

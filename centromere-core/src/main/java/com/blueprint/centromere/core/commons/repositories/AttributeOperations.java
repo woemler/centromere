@@ -18,28 +18,41 @@ package com.blueprint.centromere.core.commons.repositories;
 
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
-import com.blueprint.centromere.core.repository.MongoOperationsAware;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Ops;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.MapPath;
+import com.querydsl.core.types.dsl.PathBuilder;
 import java.util.List;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
 /**
  * @author woemler
  */
 public interface AttributeOperations<T extends Model<?>> 
-    extends MongoOperationsAware, ModelSupport<T> {
+    extends ModelSupport<T>, QueryDslPredicateExecutor<T> {
 
 	@SuppressWarnings("unchecked")
 	default List<T> findWithAttribute(@Param("name") String name){
-    Query query = new Query(Criteria.where("attributes." + name).exists(true));
-		return this.getMongoOperations().find(query, this.getModel());
+		PathBuilder<T> pathBuilder = new PathBuilder<>(this.getModel(),
+				this.getModel().getSimpleName().toLowerCase());
+		MapPath<String, String, PathBuilder<String>> mapPath
+				= pathBuilder.getMap("attributes", String.class, String.class);
+		Predicate predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE, mapPath.containsKey(name));
+		return (List<T>) ((QueryDslPredicateExecutor) this).findAll(predicate);
 	}
 
 	@SuppressWarnings("unchecked")
 	default List<T> findByAttribute(@Param("name") String name, @Param("value") String value){
-    Query query = new Query(Criteria.where("attributes." + name).is(value));
-    return this.getMongoOperations().find(query, this.getModel());
+    PathBuilder<T> pathBuilder = new PathBuilder<>(this.getModel(),
+        this.getModel().getSimpleName().toLowerCase());
+    MapPath<String, String, PathBuilder<String>> mapPath
+        = pathBuilder.getMap("attributes", String.class, String.class);
+    Expression<String> constant = Expressions.constant(value);
+    Predicate predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE, mapPath.get(name), constant);
+    return (List<T>) ((QueryDslPredicateExecutor) this).findAll(predicate);
 	}
 
 }

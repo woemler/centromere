@@ -17,33 +17,16 @@
 package com.blueprint.centromere.core.commons.repositories;
 
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.model.ModelSupport;
-import com.blueprint.centromere.core.repository.MongoOperationsAware;
 import java.util.List;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 
 /**
  * @author woemler
  * @since 0.5.0
  */
 @SuppressWarnings("unchecked")
-public interface DataOperations<T extends Model<?>> extends MongoOperationsAware, ModelSupport<T> {
-
-	default List<T> findByDataFileId(String dataFileId){
-		return getMongoOperations().find(new Query(Criteria.where("dataFileId").is(dataFileId)), this.getModel());
-	}
-
-	default List<T> findBySampleId(String sampleId){
-		return getMongoOperations().find(new Query(Criteria.where("sampleId").is(sampleId)), this.getModel());
-	}
-
-	default List<T> findByGeneId(String geneId){
-		return getMongoOperations().find(new Query(Criteria.where("geneId").is(geneId)), this.getModel());
-	}
-
-	default List<T> findByDataSetId(String dataSetId){
-		return getMongoOperations().find(new Query(Criteria.where("dataSetId").is(dataSetId)), this.getModel());
-	}
-	
+public interface DataOperations<T extends Model<?>> {
+	List<T> findByDataFileId(String dataFileId);
+	List<T> findBySampleId(String sampleId);
+	List<T> findByGeneId(String geneId);
+	List<T> findByDataSetId(String dataSetId);
 }

@@ -16,6 +16,8 @@
 
 package com.blueprint.centromere.core.repository;
 
+import com.querydsl.core.types.Path;
+
 /**
  * POJO that describes a model query parameter, used when reflecting {@link com.blueprint.centromere.core.model.Model}
  *   classes and mapping HTTP requests to {@link QueryCriteria}.
@@ -25,35 +27,35 @@ package com.blueprint.centromere.core.repository;
  */
 public class QueryParameterDescriptor {
 
-  private String paramName;
-  private String fieldName;
+  private String name;
+  private Path path;
   private Class<?> type;
   private Evaluation evaluation;
 
   public QueryParameterDescriptor() { }
 
-  public QueryParameterDescriptor(String paramName, String fieldName, Class<?> type,
+  public QueryParameterDescriptor(String name, Path path, Class<?> type,
       Evaluation evaluation) {
-    this.paramName = paramName;
-    this.fieldName = fieldName;
+    this.name = name;
+    this.path = path;
     this.type = type;
     this.evaluation = evaluation;
   }
 
-  public String getParamName() {
-    return paramName;
+  public String getName() {
+    return name;
   }
 
-  public void setParamName(String paramName) {
-    this.paramName = paramName;
+  public void setName(String name) {
+    this.name = name;
   }
 
-  public String getFieldName() {
-    return fieldName;
+  public Path getPath() {
+    return path;
   }
 
-  public void setFieldName(String fieldName) {
-    this.fieldName = fieldName;
+  public void setPath(Path path) {
+    this.path = path;
   }
 
   public Class<?> getType() {
@@ -72,17 +74,13 @@ public class QueryParameterDescriptor {
     this.evaluation = evaluation;
   }
 
-  public QueryCriteria createQueryCriteria(Object value){
-    return new QueryCriteria(fieldName, value, evaluation);
-  }
-
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return "QueryParameterDescriptor{" +
-        "paramName='" + paramName + '\'' +
-        ", fieldName='" + fieldName + '\'' +
+        "name='" + name + '\'' +
+        ", path=" + path +
         ", type=" + type +
         ", evaluation=" + evaluation +
         '}';
   }
-
 }
