@@ -20,15 +20,14 @@ import com.blueprint.centromere.core.exceptions.QueryParameterException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
 import com.google.common.collect.Iterables;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.ListPath;
 import com.querydsl.core.types.dsl.MapPath;
 import com.querydsl.core.types.dsl.NumberPath;
-import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.core.types.dsl.SimplePath;
 import com.querydsl.core.types.dsl.StringPath;
 import java.io.Serializable;
@@ -44,7 +43,6 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
@@ -212,13 +210,22 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
    */
   <S extends T> Iterable<S> update(Iterable<S> entities);
 
+  /**
+   * Converts one or more {@link QueryCriteria} objects into a Querydsl {@link Predicate} for 
+   *   query execution.
+   * 
+   * @param queryCriterias
+   * @return
+   */
   default Predicate getPredicateFromQueryCriteria(Iterable<QueryCriteria> queryCriterias){
-    PathBuilder<T> pathBuilder = new PathBuilder(this.getModel(), this.getModel().getSimpleName());
-    List<BooleanExpression> expressions = new ArrayList<>();
-    for (QueryCriteria queryCriteria: queryCriterias) {
-      BooleanExpression expression = null;
 
-      Path path = pathBuilder.get(queryCriteria.getKey());
+    BooleanBuilder builder = new BooleanBuilder();
+    
+    for (QueryCriteria queryCriteria: queryCriterias) {
+      
+      BooleanExpression expression = null;
+      Path path = queryCriteria.getPath();
+        
       if (path instanceof StringPath) {
         StringPath p = (StringPath) path;
         switch (queryCriteria.getEvaluation()) {
@@ -272,11 +279,10 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
         SimplePath p = (SimplePath) path;
         expression = p.eq(queryCriteria.getValue());
       }
-      if (expression != null) expressions.add(expression);
+      if (expression != null) builder.and(expression);
     }
-    BooleanExpression[] predicates = new BooleanExpression[expressions.size()];
-    predicates = expressions.toArray(predicates);
-    return Expressions.allOf(predicates);
+    
+    return builder.getValue();
 
   }
 

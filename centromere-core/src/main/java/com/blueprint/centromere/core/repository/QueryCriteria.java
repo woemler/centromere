@@ -16,6 +16,8 @@
 
 package com.blueprint.centromere.core.repository;
 
+import com.querydsl.core.types.Path;
+
 /**
  * Simple representation of a database query evaluation that can be passed to generic 
  * {@link ModelRepository} implementations.
@@ -26,17 +28,20 @@ public class QueryCriteria {
 
   private String key;
   private Object value;
+  private Path path;
   private Evaluation evaluation;
   
-  public QueryCriteria(String key, Object value, Evaluation evaluation) {
+  public QueryCriteria(String key, Object value, Path path, Evaluation evaluation) {
     this.key = key;
     this.value = value;
+    this.path = path;
     this.evaluation = evaluation;
   }
 
-  public QueryCriteria(String key, Object value) {
+  public QueryCriteria(String key, Object value, Path path) {
     this.key = key;
     this.value = value;
+    this.path = path;
     this.evaluation = Evaluation.EQUALS;
   }
 
@@ -59,6 +64,14 @@ public class QueryCriteria {
     this.value = value;
   }
 
+  public Path getPath() {
+    return path;
+  }
+
+  public void setPath(Path path) {
+    this.path = path;
+  }
+
   public Evaluation getEvaluation() {
     return evaluation;
   }
@@ -72,6 +85,7 @@ public class QueryCriteria {
     return "QueryCriteria{" +
         "key='" + key + '\'' +
         ", value=" + value +
+        ", path=" + path.toString() +
         ", evaluation=" + evaluation +
         '}';
   }

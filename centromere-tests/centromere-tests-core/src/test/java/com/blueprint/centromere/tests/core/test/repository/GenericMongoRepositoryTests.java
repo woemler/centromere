@@ -21,7 +21,16 @@ import com.blueprint.centromere.core.commons.repositories.DataFileRepository;
 import com.blueprint.centromere.core.commons.repositories.GeneRepository;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
-import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
+import com.blueprint.centromere.tests.core.config.MongoDataSourceConfig;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Ops;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.ListPath;
+import com.querydsl.core.types.dsl.MapPath;
+import com.querydsl.core.types.dsl.PathBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,11 +49,13 @@ import org.springframework.util.Assert;
  * @author woemler
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { EmbeddedMongoConfig.class })
+@SpringBootTest(classes = { MongoDataSourceConfig.class })
 public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
   @Autowired private GeneRepository geneRepository;
   @Autowired private DataFileRepository dataFileRepository;
+  
+  private static final Class<Gene> model = Gene.class;
 
   @Test
   public void findOneByBadIdTest(){
@@ -95,16 +106,31 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   }
 
   @Test
-  public void filteredCountTest(){
-    QueryCriteria criteria = new QueryCriteria("geneType", "protein-coding");
+  public void filteredCountQueryCriteriaTest(){
+    Path<Gene> root = Expressions.path(model, model.getSimpleName());
+    QueryCriteria criteria = new QueryCriteria("geneType", "protein-coding", 
+        Expressions.stringPath(root, "geneType"));
     long count = geneRepository.count(Collections.singleton(criteria));
     Assert.notNull(count);
     Assert.isTrue(count == 3L);
   }
 
   @Test
-  public void findBySimpleCriteriaTest(){
-    QueryCriteria criteria = new QueryCriteria("primaryGeneSymbol", "GeneB");
+  public void filteredCountPredicateTest(){
+    Path<Gene> entity = Expressions.path(model, model.getSimpleName().toLowerCase());
+    Path<String> attribute = Expressions.stringPath(entity, "geneType");
+    Expression<String> variable = Expressions.constant("protein-coding");
+    Predicate predicate = Expressions.predicate(Ops.EQ, attribute, variable);
+    long count = geneRepository.count(predicate);
+    Assert.notNull(count);
+    Assert.isTrue(count == 3L);
+  }
+
+  @Test
+  public void findBySimpleParamQueryCriteriaTest(){
+    Path<Gene> root = Expressions.path(model, model.getSimpleName());
+    QueryCriteria criteria = new QueryCriteria("primaryGeneSymbol", "GeneB", 
+        Expressions.stringPath(root, "primaryGeneSymbol"));
     List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singletonList(criteria));
     Assert.notNull(genes);
     Assert.notEmpty(genes);
@@ -118,11 +144,35 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   }
 
   @Test
-  public void findByMultipleCriteriaTest(){
+  public void findBySimpleParamPredicateTest(){
+
+    Path<Gene> entity = Expressions.path(model, model.getSimpleName().toLowerCase());
+    Path<String> attribute = Expressions.stringPath(entity, "primaryGeneSymbol");
+    Expression<String> variable = Expressions.constant("GeneB");
+    Predicate predicate = Expressions.predicate(Ops.EQ, attribute, variable);
+
+    List<Gene> genes = (List<Gene>) geneRepository.findAll(predicate);
+    Assert.notNull(genes);
+    Assert.notEmpty(genes);
+    Assert.isTrue(genes.size() == 1);
+
+    Gene gene = genes.get(0);
+    Assert.notNull(gene);
+    Assert.isTrue(gene.getPrimaryReferenceId().equals("2"));
+    Assert.isTrue("GeneB".equals(gene.getPrimaryGeneSymbol()));
+
+  }
+
+
+  @Test
+  public void findByMultipleParamsQueryCriteriaTest(){
 
     List<QueryCriteria> criterias = new ArrayList<>();
-    criterias.add(new QueryCriteria("geneType", "protein-coding"));
-    criterias.add(new QueryCriteria("chromosome", "5"));
+    Path<Gene> root = Expressions.path(model, model.getSimpleName());
+    criterias.add(new QueryCriteria("geneType", "protein-coding", 
+        Expressions.stringPath(root, "geneType")));
+    criterias.add(new QueryCriteria("chromosome", "5", 
+        Expressions.stringPath(root, "chromosome")));
 
     List<Gene> genes = (List<Gene>) geneRepository.find(criterias);
     Assert.notNull(genes);
@@ -137,9 +187,36 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   }
 
   @Test
-  public void findByNestedArrayCriteriaTest(){
+  public void findByMultipleParamsPredicateTest(){
 
-    QueryCriteria criteria = new QueryCriteria("aliases", "DEF");
+    BooleanBuilder builder = new BooleanBuilder();
+    Path<Gene> entity = Expressions.path(model, model.getSimpleName().toLowerCase());
+    Path<String> attribute1 = Expressions.stringPath(entity, "geneType");
+    Expression<String> variable1 = Expressions.constant("protein-coding");
+    Predicate predicate1 = Expressions.predicate(Ops.EQ, attribute1, variable1);
+    Path<String> attribute2 = Expressions.stringPath(entity, "chromosome");
+    Expression<String> variable2 = Expressions.constant("5");
+    Predicate predicate2 = Expressions.predicate(Ops.EQ, attribute2, variable2);
+    builder.and(predicate1).and(predicate2);
+
+    List<Gene> genes = (List<Gene>) geneRepository.findAll(builder.getValue());
+    Assert.notNull(genes);
+    Assert.notEmpty(genes);
+    Assert.isTrue(genes.size() == 1);
+
+    Gene gene = genes.get(0);
+    Assert.notNull(gene);
+    Assert.isTrue(gene.getPrimaryReferenceId().equals("2"));
+    Assert.isTrue("GeneB".equals(gene.getPrimaryGeneSymbol()));
+
+  }
+
+  @Test
+  public void findByNestedArrayParamsQueryCriteriaTest(){
+
+    PathBuilder<Gene> pathBuilder = new PathBuilder<>(model, model.getSimpleName());
+    QueryCriteria criteria = new QueryCriteria("aliases", "DEF", 
+        pathBuilder.getList("aliases", String.class));
   
     List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singletonList(criteria));
     Assert.notNull(genes);
@@ -155,11 +232,58 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   }
 
   @Test
-  public void findByNestedObjectCriteriaTest(){
+  public void findByNestedArrayParamsPredicateTest(){
 
-    QueryCriteria criteria = new QueryCriteria("attributes.isKinase", "Y");
+    PathBuilder<Gene> pathBuilder = new PathBuilder<>(model, model.getSimpleName().toLowerCase());
+    ListPath<String, PathBuilder<String>> attribute = pathBuilder.getList("aliases", String.class);
+    Expression<String> variable = Expressions.constant("DEF");
+    Predicate predicate = Expressions.predicate(Ops.EQ, attribute.any(), variable);
+
+    List<Gene> genes = (List<Gene>) geneRepository.findAll(predicate);
+    Assert.notNull(genes);
+    Assert.notEmpty(genes);
+    Assert.isTrue(genes.size() == 1);
+
+    Gene gene = genes.get(0);
+    Assert.notNull(gene);
+    Assert.isTrue(gene.getPrimaryReferenceId().equals("2"));
+    Assert.isTrue("GeneB".equals(gene.getPrimaryGeneSymbol()));
+    Assert.isTrue("DEF".equals(gene.getAliases().get(0)));
+
+  }
+
+  @Test
+  public void findByNestedObjectParamsQueryCriteriaTest(){
+
+    PathBuilder<Gene> pathBuilder = new PathBuilder<>(model, model.getSimpleName());
+    QueryCriteria criteria = new QueryCriteria("attributes.isKinase", "Y", 
+        pathBuilder.getMap("attributes", String.class, String.class));
     
     List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singletonList(criteria));
+    Assert.notNull(genes);
+    Assert.notEmpty(genes);
+    Assert.isTrue(genes.size() == 2);
+
+    Gene gene = genes.get(0);
+    Assert.notNull(gene);
+    Assert.isTrue(gene.getPrimaryReferenceId().equals("1"));
+    Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
+    Assert.isTrue(gene.getAttributes().size() == 1);
+    Assert.isTrue(gene.getAttributes().containsKey("isKinase"));
+    Assert.isTrue("Y".equals(gene.getAttributes().get("isKinase")));
+
+  }
+
+  @Test
+  public void findByNestedObjectParamsPredicateTest(){
+
+    PathBuilder<Gene> pathBuilder = new PathBuilder<>(model, model.getSimpleName().toLowerCase());
+    MapPath<String, String, PathBuilder<String>> attribute
+        = pathBuilder.getMap("attributes", String.class, String.class);
+    Expression<String> variable = Expressions.constant("Y");
+    Predicate predicate = Expressions.predicate(Ops.EQ, attribute.get("isKinase"), variable);
+
+    List<Gene> genes = (List<Gene>) geneRepository.findAll(predicate);
     Assert.notNull(genes);
     Assert.notEmpty(genes);
     Assert.isTrue(genes.size() == 2);
@@ -184,10 +308,11 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     Assert.isTrue(genes.get(0).getPrimaryReferenceId().equals("5"));
   }
 
-
   @Test
   public void findAndSortTest(){
-    QueryCriteria criteria = new QueryCriteria("geneType", "protein-coding");
+    Path<Gene> root = Expressions.path(model, model.getSimpleName());
+    QueryCriteria criteria = new QueryCriteria("geneType", "protein-coding", 
+        Expressions.stringPath(root, "geneType"));
     Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "primaryReferenceId"));
     List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singletonList(criteria), sort);
     Assert.notNull(genes);
@@ -217,12 +342,39 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   }
 
   @Test
-  public void findByCriteriaPagedTest(){
-    
-    QueryCriteria criteria = new QueryCriteria("geneType", "protein-coding");
+  public void findByParamsQueryCriteriaPagedTest(){
+
+    Path<Gene> root = Expressions.path(model, model.getSimpleName());
+    QueryCriteria criteria = new QueryCriteria("geneType", "protein-coding", 
+        Expressions.stringPath(root, "geneType"));
 
     PageRequest pageRequest = new PageRequest(1, 2);
     Page<Gene> page = geneRepository.find(Collections.singletonList(criteria), pageRequest);
+    Assert.notNull(page);
+    Assert.isTrue(page.getTotalElements() == 3);
+    Assert.isTrue(page.getTotalPages() == 2);
+
+    List<Gene> genes = page.getContent();
+    Assert.notNull(genes);
+    Assert.notEmpty(genes);
+    Assert.isTrue(genes.size() == 1);
+
+    Gene gene = genes.get(0);
+    Assert.notNull(gene);
+    Assert.isTrue(gene.getPrimaryReferenceId().equals("4"));
+
+  }
+
+  @Test
+  public void findByParamsPredicatePagedTest(){
+
+    Path<Gene> entity = Expressions.path(model, model.getSimpleName().toLowerCase());
+    Path<String> attribute = Expressions.stringPath(entity, "geneType");
+    Expression<String> variable = Expressions.constant("protein-coding");
+    Predicate predicate = Expressions.predicate(Ops.EQ, attribute, variable);
+
+    PageRequest pageRequest = new PageRequest(1, 2);
+    Page<Gene> page = geneRepository.findAll(predicate, pageRequest);
     Assert.notNull(page);
     Assert.isTrue(page.getTotalElements() == 3);
     Assert.isTrue(page.getTotalPages() == 2);
@@ -389,8 +541,10 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   }
 
   @Test
-  public void distinctQueryTest(){
-    QueryCriteria criteria = new QueryCriteria("geneType", "protein-coding");
+  public void distinctQueryCriteriaTest(){
+    Path<Gene> root = Expressions.path(model, model.getSimpleName());
+    QueryCriteria criteria = new QueryCriteria("geneType", "protein-coding", 
+        Expressions.stringPath(root, "geneType"));
     Set<Object> geneSymbols = geneRepository.distinct("primaryGeneSymbol", 
         Collections.singletonList(criteria));
     Assert.notNull(geneSymbols);
@@ -399,25 +553,38 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     Assert.isTrue(geneSymbols.contains("GeneD"));
   }
 
+  @Test
+  public void distinctQueryPredicateTest(){
+    Path<Gene> entity = Expressions.path(model, model.getSimpleName().toLowerCase());
+    Path<String> attribute = Expressions.stringPath(entity, "geneType");
+    Expression<String> variable = Expressions.constant("protein-coding");
+    Predicate predicate = Expressions.predicate(Ops.EQ, attribute, variable);
+    Set<Object> geneSymbols = geneRepository.distinct("primaryGeneSymbol", predicate);
+    Assert.notNull(geneSymbols);
+    Assert.notEmpty(geneSymbols);
+    Assert.isTrue(geneSymbols.size() == 3);
+    Assert.isTrue(geneSymbols.contains("GeneD"));
+
+  }
 
   @Test
   public void guessGeneTest() throws Exception {
 
-    List<Gene> genes = (List<Gene>) geneRepository.guess("GeneA");
+    List<Gene> genes = geneRepository.guess("GeneA");
     Assert.notNull(genes);
     Assert.notEmpty(genes);
 
     Gene gene = genes.get(0);
     Assert.isTrue(gene.getPrimaryReferenceId().equals("1"));
 
-    genes = (List<Gene>) geneRepository.guess("MNO");
+    genes = geneRepository.guess("MNO");
     Assert.notNull(genes);
     Assert.notEmpty(genes);
 
     gene = genes.get(0);
     Assert.isTrue(gene.getPrimaryReferenceId().equals("5"));
 
-    genes = (List<Gene>) geneRepository.guess("XYZ");
+    genes = geneRepository.guess("XYZ");
     Assert.isTrue(genes.size() == 0);
 
   }

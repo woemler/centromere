@@ -13,7 +13,7 @@ import com.blueprint.centromere.core.commons.repositories.GeneRepository;
 import com.blueprint.centromere.core.commons.repositories.SampleRepository;
 import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
 import com.blueprint.centromere.core.dataimport.DelimtedTextFileWriter;
-import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
+import com.blueprint.centromere.tests.core.config.MongoDataSourceConfig;
 import com.blueprint.centromere.tests.core.model.DataFileGenerator;
 import com.blueprint.centromere.tests.core.model.DataSetGenerator;
 import com.blueprint.centromere.tests.core.model.EntrezGeneDataGenerator;
@@ -33,7 +33,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author woemler
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { EmbeddedMongoConfig.class })
+@SpringBootTest(classes = { MongoDataSourceConfig.class })
 public class TempFileWriterTests {
 
   @Autowired private SampleRepository sampleRepository;

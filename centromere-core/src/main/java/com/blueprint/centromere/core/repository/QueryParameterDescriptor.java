@@ -16,7 +16,17 @@
 
 package com.blueprint.centromere.core.repository;
 
+import com.blueprint.centromere.core.model.Model;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.PathBuilder;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 /**
  * POJO that describes a model query parameter, used when reflecting {@link com.blueprint.centromere.core.model.Model}
@@ -83,4 +93,70 @@ public class QueryParameterDescriptor {
         ", evaluation=" + evaluation +
         '}';
   }
+
+  /**
+   * Inspects a {@link Model} class and returns all of the available and acceptable query parameter
+   *   definitions, as a map of parameter names and {@link QueryParameterDescriptor} objects.
+   *
+   * @param model
+   * @return
+   */
+  public static Map<String,QueryParameterDescriptor> getModelQueryDescriptors(Class<?> model){
+
+    Map<String,QueryParameterDescriptor> paramMap = new HashMap<>();
+    PathBuilder<?> pathBuilder = new PathBuilder<>(model, model.getSimpleName());
+    Path root = Expressions.path(model, model.getSimpleName());
+    Class<?> currentClass = model;
+
+    while (currentClass.getSuperclass() != null) {
+
+      for (Field field : currentClass.getDeclaredFields()) {
+
+        String fieldName = field.getName();
+        String paramName = fieldName;
+        Class<?> type = field.getType();
+        Class<?> paramType = type;
+        Path path = null;
+
+        if (field.isSynthetic() || field.isAnnotationPresent(Transient.class))
+          continue;
+        if (field.isAnnotationPresent(RestResource.class)) {
+          RestResource restResource = field.getAnnotation(RestResource.class);
+          if (!restResource.exported())
+            continue;
+        }
+
+        if (type.equals(String.class)){
+          path = Expressions.stringPath(root, fieldName);
+        } else if (Number.class.isAssignableFrom(type)) {
+          // TODO
+          //path = pathBuilder.getNumber(fieldName, Number.class);
+        } else if (Map.class.isAssignableFrom(type)){
+          ParameterizedType pType = (ParameterizedType) field.getGenericType();
+          Class<?> keyType = pType.getActualTypeArguments()[0].getClass();
+          Class<?> valueType = pType.getActualTypeArguments()[1].getClass();
+          path = pathBuilder.getMap(fieldName, keyType, valueType);
+          paramType = valueType;
+        } else if (Collection.class.isAssignableFrom(type)) {
+          ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+          paramType = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+          path = pathBuilder.getList(fieldName, paramType);
+        }
+
+        QueryParameterDescriptor descriptor = new QueryParameterDescriptor();
+        descriptor.setName(paramName);
+        descriptor.setType(paramType);
+        descriptor.setPath(path);
+        descriptor.setEvaluation(Evaluation.EQUALS);
+        paramMap.put(paramName, descriptor);
+
+      }
+
+      currentClass = currentClass.getSuperclass();
+
+    }
+
+    return paramMap;
+  }
+  
 }
