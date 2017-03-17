@@ -29,6 +29,7 @@ import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
+import com.blueprint.centromere.tests.core.config.MongoDataSourceConfig;
 import com.blueprint.centromere.ws.config.WebApplicationConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
@@ -55,7 +56,7 @@ import org.springframework.web.context.WebApplicationContext;
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
 @SpringBootTest(classes = {
-		EmbeddedMongoConfig.class,
+		MongoDataSourceConfig.class,
 		WebApplicationConfig.class
 })
 @ActiveProfiles({ Profiles.WEB_PROFILE, Security.NONE_PROFILE})
@@ -67,7 +68,6 @@ public class ModelControllerTests extends AbstractRepositoryTests {
 	@Autowired private PersistentEntities entities;
 	@Autowired private ApplicationContext applicationContext;
 	@Autowired private GeneRepository geneRepository;
-
 
 	private MockMvc mockMvc;
 	private final ObjectMapper objectMapper = new ObjectMapper();

@@ -4,6 +4,8 @@ import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.Evaluation;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.core.repository.QueryParameterDescriptor;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathBuilder;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.security.InvalidParameterException;
@@ -91,20 +93,20 @@ public class QueryUtils {
     logger.info(String.format("Generating QueryCriteria for request parameters: model=%s params=%s",
         model.getName(), parameters.toString()));
     List<QueryCriteria> criteriaList = new ArrayList<>();
-    Map<String, QueryParameterDescriptor> paramMap = getAvailableQueryParameters(model);
+    Map<String, QueryParameterDescriptor> paramMap =
+        QueryParameterDescriptor.getModelQueryDescriptors(model);
     for (Map.Entry<String, List<String>> entry: parameters.entrySet()){
       String paramName = entry.getKey();
       String[] paramValue = entry.getValue().get(0).split(",");
       if (excludedParameters.contains(paramName)) continue;
       if (paramMap.containsKey(paramName)) {
         QueryParameterDescriptor descriptor = paramMap.get(paramName);
-        QueryCriteria criteria = createCriteriaFromRequestParameter(descriptor.getFieldName(),
-            paramValue, descriptor.getType(), descriptor.getEvaluation());
+        QueryCriteria criteria = createCriteriaFromRequestParameter(descriptor.getName(),
+            paramValue, descriptor, descriptor.getEvaluation());
         criteriaList.add(criteria);
       } else {
-        logger.warn(String
-            .format("Unable to map request parameter to available model parameters: %s",
-                paramName));
+        logger.warn(String.format("Unable to map request parameter to available model "
+                + "parameters: %s", paramName));
         throw new InvalidParameterException("Invalid request parameter: " + paramName);
       }
     }
@@ -113,126 +115,68 @@ public class QueryUtils {
   }
 
   /**
-   * Inspects a {@link Model} class and returns all of the available and acceptable query parameter
-   *   definitions, as a map of parameter names and {@link QueryParameterDescriptor} objects.
-   *
-   * @param model
-   * @return
-   */
-  public static Map<String,QueryParameterDescriptor> getAvailableQueryParameters(
-      Class<?> model, 
-      boolean recursive
-  ){
-    
-    Map<String,QueryParameterDescriptor> paramMap = new HashMap<>();
-    
-    for (Field field: model.getDeclaredFields()){
-      
-      String fieldName = field.getName();
-      Class<?> type = field.getType();
-      
-      if (Collection.class.isAssignableFrom(field.getType())){
-        ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-        type = (Class<?>) parameterizedType.getActualTypeArguments()[0];
-      }
-      
-      if (field.isSynthetic() || field.isAnnotationPresent(Transient.class)) continue;
-      if (field.isAnnotationPresent(RestResource.class)){
-        RestResource restResource = field.getAnnotation(RestResource.class);
-        if (!restResource.exported()) continue;
-      }
-      
-      if (field.isAnnotationPresent(DBRef.class)){
-        
-        if (!recursive) continue;
-        
-        DBRef dbRef = field.getAnnotation(DBRef.class);
-        String relField = fieldName;
-        Class<?> relType = field.getType();
-        if (Collection.class.isAssignableFrom(relType)){
-          ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-          relType = (Class<?>) parameterizedType.getActualTypeArguments()[0];
-        }
-        
-        Map<String,QueryParameterDescriptor> foreignModelMap = getAvailableQueryParameters(relType, false);
-        for(QueryParameterDescriptor descriptor: foreignModelMap.values()){
-          String newParamName = relField + "." + descriptor.getParamName();
-          descriptor.setParamName(newParamName);
-          paramMap.put(newParamName, descriptor);
-        }
-        
-      } else {
-        paramMap.put(fieldName, new QueryParameterDescriptor(fieldName, fieldName, type, Evaluation.EQUALS));
-      }
-      
-    }
-    return paramMap;
-  }
-
-  public static Map<String,QueryParameterDescriptor> getAvailableQueryParameters(Class<?> model) {
-    return getAvailableQueryParameters(model, true);
-  }
-
-  /**
    * Creates a {@link QueryCriteria} object based upon a request parameter and {@link Evaluation}
    *   value.
    *
    * @param param
-   * @param values
-   * @param type
+   * @param descriptor
    * @param evaluation
+   * @param values
    * @return
    */
   public static QueryCriteria createCriteriaFromRequestParameter(
-      String param, 
-      Object[] values, 
-      Class<?> type, 
+      String param,
+      Object[] values,
+      QueryParameterDescriptor descriptor,
       Evaluation evaluation
   ){
     logger.debug(String.format("Generating QueryCriteria object for query string parameter: "
-        + "param=%s values=%s type=%s eval=%s", param, values.toString(), type.getName(), evaluation.toString()));
+        + "param=%s values=%s type=%s eval=%s", param, values.toString(), descriptor.getType(),
+        evaluation.toString()));
+    Class<?> type = descriptor.getType();
+    Path path = descriptor.getPath();
     if (evaluation.equals(Evaluation.EQUALS) && values.length > 1) evaluation = Evaluation.IN;
     switch (evaluation){
-      case EQUALS:
-        return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.EQUALS);
+      case EQUALS :
+        return new QueryCriteria(param, convertParameter(values[0], type), path, Evaluation.EQUALS);
       case NOT_EQUALS:
-        return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.NOT_EQUALS);
+        return new QueryCriteria(param, convertParameter(values[0], type), path, Evaluation.NOT_EQUALS);
       case IN:
-        return new QueryCriteria(param, convertParameterArray(values, type), Evaluation.IN);
+        return new QueryCriteria(param, convertParameterArray(values, type), path, Evaluation.IN);
       case NOT_IN:
-        return new QueryCriteria(param, Arrays.asList(values), Evaluation.NOT_IN);
+        return new QueryCriteria(param, Arrays.asList(values), path, Evaluation.NOT_IN);
       case IS_NULL:
-        return new QueryCriteria(param, true, Evaluation.IS_NULL);
+        return new QueryCriteria(param, true, path, Evaluation.IS_NULL);
       case NOT_NULL:
-        return new QueryCriteria(param, true, Evaluation.NOT_NULL);
+        return new QueryCriteria(param, true, path, Evaluation.NOT_NULL);
       case IS_TRUE:
-        return new QueryCriteria(param, true, Evaluation.IS_TRUE);
+        return new QueryCriteria(param, true, path, Evaluation.IS_TRUE);
       case IS_FALSE:
-        return new QueryCriteria(param, true, Evaluation.IS_FALSE);
+        return new QueryCriteria(param, true, path, Evaluation.IS_FALSE);
       case GREATER_THAN:
-        return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.GREATER_THAN);
+        return new QueryCriteria(param, convertParameter(values[0], type), path, Evaluation.GREATER_THAN);
       case GREATER_THAN_EQUALS:
-        return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.GREATER_THAN_EQUALS);
+        return new QueryCriteria(param, convertParameter(values[0], type), path, Evaluation.GREATER_THAN_EQUALS);
       case LESS_THAN:
-        return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.LESS_THAN);
+        return new QueryCriteria(param, convertParameter(values[0], type), path, Evaluation.LESS_THAN);
       case LESS_THAN_EQUALS:
-        return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.LESS_THAN_EQUALS);
+        return new QueryCriteria(param, convertParameter(values[0], type), path, Evaluation.LESS_THAN_EQUALS);
       case BETWEEN:
         return new QueryCriteria(param, Arrays.asList(convertParameter(values[0], type),
-            convertParameter(values[1], type)), Evaluation.BETWEEN);
+            convertParameter(values[1], type)), path, Evaluation.BETWEEN);
       case OUTSIDE:
         return new QueryCriteria(param, Arrays.asList(convertParameter(values[0], type),
-            convertParameter(values[1], type)), Evaluation.OUTSIDE);
+            convertParameter(values[1], type)), path, Evaluation.OUTSIDE);
       case BETWEEN_INCLUSIVE:
         return new QueryCriteria(param, Arrays.asList(convertParameter(values[0], type),
-            convertParameter(values[1], type)), Evaluation.BETWEEN_INCLUSIVE);
+            convertParameter(values[1], type)), path, Evaluation.BETWEEN_INCLUSIVE);
       case OUTSIDE_INCLUSIVE:
         return new QueryCriteria(param, Arrays.asList(convertParameter(values[0], type),
-            convertParameter(values[1], type)), Evaluation.OUTSIDE_INCLUSIVE);
+            convertParameter(values[1], type)), path, Evaluation.OUTSIDE_INCLUSIVE);
       case STARTS_WITH:
-        return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.STARTS_WITH);
+        return new QueryCriteria(param, convertParameter(values[0], type), path, Evaluation.STARTS_WITH);
       case ENDS_WITH:
-        return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.ENDS_WITH);
+        return new QueryCriteria(param, convertParameter(values[0], type), path, Evaluation.ENDS_WITH);
       default:
         return null;
     }

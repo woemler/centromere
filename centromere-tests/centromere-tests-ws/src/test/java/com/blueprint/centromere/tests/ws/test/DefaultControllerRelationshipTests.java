@@ -29,8 +29,10 @@ import com.blueprint.centromere.core.commons.models.Subject;
 import com.blueprint.centromere.core.commons.repositories.SampleRepository;
 import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
 import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
+import com.blueprint.centromere.tests.core.config.MongoDataSourceConfig;
 import com.blueprint.centromere.ws.config.WebApplicationConfig;
 import java.util.List;
 import org.junit.Before;
@@ -55,10 +57,10 @@ import org.springframework.web.context.WebApplicationContext;
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
 @SpringBootTest(classes = {
-		EmbeddedMongoConfig.class,
+		MongoDataSourceConfig.class,
 		WebApplicationConfig.class
 })
-@ActiveProfiles({ "default", Profiles.WEB_PROFILE })
+@ActiveProfiles({ Security.NONE_PROFILE, Profiles.WEB_PROFILE })
 public class DefaultControllerRelationshipTests extends AbstractRepositoryTests {
 
 	private static final String SUBJECT_URL = "/api/subjects";

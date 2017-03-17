@@ -25,6 +25,7 @@ import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CollectionPath;
 import com.querydsl.core.types.dsl.ListPath;
 import com.querydsl.core.types.dsl.MapPath;
 import com.querydsl.core.types.dsl.NumberPath;
@@ -38,6 +39,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Page;
@@ -225,8 +228,23 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
       
       BooleanExpression expression = null;
       Path path = queryCriteria.getPath();
-        
-      if (path instanceof StringPath) {
+
+      if (path instanceof MapPath) {
+        MapPath p = (MapPath) path;
+        String[] bits = queryCriteria.getKey().split("\\.");
+        if (isMultiValue(queryCriteria.getValue())) {
+          expression = p.get(bits[1]).in(queryCriteria.getValue());
+        } else {
+          expression = p.get(bits[1]).eq(queryCriteria.getValue());
+        }
+      } else if (path instanceof ListPath){
+        ListPath p = (ListPath) path;
+        if (isMultiValue(queryCriteria.getValue())){
+          expression = p.any().in(queryCriteria.getValue());
+        } else {
+          expression = p.any().eq(queryCriteria.getValue());
+        }
+      } else if (path instanceof StringPath) {
         StringPath p = (StringPath) path;
         switch (queryCriteria.getEvaluation()) {
           case STARTS_WITH:
@@ -243,7 +261,7 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
             break;
           default:
             if (isMultiValue(queryCriteria.getValue())){
-              //expression = p.in(getCollection(queryCriteria.getValue()));
+              expression = p.in((Collection<? extends String>) queryCriteria.getValue());
             } else {
               expression = p.equalsIgnoreCase((String) queryCriteria.getValue());
             }

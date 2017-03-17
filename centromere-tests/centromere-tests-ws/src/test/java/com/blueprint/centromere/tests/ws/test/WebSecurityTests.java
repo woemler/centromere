@@ -28,7 +28,7 @@ import com.blueprint.centromere.core.commons.repositories.UserRepository;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
-import com.blueprint.centromere.tests.ws.test.WebSecurityTests.SpringBootSetup;
+import com.blueprint.centromere.tests.ws.TestInitializer;
 import com.blueprint.centromere.ws.config.WebApplicationConfig;
 import com.blueprint.centromere.ws.security.BasicTokenUtils;
 import com.blueprint.centromere.ws.security.TokenDetails;
@@ -39,7 +39,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.FilterChainProxy;
@@ -56,31 +58,20 @@ import org.springframework.web.context.WebApplicationContext;
  * @author woemler
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { SpringBootSetup.class })
+@SpringBootTest(classes = { TestInitializer.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(value = {Profiles.WEB_PROFILE, Security.SECURE_READ_WRITE_PROFILE})
+@AutoConfigureMockMvc
 public class WebSecurityTests {
 	
 	@Autowired private WebApplicationContext context;
 	@Autowired private UserRepository userRepository;
 	@Autowired private FilterChainProxy springSecurityFilterChain;
 	@Autowired private BasicTokenUtils tokenUtils;
-	
-	private MockMvc mockMvc;
+	@Autowired private MockMvc mockMvc;
 	private static boolean isConfigured = false;
-
-	@SpringBootApplication
-  @Import({ EmbeddedMongoConfig.class, WebApplicationConfig.class})
-	public static class SpringBootSetup {
-    public static void main(String[] args) {
-      SpringApplication.run(SpringBootSetup.class, args);
-    }
-  }
 	
 	@Before
 	public void setup() throws Exception {
-		mockMvc = MockMvcBuilders.webAppContextSetup(context)
-				.addFilter(springSecurityFilterChain)
-				.build();
 		if (!isConfigured){
 			userRepository.deleteAll();
 			User user = new User();

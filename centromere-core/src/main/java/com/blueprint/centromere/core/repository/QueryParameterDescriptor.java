@@ -104,7 +104,7 @@ public class QueryParameterDescriptor {
   public static Map<String,QueryParameterDescriptor> getModelQueryDescriptors(Class<?> model){
 
     Map<String,QueryParameterDescriptor> paramMap = new HashMap<>();
-    PathBuilder<?> pathBuilder = new PathBuilder<>(model, model.getSimpleName());
+    PathBuilder pathBuilder = new PathBuilder<>(model, model.getSimpleName());
     Path root = Expressions.path(model, model.getSimpleName());
     Class<?> currentClass = model;
 
@@ -126,11 +126,10 @@ public class QueryParameterDescriptor {
             continue;
         }
 
-        if (type.equals(String.class)){
+        if (String.class.isAssignableFrom(type)){
           path = Expressions.stringPath(root, fieldName);
         } else if (Number.class.isAssignableFrom(type)) {
-          // TODO
-          //path = pathBuilder.getNumber(fieldName, Number.class);
+          path = pathBuilder.getNumber(fieldName, type);
         } else if (Map.class.isAssignableFrom(type)){
           ParameterizedType pType = (ParameterizedType) field.getGenericType();
           Class<?> keyType = pType.getActualTypeArguments()[0].getClass();
