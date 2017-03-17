@@ -10,7 +10,8 @@ addons:
       - mongodb-org
 before_script:
   - sleep 15
-  - mongo centromere-test --eval 'db.createUser({user: "centromere", pwd: "centromere", roles: [ "readWrite", "dbAdmin" ]});'
+  - mongo centromere-test --eval > 
+  'db.createUser({user: "centromere", pwd: "centromere", roles: [ "readWrite", "dbAdmin" ]});'
 script:
   - cd centromere-parent
   - mvn -U clean test
@@ -22,3 +23,4 @@ notifications:
     on_failure: always
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+ 
