@@ -40,21 +40,20 @@ import org.springframework.context.annotation.Import;
 @Configuration
 public class CentromereWebInitializer extends SpringBootServletInitializer {
 
-    private static final Logger logger = LoggerFactory.getLogger(CentromereWebInitializer.class);
+  private static final Logger logger = LoggerFactory.getLogger(CentromereWebInitializer.class);
 
-    public static void run(Class<?> source, String[] args){
-        SpringApplication springApplication = new SpringApplication(source);
-        if (source.isAnnotationPresent(AutoConfigureCentromere.class)){
-            AutoConfigureCentromere annotation = source.getAnnotation(AutoConfigureCentromere.class);
-            String[] profiles = ObjectArrays.concat(Profiles.WEB_PROFILE, 
-                Profiles.getApplicationProfiles(annotation.database(), annotation.schema(), annotation.webSecurity()));
-            springApplication.setAdditionalProfiles(profiles);
-            logger.info(String.format("Running Centromere with profiles: %s", Arrays.asList(profiles)));
-        } else {
-            logger.info("Running Centromere with default profiles.");
-        }
-
-        springApplication.run(args);
+  public static void run(Class<?> source, String[] args){
+    SpringApplication springApplication = new SpringApplication(source);
+    if (source.isAnnotationPresent(AutoConfigureCentromere.class)){
+      AutoConfigureCentromere annotation = source.getAnnotation(AutoConfigureCentromere.class);
+      String[] profiles = ObjectArrays.concat(Profiles.WEB_PROFILE, 
+          Profiles.getApplicationProfiles(annotation.database(), annotation.schema(), annotation.webSecurity()));
+      springApplication.setAdditionalProfiles(profiles);
+      logger.info(String.format("Running Centromere with profiles: %s", Arrays.asList(profiles)));
+    } else {
+      logger.info("Running Centromere with default profiles.");
     }
+    springApplication.run(args);
+  }
 
 }
