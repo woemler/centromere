@@ -7,7 +7,7 @@ addons:
     sources:
       - mongodb-3.0-precise
     packages:
-      - mongodb-org-server
+      - mongodb-org
 before_script:
   - sleep 15
   - mongo centromere-test --eval 'db.addUser("centromere", "centromere");'
