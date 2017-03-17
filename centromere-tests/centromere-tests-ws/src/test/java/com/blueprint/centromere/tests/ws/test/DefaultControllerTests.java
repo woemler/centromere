@@ -37,16 +37,12 @@ import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
-import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
-import com.blueprint.centromere.tests.ws.AbstractControllerTests;
 import com.blueprint.centromere.tests.ws.TestInitializer;
-import com.blueprint.centromere.ws.config.WebApplicationConfig;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import java.util.List;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,14 +52,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.Assert;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author woemler
@@ -377,7 +368,7 @@ public class DefaultControllerTests extends AbstractRepositoryTests {
     mockMvc.perform(put(BASE_URL + "/{id}", gene.getId())
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(gene)))
-        .andDo(MockMvcResultHandlers.print())
+        //.andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("primaryReferenceId")))
         .andExpect(jsonPath("$.primaryReferenceId", is("1")))

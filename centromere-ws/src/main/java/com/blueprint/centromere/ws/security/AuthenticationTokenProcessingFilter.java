@@ -61,7 +61,7 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
 			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Expecting an HTTP request.");
 		}
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
-		System.out.println("Remote Host: " + httpRequest.getRemoteHost());
+		//System.out.println("Remote Host: " + httpRequest.getRemoteHost());
 
 		String authToken = httpRequest.getHeader("X-Auth-Token");
 		if (authToken == null){

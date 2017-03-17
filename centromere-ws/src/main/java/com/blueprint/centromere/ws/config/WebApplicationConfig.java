@@ -18,6 +18,7 @@ package com.blueprint.centromere.ws.config;
 
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.model.AbstractModel;
+import com.blueprint.centromere.core.util.StringToMapParameterConverter;
 import com.blueprint.centromere.ws.controller.ModelController;
 import com.blueprint.centromere.ws.controller.UserAuthenticationController;
 import java.nio.charset.Charset;
@@ -32,6 +33,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
+import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.core.env.Environment;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.RestMediaTypes;
@@ -75,7 +77,12 @@ public class WebApplicationConfig {
 			public void configureHttpMessageConverters(List<HttpMessageConverter<?>> converters) {
 				converters.addAll(httpMessageConverters());
 			}
-			
+
+			@Override
+			public void configureConversionService(ConfigurableConversionService conversionService) {
+				super.configureConversionService(conversionService);
+				conversionService.addConverter(new StringToMapParameterConverter());
+			}
 		};
 		
 	}

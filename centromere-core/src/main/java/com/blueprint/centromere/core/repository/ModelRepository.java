@@ -25,7 +25,6 @@ import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CollectionPath;
 import com.querydsl.core.types.dsl.ListPath;
 import com.querydsl.core.types.dsl.MapPath;
 import com.querydsl.core.types.dsl.NumberPath;
@@ -38,9 +37,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Page;
@@ -60,6 +60,8 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
 		extends PagingAndSortingRepository<T, ID>, ModelSupport<T>,
     QueryDslPredicateExecutor<T>, QuerydslBinderCustomizer {
+  
+  Logger logger = LoggerFactory.getLogger(ModelRepository.class);
 
   default long count(Predicate predicate){
     return Iterables.size(findAll(predicate));
@@ -324,16 +326,30 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
 
     // String properties
     bindings.bind(String.class).all((path, strings) -> {
+      logger.info(String.format("Path=%s  Values=%s", path.toString(), strings.toString()));
       List<Object> value = new ArrayList<>(strings);
       List<String> values;
       Object o = value.get(0); // only the first occurrence of a query parameter is accepted
       if (path instanceof MapPath) {
         MapPath p = (MapPath) path;
-        if (o instanceof String){
+        if (o instanceof String) {
           String s = (String) o;
           String key = s.split(":")[0];
           values = Arrays.asList(s.split(":")[1].split(","));
-          if (values.size() > 1){
+          if (values.size() > 1) {
+            return p.get(key).in(values);
+          } else {
+            return p.get(key).eq(values.get(0));
+          }
+        } else if (o instanceof Map){
+          String key = null;
+          values = new ArrayList<>();
+          Map<String, String> map = (Map<String, String>) o;
+          for (Map.Entry<String, String> entry: map.entrySet()){
+            key = entry.getKey();
+            values = Arrays.asList(entry.getValue().split(","));
+          }
+          if (values.size() > 1) {
             return p.get(key).in(values);
           } else {
             return p.get(key).eq(values.get(0));
@@ -378,5 +394,6 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
     });
 
   }
+  
 
 }
