@@ -90,7 +90,7 @@ public abstract class CommonsDataProcessor<T extends Model<?>> extends GenericRe
             if (this.getEnvironment().containsProperty("dataSet.description")){
                 dataSet.setDescription(this.getEnvironment().getRequiredProperty("dataSet.description"));
             }
-            dataSetRepository.save(dataSet);
+            dataSetRepository.insert(dataSet);
         }
 
         dataFile = dataFileRepository.findOneByFilePath(filePath);
@@ -101,12 +101,14 @@ public abstract class CommonsDataProcessor<T extends Model<?>> extends GenericRe
             dataFile.setFilePath(filePath);
             dataFile.setDateCreated(new Date());
             dataFile.setDateUpdated(new Date());
-        } else if (this.getEnvironment().containsProperty("centromere.import.skip-existing-files")
+            dataFileRepository.insert(dataFile);
+        } else {
+            if (this.getEnvironment().containsProperty("centromere.import.skip-existing-files")
                 && this.getEnvironment().getRequiredProperty("centromere.import.skip-existing-files", Boolean.class)){
-            isSkippable = true;
-            logger.info(String.format("DataFile record for the current file exists, and will not be overwritten: %s", filePath));
+                isSkippable = true;
+                logger.info(String.format("DataFile record for the current file exists, and will not be overwritten: %s", filePath));
+            }
         }
-        dataFileRepository.save(dataFile);
 
         if (this.getReader() instanceof DataFileAware) {
             ((DataFileAware) this.getReader()).setDataFile(dataFile);
@@ -150,7 +152,7 @@ public abstract class CommonsDataProcessor<T extends Model<?>> extends GenericRe
             List<Sample> samples = ((SampleAware) this.getReader()).getSamples();
             samples.addAll(dataSet.getSamples());
             dataSet.setSamples(samples);
-            dataSetRepository.save(dataSet);
+            dataSetRepository.insert(dataSet);
         }
     }
 

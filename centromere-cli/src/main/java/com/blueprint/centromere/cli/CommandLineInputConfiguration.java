@@ -18,7 +18,9 @@ package com.blueprint.centromere.cli;
 
 import com.blueprint.centromere.core.config.Profiles;
 
+import com.blueprint.centromere.core.config.Schema;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
@@ -54,5 +56,13 @@ public class CommandLineInputConfiguration {
 	public ManifestImportExecutor manifestImportExecutor(){
 		return new ManifestImportExecutor();
 	}
+
+	@Profile({Schema.DEFAULT_PROFILE})
+  @ComponentScan(basePackages = {
+      "com.blueprince.centromere.core.commons.processors",
+      "com.blueprince.centromere.core.commons.readers"
+  })
+	public static class DefaultSchemaProcessorConfig {
+  }
 	
 }

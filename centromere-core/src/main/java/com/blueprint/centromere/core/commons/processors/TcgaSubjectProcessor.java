@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  */
 @DataTypes({ "tcga_subjects" })
 @Component
-public class TcgaSubjectProcessor extends GenericRecordProcessor<Subject> {
+public class TcgaSubjectProcessor extends CommonsDataProcessor<Subject> {
 
     @Autowired
     public TcgaSubjectProcessor(SubjectRepository repository) {
