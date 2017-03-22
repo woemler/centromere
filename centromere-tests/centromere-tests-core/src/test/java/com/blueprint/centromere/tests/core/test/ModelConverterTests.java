@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.tests.core.test;
 
-import com.blueprint.centromere.core.commons.models.Gene;
+import com.blueprint.centromere.core.model.impl.Gene;
 import com.blueprint.centromere.core.util.JsonModelConverter;
 import com.blueprint.centromere.core.util.KeyValueMapModelConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;

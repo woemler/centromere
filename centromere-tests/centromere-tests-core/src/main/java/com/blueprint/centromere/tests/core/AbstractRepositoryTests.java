@@ -16,18 +16,18 @@
 
 package com.blueprint.centromere.tests.core;
 
-import com.blueprint.centromere.core.commons.models.DataFile;
-import com.blueprint.centromere.core.commons.models.DataSet;
-import com.blueprint.centromere.core.commons.models.Gene;
-import com.blueprint.centromere.core.commons.models.GeneExpression;
-import com.blueprint.centromere.core.commons.models.Sample;
-import com.blueprint.centromere.core.commons.models.Subject;
-import com.blueprint.centromere.core.commons.repositories.DataFileRepository;
-import com.blueprint.centromere.core.commons.repositories.DataSetRepository;
-import com.blueprint.centromere.core.commons.repositories.GeneExpressionRepository;
-import com.blueprint.centromere.core.commons.repositories.GeneRepository;
-import com.blueprint.centromere.core.commons.repositories.SampleRepository;
-import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
+import com.blueprint.centromere.core.model.impl.DataFile;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.Gene;
+import com.blueprint.centromere.core.model.impl.GeneExpression;
+import com.blueprint.centromere.core.model.impl.Sample;
+import com.blueprint.centromere.core.model.impl.Subject;
+import com.blueprint.centromere.core.dataimport.impl.repositories.DataFileRepository;
+import com.blueprint.centromere.core.dataimport.impl.repositories.DataSetRepository;
+import com.blueprint.centromere.core.dataimport.impl.repositories.GeneExpressionRepository;
+import com.blueprint.centromere.core.dataimport.impl.repositories.GeneRepository;
+import com.blueprint.centromere.core.dataimport.impl.repositories.SampleRepository;
+import com.blueprint.centromere.core.dataimport.impl.repositories.SubjectRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -123,35 +123,35 @@ public abstract class AbstractRepositoryTests {
     List<DataSet> dataSets = new ArrayList<>();
 
     DataSet dataSetA = new DataSet();
-    dataSetA.setName("DataSetA");
+    dataSetA.setShortName("DataSetA");
     dataSetA.setSource("Internal");
     dataSetA.setVersion("1.0");
     dataSetA.setDescription("This is an example data set.");
     dataSets.add(dataSetA);
 
     DataSet dataSetB = new DataSet();
-    dataSetB.setName("DataSetB");
+    dataSetB.setShortName("DataSetB");
     dataSetB.setSource("External");
     dataSetB.setVersion("1.0");
     dataSetB.setDescription("This is an example data set.");
     dataSets.add(dataSetB);
 
     DataSet dataSetC = new DataSet();
-    dataSetC.setName("DataSetC");
+    dataSetC.setShortName("DataSetC");
     dataSetC.setSource("Internal");
     dataSetC.setVersion("2.0");
     dataSetC.setDescription("This is an example data set.");
     dataSets.add(dataSetC);
 
     DataSet dataSetD = new DataSet();
-    dataSetD.setName("DataSetD");
+    dataSetD.setShortName("DataSetD");
     dataSetD.setSource("External");
     dataSetD.setVersion("1.0");
     dataSetD.setDescription("This is an example data set.");
     dataSets.add(dataSetD);
 
     DataSet dataSetE = new DataSet();
-    dataSetE.setName("DataSetE");
+    dataSetE.setShortName("DataSetE");
     dataSetE.setSource("Internal");
     dataSetE.setVersion("1.0");
     dataSetE.setDescription("This is an example data set.");

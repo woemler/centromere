@@ -33,7 +33,6 @@ public interface ModelSupport<T extends Model<?>> {
 
 	/**
 	 * Assigns the given model to target object.
-	 * TODO: Do we still need to support this method?
 	 * 
 	 * @param model
 	 */

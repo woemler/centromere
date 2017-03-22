@@ -16,12 +16,11 @@
 
 package com.blueprint.centromere.tests.core.test.repository;
 
-import com.blueprint.centromere.core.commons.models.Gene;
-import com.blueprint.centromere.core.commons.repositories.DataFileRepository;
-import com.blueprint.centromere.core.commons.repositories.GeneRepository;
+import com.blueprint.centromere.core.dataimport.impl.repositories.GeneRepository;
+import com.blueprint.centromere.core.model.impl.Gene;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
-import com.blueprint.centromere.tests.core.config.MongoDataSourceConfig;
+import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Ops;
@@ -53,7 +52,6 @@ import org.springframework.util.Assert;
 public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
   @Autowired private GeneRepository geneRepository;
-  @Autowired private DataFileRepository dataFileRepository;
   
   private static final Class<Gene> model = Gene.class;
 

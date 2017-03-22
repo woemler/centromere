@@ -1,11 +1,6 @@
 package com.blueprint.centromere.tests.ws;
 
-import com.blueprint.centromere.core.config.AutoConfigureCentromere;
-import com.blueprint.centromere.core.config.Database;
-import com.blueprint.centromere.core.config.Schema;
-import com.blueprint.centromere.core.config.Security;
-import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
-import com.blueprint.centromere.tests.core.config.MongoDataSourceConfig;
+import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import com.blueprint.centromere.ws.CentromereWebInitializer;
 import com.blueprint.centromere.ws.config.WebApplicationConfig;
 import com.blueprint.centromere.ws.config.WebSecurityConfig;

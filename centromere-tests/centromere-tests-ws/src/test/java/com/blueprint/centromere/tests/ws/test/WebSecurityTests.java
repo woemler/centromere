@@ -23,13 +23,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.blueprint.centromere.core.commons.models.User;
-import com.blueprint.centromere.core.commons.repositories.UserRepository;
+import com.blueprint.centromere.core.model.impl.User;
+import com.blueprint.centromere.core.dataimport.impl.repositories.UserRepository;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.Security;
-import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
 import com.blueprint.centromere.tests.ws.TestInitializer;
-import com.blueprint.centromere.ws.config.WebApplicationConfig;
 import com.blueprint.centromere.ws.security.BasicTokenUtils;
 import com.blueprint.centromere.ws.security.TokenDetails;
 import com.jayway.jsonpath.JsonPath;
@@ -37,12 +35,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ActiveProfiles;
@@ -50,7 +45,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.Assert;
 import org.springframework.web.context.WebApplicationContext;
 

@@ -20,7 +20,7 @@ import com.blueprint.centromere.cli.CommandLineInputConfiguration;
 import com.blueprint.centromere.cli.manifest.ImportManifest;
 import com.blueprint.centromere.cli.manifest.ManifestFile;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
+import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -40,7 +40,7 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { 
-		EmbeddedMongoConfig.class,
+		MongoDataSourceConfig.class,
 		CommandLineInputConfiguration.class,
 		CommandLineTestConfig.class
 })

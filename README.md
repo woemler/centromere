@@ -14,7 +14,7 @@ Centromere aims to make the task of storing and working with processed genomic d
     - Dynamic, user-defined queries.
     - Automatic API documentation.
     - Basic security and user-authentication.
-    - Response object field dfiltering and formatting.
+    - Response object field filtering and formatting.
     
 Centromere is built using the [Spring IO Platform](https://spring.io/platform), and leverages tools such as Spring Data, Spring Data REST, and Spring Security to deliver enterprise-grade data management solutions.    
 
@@ -30,7 +30,7 @@ Centromere has the following requirements:
 
 - JDK 1.8+
 - Maven 2+
-- MongoDB 3.0+ or MySQL 5.5+
+- MongoDB 3.0+ 
 
 #### Create a new project with Maven and Spring Boot
 

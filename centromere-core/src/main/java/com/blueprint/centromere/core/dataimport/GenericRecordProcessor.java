@@ -17,13 +17,17 @@
 package com.blueprint.centromere.core.dataimport;
 
 import com.blueprint.centromere.core.model.Model;
-import com.google.common.reflect.TypeToken;
+import com.blueprint.centromere.core.model.ModelSupport;
+import com.blueprint.centromere.core.model.impl.DataFile;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 import org.springframework.validation.BindingResult;
@@ -40,45 +44,100 @@ import org.springframework.validation.Validator;
 public class GenericRecordProcessor<T extends Model<?>> 
 		implements RecordProcessor<T>, DataTypeSupport {
 
+  private static final Logger logger = LoggerFactory.getLogger(GenericRecordProcessor.class);
+
 	private Class<T> model;
+	
 	private RecordReader<T> reader;
 	private Validator validator;
 	private RecordWriter<T> writer;
 	private RecordImporter importer;
+	
+	private DataFile dataFile;
+	private DataSet dataSet;
+	
 	private Environment environment;
+	
 	private List<String> supportedDataTypes = new ArrayList<>();
+	
 	private boolean isConfigured = false;
 	private boolean isInFailedState = false;
-	private static final Logger logger = LoggerFactory.getLogger(GenericRecordProcessor.class);
 
 	/**
-	 * Performs configuration steps prior to each execution of {@link #run(Object...)}.  Assigns
-	 *   options and metadata objects to the individual processing components that are expecting them.
+	 * Empty default implementation.  The purpose of extending {@link org.springframework.beans.factory.InitializingBean}
+   * is to trigger bean post-processing by a {@link BeanPostProcessor}.
 	 */
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(model, "Model must not be null");
+		Assert.notNull(environment, "Environment must not be null");
+    if (this.getClass().isAnnotationPresent(DataTypes.class)){
+      DataTypes dataTypes = this.getClass().getAnnotation(DataTypes.class);
+      if (dataTypes.value().length > 0){
+        this.supportedDataTypes = Arrays.asList(dataTypes.value());
+      }
+    }
+	}
+
+  /**
+   * Performs configuration steps prior to each execution of {@link #run(Object...)}.  Assigns
+   *   options and metadata objects to the individual processing components that are expecting them.
+   * 
+   * @param args an array of objects of any type.
+   * @throws DataImportException
+   */
 	@SuppressWarnings("unchecked")
 	@Override
 	public void doBefore(Object... args) throws DataImportException{
-		Assert.notNull(environment, "Environment must not be null.");
-		if (this.getClass().isAnnotationPresent(DataTypes.class)){
-			DataTypes dataTypes = this.getClass().getAnnotation(DataTypes.class);
-			if (dataTypes.value() != null && dataTypes.value().length > 0){
-				this.supportedDataTypes = Arrays.asList(dataTypes.value());
-			}
-		}
-		if (model == null){
-			this.model = (Class<T>) new TypeToken<T>(getClass()) {}.getRawType();
-		}
+	  
+	  try {
+      afterPropertiesSet();
+    } catch (Exception e){
+	    throw new DataImportException(e.getMessage());
+    }
+    
+    if (args.length > 1 && args[1] instanceof DataFile){
+      dataFile = (DataFile) args[1];
+    }
+
+    if (args.length > 2 && args[2] instanceof DataSet){
+      dataSet = (DataSet) args[2];
+    }
+    
 		if (writer != null) {
+      if (writer instanceof ModelSupport) ((ModelSupport) writer).setModel(model);
 			writer.setEnvironment(environment);
 		}
 		if (reader != null) {
+      reader.setModel(model);
 			reader.setEnvironment(environment);
 		}
 		if (importer != null) {
+      if (importer instanceof ModelSupport) ((ModelSupport) importer).setModel(model);
 			importer.setEnvironment(environment);
 		}
+		
 		isConfigured = true;
+    
 	}
+
+  /**
+   * {@link #doBefore(Object...)}
+   * 
+   * @param inputFile
+   * @param dataFile
+   * @param dataSet
+   * @param args
+   * @throws DataImportException
+   */
+	public void doBefore(File inputFile, DataFile dataFile, DataSet dataSet, Object... args) 
+      throws DataImportException {
+	  List<Object> objects = Arrays.asList(inputFile, dataFile, dataSet);
+	  objects.addAll(Arrays.asList(args));
+	  Object[] arguments = new Object[objects.size()];
+	  arguments = objects.toArray(arguments);
+	  doBefore(arguments);
+  }
 
 	/**
 	 * {@link RecordProcessor#run(Object...)}
@@ -86,30 +145,45 @@ public class GenericRecordProcessor<T extends Model<?>>
 	 * @throws DataImportException
 	 */
 	public void run(Object... args) throws DataImportException {
+	  
 	  Integer count = 0;
 		if (!isConfigured) logger.warn("Processor configuration method has not run!"); // TODO: Should this return or throw exception?
-		if (isInFailedState) {
+		
+    if (isInFailedState) {
 			logger.warn("Record processor is in failed state and is aborting run.");
 			return;
 		}
+		
 		try {
 			Assert.notEmpty(args, "One or more arguments required.");
-			Assert.isTrue(args[0] instanceof String, "The first argument must be a String.");
 		} catch (IllegalArgumentException e){
 			e.printStackTrace();
 			throw new DataImportException(e.getMessage());
 		}
-		String inputFilePath = (String) args[0];
+		
+		String inputFilePath;
+		if (args[0] instanceof String){
+		  inputFilePath = (String) args[0];
+    } else if (args[0] instanceof File){
+		  inputFilePath = ((File) args[0]).getAbsolutePath();
+    } else {
+      throw new DataImportException("First argument must be a string path or file object");
+    }
+    
 		reader.doBefore(args);
-		writer.doBefore(args);
-        if (importer != null) importer.doBefore(args);
-		if (isInFailedState) {
+    writer.doBefore(args);
+    if (importer != null) importer.doBefore(args);
+		
+    if (isInFailedState) {
 			logger.warn("Record processor is in failed state and is aborting run.");
 			return;
 		}
+		
 		T record = reader.readRecord();
-		while (record != null) {
-			if (validator != null) {
+		
+    while (record != null) {
+			
+      if (validator != null) {
 				DataBinder dataBinder = new DataBinder(record);
 				dataBinder.setValidator(validator);
 				dataBinder.validate();
@@ -124,18 +198,23 @@ public class GenericRecordProcessor<T extends Model<?>>
 					}
 				}
 			}
+			
 			writer.writeRecord(record);
 			record = reader.readRecord();
 			count++;
+			
 		}
+		
 		if (isInFailedState) {
 			logger.warn("Record processor is in failed state and is aborting run.");
 			return;
 		}
+		
 		writer.doAfter(args);
 		reader.doAfter(args);
+		
 		if (importer != null) {
-		  if (writer instanceof TempFileWriter){
+		  if (TempFileWriter.class.isAssignableFrom(writer.getClass())){
 		    String tempFilePath = ((TempFileWriter) writer).getTempFilePath(inputFilePath);
         importer.importFile(tempFilePath);
         importer.doAfter(args);
@@ -144,7 +223,9 @@ public class GenericRecordProcessor<T extends Model<?>>
             + " temp file path from component."); 
       }
 		}
+		
 		logger.info(String.format("Successfully processed %d records from file: %s", count, inputFilePath));
+		
 	}
 
 	public boolean isSupportedDataType(String dataType) {
@@ -171,7 +252,23 @@ public class GenericRecordProcessor<T extends Model<?>>
 		this.model = model;
 	}
 
-	public RecordReader<T> getReader() {
+  public DataFile getDataFile() {
+    return dataFile;
+  }
+
+  public void setDataFile(DataFile dataFile) {
+    this.dataFile = dataFile;
+  }
+
+  public DataSet getDataSet() {
+    return dataSet;
+  }
+
+  public void setDataSet(DataSet dataSet) {
+    this.dataSet = dataSet;
+  }
+
+  public RecordReader<T> getReader() {
 		return reader;
 	}
 

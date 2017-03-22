@@ -19,14 +19,14 @@ package com.blueprint.centromere.tests.cli.test;
 import com.blueprint.centromere.cli.CommandLineInputConfiguration;
 import com.blueprint.centromere.cli.CommandLineInputExecutor;
 import com.blueprint.centromere.cli.ModelProcessorBeanRegistry;
-import com.blueprint.centromere.core.commons.models.Gene;
-import com.blueprint.centromere.core.commons.models.Sample;
-import com.blueprint.centromere.core.commons.repositories.GeneExpressionRepository;
-import com.blueprint.centromere.core.commons.repositories.GeneRepository;
 import com.blueprint.centromere.core.config.ProfileConfiguration;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.Schema;
-import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
+import com.blueprint.centromere.core.dataimport.impl.repositories.GeneExpressionRepository;
+import com.blueprint.centromere.core.dataimport.impl.repositories.GeneRepository;
+import com.blueprint.centromere.core.model.impl.Gene;
+import com.blueprint.centromere.core.model.impl.Sample;
+import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -45,7 +45,7 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { 
-		EmbeddedMongoConfig.class,
+		MongoDataSourceConfig.class,
 		CommandLineInputConfiguration.class,
 		CommandLineTestConfig.class,
 		ProfileConfiguration.class

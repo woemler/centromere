@@ -1,27 +1,15 @@
 package com.blueprint.centromere.tests.core.test.dataimport;
 
-import com.blueprint.centromere.core.commons.models.DataFile;
-import com.blueprint.centromere.core.commons.models.DataSet;
-import com.blueprint.centromere.core.commons.models.Gene;
-import com.blueprint.centromere.core.commons.models.GeneExpression;
-import com.blueprint.centromere.core.commons.models.Sample;
-import com.blueprint.centromere.core.commons.models.Subject;
-import com.blueprint.centromere.core.commons.repositories.DataFileRepository;
-import com.blueprint.centromere.core.commons.repositories.DataSetRepository;
-import com.blueprint.centromere.core.commons.repositories.GeneExpressionRepository;
-import com.blueprint.centromere.core.commons.repositories.GeneRepository;
-import com.blueprint.centromere.core.commons.repositories.SampleRepository;
-import com.blueprint.centromere.core.commons.repositories.SubjectRepository;
-import com.blueprint.centromere.core.dataimport.DelimtedTextFileWriter;
-import com.blueprint.centromere.tests.core.config.MongoDataSourceConfig;
-import com.blueprint.centromere.tests.core.model.DataFileGenerator;
-import com.blueprint.centromere.tests.core.model.DataSetGenerator;
-import com.blueprint.centromere.tests.core.model.EntrezGeneDataGenerator;
-import com.blueprint.centromere.tests.core.model.ExpressionDataGenerator;
-import com.blueprint.centromere.tests.core.model.SampleDataGenerator;
-import com.blueprint.centromere.tests.core.model.SubjectDataGenerator;
-import java.util.List;
-import org.junit.Before;
+import com.blueprint.centromere.core.dataimport.impl.repositories.DataFileRepository;
+import com.blueprint.centromere.core.dataimport.impl.repositories.DataSetRepository;
+import com.blueprint.centromere.core.dataimport.impl.repositories.GeneExpressionRepository;
+import com.blueprint.centromere.core.dataimport.impl.repositories.GeneRepository;
+import com.blueprint.centromere.core.dataimport.impl.repositories.SampleRepository;
+import com.blueprint.centromere.core.dataimport.impl.repositories.SubjectRepository;
+import com.blueprint.centromere.core.dataimport.impl.writers.DelimtedTextFileWriter;
+import com.blueprint.centromere.core.model.impl.GeneExpression;
+import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
+import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +22,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { MongoDataSourceConfig.class })
-public class TempFileWriterTests {
+public class TempFileWriterTests extends AbstractRepositoryTests{
 
   @Autowired private SampleRepository sampleRepository;
   @Autowired private SubjectRepository subjectRepository;
@@ -44,36 +32,11 @@ public class TempFileWriterTests {
   @Autowired private GeneExpressionRepository geneExpressionRepository;
   @Autowired private Environment environment;
   private boolean isConfigured = false;
-
-  @Before
-  public void setup() throws Exception {
-    if (!isConfigured) {
-      geneExpressionRepository.deleteAll();
-      sampleRepository.deleteAll();
-      subjectRepository.deleteAll();
-      dataFileRepository.deleteAll();
-      dataSetRepository.deleteAll();
-      geneRepository.deleteAll();
-
-      List<DataSet> dataSets = DataSetGenerator.generateData();
-      dataSetRepository.save(dataSets);
-      List<DataFile> dataFiles = DataFileGenerator.generateData(dataSets);
-      dataFileRepository.save(dataFiles);
-      List<Subject> subjects = SubjectDataGenerator.generateData();
-      subjectRepository.save(subjects);
-      List<Sample> samples = SampleDataGenerator.generateData(subjects, dataSets.get(0));
-      sampleRepository.save(samples);
-      List<Gene> genes = EntrezGeneDataGenerator.generateData();
-      geneRepository.save(genes);
-      List<GeneExpression> data = ExpressionDataGenerator.generateData(samples, genes, dataFiles);
-      geneExpressionRepository.save(data);
-      isConfigured = true;
-    }
-  }
   
   @Test
   public void delimitedTextWriterTest() throws Exception {
-    DelimtedTextFileWriter<GeneExpression> writer = new DelimtedTextFileWriter<>(GeneExpression.class);
+    DelimtedTextFileWriter<GeneExpression> writer = 
+        new DelimtedTextFileWriter<>(GeneExpression.class, environment);
     writer.setEnvironment(environment);
     String path = writer.getTempFilePath("/path/to/fake/file.txt");
     System.out.println(String.format("Writing temp file: %s", path));
@@ -84,6 +47,7 @@ public class TempFileWriterTests {
     writer.doAfter();
   }
   
+  //TODO
 //  @Test
 //  public void mysqlImportTempWriterTest() throws Exception {
 //    MySQLImportTempFileWriter<GeneExpression> writer = new MySQLImportTempFileWriter<>(GeneExpression.class);

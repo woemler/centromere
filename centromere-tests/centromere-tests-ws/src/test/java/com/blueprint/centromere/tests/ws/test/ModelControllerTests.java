@@ -24,12 +24,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.blueprint.centromere.core.commons.repositories.GeneRepository;
+import com.blueprint.centromere.core.dataimport.impl.repositories.GeneRepository;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
-import com.blueprint.centromere.tests.core.config.EmbeddedMongoConfig;
-import com.blueprint.centromere.tests.core.config.MongoDataSourceConfig;
+import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import com.blueprint.centromere.ws.config.WebApplicationConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
@@ -41,9 +40,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mapping.context.PersistentEntities;
-import org.springframework.data.util.TypeInformation;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
