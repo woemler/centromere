@@ -16,8 +16,8 @@
 
 package com.blueprint.centromere.tests.core.test.commons;
 
-import com.blueprint.centromere.core.model.impl.Subject;
-import com.blueprint.centromere.core.dataimport.impl.readers.TcgaSubjectReader;
+import com.blueprint.centromere.core.commons.model.Subject;
+import com.blueprint.centromere.core.commons.reader.TcgaSubjectReader;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

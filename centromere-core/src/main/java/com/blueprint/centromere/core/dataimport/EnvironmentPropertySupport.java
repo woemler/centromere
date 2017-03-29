@@ -26,6 +26,7 @@ import org.springframework.core.env.Environment;
  * @author woemler
  * @since 0.5.0
  */
+@Deprecated
 public interface EnvironmentPropertySupport extends EnvironmentAware {
 
   Environment getEnvironment();

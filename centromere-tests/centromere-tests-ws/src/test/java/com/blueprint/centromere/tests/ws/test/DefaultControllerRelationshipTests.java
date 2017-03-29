@@ -24,10 +24,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.blueprint.centromere.core.model.impl.Sample;
-import com.blueprint.centromere.core.model.impl.Subject;
-import com.blueprint.centromere.core.dataimport.impl.repositories.SampleRepository;
-import com.blueprint.centromere.core.dataimport.impl.repositories.SubjectRepository;
+import com.blueprint.centromere.core.commons.model.Sample;
+import com.blueprint.centromere.core.commons.model.Subject;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
+import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;

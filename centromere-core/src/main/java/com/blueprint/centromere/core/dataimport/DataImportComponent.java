@@ -28,7 +28,7 @@ import javax.annotation.PostConstruct;
  * @author woemler
  * @since 0.4.1
  */
-public interface DataImportComponent extends EnvironmentPropertySupport, InitializingBean {
+public interface DataImportComponent extends ImportOptionsAware, InitializingBean {
 
 	/**
 	 * To be executed before the main component method is first called.  Can be configured to handle 

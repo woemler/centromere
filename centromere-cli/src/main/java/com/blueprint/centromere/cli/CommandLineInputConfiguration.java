@@ -59,8 +59,8 @@ public class CommandLineInputConfiguration {
 
 	@Profile({Schema.DEFAULT_PROFILE})
   @ComponentScan(basePackages = {
-      "com.blueprince.centromere.core.commons.processors",
-      "com.blueprince.centromere.core.commons.readers"
+      "com.blueprince.centromere.core.commons.processor",
+      "com.blueprince.centromere.core.commons.reader"
   })
 	public static class DefaultSchemaProcessorConfig {
   }

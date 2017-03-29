@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.ws.controller;
 
-import com.blueprint.centromere.core.dataimport.impl.repositories.MetadataOperations;
+import com.blueprint.centromere.core.commons.repository.MetadataOperations;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import java.util.ArrayList;

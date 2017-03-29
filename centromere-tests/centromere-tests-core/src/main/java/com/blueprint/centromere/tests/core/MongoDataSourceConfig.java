@@ -20,7 +20,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 /**
  * @author woemler
  */
-@EnableMongoRepositories(basePackages = "com.blueprint.centromere.core.dataimport.impl.repositories",
+@EnableMongoRepositories(basePackages = "com.blueprint.centromere.core.commons.repository",
     repositoryBaseClass = MongoModelRepository.class,
     repositoryFactoryBeanClass = MongoModelRepositoryFactoryBean.class)
 @PropertySource({ "classpath:data-source.properties" })

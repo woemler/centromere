@@ -16,18 +16,18 @@
 
 package com.blueprint.centromere.tests.core;
 
-import com.blueprint.centromere.core.model.impl.DataFile;
-import com.blueprint.centromere.core.model.impl.DataSet;
-import com.blueprint.centromere.core.model.impl.Gene;
-import com.blueprint.centromere.core.model.impl.GeneExpression;
-import com.blueprint.centromere.core.model.impl.Sample;
-import com.blueprint.centromere.core.model.impl.Subject;
-import com.blueprint.centromere.core.dataimport.impl.repositories.DataFileRepository;
-import com.blueprint.centromere.core.dataimport.impl.repositories.DataSetRepository;
-import com.blueprint.centromere.core.dataimport.impl.repositories.GeneExpressionRepository;
-import com.blueprint.centromere.core.dataimport.impl.repositories.GeneRepository;
-import com.blueprint.centromere.core.dataimport.impl.repositories.SampleRepository;
-import com.blueprint.centromere.core.dataimport.impl.repositories.SubjectRepository;
+import com.blueprint.centromere.core.commons.model.DataFile;
+import com.blueprint.centromere.core.commons.model.DataSet;
+import com.blueprint.centromere.core.commons.model.Gene;
+import com.blueprint.centromere.core.commons.model.GeneExpression;
+import com.blueprint.centromere.core.commons.model.Sample;
+import com.blueprint.centromere.core.commons.model.Subject;
+import com.blueprint.centromere.core.commons.repository.DataFileRepository;
+import com.blueprint.centromere.core.commons.repository.DataSetRepository;
+import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
+import com.blueprint.centromere.core.commons.repository.GeneRepository;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
+import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;

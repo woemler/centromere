@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.ws.controller;
 
-import com.blueprint.centromere.core.model.impl.User;
+import com.blueprint.centromere.core.commons.model.User;
 import com.blueprint.centromere.ws.security.BasicTokenUtils;
 import com.blueprint.centromere.ws.security.TokenDetails;
 

@@ -27,13 +27,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.blueprint.centromere.core.model.impl.Gene;
-import com.blueprint.centromere.core.dataimport.impl.repositories.DataFileRepository;
-import com.blueprint.centromere.core.dataimport.impl.repositories.DataSetRepository;
-import com.blueprint.centromere.core.dataimport.impl.repositories.GeneExpressionRepository;
-import com.blueprint.centromere.core.dataimport.impl.repositories.GeneRepository;
-import com.blueprint.centromere.core.dataimport.impl.repositories.SampleRepository;
-import com.blueprint.centromere.core.dataimport.impl.repositories.SubjectRepository;
+import com.blueprint.centromere.core.commons.model.Gene;
+import com.blueprint.centromere.core.commons.repository.DataFileRepository;
+import com.blueprint.centromere.core.commons.repository.DataSetRepository;
+import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
+import com.blueprint.centromere.core.commons.repository.GeneRepository;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
+import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;

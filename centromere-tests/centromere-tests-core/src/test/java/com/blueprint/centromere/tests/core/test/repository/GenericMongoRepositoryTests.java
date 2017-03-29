@@ -16,8 +16,8 @@
 
 package com.blueprint.centromere.tests.core.test.repository;
 
-import com.blueprint.centromere.core.dataimport.impl.repositories.GeneRepository;
-import com.blueprint.centromere.core.model.impl.Gene;
+import com.blueprint.centromere.core.commons.repository.GeneRepository;
+import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;

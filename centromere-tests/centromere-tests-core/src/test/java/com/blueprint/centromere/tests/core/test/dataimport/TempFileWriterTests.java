@@ -1,13 +1,13 @@
 package com.blueprint.centromere.tests.core.test.dataimport;
 
-import com.blueprint.centromere.core.dataimport.impl.repositories.DataFileRepository;
-import com.blueprint.centromere.core.dataimport.impl.repositories.DataSetRepository;
-import com.blueprint.centromere.core.dataimport.impl.repositories.GeneExpressionRepository;
-import com.blueprint.centromere.core.dataimport.impl.repositories.GeneRepository;
-import com.blueprint.centromere.core.dataimport.impl.repositories.SampleRepository;
-import com.blueprint.centromere.core.dataimport.impl.repositories.SubjectRepository;
-import com.blueprint.centromere.core.dataimport.impl.writers.DelimtedTextFileWriter;
-import com.blueprint.centromere.core.model.impl.GeneExpression;
+import com.blueprint.centromere.core.commons.repository.DataFileRepository;
+import com.blueprint.centromere.core.commons.repository.DataSetRepository;
+import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
+import com.blueprint.centromere.core.commons.repository.GeneRepository;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
+import com.blueprint.centromere.core.commons.repository.SubjectRepository;
+import com.blueprint.centromere.core.dataimport.impl.writer.DelimtedTextFileWriter;
+import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import org.junit.Test;
@@ -36,8 +36,7 @@ public class TempFileWriterTests extends AbstractRepositoryTests{
   @Test
   public void delimitedTextWriterTest() throws Exception {
     DelimtedTextFileWriter<GeneExpression> writer = 
-        new DelimtedTextFileWriter<>(GeneExpression.class, environment);
-    writer.setEnvironment(environment);
+        new DelimtedTextFileWriter<>(GeneExpression.class);
     String path = writer.getTempFilePath("/path/to/fake/file.txt");
     System.out.println(String.format("Writing temp file: %s", path));
     writer.doBefore(path);

@@ -17,7 +17,8 @@
 package com.blueprint.centromere.tests.core;
 
 import com.blueprint.centromere.core.dataimport.DataImportException;
-import com.blueprint.centromere.core.dataimport.RecordReader;
+import com.blueprint.centromere.core.dataimport.ImportOptions;
+import com.blueprint.centromere.core.dataimport.impl.reader.RecordReader;
 import com.blueprint.centromere.core.model.Model;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ import java.util.List;
 public class RecordCollectionReader<T extends Model<?>> implements RecordReader<T> {
 	
 	private final List<T> records = new ArrayList<>();
-	private Environment environment;
+	private ImportOptions importOptions;
 	private Class<T> model;
 
   public RecordCollectionReader(List<T> records) {
@@ -47,18 +48,17 @@ public class RecordCollectionReader<T extends Model<?>> implements RecordReader<
 		return null;
 	}
 
-	@Override 
-	@Autowired
-	public void setEnvironment(Environment environment) {
-		this.environment = environment;
-	}
+  @Override
+  public ImportOptions getImportOptions() {
+    return importOptions;
+  }
 
-	@Override
-	public Environment getEnvironment() {
-		return environment;
-	}
+  @Override
+  public void setImportOptions(ImportOptions importOptions) {
+    this.importOptions = importOptions;
+  }
 
-	@Override
+  @Override
 	public Class<T> getModel() {
 			return model;
 	}

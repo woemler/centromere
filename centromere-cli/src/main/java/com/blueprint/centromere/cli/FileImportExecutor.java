@@ -17,7 +17,7 @@
 package com.blueprint.centromere.cli;
 
 import com.blueprint.centromere.core.dataimport.DataImportException;
-import com.blueprint.centromere.core.dataimport.RecordProcessor;
+import com.blueprint.centromere.core.dataimport.impl.processor.RecordProcessor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

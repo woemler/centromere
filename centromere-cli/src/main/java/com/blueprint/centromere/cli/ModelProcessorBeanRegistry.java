@@ -17,7 +17,7 @@
 package com.blueprint.centromere.cli;
 
 import com.blueprint.centromere.core.dataimport.DataTypes;
-import com.blueprint.centromere.core.dataimport.RecordProcessor;
+import com.blueprint.centromere.core.dataimport.impl.processor.RecordProcessor;
 import com.blueprint.centromere.core.model.Model;
 
 import org.slf4j.Logger;
@@ -177,7 +177,7 @@ public class ModelProcessorBeanRegistry implements BeanPostProcessor, Applicatio
 	/**
 	 * Returns a list of unique registered {@link RecordProcessor} beans.
 	 * 
-	 * @return list of processors.
+	 * @return list of processor.
 	 */
 	public List<RecordProcessor> getRegisteredProcessors() {
 		Set<RecordProcessor> processors = new HashSet<>();

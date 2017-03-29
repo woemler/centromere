@@ -16,8 +16,8 @@
 
 package com.blueprint.centromere.tests.core.test.commons;
 
-import com.blueprint.centromere.core.model.impl.Gene;
-import com.blueprint.centromere.core.dataimport.impl.readers.EntrezGeneInfoReader;
+import com.blueprint.centromere.core.commons.model.Gene;
+import com.blueprint.centromere.core.commons.reader.EntrezGeneInfoReader;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -23,8 +23,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.blueprint.centromere.core.model.impl.User;
-import com.blueprint.centromere.core.dataimport.impl.repositories.UserRepository;
+import com.blueprint.centromere.core.commons.model.User;
+import com.blueprint.centromere.core.commons.repository.UserRepository;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.tests.ws.TestInitializer;
