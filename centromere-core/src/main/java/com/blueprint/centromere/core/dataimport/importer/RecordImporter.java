@@ -14,26 +14,24 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.dataimport.impl.reader;
+package com.blueprint.centromere.core.dataimport.importer;
 
 import com.blueprint.centromere.core.dataimport.DataImportComponent;
 import com.blueprint.centromere.core.dataimport.DataImportException;
-import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.model.ModelSupport;
 
 /**
- * Data impoer component class.  Reads from a data source and returns {@link Model} class instances.
+ * Data import component designed to take a temporary record file and import it directly into the 
+ *   database, via a specified utility (eg. MySQLImport of MongoImport).  
  * 
  * @author woemler
  */
-public interface RecordReader<T extends Model<?>> extends DataImportComponent, ModelSupport<T> {
+public interface RecordImporter extends DataImportComponent {
 
 	/**
-	 * Generates and returns a single {@link Model} entity from the input data source.
+	 * Runs the data import on the specified temp file.
 	 * 
-	 * @return a single {@link Model} record.
+	 * @param filePath
 	 * @throws DataImportException
 	 */
-	T readRecord() throws DataImportException;
-
+	void importFile(String filePath) throws DataImportException;
 }

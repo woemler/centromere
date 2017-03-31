@@ -17,7 +17,7 @@
 package com.blueprint.centromere.tests.core.test.dataimport;
 
 import com.blueprint.centromere.core.commons.model.Gene;
-import com.blueprint.centromere.core.dataimport.impl.reader.BasicColumnMappingRecordReader;
+import com.blueprint.centromere.core.dataimport.reader.BasicColumnMappingRecordReader;
 import com.blueprint.centromere.core.model.Model;
 
 import org.junit.Test;

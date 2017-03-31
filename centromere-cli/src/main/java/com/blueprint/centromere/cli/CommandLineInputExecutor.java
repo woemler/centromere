@@ -18,14 +18,16 @@ package com.blueprint.centromere.cli;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.MissingCommandException;
-
+import com.blueprint.centromere.cli.arguments.ImportCommandArguments;
+import com.blueprint.centromere.cli.arguments.ImportFileCommandArguments;
+import com.blueprint.centromere.cli.arguments.ImportManifestCommandArguments;
+import com.blueprint.centromere.cli.arguments.ListCommandArguments;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author woemler
@@ -34,12 +36,21 @@ import java.util.concurrent.TimeUnit;
 public class CommandLineInputExecutor implements CommandLineRunner {
 	
 	private FileImportExecutor fileImportExecutor;
+	private ManifestImportExecutor manifestImportExecutor;
 	
 	public static final String IMPORT_COMMAND = "import";
 	public static final String IMPORT_FILE_COMMAND = "file";
 	public static final String IMPORT_BATCH_COMMAND = "batch";
+	public static final String LIST_COMMAND = "list";
 	private static final Logger logger = LoggerFactory.getLogger(CommandLineInputExecutor.class);
 
+  /**
+   * Accepts command line input and passes it to processing methods.  Throws an exception to halt
+   *   the pipeline if an error is hit in a runner.
+   * 
+   * @param args string arguments from command line
+   * @throws Exception Exception any exception thrown by runners
+   */
 	@Override 
 	public void run(String... args) throws Exception {
 		int code = 1;
@@ -58,11 +69,20 @@ public class CommandLineInputExecutor implements CommandLineRunner {
 		}
 		
 	}
-	
+
+  /**
+   * Processes the input arguments and executes the appropriate action.  Uses JCommander for argument
+   *   parsing.
+   * 
+   * @param args string arguments from command line
+   * @return application exit code
+   * @throws Exception any exception thrown by runners
+   */
 	private int processArguments(String... args) throws Exception {
 		
 		JCommander jc = new JCommander();
 		jc.setAcceptUnknownOptions(true);
+		
 		ImportCommandArguments importCommandArguments = new ImportCommandArguments();
 		ImportFileCommandArguments importFileCommandArguments = new ImportFileCommandArguments();
 		ImportManifestCommandArguments importManifestCommandArguments = new ImportManifestCommandArguments();
@@ -70,6 +90,10 @@ public class CommandLineInputExecutor implements CommandLineRunner {
 		JCommander importJc = jc.getCommands().get(IMPORT_COMMAND);
 		importJc.addCommand(IMPORT_FILE_COMMAND, importFileCommandArguments);
 		importJc.addCommand(IMPORT_BATCH_COMMAND, importManifestCommandArguments);
+
+    ListCommandArguments listCommandArguments = new ListCommandArguments();
+    jc.addCommand("list", listCommandArguments);
+		
 		int code = 1;
 		
 		try {
@@ -77,29 +101,49 @@ public class CommandLineInputExecutor implements CommandLineRunner {
 		} catch (MissingCommandException e){
 			logger.error("Invalid arguments.");
 			printUsage(jc);
+			return code;
 		}
 		
 		String mainCommand = jc.getParsedCommand();
-		if (IMPORT_COMMAND.equals(mainCommand)){
-			String importCommand = importJc.getParsedCommand();
-			if (IMPORT_FILE_COMMAND.equals(importCommand)){
-				logger.info(String.format("Running import file command with arguments: %s %s", 
-						importFileCommandArguments.toString(), importCommandArguments.toString()));
-				try {
-					fileImportExecutor.run(importFileCommandArguments.getDataType(),
-							importFileCommandArguments.getFilePath());
-				} catch (Exception e){
-					e.printStackTrace();
-				}
-				code = 0;
-			} else if (IMPORT_BATCH_COMMAND.equals(importCommand)){
-				logger.info(String.format("Running import batch command with arguments: %s %s",
-						importManifestCommandArguments.toString(), importCommandArguments.toString()));
-				// TODO
-			} else {
-				logger.error(String.format("Unknown import command: %s", importCommand));
-				printUsage(jc);
-			}
+		
+		// File import
+		if (IMPORT_COMMAND.equals(mainCommand)) {
+      
+		  String importCommand = importJc.getParsedCommand();
+      
+		  // Single file import
+		  if (IMPORT_FILE_COMMAND.equals(importCommand)) {
+        logger.info(String.format("Running import file command with arguments: %s %s",
+            importFileCommandArguments.toString(), importCommandArguments.toString()));
+        try {
+          fileImportExecutor.run(importFileCommandArguments.getDataType(),
+              importFileCommandArguments.getFilePath());
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+        code = 0;
+      
+      // Manifest import
+		  } else if (IMPORT_BATCH_COMMAND.equals(importCommand)) {
+		    
+        logger.info(String.format("Running import batch command with arguments: %s %s",
+            importManifestCommandArguments.toString(), importCommandArguments.toString()));
+        try {
+          manifestImportExecutor.run(importManifestCommandArguments.getFilePath());
+        } catch (Exception e){
+          e.printStackTrace();
+        }
+        code = 0;
+      
+		  } else {
+		    
+        logger.error(String.format("Unknown import command: %s", importCommand));
+        printUsage(jc);
+        
+      }
+      
+    } else if (LIST_COMMAND.equals(mainCommand)) {
+		  // TODO
 		} else {
 			logger.error(String.format("Unknown command: %s", mainCommand));
 			printUsage(jc);
@@ -108,7 +152,12 @@ public class CommandLineInputExecutor implements CommandLineRunner {
 		return code;
 		
 	}
-	
+
+  /**
+   * Prints the command line application usage.
+   * 
+   * @param jc JCommander object
+   */
 	private void printUsage(JCommander jc){
 		JCommander importJc = jc.getCommands().get(IMPORT_COMMAND);
 		importJc.usage(IMPORT_FILE_COMMAND);
@@ -134,4 +183,9 @@ public class CommandLineInputExecutor implements CommandLineRunner {
 	public void setFileImportExecutor(FileImportExecutor fileImportExecutor) {
 		this.fileImportExecutor = fileImportExecutor;
 	}
+
+	@Autowired
+  public void setManifestImportExecutor(ManifestImportExecutor manifestImportExecutor) {
+    this.manifestImportExecutor = manifestImportExecutor;
+  }
 }

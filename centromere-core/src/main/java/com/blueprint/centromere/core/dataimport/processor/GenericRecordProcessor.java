@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.dataimport.impl.processor;
+package com.blueprint.centromere.core.dataimport.processor;
 
+import com.blueprint.centromere.core.commons.support.DataFileAware;
+import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.DataTypeSupport;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
-import com.blueprint.centromere.core.dataimport.impl.importer.RecordImporter;
-import com.blueprint.centromere.core.dataimport.impl.reader.RecordReader;
-import com.blueprint.centromere.core.dataimport.impl.writer.RecordWriter;
-import com.blueprint.centromere.core.dataimport.impl.writer.TempFileWriter;
+import com.blueprint.centromere.core.dataimport.importer.RecordImporter;
+import com.blueprint.centromere.core.dataimport.reader.RecordReader;
+import com.blueprint.centromere.core.dataimport.writer.RecordWriter;
+import com.blueprint.centromere.core.dataimport.writer.TempFileWriter;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
@@ -48,7 +50,7 @@ import org.springframework.validation.Validator;
  * @author woemler
  */
 public class GenericRecordProcessor<T extends Model<?>> 
-		implements RecordProcessor<T>, DataTypeSupport {
+		implements RecordProcessor<T>, DataTypeSupport, DataFileAware, DataSetAware {
 
   private static final Logger logger = LoggerFactory.getLogger(GenericRecordProcessor.class);
 
@@ -252,6 +254,7 @@ public class GenericRecordProcessor<T extends Model<?>>
     return dataFile;
   }
 
+  @Override
   public void setDataFile(DataFile dataFile) {
     this.dataFile = dataFile;
   }
@@ -260,6 +263,7 @@ public class GenericRecordProcessor<T extends Model<?>>
     return dataSet;
   }
 
+  @Override
   public void setDataSet(DataSet dataSet) {
     this.dataSet = dataSet;
   }

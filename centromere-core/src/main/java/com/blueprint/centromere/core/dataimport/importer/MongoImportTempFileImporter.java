@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.dataimport.impl.importer;
+package com.blueprint.centromere.core.dataimport.importer;
 
 import com.blueprint.centromere.core.config.ApplicationProperties;
 import com.blueprint.centromere.core.dataimport.DataImportException;

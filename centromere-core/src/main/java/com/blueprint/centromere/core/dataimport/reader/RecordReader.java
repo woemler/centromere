@@ -14,27 +14,26 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.dataimport.impl.writer;
+package com.blueprint.centromere.core.dataimport.reader;
 
+import com.blueprint.centromere.core.dataimport.DataImportComponent;
 import com.blueprint.centromere.core.dataimport.DataImportException;
-import java.io.File;
+import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.ModelSupport;
 
 /**
+ * Data impoer component class.  Reads from a data source and returns {@link Model} class instances.
+ * 
  * @author woemler
  */
-public interface TempFileWriter {
+public interface RecordReader<T extends Model<?>> extends DataImportComponent, ModelSupport<T> {
 
-  /**
-   * Generates a file name and path for temporary files to be written by the writer component.  Allows
-   *   the component and external objects to reference a temporary file.
-   * 
-   * @param inputFilePath
-   * @return
-   */
-  default String getTempFilePath(String inputFilePath) throws DataImportException {
-    File tempDir = new File(System.getProperty("java.io.tmpdir"));
-    File tempFile = new File(tempDir, inputFilePath + ".tmp");
-    return tempFile.getAbsolutePath();
-  }
-  
+	/**
+	 * Generates and returns a single {@link Model} entity from the input data source.
+	 * 
+	 * @return a single {@link Model} record.
+	 * @throws DataImportException
+	 */
+	T readRecord() throws DataImportException;
+
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.dataimport.impl.importer;
+package com.blueprint.centromere.core.dataimport.importer;
 
 import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
@@ -22,7 +22,6 @@ import com.blueprint.centromere.core.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 
 /**

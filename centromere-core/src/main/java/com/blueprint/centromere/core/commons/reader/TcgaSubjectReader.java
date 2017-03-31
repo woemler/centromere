@@ -17,7 +17,7 @@
 package com.blueprint.centromere.core.commons.reader;
 
 import com.blueprint.centromere.core.commons.model.Subject;
-import com.blueprint.centromere.core.dataimport.impl.reader.ColumnRecordFileReader;
+import com.blueprint.centromere.core.dataimport.reader.ColumnRecordFileReader;
 
 /**
  * 

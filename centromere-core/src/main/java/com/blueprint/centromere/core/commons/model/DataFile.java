@@ -116,6 +116,6 @@ public class DataFile extends AbstractModel implements Attributes {
 
 	@Override
 	public String getAttribute(String name) {
-		return attributes.containsKey(name) ? attributes.get(name) : null;
+		return attributes.getOrDefault(name, null);
 	}
 }

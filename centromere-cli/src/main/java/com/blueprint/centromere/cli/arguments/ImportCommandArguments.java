@@ -14,32 +14,12 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.cli;
-
-import com.beust.jcommander.Parameter;
+package com.blueprint.centromere.cli.arguments;
 
 /**
  * @author woemler
  * @since 0.5.0
  */
-public class ImportManifestCommandArguments {
-	
-	@Parameter(names = { "-f", "--file" }, required = true, description = "Input file path.  Required")
-	private String filePath;
+public class ImportCommandArguments extends GenericCommandArguments {
 
-	public String getFilePath() {
-		return filePath;
-	}
-
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
-	}
-
-	@Override 
-	public String toString() {
-		return "ImportManifestCommandArguments{" +
-				"filePath='" + filePath + '\'' +
-				'}';
-	}
-	
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.cli;
+package com.blueprint.centromere.cli.arguments;
 
 import com.beust.jcommander.DynamicParameter;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.cli;
+package com.blueprint.centromere.cli.arguments;
 
 import com.beust.jcommander.Parameter;
 
@@ -22,16 +22,10 @@ import com.beust.jcommander.Parameter;
  * @author woemler
  * @since 0.5.0
  */
-public class ImportFileCommandArguments {
+public class ImportManifestCommandArguments {
 	
 	@Parameter(names = { "-f", "--file" }, required = true, description = "Input file path.  Required")
 	private String filePath;
-
-	@Parameter(names = { "-t", "--type" }, required = true, description = "Data type label for the target file.  Required.")
-	private String dataType;
-	
-//	@Parameter(description = "Data type label and file path.")
-//	private List<String> args = new ArrayList<>();
 
 	public String getFilePath() {
 		return filePath;
@@ -41,35 +35,11 @@ public class ImportFileCommandArguments {
 		this.filePath = filePath;
 	}
 
-	public String getDataType() {
-		return dataType;
-	}
-
-	public void setDataType(String dataType) {
-		this.dataType = dataType;
-	}
-
-//	public List<String> getArgs() {
-//		return args;
-//	}
-//
-//	public void setArgs(List<String> args) {
-//		this.args = args;
-//	}
-//	
-//	public String getDataType(){
-//		return args.size() > 0 ? args.get(0) : null;
-//	}
-//	
-//	public String getFilePath(){
-//		return args.size() > 1 ? args.get(1) : null;
-//	}
-
 	@Override 
 	public String toString() {
-		return "ImportFileCommandArguments{" +
+		return "ImportManifestCommandArguments{" +
 				"filePath='" + filePath + '\'' +
-				", dataType='" + dataType + '\'' +
 				'}';
 	}
+	
 }

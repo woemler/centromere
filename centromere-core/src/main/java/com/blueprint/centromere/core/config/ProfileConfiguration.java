@@ -44,7 +44,7 @@ public class ProfileConfiguration {
 		  return new TcgaSupport();
     }
 		
-		@Profile({ Database.MONGODB_PROFILE, Database.EMBEDDED_MONGODB_PROFILE })
+		@Profile({ Database.MONGODB_PROFILE })
 		@Configuration
 		@EnableMongoRepositories(basePackages = {
         "com.blueprint.centromere.core.commons.repository"},

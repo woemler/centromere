@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.dataimport.impl.processor;
+package com.blueprint.centromere.core.dataimport.processor;
 
 import com.blueprint.centromere.core.dataimport.DataImportComponent;
 import com.blueprint.centromere.core.dataimport.DataImportException;
-import com.blueprint.centromere.core.dataimport.impl.importer.RecordImporter;
-import com.blueprint.centromere.core.dataimport.impl.reader.RecordReader;
-import com.blueprint.centromere.core.dataimport.impl.writer.RecordWriter;
+import com.blueprint.centromere.core.dataimport.importer.RecordImporter;
+import com.blueprint.centromere.core.dataimport.reader.RecordReader;
+import com.blueprint.centromere.core.dataimport.writer.RecordWriter;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
 

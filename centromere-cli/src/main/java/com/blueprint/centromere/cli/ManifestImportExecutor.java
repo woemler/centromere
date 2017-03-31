@@ -16,21 +16,21 @@
 
 package com.blueprint.centromere.cli;
 
-import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.cli.manifest.ImportManifest;
 import com.blueprint.centromere.cli.manifest.ManifestFile;
+import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.ImportOptions;
+import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
+import java.io.File;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
-
-import java.io.File;
-import java.util.Map;
 
 /**
  * @author woemler
@@ -73,17 +73,32 @@ public class ManifestImportExecutor {
 		}
 		
 		// Set environemntal properties from manifest options.
-		setEnvironmentProperties(manifest.getAttributes());
+		setEnvironmentProperties(manifest.getParameters());
 		
 		// Import each file
 		for (ManifestFile mf: manifest.getFiles()){
-			String partialPath = mf.getPath();
+		  
+		  logger.info(String.format("Processing manifest file: %s", mf.toString()));
+			
+		  String partialPath = mf.getPath();
 			File dataFile = new File(partialPath);
 			if (!dataFile.isAbsolute()){
 				dataFile = new File(directory, partialPath);
 			}
-			setEnvironmentProperties(mf.getAttributes());
-			fileImportExecutor.run(mf.getType(), dataFile.getAbsolutePath());
+			
+			setEnvironmentProperties(mf.getParameters());
+      ImportOptions importOptions = new ImportOptionsImpl(environment);
+			
+      try {
+        fileImportExecutor.run(mf.getType(), dataFile.getAbsolutePath());
+      } catch (Exception e){
+        if (importOptions.skipInvalidFiles()){
+          logger.warn(String.format("File processing failed, skipping file: %s", 
+              dataFile.getAbsolutePath()));
+        } else {
+          throw e;
+        }
+      }
 		}
 	}
 	

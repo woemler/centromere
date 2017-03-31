@@ -22,20 +22,16 @@ package com.blueprint.centromere.core.config;
  */
 public enum Database {
 	CUSTOM,
-	MONGODB,
-	EMBEDDED_MONGO
+	MONGODB
 	;
 
 	public static final String CUSTOM_PROFILE = "db_custom";
-	public static final String EMBEDDED_MONGODB_PROFILE = "db_embedded_mongodb";
 	public static final String MONGODB_PROFILE = "db_mongodb";
 
 	public static String getProfile(Database database){
 		switch (database){
 			case MONGODB:
 				return MONGODB_PROFILE;
-      case EMBEDDED_MONGO:
-				return EMBEDDED_MONGODB_PROFILE;
 			default:
 				return CUSTOM_PROFILE;
 		}

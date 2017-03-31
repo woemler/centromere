@@ -1,11 +1,15 @@
 <manifest>
-    <name>Test Manifest</name>
-    <label>test</label>
-    <notes>This is a test</notes>
+    <displayName>Test Manifest</displayName>
+    <shortName>test</shortName>
+    <description>This is a test</description>
     <source>internal</source>
     <version>1.0</version>
-    <date-created>2017-01-10</date-created>
-    <skip-invalid-records>true</skip-invalid-records>
+    <attributes>
+        <date-created>2017-01-10</date-created>    
+    </attributes>
+    <parameters>
+        <skip-invalid-records>true</skip-invalid-records>
+    </parameters>
     <files>
         <file> 
             <path>../Homo_sapiens.gene_info</path>

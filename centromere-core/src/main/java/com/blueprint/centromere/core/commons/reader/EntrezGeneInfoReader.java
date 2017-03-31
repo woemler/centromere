@@ -18,7 +18,7 @@ package com.blueprint.centromere.core.commons.reader;
 
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.dataimport.DataImportException;
-import com.blueprint.centromere.core.dataimport.impl.reader.StandardRecordFileReader;
+import com.blueprint.centromere.core.dataimport.reader.StandardRecordFileReader;
 import com.blueprint.centromere.core.model.ModelSupport;
 
 /**

@@ -14,24 +14,27 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.dataimport.impl.importer;
+package com.blueprint.centromere.core.dataimport.writer;
 
-import com.blueprint.centromere.core.dataimport.DataImportComponent;
 import com.blueprint.centromere.core.dataimport.DataImportException;
+import java.io.File;
 
 /**
- * Data import component designed to take a temporary record file and import it directly into the 
- *   database, via a specified utility (eg. MySQLImport of MongoImport).  
- * 
  * @author woemler
  */
-public interface RecordImporter extends DataImportComponent {
+public interface TempFileWriter {
 
-	/**
-	 * Runs the data import on the specified temp file.
-	 * 
-	 * @param filePath
-	 * @throws DataImportException
-	 */
-	void importFile(String filePath) throws DataImportException;
+  /**
+   * Generates a file name and path for temporary files to be written by the writer component.  Allows
+   *   the component and external objects to reference a temporary file.
+   * 
+   * @param inputFilePath
+   * @return
+   */
+  default String getTempFilePath(String inputFilePath) throws DataImportException {
+    File tempDir = new File(System.getProperty("java.io.tmpdir"));
+    File tempFile = new File(tempDir, inputFilePath + ".tmp");
+    return tempFile.getAbsolutePath();
+  }
+  
 }

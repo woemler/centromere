@@ -16,8 +16,10 @@
 
 package com.blueprint.centromere.cli.manifest;
 
+import com.blueprint.centromere.core.commons.model.DataFile;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 
 /**
@@ -27,40 +29,59 @@ import java.util.LinkedHashMap;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ManifestFile {
 
-    private String path;
-    private String type;
-    private LinkedHashMap<String, String> attributes = new LinkedHashMap<>();
+  private String path;
+  private String type;
+  private LinkedHashMap<String, String> parameters = new LinkedHashMap<>();
+  private LinkedHashMap<String, String> attributes = new LinkedHashMap<>();
 
-    public String getPath() {
-        return path;
-    }
+  public String getPath() {
+      return path;
+  }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
+  public void setPath(String path) {
+      this.path = path;
+  }
 
-    public String getType() {
-        return type;
-    }
+  public String getType() {
+      return type;
+  }
 
-    public void setType(String type) {
-        this.type = type;
-    }
+  public void setType(String type) {
+      this.type = type;
+  }
 
-    public LinkedHashMap<String, String> getAttributes() {
-        return attributes;
-    }
+  public LinkedHashMap<String, String> getParameters() {
+    return parameters;
+  }
 
-    public void setAttributes(LinkedHashMap<String, String> attributes) {
-        this.attributes = attributes;
-    }
+  public void setParameters(LinkedHashMap<String, String> parameters) {
+    this.parameters = parameters;
+  }
 
-    @Override 
-    public String toString() {
-        return "ManifestFile{" +
-            "path='" + path + '\'' +
-            ", type='" + type + '\'' +
-            ", attributes=" + attributes +
-            '}';
-    }
+  public LinkedHashMap<String, String> getAttributes() {
+      return attributes;
+  }
+
+  public void setAttributes(LinkedHashMap<String, String> attributes) {
+      this.attributes = attributes;
+  }
+  
+  public DataFile createDataFile(){
+    DataFile dataFile = new DataFile();
+    dataFile.setFilePath(path);
+    dataFile.setDataType(type);
+    dataFile.setDateCreated(new Date());
+    dataFile.setDateUpdated(new Date());
+    dataFile.setAttributes(attributes);
+    return dataFile;
+  }
+
+  @Override 
+  public String toString() {
+    return "ManifestFile{" +
+      "path='" + path + '\'' +
+      ", type='" + type + '\'' +
+      ", attributes=" + attributes +
+      '}';
+  }
 }

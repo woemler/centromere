@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.dataimport.impl.writer;
+package com.blueprint.centromere.core.dataimport.writer;
 
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.model.ModelReflectionUtils;

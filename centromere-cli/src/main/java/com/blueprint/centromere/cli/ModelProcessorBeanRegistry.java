@@ -17,7 +17,7 @@
 package com.blueprint.centromere.cli;
 
 import com.blueprint.centromere.core.dataimport.DataTypes;
-import com.blueprint.centromere.core.dataimport.impl.processor.RecordProcessor;
+import com.blueprint.centromere.core.dataimport.processor.RecordProcessor;
 import com.blueprint.centromere.core.model.Model;
 
 import org.slf4j.Logger;
