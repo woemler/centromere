@@ -17,7 +17,6 @@
 package com.blueprint.centromere.core.commons.validator;
 
 import com.blueprint.centromere.core.commons.model.Data;
-
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 

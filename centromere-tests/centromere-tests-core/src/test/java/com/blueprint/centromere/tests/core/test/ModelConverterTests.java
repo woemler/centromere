@@ -20,15 +20,13 @@ import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.util.JsonModelConverter;
 import com.blueprint.centromere.core.util.KeyValueMapModelConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author woemler

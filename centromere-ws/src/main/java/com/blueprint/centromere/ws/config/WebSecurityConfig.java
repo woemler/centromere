@@ -18,7 +18,6 @@ package com.blueprint.centromere.ws.config;
 
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.Security;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

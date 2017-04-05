@@ -18,16 +18,14 @@ package com.blueprint.centromere.tests.core.test.commons;
 
 import com.blueprint.centromere.core.commons.model.Subject;
 import com.blueprint.centromere.core.commons.reader.TcgaSubjectReader;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author woemler

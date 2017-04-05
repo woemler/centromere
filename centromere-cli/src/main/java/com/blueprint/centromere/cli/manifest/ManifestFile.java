@@ -18,7 +18,6 @@ package com.blueprint.centromere.cli.manifest;
 
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.util.Date;
 import java.util.LinkedHashMap;
 

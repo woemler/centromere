@@ -30,26 +30,22 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  */
 public class ProfileConfiguration {
 	
-	@Profile({ "default", Schema.CUSTOM_PROFILE })
+	@Profile({ "default", Schema.CUSTOM_PROFILE, Schema.DEFAULT_PROFILE })
 	@Configuration
 	public static class DefaultModelConfiguration {
-	}
-
-	@Profile({ Schema.DEFAULT_PROFILE })
-	@Configuration
-	public static class DefaultSchemaConfiguration {
 
 		@Bean
-    public TcgaSupport tcgaSupport(){
-		  return new TcgaSupport();
-    }
-		
+		public TcgaSupport tcgaSupport(){
+			return new TcgaSupport();
+		}
+
 		@Profile({ Database.MONGODB_PROFILE })
 		@Configuration
 		@EnableMongoRepositories(basePackages = {
-        "com.blueprint.centromere.core.commons.repository"},
-				repositoryBaseClass = MongoModelRepository.class, 
+				"com.blueprint.centromere.core.commons.repository"},
+				repositoryBaseClass = MongoModelRepository.class,
 				repositoryFactoryBeanClass = MongoModelRepositoryFactoryBean.class)
+		//@Import({ DataSourceConfiguration.DefaultMongoDataSourceConfiguration.class })
 		public static class DefaultMongoSchemaConfiguration { }
 
 		@Profile({ Profiles.CLI_PROFILE })
@@ -59,8 +55,7 @@ public class ProfileConfiguration {
 				"com.blueprint.centromere.core.commons.processor"
 		})
 		public static class CommandLineComponentConfiguration { }
-		
+
 	}
-	
-	
+
 }

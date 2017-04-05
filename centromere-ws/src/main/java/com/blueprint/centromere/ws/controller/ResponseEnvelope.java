@@ -18,7 +18,6 @@ package com.blueprint.centromere.ws.controller;
 
 import com.blueprint.centromere.ws.config.FilteringJackson2HttpMessageConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.HashSet;
 import java.util.Set;
 

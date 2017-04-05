@@ -16,14 +16,13 @@
 
 package com.blueprint.centromere.ws.security;
 
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.codec.Hex;
-import org.springframework.util.Assert;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.Date;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.codec.Hex;
+import org.springframework.util.Assert;
 
 /**
  * Simple implementation of {@link TokenOperations} that

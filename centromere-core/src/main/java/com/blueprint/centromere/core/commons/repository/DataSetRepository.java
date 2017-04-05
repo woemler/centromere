@@ -18,10 +18,8 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.repository.ModelRepository;
-
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-
 import java.util.List;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 /**
  * @author woemler

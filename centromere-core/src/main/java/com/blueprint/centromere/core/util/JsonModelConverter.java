@@ -18,12 +18,10 @@ package com.blueprint.centromere.core.util;
 
 import com.blueprint.centromere.core.model.Model;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
-
-import java.io.IOException;
 
 /**
  * Simple utility class for converting JSON into {@link Model} objects using Jackson.

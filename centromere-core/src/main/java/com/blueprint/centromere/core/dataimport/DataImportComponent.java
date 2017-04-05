@@ -16,10 +16,8 @@
 
 package com.blueprint.centromere.core.dataimport;
 
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.EnvironmentAware;
-
 import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * Ensures that data import component classes have flexible setup and teardown methods that run

@@ -18,13 +18,11 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.repository.ModelRepository;
-
-import org.springframework.data.repository.query.Param;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.repository.query.Param;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 /**
  * @author woemler

@@ -18,19 +18,9 @@ package com.blueprint.centromere.core.repository;
 
 import com.blueprint.centromere.core.model.Model;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
 import org.springframework.data.mongodb.repository.support.QueryDslMongoRepository;
-import org.springframework.data.mongodb.repository.support.SimpleMongoRepository;
 
 /**
  * @author woemler

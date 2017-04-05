@@ -30,18 +30,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 
 /**
+ * Primary command line input handler.  Parses input and execute the appropriate functions.
+ *
  * @author woemler
  * @since 0.5.0
  */
 public class CommandLineInputExecutor implements CommandLineRunner {
 	
-	private FileImportExecutor fileImportExecutor;
+  private FileImportExecutor fileImportExecutor;
 	private ManifestImportExecutor manifestImportExecutor;
+	private ListCommandExecutor listCommandExecutor;
 	
 	public static final String IMPORT_COMMAND = "import";
 	public static final String IMPORT_FILE_COMMAND = "file";
 	public static final String IMPORT_BATCH_COMMAND = "batch";
+
 	public static final String LIST_COMMAND = "list";
+
 	private static final Logger logger = LoggerFactory.getLogger(CommandLineInputExecutor.class);
 
   /**
@@ -92,7 +97,7 @@ public class CommandLineInputExecutor implements CommandLineRunner {
 		importJc.addCommand(IMPORT_BATCH_COMMAND, importManifestCommandArguments);
 
     ListCommandArguments listCommandArguments = new ListCommandArguments();
-    jc.addCommand("list", listCommandArguments);
+    jc.addCommand(LIST_COMMAND, listCommandArguments);
 		
 		int code = 1;
 		
@@ -143,7 +148,14 @@ public class CommandLineInputExecutor implements CommandLineRunner {
       }
       
     } else if (LIST_COMMAND.equals(mainCommand)) {
-		  // TODO
+
+		  if (listCommandArguments.getArgs() == null || listCommandArguments.getArgs().isEmpty()){
+		    printUsage(jc);
+      } else {
+		    String arg = listCommandArguments.getArgs().get(0);
+		    listCommandExecutor.run(arg);
+      }
+
 		} else {
 			logger.error(String.format("Unknown command: %s", mainCommand));
 			printUsage(jc);
@@ -162,6 +174,8 @@ public class CommandLineInputExecutor implements CommandLineRunner {
 		JCommander importJc = jc.getCommands().get(IMPORT_COMMAND);
 		importJc.usage(IMPORT_FILE_COMMAND);
 		importJc.usage(IMPORT_BATCH_COMMAND);
+		JCommander listJc = jc.getCommands().get(LIST_COMMAND);
+    listJc.usage();
 	}
 
 	/**
@@ -187,5 +201,10 @@ public class CommandLineInputExecutor implements CommandLineRunner {
 	@Autowired
   public void setManifestImportExecutor(ManifestImportExecutor manifestImportExecutor) {
     this.manifestImportExecutor = manifestImportExecutor;
+  }
+
+  @Autowired
+  public void setListCommandExecutor(ListCommandExecutor listCommandExecutor) {
+    this.listCommandExecutor = listCommandExecutor;
   }
 }

@@ -16,6 +16,8 @@
 
 package com.blueprint.centromere.core.dataimport.processor;
 
+import com.blueprint.centromere.core.commons.model.DataFile;
+import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.dataimport.DataImportException;
@@ -28,8 +30,6 @@ import com.blueprint.centromere.core.dataimport.reader.RecordReader;
 import com.blueprint.centromere.core.dataimport.writer.RecordWriter;
 import com.blueprint.centromere.core.dataimport.writer.TempFileWriter;
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,9 +111,21 @@ public class GenericRecordProcessor<T extends Model<?>>
       dataSet = (DataSet) args[2];
     }
     
-		if (writer != null) writer.setImportOptions(options);
-		if (reader != null) reader.setImportOptions(options);
-		if (importer != null) importer.setImportOptions(options);
+		if (writer != null) {
+    	writer.setImportOptions(options);
+    	if (writer instanceof DataSetAware) ((DataSetAware) writer).setDataSet(dataSet);
+    	if (writer instanceof DataFileAware) ((DataFileAware) writer).setDataFile(dataFile);
+		}
+		if (reader != null) {
+      reader.setImportOptions(options);
+      if (reader instanceof DataSetAware) ((DataSetAware) reader).setDataSet(dataSet);
+      if (reader instanceof DataFileAware) ((DataFileAware) reader).setDataFile(dataFile);
+    }
+		if (importer != null) {
+      importer.setImportOptions(options);
+      if (importer instanceof DataSetAware) ((DataSetAware) importer).setDataSet(dataSet);
+      if (importer instanceof DataFileAware) ((DataFileAware) importer).setDataFile(dataFile);
+    }
 		
 		isConfigured = true;
     

@@ -16,14 +16,14 @@
 
 package com.blueprint.centromere.core.dataimport.reader;
 
+import com.blueprint.centromere.core.commons.model.DataFile;
+import com.blueprint.centromere.core.commons.model.DataSet;
+import com.blueprint.centromere.core.commons.support.DataFileAware;
+import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
-import com.blueprint.centromere.core.commons.support.DataFileAware;
-import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;

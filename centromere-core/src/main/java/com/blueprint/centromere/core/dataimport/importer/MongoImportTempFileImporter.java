@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.util.Assert;
 
 /**
  * @author woemler
@@ -45,6 +46,18 @@ public class MongoImportTempFileImporter<T extends Model<?>> extends AbstractFil
   public MongoImportTempFileImporter(Class<T> model, Environment environment) {
     super(model);
     this.environment = environment;
+  }
+
+  @Override
+  public void doBefore(Object... args) throws DataImportException {
+    Assert.isTrue(environment.containsProperty(ApplicationProperties.DB_HOST),
+        String.format("Environment property must not be null: %s", ApplicationProperties.DB_HOST));
+    Assert.isTrue(environment.containsProperty(ApplicationProperties.DB_NAME),
+        String.format("Environment property must not be null: %s", ApplicationProperties.DB_NAME));
+    Assert.isTrue(environment.containsProperty(ApplicationProperties.DB_USER),
+        String.format("Environment property must not be null: %s", ApplicationProperties.DB_USER));
+    Assert.isTrue(environment.containsProperty(ApplicationProperties.DB_PASSWORD),
+        String.format("Environment property must not be null: %s", ApplicationProperties.DB_PASSWORD));
   }
 
   /**

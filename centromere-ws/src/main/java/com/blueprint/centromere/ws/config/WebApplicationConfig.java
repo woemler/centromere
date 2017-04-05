@@ -54,7 +54,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 		@PropertySource({"classpath:centromere-defaults.properties"}),
 		@PropertySource(value = {"classpath:centromere.properties"},ignoreResourceNotFound = true)
 })
-@Import({ RepositoryRestMvcConfiguration.class, WebSecurityConfig.class })
+@Import({
+		RepositoryRestMvcConfiguration.class,
+		WebSecurityConfig.class,
+		SwaggerConfig.class
+})
 @ComponentScan(basePackageClasses = { UserAuthenticationController.class, ModelController.class })
 @Profile({ Profiles.WEB_PROFILE })
 public class WebApplicationConfig {

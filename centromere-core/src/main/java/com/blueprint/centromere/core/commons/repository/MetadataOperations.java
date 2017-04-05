@@ -18,10 +18,8 @@ package com.blueprint.centromere.core.commons.repository;
 
 
 import com.blueprint.centromere.core.model.Model;
-
-import org.springframework.data.repository.query.Param;
-
 import java.util.List;
+import org.springframework.data.repository.query.Param;
 
 /**
  * @author woemler

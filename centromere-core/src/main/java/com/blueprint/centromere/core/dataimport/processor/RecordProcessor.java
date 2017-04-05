@@ -23,7 +23,6 @@ import com.blueprint.centromere.core.dataimport.reader.RecordReader;
 import com.blueprint.centromere.core.dataimport.writer.RecordWriter;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
-
 import org.springframework.validation.Validator;
 
 /**

@@ -17,7 +17,6 @@
 package com.blueprint.centromere.core.commons.validator;
 
 import com.blueprint.centromere.core.commons.model.SegmentCopyNumber;
-
 import org.springframework.validation.Errors;
 
 /**

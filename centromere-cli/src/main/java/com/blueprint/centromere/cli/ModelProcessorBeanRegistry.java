@@ -19,7 +19,12 @@ package com.blueprint.centromere.cli;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.processor.RecordProcessor;
 import com.blueprint.centromere.core.model.Model;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -27,13 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Registry bean for mapping input file data types to their appropriate
@@ -186,6 +184,15 @@ public class ModelProcessorBeanRegistry implements BeanPostProcessor, Applicatio
 		}
 		return new ArrayList<>(processors);
 	}
+
+  /**
+   * Returns a list of registered data types.
+   *
+   * @return
+   */
+	public List<String> getRegisteredDataTypes(){
+	  return new ArrayList<>(dataTypeMap.keySet());
+  }
 
 	/**
 	 * Returns a list of {@link Model} types that have associated {@link RecordProcessor} beans registered.

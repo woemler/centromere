@@ -54,6 +54,11 @@ public class CommandLineInputConfiguration {
 		return new ManifestImportExecutor();
 	}
 
+	@Bean
+  public ListCommandExecutor listCommandExecutor(){
+	  return new ListCommandExecutor();
+  }
+
 //	@Profile({Schema.DEFAULT_PROFILE})
 //  @ComponentScan(basePackages = {
 //      "com.blueprince.centromere.core.commons.processor",

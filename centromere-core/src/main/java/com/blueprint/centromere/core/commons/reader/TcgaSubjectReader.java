@@ -26,19 +26,19 @@ import com.blueprint.centromere.core.dataimport.reader.ColumnRecordFileReader;
  */
 public class TcgaSubjectReader extends ColumnRecordFileReader<Subject> {
 
-    public TcgaSubjectReader() {
-        this.setModel(Subject.class);
-    }
+  public TcgaSubjectReader() {
+    this.setModel(Subject.class);
+  }
 
-    @Override
-    protected void setModelAttribute(Subject record, String attribute, String value) {
-        if (attribute.equalsIgnoreCase("hybridization ref")){
-            record.setName(value);
-        } else if (attribute.equalsIgnoreCase("gender")){
-            record.setGender(value);
-        } else {
-            record.addAttribute(attribute, value);
-        }
-        if (record.getSpecies() == null) record.setSpecies("Homo sapiens");
+  @Override
+  protected void setModelAttribute(Subject record, String attribute, String value) {
+    if (attribute.equalsIgnoreCase("hybridization ref")){
+      record.setName(value);
+    } else if (attribute.equalsIgnoreCase("gender")){
+      record.setGender(value);
+    } else {
+      record.addAttribute(attribute, value);
     }
+    if (record.getSpecies() == null) record.setSpecies("Homo sapiens");
+  }
 }

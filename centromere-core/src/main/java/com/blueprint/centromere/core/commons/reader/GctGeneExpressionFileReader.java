@@ -22,24 +22,22 @@ import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.dataimport.reader.MultiRecordLineFileReader;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.config.ApplicationProperties;
 import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.reader.MultiRecordLineFileReader;
 import com.blueprint.centromere.core.model.ModelSupport;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Reads normalized gene expression data from GCT files

@@ -51,7 +51,8 @@ public class ImportOptionsImpl implements ImportOptions {
       skipExistingFiles = environment.getProperty(ApplicationProperties.SKIP_EXISTING_FILES, Boolean.class);
     }
     if (environment.containsProperty(ApplicationProperties.TEMP_DIR)){
-      tempFilePath = environment.getProperty(ApplicationProperties.TEMP_DIR);
+      String tempPath = environment.getProperty(ApplicationProperties.TEMP_DIR);
+      if (tempPath != null && !tempPath.trim().equals("")) tempFilePath = tempPath;
     }
   }
 

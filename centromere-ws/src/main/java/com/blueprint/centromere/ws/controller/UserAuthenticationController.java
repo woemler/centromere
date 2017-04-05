@@ -19,7 +19,6 @@ package com.blueprint.centromere.ws.controller;
 import com.blueprint.centromere.core.commons.model.User;
 import com.blueprint.centromere.ws.security.BasicTokenUtils;
 import com.blueprint.centromere.ws.security.TokenDetails;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

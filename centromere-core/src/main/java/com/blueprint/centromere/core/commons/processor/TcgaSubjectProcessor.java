@@ -16,13 +16,13 @@
 
 package com.blueprint.centromere.core.commons.processor;
 
-import com.blueprint.centromere.core.dataimport.DataTypes;
+import com.blueprint.centromere.core.commons.model.Subject;
 import com.blueprint.centromere.core.commons.reader.TcgaSubjectReader;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.validator.SubjectValidator;
+import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter;
-import com.blueprint.centromere.core.commons.model.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

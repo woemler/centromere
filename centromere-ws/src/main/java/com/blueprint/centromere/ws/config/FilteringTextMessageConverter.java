@@ -19,7 +19,14 @@ package com.blueprint.centromere.ws.config;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.ws.controller.FilterableResource;
 import com.blueprint.centromere.ws.controller.ResponseEnvelope;
-
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.hateoas.PagedResources;
@@ -32,15 +39,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Message converter that takes web service response data and converts it to delimited-text in a

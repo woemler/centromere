@@ -17,7 +17,6 @@
 package com.blueprint.centromere.cli.arguments;
 
 import com.beust.jcommander.DynamicParameter;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,10 +28,10 @@ import java.util.Map;
  */
 public abstract class GenericCommandArguments {
 
-	@DynamicParameter(names = "-D", description = "Dynamic key-value parameters. eg -Dname=Joe")
+  @DynamicParameter(names = "-D", description = "Dynamic key-value parameters. eg -Dname=Joe")
 	private Map<String, String> parameters = new HashMap<>();
 
-	public Map<String, String> getParameters() {
+  public Map<String, String> getParameters() {
 		return parameters;
 	}
 
@@ -43,7 +42,7 @@ public abstract class GenericCommandArguments {
 	@Override 
 	public String toString() {
 		return "GenericCommandArguments{" +
-				"parameters=" + parameters +
+        "parameters=" + parameters +
 				'}';
 	}
 }

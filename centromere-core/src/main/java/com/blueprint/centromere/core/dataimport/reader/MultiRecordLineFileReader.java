@@ -18,7 +18,6 @@ package com.blueprint.centromere.core.dataimport.reader;
 
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.model.Model;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

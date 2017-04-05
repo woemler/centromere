@@ -16,15 +16,15 @@
 
 package com.blueprint.centromere.core.commons.reader;
 
-import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.dataimport.reader.MultiRecordLineFileReader;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
+import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
 import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.reader.MultiRecordLineFileReader;
 import com.blueprint.centromere.core.model.ModelSupport;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,13 +42,12 @@ import org.springframework.util.Assert;
  */
 public class TcgaRnaSeqGeneExpressionFileReader
 		extends MultiRecordLineFileReader<GeneExpression>
-		implements ModelSupport<GeneExpression>, DataFileAware {
+		implements ModelSupport<GeneExpression>, DataFileAware, DataSetAware {
 
 	private static final Logger logger = LoggerFactory.getLogger(TcgaRnaSeqGeneExpressionFileReader.class);
 
 	private final GeneRepository geneRepository;
 	private final TcgaSupport tcgaSupport;
-	private DataFile dataFile;
 	private Map<String, Sample> sampleMap;
 	private Map<String, Gene> geneMap;
 	private Class<GeneExpression> model = GeneExpression.class;
@@ -64,7 +63,8 @@ public class TcgaRnaSeqGeneExpressionFileReader
 	@Override
 	public void doBefore(Object... args) throws DataImportException {
 		super.doBefore(args);
-        Assert.notNull(dataFile.getDataSet(), "DataSet must be set for DataFile object.");
+    Assert.notNull(this.getDataSet(), "DataSet record must not be null.");
+    Assert.notNull(this.getDataFile(), "DataFile record must not be null.");
 		sampleMap = new HashMap<>();
 		geneMap = new HashMap<>();
 		for (Gene gene: geneRepository.findAll()){
@@ -72,7 +72,7 @@ public class TcgaRnaSeqGeneExpressionFileReader
     }
 	}
 
-	@Override 
+  @Override
 	protected List<GeneExpression> getRecordsFromLine(String line) throws DataImportException {
 		List<GeneExpression> records = new ArrayList<>();
 		String[] bits = line.trim().split(this.getDelimiter());
@@ -100,7 +100,7 @@ public class TcgaRnaSeqGeneExpressionFileReader
 						throw new DataImportException(String.format("Cannot parse value: %s", bits[i]));
 					}
 				}
-				record.setDataFile(dataFile);
+				record.setDataFile(this.getDataFile());
 				record.setGene(gene);
 				record.setSample(sample);
 				records.add(record);
@@ -110,16 +110,23 @@ public class TcgaRnaSeqGeneExpressionFileReader
 		return records;
 	}
 
+  @Override
+  protected void parseHeader(String line) {
+    super.parseHeader(line);
+
+  }
+
 	private Sample getSample(int index) {
-		String sampleName = this.getHeaders().get(index);
+		String sampleName = this.getHeaders().get(index).toLowerCase();
 		Sample sample = null;
 		if (sampleMap.containsKey(sampleName)){
 			sample = sampleMap.get(sampleName);
 		} else {
 			sample = tcgaSupport.findSample(sampleName);
 			if (sample == null){
-			  sample = tcgaSupport.createSample(sampleName, dataFile.getDataSet());
+			  sample = tcgaSupport.createSample(sampleName, this.getDataSet());
 			}
+			sampleMap.put(this.getHeaders().get(index), sample);
 		}
 		return sample;
 	}
@@ -155,13 +162,4 @@ public class TcgaRnaSeqGeneExpressionFileReader
 		this.model = model;
 	}
 
-	@Override
-	public DataFile getDataFile() {
-			return dataFile;
-	}
-
-	@Override
-	public void setDataFile(DataFile dataFile) {
-			this.dataFile = dataFile;
-	}
 }

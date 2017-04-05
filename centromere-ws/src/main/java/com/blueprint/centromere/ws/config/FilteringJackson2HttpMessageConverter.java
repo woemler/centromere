@@ -23,14 +23,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.Set;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.Set;
 
 /**
  * Uses {@link ResponseEnvelope} to identify filterable entities and

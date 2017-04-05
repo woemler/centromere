@@ -1,5 +1,6 @@
 package com.blueprint.centromere.tests.core.test.dataimport;
 
+import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
@@ -7,7 +8,6 @@ import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.dataimport.writer.DelimtedTextFileWriter;
-import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import org.junit.Test;

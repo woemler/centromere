@@ -1,18 +1,12 @@
 package com.blueprint.centromere.ws.controller;
 
-import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.Evaluation;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.core.repository.QueryParameterDescriptor;
 import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.PathBuilder;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.util.MultiValueMap;
 
 /**

@@ -19,17 +19,15 @@ package com.blueprint.centromere.core.dataimport.reader;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
-
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
-
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Generic {@link RecordReader} implementation that will use data file column headers to try to map

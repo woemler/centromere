@@ -60,7 +60,7 @@ public class TcgaSupport {
     sample.setDataSetId(dataSet.getId());
     sample.setTissue(subject.getAttribute("tumor_tissue_site"));
     sample.setHistology(subject.getAttribute("histological_type"));
-    sampleRepository.save(sample);
+    sampleRepository.insert(sample);
 
     return sample;
 

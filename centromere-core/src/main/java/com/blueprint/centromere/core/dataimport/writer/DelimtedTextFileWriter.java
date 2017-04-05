@@ -17,8 +17,8 @@
 package com.blueprint.centromere.core.dataimport.writer;
 
 import com.blueprint.centromere.core.dataimport.DataImportException;
-import com.blueprint.centromere.core.model.ModelReflectionUtils;
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.ModelReflectionUtils;
 import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.FileWriter;
 import java.io.IOException;

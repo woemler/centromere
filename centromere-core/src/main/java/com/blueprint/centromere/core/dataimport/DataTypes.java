@@ -18,7 +18,6 @@ package com.blueprint.centromere.core.dataimport;
 
 import com.blueprint.centromere.core.dataimport.processor.RecordProcessor;
 import com.blueprint.centromere.core.model.Model;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

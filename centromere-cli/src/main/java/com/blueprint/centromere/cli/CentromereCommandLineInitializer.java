@@ -16,18 +16,15 @@
 
 package com.blueprint.centromere.cli;
 
-import com.google.common.collect.ObjectArrays;
-
 import com.blueprint.centromere.core.config.AutoConfigureCentromere;
 import com.blueprint.centromere.core.config.Profiles;
-
+import com.google.common.collect.ObjectArrays;
+import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Arrays;
 import org.springframework.context.annotation.Import;
 
 /**
