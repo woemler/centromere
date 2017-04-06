@@ -36,32 +36,36 @@ import org.springframework.context.annotation.Import;
 @Target(ElementType.TYPE)
 @Inherited
 @Configuration
-@Import({ ProfileConfiguration.class })
+@Import({ ProfileConfiguration.DefaultModelConfiguration.class })
 public @interface AutoConfigureCentromere {
 
-	/**
-	 * Allows selection of a default database configuration.  Defaults to {@code CUSTOM}, which assumes
-	 *   a user-supplied configuration class is present.
-	 * 
-	 * @return database profile
-	 */
-	Database database() default Database.CUSTOM;
+//	/**
+//	 * Allows selection of a default database configuration.  Defaults to {@code CUSTOM}, which assumes
+//	 *   a user-supplied configuration class is present.
+//	 *
+//	 * @return database profile
+//	 */
+//	Database database() default Database.MONGODB;
+//
+//	/**
+//	 * Allows selection fo a default set of {@link Model} classes,
+//	 *   which will be registered in the application.  Defaults to {@code CUSTOM}, which assumes that
+//	 *   model creation and repository instantiation will be handled by the user.
+//	 *
+//	 * @return
+//	 */
+//	Schema schema() default Schema.DEFAULT;
+//
+//	/**
+//	 * Sets the level of security to be automaticaly configured within the web services context.
+//	 *   Defaults to NONE, which is no security.
+//	 *
+//	 * @return
+//	 */
+//	Security webSecurity() default Security.NONE;
 
-	/**
-	 * Allows selection fo a default set of {@link Model} classes,
-	 *   which will be registered in the application.  Defaults to {@code CUSTOM}, which assumes that
-	 *   model creation and repository instantiation will be handled by the user.
-	 * 
-	 * @return
-	 */
-	Schema schema() default Schema.CUSTOM;
+  boolean enableWebSecurity() default false;
 
-	/**
-	 * Sets the level of security to be automaticaly configured within the web services context.
-	 *   Defaults to NONE, which is no security.
-	 *
-	 * @return
-	 */
-	Security webSecurity() default Security.NONE;
+  boolean enableApiDocumentation() default false;
 	
 }

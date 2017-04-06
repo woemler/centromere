@@ -30,7 +30,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  */
 public class ProfileConfiguration {
 	
-	@Profile({ "default", Schema.CUSTOM_PROFILE, Schema.DEFAULT_PROFILE })
+	//@Profile({ "default", Schema.CUSTOM_PROFILE, Schema.DEFAULT_PROFILE })
 	@Configuration
 	public static class DefaultModelConfiguration {
 
@@ -39,7 +39,7 @@ public class ProfileConfiguration {
 			return new TcgaSupport();
 		}
 
-		@Profile({ Database.MONGODB_PROFILE })
+		//@Profile({ Database.MONGODB_PROFILE })
 		@Configuration
 		@EnableMongoRepositories(basePackages = {
 				"com.blueprint.centromere.core.commons.repository"},

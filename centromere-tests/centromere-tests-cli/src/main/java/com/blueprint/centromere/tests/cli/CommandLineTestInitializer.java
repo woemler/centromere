@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Import;
  * @author woemler
  */
 @Import({MongoDataSourceConfig.class})
-@AutoConfigureCentromere(schema = Schema.DEFAULT)
+@AutoConfigureCentromere
 public class CommandLineTestInitializer extends CentromereCommandLineInitializer {
 
   public static void main(String[] args) {

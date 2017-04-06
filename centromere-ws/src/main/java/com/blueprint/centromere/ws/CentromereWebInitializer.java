@@ -18,6 +18,7 @@ package com.blueprint.centromere.ws;
 
 import com.blueprint.centromere.core.config.AutoConfigureCentromere;
 import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.ws.config.WebApplicationConfig;
 import com.google.common.collect.ObjectArrays;
 import java.util.Arrays;
@@ -43,8 +44,11 @@ public class CentromereWebInitializer extends SpringBootServletInitializer {
     SpringApplication springApplication = new SpringApplication(source);
     if (source.isAnnotationPresent(AutoConfigureCentromere.class)){
       AutoConfigureCentromere annotation = source.getAnnotation(AutoConfigureCentromere.class);
-      String[] profiles = ObjectArrays.concat(Profiles.WEB_PROFILE, 
-          Profiles.getApplicationProfiles(annotation.database(), annotation.schema(), annotation.webSecurity()));
+      String securityProfile = annotation.enableWebSecurity()
+          ? Security.SECURE_READ_WRITE_PROFILE : Security.NONE_PROFILE;
+      String apiDocumentationProfile = annotation.enableApiDocumentation()
+          ? Profiles.API_DOCUMENTATION_ENABLED_PROFILE : Profiles.API_DOCUMENTATION_DISABLED_PROFILE;
+      String[] profiles = { Profiles.WEB_PROFILE, securityProfile, apiDocumentationProfile };
       springApplication.setAdditionalProfiles(profiles);
       logger.info(String.format("Running Centromere with profiles: %s", Arrays.asList(profiles)));
     } else {

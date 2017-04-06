@@ -29,6 +29,8 @@ public class Profiles {
 	
 	public static final String WEB_PROFILE = "mode_web";
 	public static final String CLI_PROFILE = "mode_cli";
+	public static final String API_DOCUMENTATION_ENABLED_PROFILE = "documentation_enabled";
+	public static final String API_DOCUMENTATION_DISABLED_PROFILE = "documentation_disabled";
 	
 	public static String getApplicationModeProfile(ApplicationMode mode){
 		switch (mode){
@@ -41,21 +43,21 @@ public class Profiles {
 		}
 	}
 
-	public static String[] getApplicationProfiles(Database database, Schema schema, Security security){
-		String dbProfile = Database.getProfile(database);
-		String schemaProfile = Schema.getProfile(schema);
-		String securityProfile = Security.getProfile(security);
-		return new String[]{dbProfile, schemaProfile, securityProfile};
-	}
-
-	public static String[] getApplicationProfiles(Database database, Schema schema){
-		String dbProfile = Database.getProfile(database);
-		String schemaProfile = Schema.getProfile(schema);
-		return new String[]{dbProfile, schemaProfile};
-	}
-
-	public static String[] getApplicationProfiles(AutoConfigureCentromere annotation){
-		return getApplicationProfiles(annotation.database(), annotation.schema(), annotation.webSecurity());
-	}
+//	public static String[] getApplicationProfiles(Database database, Schema schema, Security security){
+//		String dbProfile = Database.getProfile(database);
+//		String schemaProfile = Schema.getProfile(schema);
+//		String securityProfile = Security.getProfile(security);
+//		return new String[]{dbProfile, schemaProfile, securityProfile};
+//	}
+//
+//	public static String[] getApplicationProfiles(Database database, Schema schema){
+//		String dbProfile = Database.getProfile(database);
+//		String schemaProfile = Schema.getProfile(schema);
+//		return new String[]{dbProfile, schemaProfile};
+//	}
+//
+//	public static String[] getApplicationProfiles(AutoConfigureCentromere annotation){
+//		return getApplicationProfiles(annotation.database(), annotation.schema(), annotation.webSecurity());
+//	}
 	
 }

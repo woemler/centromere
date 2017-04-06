@@ -41,8 +41,7 @@ public class CentromereCommandLineInitializer {
 		SpringApplication springApplication = new SpringApplication(source);
 		if (source.isAnnotationPresent(AutoConfigureCentromere.class)){
 			AutoConfigureCentromere annotation = source.getAnnotation(AutoConfigureCentromere.class);
-			String[] profiles = ObjectArrays.concat(Profiles.CLI_PROFILE, 
-					Profiles.getApplicationProfiles(annotation.database(), annotation.schema()));
+			String[] profiles = { Profiles.CLI_PROFILE };
 			springApplication.setAdditionalProfiles(profiles);
 			logger.info(String.format("Running Centromere with profiles: %s", Arrays.asList(profiles)));
 		} else {
