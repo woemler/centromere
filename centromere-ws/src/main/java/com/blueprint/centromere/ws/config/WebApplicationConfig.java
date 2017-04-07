@@ -25,6 +25,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -42,6 +44,7 @@ import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapt
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -63,45 +66,62 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @Profile({ Profiles.WEB_PROFILE })
 public class WebApplicationConfig {
 	
-	@Bean
-	public RepositoryRestConfigurer springDataRestCustomConfig(){
-		
-		return new RepositoryRestConfigurerAdapter(){
+	@Configuration
+	public static class SpringDataRestCustomConfig extends RepositoryRestConfigurerAdapter{
 
-			@Autowired private Environment env;
-			
-			@Override
-			public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
-				config.setBasePath(env.getRequiredProperty("centromere.api.root-url"));
-				config.setReturnBodyForPutAndPost(true);
-				config.exposeIdsFor(AbstractModel.class);
-			}
+    @Autowired private Environment env;
 
-			@Override
-			public void configureHttpMessageConverters(List<HttpMessageConverter<?>> converters) {
-				converters.addAll(httpMessageConverters());
-			}
+    @Override
+    public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
+      config.setBasePath(env.getRequiredProperty("centromere.api.root-url"));
+      config.setReturnBodyForPutAndPost(true);
+      config.exposeIdsFor(AbstractModel.class);
+    }
 
-			@Override
-			public void configureConversionService(ConfigurableConversionService conversionService) {
-				super.configureConversionService(conversionService);
-				conversionService.addConverter(new StringToMapParameterConverter());
-			}
-		};
+    @Override
+    public void configureHttpMessageConverters(List<HttpMessageConverter<?>> converters) {
+      converters.addAll(httpMessageConverters());
+    }
+
+    @Override
+    public void configureConversionService(ConfigurableConversionService conversionService) {
+      super.configureConversionService(conversionService);
+      conversionService.addConverter(new StringToMapParameterConverter());
+    }
 		
 	}
 	
-	@Bean
-	public WebMvcConfigurer springMvcCustomConfig(){
-		
-		return new WebMvcConfigurerAdapter() {
-			
-			@Override 
-			public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-				converters.addAll(httpMessageConverters());
-			}
-			
-		};
+	@Configuration
+	public static class SpringMvcCustomConfig extends WebMvcConfigurerAdapter {
+
+	  private static final Logger logger = LoggerFactory.getLogger(SpringMvcCustomConfig.class);
+
+    @Autowired private Environment env;
+
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+      converters.addAll(httpMessageConverters());
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+      registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
+      registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+      if ("true".equals(env.getRequiredProperty("centromere.web.enable-static-content").toLowerCase())){
+        registry.addResourceHandler("/static/**").addResourceLocations("/static/");
+        if (env.getRequiredProperty("centromere.web.home-page") != null
+            && !"".equals(env.getRequiredProperty("centromere.web.home-page"))
+            && env.getRequiredProperty("centromere.web.home-page-location") != null
+            && !"".equals(env.getRequiredProperty("centromere.web.home-page"))){
+          registry.addResourceHandler(env.getRequiredProperty("centromere.web.home-page"))
+              .addResourceLocations(env.getRequiredProperty("centromere.web.home-page-location"));
+          logger.info(String.format("[Static home page configured at URL: /%s",
+              env.getRequiredProperty("centromere.web.home-page")));
+        } else {
+          logger.warn("Static home page location not properly configured.");
+        }
+      }
+    }
 		
 	}
 	
