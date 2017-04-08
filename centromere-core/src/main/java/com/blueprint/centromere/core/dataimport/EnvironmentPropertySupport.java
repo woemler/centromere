@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.dataimport;
 
-import com.blueprint.centromere.core.config.ApplicationProperties;
+import com.blueprint.centromere.core.config.Properties;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 
@@ -32,7 +32,7 @@ public interface EnvironmentPropertySupport extends EnvironmentAware {
   Environment getEnvironment();
 
   default boolean isSkipInvalidGenes() {
-    return this.getEnvironment().getRequiredProperty(ApplicationProperties.SKIP_INVALID_GENES, Boolean.class);
+    return this.getEnvironment().getRequiredProperty(Properties.SKIP_INVALID_GENES, Boolean.class);
   }
 
   default boolean isInvalidGene(Object gene) throws DataImportException {
@@ -48,7 +48,7 @@ public interface EnvironmentPropertySupport extends EnvironmentAware {
   }
 
   default boolean isSkipInvalidRecords() {
-    return this.getEnvironment().getRequiredProperty(ApplicationProperties.SKIP_INVALID_RECORDS, Boolean.class);
+    return this.getEnvironment().getRequiredProperty(Properties.SKIP_INVALID_RECORDS, Boolean.class);
   }
 
   default boolean isInvalidRecord(Object record) throws DataImportException {
@@ -64,7 +64,7 @@ public interface EnvironmentPropertySupport extends EnvironmentAware {
   }
 
   default boolean isSkipInvalidSamples() {
-    return this.getEnvironment().getRequiredProperty(ApplicationProperties.SKIP_INVALID_SAMPLES, Boolean.class);
+    return this.getEnvironment().getRequiredProperty(Properties.SKIP_INVALID_SAMPLES, Boolean.class);
   }
 
   default boolean isInvalidSample(Object sample) throws DataImportException {

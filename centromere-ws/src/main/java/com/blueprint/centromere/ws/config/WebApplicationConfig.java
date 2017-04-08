@@ -16,7 +16,6 @@
 
 package com.blueprint.centromere.ws.config;
 
-import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.util.StringToMapParameterConverter;
 import com.blueprint.centromere.ws.controller.ModelController;
@@ -63,7 +62,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 		SwaggerConfig.class
 })
 @ComponentScan(basePackageClasses = { UserAuthenticationController.class, ModelController.class })
-@Profile({ Profiles.WEB_PROFILE })
 public class WebApplicationConfig {
 	
 	@Configuration

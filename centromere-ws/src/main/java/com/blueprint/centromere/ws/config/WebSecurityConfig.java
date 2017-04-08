@@ -17,7 +17,6 @@
 package com.blueprint.centromere.ws.config;
 
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.config.Security;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +59,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Configuration
     @Order(1)
-    @Profile({"default", Security.NONE_PROFILE})
+    @Profile({ Profiles.NO_SECURITY })
     public static class OpenReadWriteTokenSecurityConfig extends TokenSecurityConfiguration {
         
         @Autowired private Environment env;
@@ -93,43 +92,43 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         }
     }
 
+//    @Configuration
+//    @Order(1)
+//    @Profile({Profiles.SECURE_WRITE_PROFILE})
+//    public static class SecuredWriteTokenSecurityConfig extends TokenSecurityConfiguration {
+//
+//        @Autowired private Environment env;
+//
+//        @Override
+//        protected void configure(HttpSecurity http) throws Exception {
+//
+//            String secureUrl = env.getRequiredProperty("centromere.security.secure-url");
+//            logger.info(String.format("Configuring web security with OPEN READ and RESTRICTED WRITE "
+//                + "for API root %s", secureUrl));
+//
+//            http
+//                .sessionManagement()
+//                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                .and().addFilterBefore(authenticationTokenProcessingFilter(),
+//                    UsernamePasswordAuthenticationFilter.class)
+//                    .antMatcher(secureUrl)
+//                    .authorizeRequests()
+//                        .antMatchers(HttpMethod.GET, secureUrl).permitAll()
+//                        .antMatchers(HttpMethod.POST, secureUrl).fullyAuthenticated()
+//                        .antMatchers(HttpMethod.PUT, secureUrl).fullyAuthenticated()
+//                        .antMatchers(HttpMethod.DELETE, secureUrl).fullyAuthenticated()
+//                        .antMatchers(HttpMethod.PATCH, secureUrl).fullyAuthenticated()
+//                        .antMatchers(HttpMethod.OPTIONS, secureUrl).permitAll()
+//                        .antMatchers(HttpMethod.HEAD, secureUrl).permitAll()
+//                .and().csrf()
+//                    .disable();
+//
+//        }
+//    }
+
     @Configuration
     @Order(1)
-    @Profile({Security.SECURE_WRITE_PROFILE})
-    public static class SecuredWriteTokenSecurityConfig extends TokenSecurityConfiguration {
-
-        @Autowired private Environment env;
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-
-            String secureUrl = env.getRequiredProperty("centromere.security.secure-url");
-            logger.info(String.format("Configuring web security with OPEN READ and RESTRICTED WRITE " 
-                + "for API root %s", secureUrl));
-
-            http
-                .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().addFilterBefore(authenticationTokenProcessingFilter(),
-                    UsernamePasswordAuthenticationFilter.class)
-                    .antMatcher(secureUrl)
-                    .authorizeRequests()
-                        .antMatchers(HttpMethod.GET, secureUrl).permitAll()
-                        .antMatchers(HttpMethod.POST, secureUrl).fullyAuthenticated()
-                        .antMatchers(HttpMethod.PUT, secureUrl).fullyAuthenticated()
-                        .antMatchers(HttpMethod.DELETE, secureUrl).fullyAuthenticated()
-                        .antMatchers(HttpMethod.PATCH, secureUrl).fullyAuthenticated()
-                        .antMatchers(HttpMethod.OPTIONS, secureUrl).permitAll()
-                        .antMatchers(HttpMethod.HEAD, secureUrl).permitAll()
-                .and().csrf()
-                    .disable();
-
-        }
-    }
-
-    @Configuration
-    @Order(1)
-    @Profile({Security.SECURE_READ_WRITE_PROFILE})
+    @Profile({Profiles.SECURE_READ_WRITE_PROFILE})
     public static class SecuredReadWriteTokenSecurityConfig extends TokenSecurityConfiguration {
 
         @Autowired private Environment env;

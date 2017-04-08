@@ -35,7 +35,6 @@ import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.ws.TestInitializer;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -61,7 +60,7 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestInitializer.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(value = { Profiles.WEB_PROFILE, Security.NONE_PROFILE })
+@ActiveProfiles(value = { Profiles.WEB_PROFILE, Profiles.NO_SECURITY })
 @AutoConfigureMockMvc
 public class DefaultControllerTests extends AbstractRepositoryTests {
 

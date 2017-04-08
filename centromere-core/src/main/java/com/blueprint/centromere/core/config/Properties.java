@@ -22,7 +22,7 @@ package com.blueprint.centromere.core.config;
  * @author woemler
  * @since 0.5.0
  */
-public class ApplicationProperties {
+public class Properties {
 
   private static final String CENTROMERE_PREFIX = "centromere.";
   private static final String APP_PREFIX = CENTROMERE_PREFIX + "app.";

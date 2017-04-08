@@ -16,7 +16,6 @@
 
 package com.blueprint.centromere.core.config;
 
-import com.blueprint.centromere.core.model.Model;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -26,8 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
- * Performs full, automatic configuration for model schema selection, database integration, and 
- *   web services creation.  
+ * Performs configuration of core components of Centromere.
  * 
  * @author woemler
  * @since 0.4.3
@@ -36,36 +34,21 @@ import org.springframework.context.annotation.Import;
 @Target(ElementType.TYPE)
 @Inherited
 @Configuration
-@Import({ ProfileConfiguration.DefaultModelConfiguration.class })
+@Import({ CoreConfiguration.class })
 public @interface AutoConfigureCentromere {
 
-//	/**
-//	 * Allows selection of a default database configuration.  Defaults to {@code CUSTOM}, which assumes
-//	 *   a user-supplied configuration class is present.
-//	 *
-//	 * @return database profile
-//	 */
-//	Database database() default Database.MONGODB;
-//
-//	/**
-//	 * Allows selection fo a default set of {@link Model} classes,
-//	 *   which will be registered in the application.  Defaults to {@code CUSTOM}, which assumes that
-//	 *   model creation and repository instantiation will be handled by the user.
-//	 *
-//	 * @return
-//	 */
-//	Schema schema() default Schema.DEFAULT;
-//
-//	/**
-//	 * Sets the level of security to be automaticaly configured within the web services context.
-//	 *   Defaults to NONE, which is no security.
-//	 *
-//	 * @return
-//	 */
-//	Security webSecurity() default Security.NONE;
-
+  /**
+   * If true, web API access will require authentication.
+   *
+   * @return
+   */
   boolean enableWebSecurity() default false;
 
+  /**
+   * If true, web services will include automatic API documentation.
+   *
+   * @return
+   */
   boolean enableApiDocumentation() default false;
 	
 }

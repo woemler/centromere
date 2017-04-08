@@ -23,9 +23,8 @@ import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.config.ProfileConfiguration;
+import com.blueprint.centromere.core.config.CoreConfiguration;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.config.Schema;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -48,9 +47,9 @@ import org.springframework.util.Assert;
 		MongoDataSourceConfig.class,
 		CommandLineInputConfiguration.class,
 		CommandLineTestConfig.class,
-		ProfileConfiguration.class
+		CoreConfiguration.class
 })
-@ActiveProfiles({Profiles.CLI_PROFILE, Schema.DEFAULT_PROFILE})
+@ActiveProfiles({ Profiles.CLI_PROFILE })
 @FixMethodOrder
 public class CommandLineExecutorTests {
 	

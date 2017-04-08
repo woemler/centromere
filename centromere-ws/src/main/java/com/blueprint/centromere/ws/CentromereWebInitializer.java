@@ -18,9 +18,7 @@ package com.blueprint.centromere.ws;
 
 import com.blueprint.centromere.core.config.AutoConfigureCentromere;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.ws.config.WebApplicationConfig;
-import com.google.common.collect.ObjectArrays;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +43,7 @@ public class CentromereWebInitializer extends SpringBootServletInitializer {
     if (source.isAnnotationPresent(AutoConfigureCentromere.class)){
       AutoConfigureCentromere annotation = source.getAnnotation(AutoConfigureCentromere.class);
       String securityProfile = annotation.enableWebSecurity()
-          ? Security.SECURE_READ_WRITE_PROFILE : Security.NONE_PROFILE;
+          ? Profiles.SECURE_READ_WRITE_PROFILE : Profiles.NO_SECURITY;
       String apiDocumentationProfile = annotation.enableApiDocumentation()
           ? Profiles.API_DOCUMENTATION_ENABLED_PROFILE : Profiles.API_DOCUMENTATION_DISABLED_PROFILE;
       String[] profiles = { Profiles.WEB_PROFILE, securityProfile, apiDocumentationProfile };

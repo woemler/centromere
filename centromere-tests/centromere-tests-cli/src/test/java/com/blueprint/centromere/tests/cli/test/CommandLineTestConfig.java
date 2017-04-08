@@ -17,7 +17,7 @@
 package com.blueprint.centromere.tests.cli.test;
 
 import com.blueprint.centromere.cli.CommandLineInputConfiguration;
-import com.blueprint.centromere.core.config.ProfileConfiguration;
+import com.blueprint.centromere.core.config.CoreConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -27,6 +27,6 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @ComponentScan(basePackages = { "com.blueprint.centromere.tests.core.test.dataimport"})
-@Import({ CommandLineInputConfiguration.class, ProfileConfiguration.class})
+@Import({ CommandLineInputConfiguration.class, CoreConfiguration.class})
 public class CommandLineTestConfig {
 }

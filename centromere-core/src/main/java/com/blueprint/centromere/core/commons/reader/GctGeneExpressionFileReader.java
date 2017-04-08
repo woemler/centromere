@@ -24,7 +24,7 @@ import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.SampleAware;
-import com.blueprint.centromere.core.config.ApplicationProperties;
+import com.blueprint.centromere.core.config.Properties;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.reader.MultiRecordLineFileReader;
 import com.blueprint.centromere.core.model.ModelSupport;
@@ -75,7 +75,7 @@ public class GctGeneExpressionFileReader
 		if (bits.length > 1){
 			Gene gene = getGene(line);
 			if (gene == null){
-				if (environment.getRequiredProperty(ApplicationProperties.SKIP_INVALID_GENES, Boolean.class)){
+				if (environment.getRequiredProperty(Properties.SKIP_INVALID_GENES, Boolean.class)){
 					logger.warn(String.format("Skipping line due to invalid gene: %s", line));
 					return new ArrayList<>();
 				} else {
@@ -101,7 +101,7 @@ public class GctGeneExpressionFileReader
 					}
 				}
 				if (sample == null){
-					if (environment.getRequiredProperty(ApplicationProperties.SKIP_INVALID_SAMPLES, Boolean.class)){
+					if (environment.getRequiredProperty(Properties.SKIP_INVALID_SAMPLES, Boolean.class)){
 						logger.warn(String.format("Skipping record due to invalid sample: %s", 
 								this.getHeaders().get(i)));
 						continue;
@@ -112,7 +112,7 @@ public class GctGeneExpressionFileReader
 				try {
 					record.setValue(Double.parseDouble(bits[i]));
 				} catch (NumberFormatException e){
-					if (environment.getRequiredProperty(ApplicationProperties.SKIP_INVALID_RECORDS, Boolean.class)){
+					if (environment.getRequiredProperty(Properties.SKIP_INVALID_RECORDS, Boolean.class)){
 						logger.warn(String.format("Invalid record, cannot parse value: %s", bits[i]));
 						continue;
 					} else {

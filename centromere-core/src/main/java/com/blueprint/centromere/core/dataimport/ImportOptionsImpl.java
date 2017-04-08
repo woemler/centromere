@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.dataimport;
 
-import com.blueprint.centromere.core.config.ApplicationProperties;
+import com.blueprint.centromere.core.config.Properties;
 import org.springframework.core.env.Environment;
 
 /**
@@ -35,23 +35,23 @@ public class ImportOptionsImpl implements ImportOptions {
   }
 
   public ImportOptionsImpl(Environment environment) {
-    if (environment.containsProperty(ApplicationProperties.SKIP_INVALID_RECORDS)){
-      skipInvalidRecords = environment.getProperty(ApplicationProperties.SKIP_INVALID_RECORDS, Boolean.class);
+    if (environment.containsProperty(Properties.SKIP_INVALID_RECORDS)){
+      skipInvalidRecords = environment.getProperty(Properties.SKIP_INVALID_RECORDS, Boolean.class);
     }
-    if (environment.containsProperty(ApplicationProperties.SKIP_INVALID_SAMPLES)){
-      skipInvalidSamples = environment.getProperty(ApplicationProperties.SKIP_INVALID_SAMPLES, Boolean.class);
+    if (environment.containsProperty(Properties.SKIP_INVALID_SAMPLES)){
+      skipInvalidSamples = environment.getProperty(Properties.SKIP_INVALID_SAMPLES, Boolean.class);
     }
-    if (environment.containsProperty(ApplicationProperties.SKIP_INVALID_GENES)){
-      skipInvalidGenes = environment.getProperty(ApplicationProperties.SKIP_INVALID_GENES, Boolean.class);
+    if (environment.containsProperty(Properties.SKIP_INVALID_GENES)){
+      skipInvalidGenes = environment.getProperty(Properties.SKIP_INVALID_GENES, Boolean.class);
     }
-    if (environment.containsProperty(ApplicationProperties.SKIP_INVALID_FILES)){
-      skipInvalidFiles = environment.getProperty(ApplicationProperties.SKIP_EXISTING_FILES, Boolean.class);
+    if (environment.containsProperty(Properties.SKIP_INVALID_FILES)){
+      skipInvalidFiles = environment.getProperty(Properties.SKIP_EXISTING_FILES, Boolean.class);
     }
-    if (environment.containsProperty(ApplicationProperties.SKIP_EXISTING_FILES)){
-      skipExistingFiles = environment.getProperty(ApplicationProperties.SKIP_EXISTING_FILES, Boolean.class);
+    if (environment.containsProperty(Properties.SKIP_EXISTING_FILES)){
+      skipExistingFiles = environment.getProperty(Properties.SKIP_EXISTING_FILES, Boolean.class);
     }
-    if (environment.containsProperty(ApplicationProperties.TEMP_DIR)){
-      String tempPath = environment.getProperty(ApplicationProperties.TEMP_DIR);
+    if (environment.containsProperty(Properties.TEMP_DIR)){
+      String tempPath = environment.getProperty(Properties.TEMP_DIR);
       if (tempPath != null && !tempPath.trim().equals("")) tempFilePath = tempPath;
     }
   }

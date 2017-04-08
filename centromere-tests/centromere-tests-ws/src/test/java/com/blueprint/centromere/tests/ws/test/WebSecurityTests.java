@@ -26,7 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.blueprint.centromere.core.commons.model.User;
 import com.blueprint.centromere.core.commons.repository.UserRepository;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.tests.ws.TestInitializer;
 import com.blueprint.centromere.ws.security.BasicTokenUtils;
 import com.blueprint.centromere.ws.security.TokenDetails;
@@ -53,8 +52,9 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { TestInitializer.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(value = {Profiles.WEB_PROFILE, Security.SECURE_READ_WRITE_PROFILE})
+@ActiveProfiles(value = {Profiles.WEB_PROFILE, Profiles.SECURE_READ_WRITE_PROFILE})
 @AutoConfigureMockMvc
+@SuppressWarnings("SpringJavaAutowiringInspection")
 public class WebSecurityTests {
 	
 	@Autowired private WebApplicationContext context;

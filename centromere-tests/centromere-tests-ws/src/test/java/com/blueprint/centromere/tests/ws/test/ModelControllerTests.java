@@ -26,7 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.config.Security;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import com.blueprint.centromere.ws.config.WebApplicationConfig;
@@ -56,7 +55,7 @@ import org.springframework.web.context.WebApplicationContext;
 		MongoDataSourceConfig.class,
 		WebApplicationConfig.class
 })
-@ActiveProfiles({ Profiles.WEB_PROFILE, Security.NONE_PROFILE})
+@ActiveProfiles({ Profiles.WEB_PROFILE, Profiles.NO_SECURITY })
 public class ModelControllerTests extends AbstractRepositoryTests {
 	
 	private static final String BASE_URL = "/api/genes";

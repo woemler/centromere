@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.dataimport.importer;
 
-import com.blueprint.centromere.core.config.ApplicationProperties;
+import com.blueprint.centromere.core.config.Properties;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
@@ -50,14 +50,14 @@ public class MongoImportTempFileImporter<T extends Model<?>> extends AbstractFil
 
   @Override
   public void doBefore(Object... args) throws DataImportException {
-    Assert.isTrue(environment.containsProperty(ApplicationProperties.DB_HOST),
-        String.format("Environment property must not be null: %s", ApplicationProperties.DB_HOST));
-    Assert.isTrue(environment.containsProperty(ApplicationProperties.DB_NAME),
-        String.format("Environment property must not be null: %s", ApplicationProperties.DB_NAME));
-    Assert.isTrue(environment.containsProperty(ApplicationProperties.DB_USER),
-        String.format("Environment property must not be null: %s", ApplicationProperties.DB_USER));
-    Assert.isTrue(environment.containsProperty(ApplicationProperties.DB_PASSWORD),
-        String.format("Environment property must not be null: %s", ApplicationProperties.DB_PASSWORD));
+    Assert.isTrue(environment.containsProperty(Properties.DB_HOST),
+        String.format("Environment property must not be null: %s", Properties.DB_HOST));
+    Assert.isTrue(environment.containsProperty(Properties.DB_NAME),
+        String.format("Environment property must not be null: %s", Properties.DB_NAME));
+    Assert.isTrue(environment.containsProperty(Properties.DB_USER),
+        String.format("Environment property must not be null: %s", Properties.DB_USER));
+    Assert.isTrue(environment.containsProperty(Properties.DB_PASSWORD),
+        String.format("Environment property must not be null: %s", Properties.DB_PASSWORD));
   }
 
   /**
@@ -125,23 +125,23 @@ public class MongoImportTempFileImporter<T extends Model<?>> extends AbstractFil
     if (stopOnError) sb.append(" --stopOnError ");
     if (dropCollection) sb.append(" --drop ");
     if (upsertRecords) sb.append(" --upsert ");
-    if (environment.containsProperty(ApplicationProperties.DB_USER)) {
-      sb.append(String.format(" --username %s ", environment.getRequiredProperty(ApplicationProperties.DB_USER)));
+    if (environment.containsProperty(Properties.DB_USER)) {
+      sb.append(String.format(" --username %s ", environment.getRequiredProperty(Properties.DB_USER)));
     }
-    if (environment.containsProperty(ApplicationProperties.DB_PASSWORD)){
-      sb.append(String.format(" --password %s ", environment.getRequiredProperty(ApplicationProperties.DB_PASSWORD)));
+    if (environment.containsProperty(Properties.DB_PASSWORD)){
+      sb.append(String.format(" --password %s ", environment.getRequiredProperty(Properties.DB_PASSWORD)));
     }
-    if (environment.containsProperty(ApplicationProperties.DB_HOST)) {
-      if (environment.getRequiredProperty(ApplicationProperties.DB_HOST).contains(":")) {
-        sb.append(String.format(" --host %s ", environment.getRequiredProperty(ApplicationProperties.DB_HOST)));
-      } else if (environment.containsProperty(ApplicationProperties.DB_PORT)) {
-        sb.append(String.format(" --host %s:%s ", environment.getRequiredProperty(ApplicationProperties.DB_HOST), 
-            environment.getRequiredProperty(ApplicationProperties.DB_PORT)));
+    if (environment.containsProperty(Properties.DB_HOST)) {
+      if (environment.getRequiredProperty(Properties.DB_HOST).contains(":")) {
+        sb.append(String.format(" --host %s ", environment.getRequiredProperty(Properties.DB_HOST)));
+      } else if (environment.containsProperty(Properties.DB_PORT)) {
+        sb.append(String.format(" --host %s:%s ", environment.getRequiredProperty(Properties.DB_HOST),
+            environment.getRequiredProperty(Properties.DB_PORT)));
       } else {
-        sb.append(String.format(" --host %s:27017 ", environment.getRequiredProperty(ApplicationProperties.DB_HOST)));
+        sb.append(String.format(" --host %s:27017 ", environment.getRequiredProperty(Properties.DB_HOST)));
       }
     }
-    sb.append(String.format(" --db %s ", environment.getRequiredProperty(ApplicationProperties.DB_NAME)));
+    sb.append(String.format(" --db %s ", environment.getRequiredProperty(Properties.DB_NAME)));
     sb.append(String.format(" --collection %s ", getCollectionName()));
     sb.append(String.format(" --file %s ", filePath));
     return sb.toString();
