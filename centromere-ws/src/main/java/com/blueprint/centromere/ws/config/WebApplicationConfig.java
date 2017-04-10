@@ -27,24 +27,20 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.core.env.Environment;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.RestMediaTypes;
-import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
@@ -105,7 +101,7 @@ public class WebApplicationConfig {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
       registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
       registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
-      if ("true".equals(env.getRequiredProperty("centromere.web.enable-static-content").toLowerCase())){
+      if (env.getRequiredProperty("centromere.web.enable-static-content", Boolean.class)){
         registry.addResourceHandler("/static/**").addResourceLocations("/static/");
         if (env.getRequiredProperty("centromere.web.home-page") != null
             && !"".equals(env.getRequiredProperty("centromere.web.home-page"))
@@ -113,7 +109,7 @@ public class WebApplicationConfig {
             && !"".equals(env.getRequiredProperty("centromere.web.home-page"))){
           registry.addResourceHandler(env.getRequiredProperty("centromere.web.home-page"))
               .addResourceLocations(env.getRequiredProperty("centromere.web.home-page-location"));
-          logger.info(String.format("[Static home page configured at URL: /%s",
+          logger.info(String.format("Static home page configured at URL: /%s",
               env.getRequiredProperty("centromere.web.home-page")));
         } else {
           logger.warn("Static home page location not properly configured.");

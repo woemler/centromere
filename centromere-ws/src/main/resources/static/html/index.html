@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+  <link href='http://fonts.googleapis.com/css?family=Raleway:400,100,300,700,600,500' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Droid+Serif:400,400italic,700' rel='stylesheet' type='text/css'>
+
+
+  <link rel="stylesheet" href="/css/slicknav.css">
+  <link rel="stylesheet" href="/css/owl.theme.css">
+  <link rel="stylesheet" href="/css/owl.carousel.css">
+  <link rel="stylesheet" href="/css/owl.transitions.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  <script src="/js/vendor/modernizr-2.6.2.min.js"></script>
+</head>
+<body>
+
+<section id="header">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="block-left">
+          <nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+              <!-- Brand and toggle get grouped for better mobile display -->
+              <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                </button>
+                <div class="nav-logo">
+                  <a href="http://www.blueprintmedicines.com/"><img src="/img/blueprint_logo_small.png" style="max-height:40px;" alt="logo"></a>
+                </div>
+              </div>
+
+            </div><!-- /.container-fluid -->
+          </nav>
+        </div>
+      </div><!-- .col-md-6 -->
+
+      <div class="col-md-6">
+        <div class="block-right">
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+              <li><a target="_blank" href="/actuator">Status</a></li>
+              <li><a target="_blank" href="/swagger-ui.html">Swagger UI</a></li>
+              <li><a target="_blank" href="https://github.com/blueprintmedicines">GitHub</a></li>
+              <li><a target="_blank" href="https://github.com/blueprintmedicines/centromere/blob/master/docs/documentation.md">Documentation</a></li>
+              <li><a href="mailto:woemler@blueprintmedicines.com">Contact</a></li>
+            </ul>
+          </div><!-- /.navbar-collapse -->
+        </div>
+      </div><!-- .col-md-6 close -->
+    </div><!-- .row close -->
+  </div><!-- .container close -->
+</section><!-- #heder close -->
+
+<section id="slider">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="block">
+          <div class="slider-text-area">
+            <div class="slider-text">
+              <h2>Welcome to Centromere <br></h2>
+              <p class="sub-slider-text">Genomic Data Warehouse and RESTful API</p>
+              <a href="#getting-started"><button type="button" class="btn btn-default edit-button-1">GET STARTED</button></a>
+            </div>
+          </div>
+        </div>
+      </div><!-- .col-md-12 close -->
+    </div><!-- .row close -->
+  </div><!-- .container close -->
+</section><!-- #slider close -->
+
+<section id="service">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="block-top">
+          <div id="getting-started" class="service-header">
+            <h1>Getting started</h1>
+            <p>Centromere is up-and-running and ready to use.  Follow the instructions below to take a tour of the web service and its features.</p>
+          </div>
+        </div>
+      </div><!-- .col-md-12 close -->
+    </div><!-- row close -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="block-bottom">
+          <div class="service-tab">
+            <!-- Nav tabs -->
+            <ul class="badhon-tab" role="tablist">
+              <li class="active"><a href="#querying" aria-controls="home" role="tab" data-toggle="tab">
+                <i class="fa fa-search"></i>
+                Querying the Centromere API
+              </a></li>
+              <li><a href="#filtering" aria-controls="profile" role="tab" data-toggle="tab">
+                <i class="fa fa-filter"></i>
+                Filtering search results
+              </a></li>
+              <li><a href="#media-types" aria-controls="messages" role="tab" data-toggle="tab">
+                <i class="fa fa-code"></i>
+                Outputting XML and plain-text
+              </a></li>
+              <li><a href="#hypermedia" aria-controls="settings" role="tab" data-toggle="tab">
+                <i class="fa fa-link"></i>
+                Hypermedia and resource discovery
+              </a></li>
+              <li><a href="#security" aria-controls="settings" role="tab" data-toggle="tab">
+                <i class="fa fa-lock"></i>
+                Method-based security
+              </a></li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content edit-tab-content">
+              <div class="tab-pane active edit-tab" id="querying">
+                <h1>Querying the Centromere API</h1>
+                <p>Each model class in Centromere is represented by a single web service endpoint.  To query the <code>Genes</code> repository, simple make a request to the root resource URL:</p>
+                <br/>
+                <p style="font-size:1.2em">
+                  <samp>curl "http://localhost:8080/api/genes?size=10"</samp>
+                </p>
+                <br/>
+                <p>You can filter, sort, and page results using query string parameters.  Most model attributes are filterable, using the field name as a query string parameter:</p>
+                <br/>
+                <p style="font-size: 1.2em;">
+                  <samp>curl http://localhost:8080/api/genes<br>&nbsp;&nbsp;&nbsp;?geneType=protein-coding<br>&nbsp;&nbsp;&nbsp;&sort=entrezGeneId,asc<br>&nbsp;&nbsp;&nbsp;&page=2&size=100</samp>
+                </p>
+              </div>
+              <div class="tab-pane edit-tab" id="filtering">
+                <h1>Filtering search results</h1>
+                <p>If you do no want to all of the target model's attributes to be returned, you can selectively filter them out with the <code>exclude</code> query string parameter.  If you want only to return specific attributes, you can use the <code>fields</code> parameter:</p>
+                <br/>
+                <p style="font-size: 1.2em;">
+                  <samp>curl http://localhost:8080/api/genes<br>&nbsp;&nbsp;&nbsp;?fields=entrezGeneId,primaryGeneSymbol,aliases<br>&nbsp;&nbsp;&nbsp;&size=10&sort=entrezGeneId,asc</samp>
+                </p>
+              </div>
+              <div class="tab-pane edit-tab" id="media-types">
+                <h1>Outputting XML and plain-text</h1>
+                <p>If no media type is specified in the <code>Accept</code> header, then <code>application/json</code> will be used.Centromere also support XML and tab-delimited plain-text output using <code>application/xml</code> and <code>text/plain</code> respectively:</p>
+                <br/>
+                <p style="font-size: 1.2em;">
+                  <samp>curl -H "Accept: text/plain" <br>&nbsp;&nbsp;&nbsp;http://localhost:8080/api/mutations?size=100</samp>
+                </p>
+              </div>
+              <div class="tab-pane edit-tab" id="hypermedia">
+                <h1>Hypermedia and resource discovery</h1>
+                <p>Centromere uses Spring HATEOAS to generate HAL-formatted links associated with each entity record and resource collection.  To view model hypermedia, use the associated media types, <code>application/hal+json</code> and <code>application/hal+xml</code>:</p>
+                <br/>
+                <p style="font-size: 1.2em;">
+                  <samp>curl -H "Accept: application/hal+json" <br>&nbsp;&nbsp;&nbsp;http://localhost:8080/api/mutations?size=10</samp>
+                </p>
+              </div>
+              <div class="tab-pane edit-tab" id="security">
+                <h1>Method-based security</h1>
+                <p>Centromere intercepts HTTP requests and will filter them based upon security configuration.  By default, read-requests will all be accepted (<code>GET</code>, <code>HEAD</code>, and <code>OPTIONS</code>), while write-requests will be denied, ubless properly authenticated (<code>POST</code>, <code>PUT</code>, and <code>DELETE</code>). An authentication token can be acquired by posting user credentials to the <code>/authenticate</code> address:</p>
+                <br/>
+                <p style="font-size: 1.2em;">
+                  <samp>curl -X POST -u username:password <br>&nbsp;&nbsp;&nbsp;http://localhost:8080/authenticate</samp>
+                </p>
+                <br/>
+                <p>The generated token may then be used to make requests to secured endpoints:</p>
+                <br/>
+                <p>
+                  <samp>curl -X POST <br>&nbsp;&nbsp;&nbsp;-H "X-Auth-Token: username:24243563:grw86e7rg59ew5gb0q9gwg" <br>&nbsp;&nbsp;&nbsp;-H "Content-Type: application/json" <br>&nbsp;&nbsp;&nbsp;-d '{"name": "test"}' <br>&nbsp;&nbsp;&nbsp;http://localhost:8080/api/subjects</samp>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- .col-md-12 close -->
+    </div><!-- row close -->
+  </div><!-- .container close -->
+</section><!-- #service close -->
+
+
+<section id="contant-1">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="block-left">
+          <div class="contant-1-text-area">
+            <div class="contant-1-head">
+              <h1>Centromere is part of the Oncoblocks collaboration</h1>
+            </div>
+            <div class="contant-1-text">
+              <h2>Developing open-source tools for cancer genomics.</h2>
+              <a href="https://github.com/oncoblocks" target="_blank"><button type="button" class="btn btn-default edit-button-2">LEARN MORE</button></a>
+            </div>
+          </div>
+        </div>
+      </div><!-- .col-md-6 close -->
+      <div class="col-md-6">
+        <div class="block-right">
+          <div class="block-right-img">
+            <img src="/img/oncoblocks_logo_big.png" alt="img">
+          </div>
+        </div>
+      </div><!-- .col-md-6 close -->
+    </div><!-- .row close -->
+  </div><!-- .container close -->
+</section><!-- #contant-1 close -->
+
+<section id="gallery">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="block-top">
+          <div class="gallery-area">
+            <h1>Put Centromere to Work for Your Data</h1>
+            <p>Centromere is modular and extensible.  It is developed in Java using the enterprise-grade Spring Framework.  Centromere is designed to make developing data warehouses and web services as easy as possible, while ensuring long-term scalability and support.</p>
+          </div>
+        </div>
+      </div><!-- .col-md-12 -->
+    </div><!-- .row close -->
+    <div class="row">
+      <div class="col-md-12">
+        <div class="block-bottom">
+          <div class="gallery-list" id="owl-demo">
+            <div class="gallery-items item">
+              <div class="gallery-img">
+                <img src="/img/database-128.png" alt="img">
+              </div>
+              <div class="gallery-items-text">
+                <p>Create a warehouse for you genomic data from scratch using SQL or NoSQL technologies, or bootstrap your existing databases using Centromere's repository API.</p>
+              </div>
+            </div>
+            <div class="gallery-items item">
+              <div class="gallery-img">
+                <img src="/img/code-128.png" alt="img">
+              </div>
+              <div class="gallery-items-text">
+                <p>Define your own data model and expose as much or as little of your data via customizable RESTful API.  Automatic web service security and API documentation are available right out of the box.</p>
+              </div>
+            </div>
+            <div class="gallery-items item">
+              <div class="gallery-img">
+                <img src="/img/github-128.png" alt="img">
+              </div>
+              <div class="gallery-items-text">
+                <p>Centromere is free and open source.  Visit the GitHub repository to get the latests build, or contribute your own code.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- .col-md-12 close -->
+    </div><!-- .row close -->
+  </div><!-- .container close -->
+</section><!-- #gallery close -->
+
+<section id="footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="block">
+          <div class="footer-contant">
+            <div class="support-link">
+              <ul>
+                <li><a href="mailto:woemler@blueprintmedicines.com.com">Contact</a></li>
+                <li><a href="https://github.com/blueprintmedicines/centromere" target="_blank">GitHub</a></li>
+                <li><a href="https://github.com/blueprintmedicines/centromere/blob/master/docs/documentation.md">Documentation</a></li>
+              </ul>
+            </div>
+            <br/>
+            <p>Copyright Will Oemler, 2017.  Theme by <a href="http://www.themefisher.com/" target="_blank">Themefisher</a>.  Photo credit: George von Dassow/Victoria Foe /Bill Bement</p>
+          </div>
+        </div>
+      </div><!-- col-md-12 -->
+    </div><!-- .row -->
+  </div><!-- .container -->
+</section><!-- #footer -->
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="/js/vendor/jquery-1.10.2.min.js"><\/script>')</script>
+<script src="/js/owl.carousel.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="/js/plugins.js"></script>
+<script src="/js/main.js"></script>
+
+</body>
+</html>
