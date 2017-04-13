@@ -180,6 +180,7 @@ public class GenericRecordProcessor<T extends Model<?>>
       throw new DataImportException("First argument must be a string path or file object");
     }
     
+    logger.info("Running doBefore method for processor components.");
 		reader.doBefore(args);
     writer.doBefore(args);
     if (importer != null) importer.doBefore(args);
@@ -189,8 +190,9 @@ public class GenericRecordProcessor<T extends Model<?>>
 			return;
 		}
 		
-		T record = reader.readRecord();
-		
+    logger.info("Processing records.");
+    T record = reader.readRecord();
+    
     while (record != null) {
 			
       if (validator != null) {
@@ -220,13 +222,16 @@ public class GenericRecordProcessor<T extends Model<?>>
 			return;
 		}
 		
+		logger.info("Running doAfter methods for processor components.");
 		writer.doAfter(args);
 		reader.doAfter(args);
 		
 		if (importer != null) {
 		  if (TempFileWriter.class.isAssignableFrom(writer.getClass())){
+		    logger.info("Running RecordImporter file import");
 		    String tempFilePath = ((TempFileWriter) writer).getTempFilePath(inputFilePath);
         importer.importFile(tempFilePath);
+        logger.info("Running RecordImporter doAfter method");
         importer.doAfter(args);
       } else {
         logger.warn("RecordWriter instance does not implement TempFileWriter interface, cannot get" 

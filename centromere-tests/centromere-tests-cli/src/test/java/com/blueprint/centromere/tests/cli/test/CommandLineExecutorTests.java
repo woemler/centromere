@@ -80,7 +80,7 @@ public class CommandLineExecutorTests {
 		Resource file = new ClassPathResource("Homo_sapiens.gene_info");
 		String[] args = { "import", "file", "-f", file.getFile().getAbsolutePath(), "-t", "entrez_gene" };
 		executor.run(args);
-		Assert.isTrue(geneRepository.count() == 5);
+		Assert.isTrue(geneRepository.count() == 5, String.format("Expected 5 records, found %d", geneRepository.count()));
 	}
 
 	@Test
@@ -88,9 +88,43 @@ public class CommandLineExecutorTests {
 		Assert.isTrue(geneRepository.count() == 0);
 		Resource file = new ClassPathResource("Homo_sapiens.gene_info");
 		String[] args = { "import", "file", "-f", file.getFile().getAbsolutePath(), "-t", "genes" };
-		executor.run(args);
-		Assert.isTrue(geneRepository.count() == 0);
-	} 
-	
-	
+		Exception exception = null;
+		try {
+      executor.run(args);
+    } catch (Exception e){
+		  exception = e;
+    }
+    Assert.notNull(exception, "Exception not thrown.");
+		Assert.isTrue(geneRepository.count() == 0, "No records should be present.");
+	}
+
+  @Test
+  public void missingFileTest() throws Exception {
+    Assert.isTrue(geneRepository.count() == 0);
+    String[] args = { "import", "file", "-f", "/path/to/bad/file", "-t", "genes" };
+    Exception exception = null;
+    try {
+      executor.run(args);
+    } catch (Exception e){
+      exception = e;
+    }
+    Assert.notNull(exception, "Exception not thrown.");
+    Assert.isTrue(geneRepository.count() == 0, "No records should be present.");
+  }
+
+  @Test
+  public void missingCommandTest() throws Exception {
+    Assert.isTrue(geneRepository.count() == 0);
+    String[] args = { "import", "-f", "/path/to/bad/file", "-t", "genes" };
+    Exception exception = null;
+    try {
+      executor.run(args);
+    } catch (Exception e){
+      exception = e;
+    }
+    Assert.isTrue(exception == null, "Exception should still be null");
+    Assert.isTrue(geneRepository.count() == 0, "No records should be present.");
+  }
+
+
 }

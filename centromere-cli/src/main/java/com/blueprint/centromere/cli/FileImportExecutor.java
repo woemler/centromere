@@ -62,8 +62,10 @@ public class FileImportExecutor implements EnvironmentAware {
     DataSet ds = dataSetRepository.findOneByShortName(dataSet.getShortName());
     if (ds == null){
       dataSet = dataSetRepository.insert(dataSet);
+      logger.info(String.format("Creating new DataSet record: %s", dataSet.toString()));
     } else {
       dataSet = ds;
+      logger.info(String.format("Using existing DataSet record: %s", dataSet.toString()));
     }
     
     // Get the data file object
@@ -78,12 +80,15 @@ public class FileImportExecutor implements EnvironmentAware {
     DataFile df = dataFileRepository.findOneByFilePath(filePath);
     if (df == null){
       dataFile = dataFileRepository.insert(dataFile);
+      logger.info(String.format("Creating new DataFile record: %s", dataFile.toString()));
     } else {
       dataFile = df;
+      logger.info(String.format("Using existing DataFile record: %s", dataFile.toString()));
     }
     
     // Get the requested processor
 	  RecordProcessor processor = processorRegistry.getByDataType(dataType);
+    logger.info(String.format("Using record processor: %s", processor.getClass().getName()));
 		processor.setImportOptions(new ImportOptionsImpl(environment));
 		
 		if (processor instanceof DataSetAware){
@@ -92,10 +97,16 @@ public class FileImportExecutor implements EnvironmentAware {
     if (processor instanceof DataFileAware){
 		  ((DataFileAware) processor).setDataFile(dataFile);
     }
-		
+
+    logger.info("Running processor doBefore method");
 		processor.doBefore(filePath, dataFile, dataSet);
+
+    logger.info("Processing file");
 		processor.run(filePath);
+
+    logger.info("Running processor doAfter method");
 		processor.doAfter(filePath);
+    logger.info("File processing complete.");
 	}
 
   private DataSet getDataSetFromEnvironment() {

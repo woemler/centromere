@@ -36,7 +36,7 @@ public class DataSet extends AbstractModel implements Attributes {
 	
 	private String displayName;
 	@Indexed(unique = true) private String shortName;
-	private String source;
+	@Indexed private String source;
 	private String version;
 	private String description;
 

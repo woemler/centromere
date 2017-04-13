@@ -38,11 +38,7 @@ public class TcgaSubjectProcessor extends GenericRecordProcessor<Subject> {
       this.setModel(Subject.class);
       this.setReader(new TcgaSubjectReader());
       this.setValidator(new SubjectValidator());
-
-      RepositoryRecordWriter<Subject, String> writer = new RepositoryRecordWriter<>();
-      writer.setRepository(repository);
-      writer.setBatchSize(1000);
-      this.setWriter(writer);
+      this.setWriter(new RepositoryRecordWriter<>(repository));
         
     }
 

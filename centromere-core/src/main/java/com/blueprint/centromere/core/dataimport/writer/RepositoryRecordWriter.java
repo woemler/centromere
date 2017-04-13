@@ -23,6 +23,7 @@ import com.blueprint.centromere.core.repository.ModelRepository;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.data.repository.CrudRepository;
@@ -40,11 +41,20 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
 	
 	public enum WriteMode { INSERT, UPDATE, UPSERT }
 	
-	private ModelRepository<T, ID> repository;
+	private final ModelRepository<T, ID> repository;
 	private Integer batchSize = 1;
 	private WriteMode writeMode = WriteMode.INSERT;
 	private ImportOptions options;
 	private List<T> records = new ArrayList<>();
+
+  public RepositoryRecordWriter(ModelRepository<T, ID> repository) {
+    this.repository = repository;
+  }
+
+  public RepositoryRecordWriter(ModelRepository<T, ID> repository, Integer batchSize) {
+    this.repository = repository;
+    this.batchSize = batchSize;
+  }
 
   /**
    * Empty default implementation.  The purpose of extending {@link org.springframework.beans.factory.InitializingBean}
@@ -79,7 +89,7 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
         records = new ArrayList<>();
       }
     } else {
-      writeRecords(records);
+      writeRecords(Collections.singleton(entity));
     }
 	}
 	
@@ -103,14 +113,6 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
 	public void doAfter(Object... args) throws DataImportException {
 			if (records.size() > 0) repository.save(records);
 	}
-
-	public ModelRepository<T, ID> getRepository() {
-	return repository;
-}
-
-  public void setRepository(ModelRepository<T, ID> repository) {
-    this.repository = repository;
-  }
 
   @Override
   public ImportOptions getImportOptions() {

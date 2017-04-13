@@ -22,6 +22,7 @@ import com.blueprint.centromere.cli.arguments.ImportCommandArguments;
 import com.blueprint.centromere.cli.arguments.ImportFileCommandArguments;
 import com.blueprint.centromere.cli.arguments.ImportManifestCommandArguments;
 import com.blueprint.centromere.cli.arguments.ListCommandArguments;
+import com.blueprint.centromere.core.dataimport.DataImportException;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
@@ -124,7 +125,7 @@ public class CommandLineInputExecutor implements CommandLineRunner {
           fileImportExecutor.run(importFileCommandArguments.getDataType(),
               importFileCommandArguments.getFilePath());
         } catch (Exception e) {
-          e.printStackTrace();
+          throw new DataImportException(e.getMessage());
         }
         code = 0;
       
@@ -136,7 +137,7 @@ public class CommandLineInputExecutor implements CommandLineRunner {
         try {
           manifestImportExecutor.run(importManifestCommandArguments.getFilePath());
         } catch (Exception e){
-          e.printStackTrace();
+          throw new DataImportException(e.getMessage());
         }
         code = 0;
       

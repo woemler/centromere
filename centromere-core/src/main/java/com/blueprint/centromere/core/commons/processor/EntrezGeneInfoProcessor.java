@@ -38,16 +38,9 @@ public class EntrezGeneInfoProcessor extends GenericRecordProcessor<Gene> {
 
     @Autowired
     public EntrezGeneInfoProcessor(GeneRepository geneRepository) {
-        
         this.setReader(new EntrezGeneInfoReader());
-        
         this.setValidator(new GeneValidator());
-        
-        RepositoryRecordWriter<Gene, String> writer = new RepositoryRecordWriter<>();
-        writer.setRepository(geneRepository);
-        writer.setBatchSize(1000);
-        this.setWriter(writer);
-        
+        this.setWriter(new RepositoryRecordWriter<>(geneRepository));
         this.setModel(Gene.class);
     }
 

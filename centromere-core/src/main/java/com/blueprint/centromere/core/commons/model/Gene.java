@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -29,7 +30,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Gene extends AbstractModel implements Attributes {
 
-	private String primaryReferenceId;
+	@Indexed(unique = true, background = true) private String primaryReferenceId;
 	private String primaryGeneSymbol;
 	private Integer taxId;
 	private String chromosome;

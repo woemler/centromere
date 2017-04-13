@@ -135,5 +135,18 @@ public class Subject extends AbstractModel implements Attributes {
 	public void addAlias(String alias){
 		if (!aliases.contains(alias)) this.aliases.add(alias);
 	}
-	
+
+	@Override
+	public String toString() {
+		return "Subject{" +
+				"name='" + name + '\'' +
+				", species='" + species + '\'' +
+				", gender='" + gender + '\'' +
+				", notes='" + notes + '\'' +
+				", aliases=" + aliases +
+				", attributes=" + attributes +
+				", samples=" + samples +
+				", sampleIds=" + sampleIds +
+				'}';
+	}
 }

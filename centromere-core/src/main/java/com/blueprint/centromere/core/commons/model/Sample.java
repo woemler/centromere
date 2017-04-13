@@ -146,4 +146,20 @@ public class Sample extends AbstractModel implements Attributes {
 	public String getAttribute(String name) {
 		return attributes.containsKey(name) ? attributes.get(name) : null;
 	}
+
+	@Override
+	public String toString() {
+		return "Sample{" +
+				"name='" + name + '\'' +
+				", sampleType='" + sampleType + '\'' +
+				", tissue='" + tissue + '\'' +
+				", histology='" + histology + '\'' +
+				", notes='" + notes + '\'' +
+				", attributes=" + attributes +
+				", subject=" + subject +
+				", subjectId='" + subjectId + '\'' +
+				", dataSet=" + dataSet +
+				", dataSetId='" + dataSetId + '\'' +
+				'}';
+	}
 }

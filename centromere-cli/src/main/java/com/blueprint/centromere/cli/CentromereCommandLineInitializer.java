@@ -18,7 +18,6 @@ package com.blueprint.centromere.cli;
 
 import com.blueprint.centromere.core.config.AutoConfigureCentromere;
 import com.blueprint.centromere.core.config.Profiles;
-import com.google.common.collect.ObjectArrays;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +46,7 @@ public class CentromereCommandLineInitializer {
 		} else {
 			logger.info("Running Centromere with default profiles.");
 		}
+		logger.info(String.format("Running Centromere with arguments: %s", args));
 		springApplication.run(args);
 	}
 	
