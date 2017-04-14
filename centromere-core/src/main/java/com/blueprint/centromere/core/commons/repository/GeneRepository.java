@@ -26,6 +26,7 @@ import com.querydsl.core.types.dsl.MapPath;
 import com.querydsl.core.types.dsl.PathBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
@@ -38,7 +39,8 @@ public interface GeneRepository extends
 		MetadataOperations<Gene>,
 		AttributeOperations<Gene> {
 
-	List<Gene> findByPrimaryReferenceId(@Param("refId") String refId);
+  Optional<Gene> findByPrimaryReferenceId(@Param("refId") String refId);
+	//List<Gene> findByPrimaryReferenceId(@Param("refId") String refId);
 	List<Gene> findByPrimaryGeneSymbol(@Param("symbol") String symbol);
 	List<Gene> findByAliases(@Param("alias") String alias);
 

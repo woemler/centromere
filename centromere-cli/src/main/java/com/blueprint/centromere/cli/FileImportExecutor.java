@@ -74,7 +74,7 @@ public class FileImportExecutor implements EnvironmentAware {
       dataFile.setDataType(dataType);
       dataFile.setDateCreated(new Date());
       dataFile.setDateUpdated(new Date());
-      dataFile.setDataSet(dataSet);
+      dataFile.setDataSetId(dataSet.getId());
     }
     DataFile df = dataFileRepository.findOneByFilePath(filePath);
     if (df == null){

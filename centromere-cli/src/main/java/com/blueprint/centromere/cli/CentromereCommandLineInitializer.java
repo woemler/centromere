@@ -46,7 +46,7 @@ public class CentromereCommandLineInitializer {
 		} else {
 			logger.info("Running Centromere with default profiles.");
 		}
-		logger.info(String.format("Running Centromere with arguments: %s", args));
+		logger.info(String.format("Running Centromere with arguments: %s", args.toString()));
 		springApplication.run(args);
 	}
 	

@@ -119,9 +119,9 @@ public class GctGeneExpressionFileReader
 						throw new DataImportException(String.format("Cannot parse value: %s", bits[i]));
 					}
 				}
-				record.setDataFile(dataFile);
-				record.setGene(gene);
-				record.setSample(sample);
+				record.setDataFileId(dataFile.getId());
+				record.setGeneId(gene.getId());
+				record.setSampleId(sample.getId());
 				records.add(record);
 			}
 			

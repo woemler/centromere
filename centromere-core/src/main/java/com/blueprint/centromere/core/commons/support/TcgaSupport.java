@@ -56,9 +56,7 @@ public class TcgaSupport {
 
     Sample sample = new Sample();
     sample.setName(sampleName);
-    sample.setSubject(subject);
     sample.setSubjectId(subject.getId());
-    sample.setDataSet(dataSet);
     sample.setDataSetId(dataSet.getId());
     sample.setTissue(subject.getAttribute("tumor_tissue_site"));
     sample.setHistology(subject.getAttribute("histological_type"));

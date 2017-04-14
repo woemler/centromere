@@ -17,11 +17,11 @@
 package com.blueprint.centromere.core.commons.model;
 
 import com.blueprint.centromere.core.model.AbstractModel;
+import com.blueprint.centromere.core.model.Linked;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -34,8 +34,7 @@ public class DataFile extends AbstractModel implements Attributes {
 	private String dataType;
 	private Date dateCreated;
 	private Date dateUpdated;
-	@DBRef(lazy = true) private DataSet dataSet;
-	@Indexed private String dataSetId;
+	@Indexed @Linked(model = DataSet.class) private String dataSetId;
 	
 	private Map<String, String> attributes = new HashMap<>();
 	
@@ -73,15 +72,6 @@ public class DataFile extends AbstractModel implements Attributes {
 		this.dateUpdated = dateUpdated;
 	}
 
-	public DataSet getDataSet() {
-		return dataSet;
-	}
-
-	public void setDataSet(DataSet dataSet) {
-		this.dataSet = dataSet;
-		this.dataSetId = dataSet.getId();
-	}
-
 	public String getDataSetId() {
 		return dataSetId;
 	}
@@ -117,5 +107,17 @@ public class DataFile extends AbstractModel implements Attributes {
 	@Override
 	public String getAttribute(String name) {
 		return attributes.getOrDefault(name, null);
+	}
+
+	@Override
+	public String toString() {
+		return "DataFile{" +
+				"filePath='" + filePath + '\'' +
+				", dataType='" + dataType + '\'' +
+				", dateCreated=" + dateCreated +
+				", dateUpdated=" + dateUpdated +
+				", dataSetId='" + dataSetId + '\'' +
+				", attributes=" + attributes +
+				'}';
 	}
 }

@@ -28,6 +28,7 @@ import com.mysema.commons.lang.Assert;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +61,6 @@ public class MafReader extends StandardRecordFileReader<Mutation>
   protected Mutation getRecordFromLine(String line) {
 
     Mutation mutation = new Mutation();
-    mutation.setDataFile(this.getDataFile());
     mutation.setDataFileId(this.getDataFile().getId());
 
     Sample sample = getSampleFromLine(line);
@@ -68,7 +68,6 @@ public class MafReader extends StandardRecordFileReader<Mutation>
       logger.info("Skipping line due to invalid sample: " + line);
       return null;
     } else {
-      mutation.setSample(sample);
       mutation.setSampleId(sample.getId());
     }
 
@@ -77,7 +76,6 @@ public class MafReader extends StandardRecordFileReader<Mutation>
       logger.info("Skipping line due to invalid gene: " + line);
       return null;
     } else {
-      mutation.setGene(gene);
       mutation.setGeneId(gene.getId());
     }
 
@@ -100,8 +98,8 @@ public class MafReader extends StandardRecordFileReader<Mutation>
   private Gene getGeneFromLine(String line){
     Gene gene = null;
     if (hasColumn("entrez_gene_id")){
-      List<Gene> genes = geneRepository.findByPrimaryReferenceId(getColumnValue(line, "entrez_gene_id"));
-      if (!genes.isEmpty()) gene = genes.get(0);
+      Optional<Gene> optional = geneRepository.findByPrimaryReferenceId(getColumnValue(line, "entrez_gene_id"));
+      if (optional.isPresent()) gene = optional.get();
     }
     if (gene == null && hasColumn("hugo_symbol")){
       List<Gene> genes = geneRepository.findByPrimaryGeneSymbol(getColumnValue(line, "hugo_symbol"));

@@ -30,7 +30,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Gene extends AbstractModel implements Attributes {
 
-	@Indexed(unique = true, background = true) private String primaryReferenceId;
+	@Indexed(unique = true) private String primaryReferenceId;
 	private String primaryGeneSymbol;
 	private Integer taxId;
 	private String chromosome;

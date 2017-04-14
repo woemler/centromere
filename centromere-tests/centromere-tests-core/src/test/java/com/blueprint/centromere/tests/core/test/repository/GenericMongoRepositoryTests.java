@@ -33,6 +33,7 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -398,7 +399,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     gene.setGeneType("protein-coding");
     geneRepository.save(gene);
 
-    Gene created = geneRepository.findByPrimaryReferenceId("100").get(0);
+    Gene created = geneRepository.findByPrimaryReferenceId("100").get();
     Assert.notNull(created);
     Assert.isTrue(created.getPrimaryReferenceId().equals("100"));
     Assert.isTrue("TEST".equals(created.getPrimaryGeneSymbol()));
@@ -425,14 +426,14 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     gene2.setGeneType("pseudo");
     genes.add(gene2);
     geneRepository.save(genes);
-    genes = geneRepository.findByPrimaryReferenceId("100");
-    Assert.notNull(genes);
-    Assert.notEmpty(genes);
-    Gene gene = genes.get(0);
+    Optional<Gene> optional = geneRepository.findByPrimaryReferenceId("100");
+    Assert.notNull(optional);
+    Assert.isTrue(optional.isPresent());
+    Gene gene = optional.get();
     Assert.notNull(gene);
-    genes = geneRepository.findByPrimaryReferenceId("101");
+    optional = geneRepository.findByPrimaryReferenceId("101");
     Assert.notNull(genes);
-    Assert.notEmpty(genes);
+    Assert.isTrue(optional.isPresent());
     gene = genes.get(0);
     Assert.notNull(gene);
     Assert.isTrue(geneRepository.count() == 7L);
@@ -453,10 +454,10 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     gene.setGeneType("pseudogene");
     geneRepository.save(gene);
 
-    List<Gene> genes = geneRepository.findByPrimaryReferenceId("100");
-    Assert.notNull(genes);
-    Assert.notEmpty(genes);
-    Gene updated = genes.get(0);
+    Optional<Gene> optional = geneRepository.findByPrimaryReferenceId("100");
+    Assert.notNull(optional);
+    Assert.isTrue(optional.isPresent());
+    Gene updated = optional.get();
     Assert.notNull(updated);
     Assert.isTrue("TEST_TEST".equals(updated.getPrimaryGeneSymbol()));
     Assert.isTrue("pseudogene".equals(updated.getGeneType()));
@@ -490,16 +491,16 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     genes.add(gene2);
     geneRepository.save(genes);
 
-    genes = geneRepository.findByPrimaryReferenceId("100");
-    Assert.notNull(genes);
-    Assert.notEmpty(genes);
-    Gene gene = genes.get(0);
+    Optional<Gene> optional = geneRepository.findByPrimaryReferenceId("100");
+    Assert.notNull(optional);
+    Assert.isTrue(optional.isPresent());
+    Gene gene = optional.get();
     Assert.notNull(gene);
     Assert.isTrue("TEST".equals(gene.getGeneType()));
-    genes = geneRepository.findByPrimaryReferenceId("101");
-    Assert.notNull(genes);
-    Assert.notEmpty(genes);
-    gene = genes.get(0);
+    optional = geneRepository.findByPrimaryReferenceId("101");
+    Assert.notNull(optional);
+    Assert.isTrue(optional.isPresent());
+    gene = optional.get();
     Assert.notNull(gene);
     Assert.isTrue("TEST".equals(gene.getGeneType()));
   }
@@ -515,17 +516,17 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     gene.setGeneType("protein-coding");
     geneRepository.save(gene);
 
-    List<Gene> genes = geneRepository.findByPrimaryReferenceId("100");
-    Assert.notNull(genes);
-    Assert.notEmpty(genes);
-    Gene created = genes.get(0);
+    Optional<Gene> optional = geneRepository.findByPrimaryReferenceId("100");
+    Assert.notNull(optional);
+    Assert.isTrue(optional.isPresent());
+    Gene created = optional.get();
     Assert.notNull(created);
     Assert.isTrue(created.getPrimaryReferenceId().equals("100"));
 
     geneRepository.delete(created);
-    genes = geneRepository.findByPrimaryReferenceId("100");
-    Assert.notNull(genes);
-    Assert.isTrue(genes.isEmpty());
+    optional = geneRepository.findByPrimaryReferenceId("100");
+    Assert.notNull(optional);
+    Assert.isTrue(!optional.isPresent());
 
   }
 

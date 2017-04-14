@@ -17,12 +17,12 @@
 package com.blueprint.centromere.core.commons.model;
 
 import com.blueprint.centromere.core.model.AbstractModel;
+import com.blueprint.centromere.core.model.Linked;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -40,14 +40,10 @@ public class DataSet extends AbstractModel implements Attributes {
 	private String version;
 	private String description;
 
-	@DBRef(lazy = true)
-	private List<DataFile> dataFiles = new ArrayList<>();
-	
+	@Linked(model = DataFile.class)
 	private List<String> dataFileIds = new ArrayList<>();
 
-	@DBRef(lazy = true)
-  private List<Sample> samples = new ArrayList<>();
-	
+	@Linked(model = Sample.class)
 	private List<String> sampleIds = new ArrayList<>();
 	
 	private Map<String, String> attributes = new HashMap<>();
@@ -90,30 +86,6 @@ public class DataSet extends AbstractModel implements Attributes {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public List<DataFile> getDataFiles() {
-		return dataFiles;
-	}
-
-	public void setDataFiles(List<DataFile> dataFiles) {
-		this.dataFiles = dataFiles;
-		this.dataFileIds = new ArrayList<>();
-		for (DataFile dataFile: dataFiles){
-		  dataFileIds.add(dataFile.getId());
-    }
-	}
-
-	public List<Sample> getSamples() {
-		return samples;
-	}
-
-	public void setSamples(List<Sample> samples) {
-		this.samples = samples;
-		this.sampleIds = new ArrayList<>();
-		for (Sample sample: samples){
-		  sampleIds.add(sample.getId());
-    }
 	}
 
 	@Override
@@ -159,5 +131,19 @@ public class DataSet extends AbstractModel implements Attributes {
 
   public void setSampleIds(List<String> sampleIds) {
     this.sampleIds = sampleIds;
+  }
+
+  @Override
+  public String toString() {
+    return "DataSet{" +
+        "displayName='" + displayName + '\'' +
+        ", shortName='" + shortName + '\'' +
+        ", source='" + source + '\'' +
+        ", version='" + version + '\'' +
+        ", description='" + description + '\'' +
+        ", dataFileIds=" + dataFileIds +
+        ", sampleIds=" + sampleIds +
+        ", attributes=" + attributes +
+        '}';
   }
 }

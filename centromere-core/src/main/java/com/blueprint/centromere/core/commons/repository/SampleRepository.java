@@ -20,6 +20,7 @@ import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
@@ -32,7 +33,8 @@ public interface SampleRepository extends
 		ModelRepository<Sample, String>,
 		MetadataOperations<Sample>,
 		AttributeOperations<Sample> {
-	
+
+  Optional<Sample> findByNameAndDataSetId(@Param("name") String name, @Param("dataSetId") String dataSetId);
 	Sample findOneByName(@Param("name") String name);
 	List<Sample> findBySampleType(@Param("type") String sampleType);
 	List<Sample> findByTissue(@Param("tissue") String tissue);

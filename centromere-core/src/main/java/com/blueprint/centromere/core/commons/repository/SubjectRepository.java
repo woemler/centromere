@@ -20,6 +20,7 @@ import com.blueprint.centromere.core.commons.model.Subject;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
@@ -32,6 +33,7 @@ public interface SubjectRepository
 		MetadataOperations<Subject>,
  		AttributeOperations<Subject> {
 	
+  Optional<Subject> findByName(@Param("name") String name);
 	Subject findOneByName(@Param("name") String name);
 	List<Subject> findBySpecies(@Param("species") String species);
 	

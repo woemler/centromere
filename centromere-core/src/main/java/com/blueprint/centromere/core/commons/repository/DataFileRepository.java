@@ -19,6 +19,8 @@ package com.blueprint.centromere.core.commons.repository;
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 /**
@@ -26,7 +28,8 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
  */
 @RepositoryRestResource(path = "datafiles", collectionResourceRel = "dataFiles")
 public interface DataFileRepository extends ModelRepository<DataFile, String> {
-	DataFile findOneByFilePath(String filePath);
+	Optional<DataFile> findByFilePath(@Param("path") String filePath );
+  DataFile findOneByFilePath(String filePath);
 	List<DataFile> findByDataType(String dataType);
 	List<DataFile> findByDataSetId(String dataSetId);
 }

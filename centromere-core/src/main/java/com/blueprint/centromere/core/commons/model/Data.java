@@ -17,8 +17,8 @@
 package com.blueprint.centromere.core.commons.model;
 
 import com.blueprint.centromere.core.model.AbstractModel;
+import com.blueprint.centromere.core.model.Linked;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 
 /**
  * Base class for modeling processed genomic data.  Assumes that each record has an associated 
@@ -29,38 +29,21 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
  */
 public abstract class Data extends AbstractModel {
 
-	@DBRef(lazy = true)
-	private Sample sample;
-
 	@Indexed
+	@Linked(model = Sample.class)
 	private String sampleId;
 
-	@DBRef(lazy = true)
-	private DataFile dataFile;
-
 	@Indexed
+	@Linked(model = DataFile.class)
 	private String dataFileId;
 	
-	@DBRef(lazy = true)
-  private DataSet dataSet;
-	
 	@Indexed
+	@Linked(model = DataSet.class)
   private String dataSetId;
 
-	@DBRef(lazy = true)
-	private Gene gene;
-
 	@Indexed
+	@Linked(model = Gene.class)
 	private String geneId;
-
-	public Sample getSample() {
-		return sample;
-	}
-
-	public void setSample(Sample sample) {
-		this.sample = sample;
-		this.sampleId = sample.getId();
-	}
 
 	public String getSampleId() {
 		return sampleId;
@@ -68,15 +51,6 @@ public abstract class Data extends AbstractModel {
 
 	public void setSampleId(String sampleId) {
 		this.sampleId = sampleId;
-	}
-
-	public DataFile getDataFile() {
-		return dataFile;
-	}
-
-	public void setDataFile(DataFile dataFile) {
-		this.dataFile = dataFile;
-		this.dataFileId = dataFile.getId();
 	}
 
 	public String getDataFileId() {
@@ -87,15 +61,6 @@ public abstract class Data extends AbstractModel {
 		this.dataFileId = dataFileId;
 	}
 
-	public Gene getGene() {
-		return gene;
-	}
-
-	public void setGene(Gene gene) {
-		this.gene = gene;
-		this.geneId = gene.getId();
-	}
-
 	public String getGeneId() {
 		return geneId;
 	}
@@ -103,15 +68,6 @@ public abstract class Data extends AbstractModel {
 	public void setGeneId(String geneId) {
 		this.geneId = geneId;
 	}
-
-  public DataSet getDataSet() {
-    return dataSet;
-  }
-
-  public void setDataSet(DataSet dataSet) {
-    this.dataSet = dataSet;
-    this.dataSetId = dataSet.getId();
-  }
 
   public String getDataSetId() {
     return dataSetId;

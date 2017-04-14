@@ -100,9 +100,9 @@ public class TcgaRnaSeqGeneExpressionFileReader
 						throw new DataImportException(String.format("Cannot parse value: %s", bits[i]));
 					}
 				}
-				record.setDataFile(this.getDataFile());
-				record.setGene(gene);
-				record.setSample(sample);
+				record.setDataFileId(this.getDataFile().getId());
+				record.setGeneId(gene.getId());
+				record.setSampleId(sample.getId());
 				records.add(record);
 			}
 			

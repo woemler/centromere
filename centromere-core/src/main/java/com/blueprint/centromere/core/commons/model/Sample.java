@@ -17,10 +17,12 @@
 package com.blueprint.centromere.core.commons.model;
 
 import com.blueprint.centromere.core.model.AbstractModel;
+import com.blueprint.centromere.core.model.Linked;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -30,6 +32,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * 
  * @author woemler
  */
+@CompoundIndexes({
+    @CompoundIndex(name = "sample_name_datasetid_idx", def = "{ 'name': 1, 'dataSetId': 1 }", unique = true)
+})
 @Document
 public class Sample extends AbstractModel implements Attributes {
 
@@ -39,19 +44,8 @@ public class Sample extends AbstractModel implements Attributes {
 	private String histology;
 	private String notes;
 	private Map<String, String> attributes = new HashMap<>();
-	@DBRef(lazy = true) private Subject subject;
-	private String subjectId;
-	@DBRef(lazy = true) private DataSet dataSet;
-	private String dataSetId;
-
-	public Subject getSubject() {
-		return subject;
-	}
-
-	public void setSubject(Subject subject) {
-		this.subject = subject;
-		this.subjectId = subject.getId();
-	}
+	@Linked(model = Subject.class) private String subjectId;
+	@Linked(model = DataSet.class) private String dataSetId;
 
 	public String getSubjectId() {
 		return subjectId;
@@ -110,15 +104,6 @@ public class Sample extends AbstractModel implements Attributes {
 		this.notes = notes;
 	}
 
-	public DataSet getDataSet() {
-		return dataSet;
-	}
-
-	public void setDataSet(DataSet dataSet) {
-		this.dataSet = dataSet;
-		this.dataSetId = dataSet.getId();
-	}
-
 	public String getDataSetId() {
 		return dataSetId;
 	}
@@ -156,9 +141,7 @@ public class Sample extends AbstractModel implements Attributes {
 				", histology='" + histology + '\'' +
 				", notes='" + notes + '\'' +
 				", attributes=" + attributes +
-				", subject=" + subject +
 				", subjectId='" + subjectId + '\'' +
-				", dataSet=" + dataSet +
 				", dataSetId='" + dataSetId + '\'' +
 				'}';
 	}

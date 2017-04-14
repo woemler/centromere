@@ -72,7 +72,7 @@ public interface ImportOptions {
    * @return
    */
   default boolean isInvalidSample(Sample sample)  {
-    if (sample == null || StringUtils.isEmpty(sample.getName()) || sample.getSubject() == null){
+    if (sample == null || StringUtils.isEmpty(sample.getName()) || sample.getSubjectId() == null){
       if (skipInvalidSamples()){
         return true;
       } else {

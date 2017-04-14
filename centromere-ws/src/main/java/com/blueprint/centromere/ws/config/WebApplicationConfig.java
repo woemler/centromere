@@ -27,6 +27,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -59,8 +60,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 })
 @ComponentScan(basePackageClasses = { UserAuthenticationController.class, ModelController.class })
 public class WebApplicationConfig {
-	
-	@Configuration
+  
+  @Configuration
 	public static class SpringDataRestCustomConfig extends RepositoryRestConfigurerAdapter{
 
     @Autowired private Environment env;
@@ -82,6 +83,11 @@ public class WebApplicationConfig {
       super.configureConversionService(conversionService);
       conversionService.addConverter(new StringToMapParameterConverter());
     }
+    
+    @Bean
+		public LinkedResourceProcessor linkedResourceProcessor(){
+    	return new LinkedResourceProcessor();
+		}
 		
 	}
 	

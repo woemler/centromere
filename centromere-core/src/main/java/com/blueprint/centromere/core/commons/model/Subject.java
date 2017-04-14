@@ -17,12 +17,12 @@
 package com.blueprint.centromere.core.commons.model;
 
 import com.blueprint.centromere.core.model.AbstractModel;
+import com.blueprint.centromere.core.model.Linked;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -35,14 +35,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Subject extends AbstractModel implements Attributes {
 	
-	@Indexed(unique = true) private String name;
+	@Indexed private String name;
 	private String species;
 	private String gender;
 	private String notes;
 	private List<String> aliases = new ArrayList<>();
 	private Map<String, String> attributes = new HashMap<>();
-	@DBRef(lazy = true) private List<Sample> samples = new ArrayList<>();
-	private List<String> sampleIds = new ArrayList<>();
+	@Linked(model = Sample.class) private List<String> sampleIds = new ArrayList<>();
 
 	public String getName() {
 		return name;
@@ -92,18 +91,6 @@ public class Subject extends AbstractModel implements Attributes {
 		this.attributes = attributes;
 	}
 
-	public List<Sample> getSamples() {
-		return samples;
-	}
-
-	public void setSamples(List<Sample> samples) {
-		this.samples = samples;
-		this.sampleIds = new ArrayList<>();
-		for (Sample sample: samples){
-		  this.sampleIds.add(sample.getId());
-    }
-	}
-
 	public List<String> getSampleIds() {
 		return sampleIds;
 	}
@@ -145,7 +132,6 @@ public class Subject extends AbstractModel implements Attributes {
 				", notes='" + notes + '\'' +
 				", aliases=" + aliases +
 				", attributes=" + attributes +
-				", samples=" + samples +
 				", sampleIds=" + sampleIds +
 				'}';
 	}
