@@ -214,7 +214,7 @@ The `centromere-core` module contains a number of simple classes intended to aid
 public class GeneInfoReader extends AbstractRecordFileReader<Gene> {
 
 	@Override
-	public Gene readRecord() throws DataImportException {
+	public Gene readRecord()  {
 		Gene gene = null;
 		String line;
 		try {

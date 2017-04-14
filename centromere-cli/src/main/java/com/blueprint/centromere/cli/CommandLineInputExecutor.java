@@ -125,7 +125,7 @@ public class CommandLineInputExecutor implements CommandLineRunner {
           fileImportExecutor.run(importFileCommandArguments.getDataType(),
               importFileCommandArguments.getFilePath());
         } catch (Exception e) {
-          throw new DataImportException(e.getMessage());
+          throw new DataImportException(e);
         }
         code = 0;
       
@@ -137,7 +137,7 @@ public class CommandLineInputExecutor implements CommandLineRunner {
         try {
           manifestImportExecutor.run(importManifestCommandArguments.getFilePath());
         } catch (Exception e){
-          throw new DataImportException(e.getMessage());
+          throw new DataImportException(e);
         }
         code = 0;
       

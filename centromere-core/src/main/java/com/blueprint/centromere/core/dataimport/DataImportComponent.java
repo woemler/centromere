@@ -33,18 +33,16 @@ public interface DataImportComponent extends ImportOptionsAware, InitializingBea
 	 *   a variety of tasks using flexible input parameters.
 	 *
 	 * @param args an array of objects of any type.
-	 * @throws DataImportException
 	 */
-	default void doBefore(Object... args) throws DataImportException { }
+	default void doBefore(Object... args){ }
 
 	/**
 	 * To be executed after the main component method is called for the last time.  Can be configured 
 	 *   to handle a variety of tasks using flexible input parameters.
 	 *
 	 * @param args an array of objects of any type.
-	 * @throws DataImportException
 	 */
-	default void doAfter(Object... args) throws DataImportException { }
+	default void doAfter(Object... args) { }
 
 	/**
 	 * Empty default implementation.  The purpose of extending {@link InitializingBean} is to trigger

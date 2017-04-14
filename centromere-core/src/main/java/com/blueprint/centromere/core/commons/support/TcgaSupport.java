@@ -40,6 +40,8 @@ public class TcgaSupport {
 
   public Sample createSample(String sampleName, DataSet dataSet){
 
+    sampleName = sampleName.toLowerCase();
+
     String subjectName = getSubjectNameFromSampleName(sampleName);
     if (subjectName == null){
       logger.warn(String.format("Unable to extract subject name from sample name: %s", sampleName));

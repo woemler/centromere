@@ -43,9 +43,8 @@ public interface ImportOptions {
    *
    * @param record
    * @return
-   * @throws DataImportException
    */
-  default boolean isInvalidRecord(Object record) throws DataImportException {
+  default boolean isInvalidRecord(Object record)  {
     if (record == null){
       if (skipInvalidRecords()){
         return true;
@@ -71,9 +70,8 @@ public interface ImportOptions {
    *
    * @param sample
    * @return
-   * @throws DataImportException
    */
-  default boolean isInvalidSample(Sample sample) throws DataImportException {
+  default boolean isInvalidSample(Sample sample)  {
     if (sample == null || StringUtils.isEmpty(sample.getName()) || sample.getSubject() == null){
       if (skipInvalidSamples()){
         return true;
@@ -99,9 +97,8 @@ public interface ImportOptions {
    *
    * @param gene
    * @return
-   * @throws DataImportException
    */
-  default boolean isInvalidGene(Gene gene) throws DataImportException {
+  default boolean isInvalidGene(Gene gene)  {
     if (gene == null || StringUtils.isEmpty(gene.getPrimaryGeneSymbol())
         || StringUtils.isEmpty(gene.getPrimaryReferenceId())){
       if (skipInvalidGenes()){

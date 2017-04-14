@@ -32,8 +32,7 @@ public interface RecordWriter<T extends Model<?>> extends DataImportComponent {
 	 * Writes a single {@link Model} entity to the target destination.
 	 * 
 	 * @param record
-	 * @throws DataImportException
 	 */
-	void writeRecord(T record) throws DataImportException;
+	void writeRecord(T record) ;
 
 }

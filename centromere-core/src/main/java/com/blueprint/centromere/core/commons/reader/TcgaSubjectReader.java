@@ -33,7 +33,7 @@ public class TcgaSubjectReader extends ColumnRecordFileReader<Subject> {
   @Override
   protected void setModelAttribute(Subject record, String attribute, String value) {
     if (attribute.equalsIgnoreCase("hybridization ref")){
-      record.setName(value);
+      record.setName(value.toLowerCase());
     } else if (attribute.equalsIgnoreCase("gender")){
       record.setGender(value);
     } else {

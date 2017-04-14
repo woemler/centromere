@@ -43,10 +43,9 @@ public abstract class MultiRecordLineFileReader<T extends Model<?>>
 	 * Initializes the header and record list objects.
 	 * 
 	 * @param args
-	 * @throws DataImportException
 	 */
 	@Override 
-	public void doBefore(Object... args) throws DataImportException {
+	public void doBefore(Object... args)  {
 		super.doBefore(args);
 		recordList = new ArrayList<>();
 		headers = new ArrayList<>();
@@ -57,7 +56,7 @@ public abstract class MultiRecordLineFileReader<T extends Model<?>>
 	 * {@link RecordReader#readRecord()}
 	 */
 	@Override 
-	public T readRecord() throws DataImportException {
+	public T readRecord()  {
 		if (recordList.size() > 0){
 			return recordList.remove(0);
 		} else {
@@ -76,8 +75,7 @@ public abstract class MultiRecordLineFileReader<T extends Model<?>>
 					line = this.getReader().readLine();
 				}
 			} catch (Exception e){
-				e.printStackTrace();
-				throw new DataImportException(e.getMessage());
+				throw new DataImportException(e);
 			}
 		}
 		return null;
@@ -99,7 +97,7 @@ public abstract class MultiRecordLineFileReader<T extends Model<?>>
 	 * @param line
 	 * @return
 	 */
-	abstract protected List<T> getRecordsFromLine(String line) throws DataImportException;
+	abstract protected List<T> getRecordsFromLine(String line) ;
 
 	/**
 	 * Tests whether a given line should be skipped.

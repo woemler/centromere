@@ -4,23 +4,37 @@
 
 ## About
 
-Centromere aims to make the task of storing and working with processed genomic data easier, by provided a comprehensive tool-set for file parsing, database integration, and data access via REST web services.  You can create your own data model, or use the built-in one, for managing sample or experimental metadata, genomic profile data, and anything else that you can think of.  Centromere includes all of the required dependencies for running a full-featured data warehouse, and provides several starter projects to help you get up and running even faster.  Key features include:
+Centromere aims to make the task of storing and working with processed 
+genomic data easier, by provided a comprehensive tool-set for file parsing, 
+database integration, and data access via REST web services.  Centromere 
+includes a built-in data model for managing sample and experimental metadata,
+gene expression, copy-number variation, mutation data, and more.  You can even 
+extend or replace the core data model to suit your needs.  Centromere 
+includes all of the required dependencies for running a full-featured data 
+warehouse, and provides several starter projects to help you get up and 
+running even faster.  Key features include:
  
-- File readers and processors for common bioinformatics data types.
-- Preexisting data models for common data sets (such as The Cancer Genome Atlas).
-- Integration with SQL and NoSQL databases.
+- File processors for common bioinformatics data types and data sets (such as The Cancer Genome Atlas and Cancer Cell Line Encyclopedia).
+- High-performance queries and flexible data-modeling, using MongoDB databases.
 - A Command line utility for reading and writing data to the warehouse.
 - REST web services, with a number of useful features:
     - Dynamic, user-defined queries.
-    - Automatic API documentation.
+    - Automatic [Swagger](http://swagger.io/) API documentation with.
     - Basic security and user-authentication.
     - Response object field filtering and formatting.
     
-Centromere is built using the [Spring IO Platform](https://spring.io/platform), and leverages tools such as Spring Data, Spring Data REST, and Spring Security to deliver enterprise-grade data management solutions.    
+Centromere is built using the [Spring IO Platform](https://spring.io/platform), 
+and leverages tools such as Spring Data, Spring Data REST, and Spring Security 
+to deliver enterprise-grade data management solutions.    
 
 ## Important Note
 
-The current development build of Centromere (0.5.0-SNAPSHOT) significantly overhauls the codebase, eliminating excess dependencies and streamlining the process to deployment.  If you are new to Centromere, I highly recommend waiting for the 0.5.0 release before getting started.  This is expected to be complete Q1 2017.  For a brief description of the current development road map, please see the `roadmap.md` document.
+The current development build of Centromere (0.5.0-SNAPSHOT) significantly 
+overhauls the codebase, eliminating excess dependencies and streamlining the 
+process to deployment.  If you are new to Centromere, I highly recommend 
+waiting for the 0.5.0 release before getting started.  This is expected to 
+be complete Q1 2017.  For a brief description of the current development 
+road map, please see the `roadmap.md` document.
 
 ## Quick Start
 
@@ -41,7 +55,8 @@ Centromere has the following requirements:
 
 ## Contact
 
-For questions about Centromere, or if you are interested in contributing, please contact:
+For questions about Centromere, or if you are interested in contributing, 
+please contact:
   - [Will Oemler](mailto:woemler@blueprintmedicines.com), Blueprint Medicines
 
 ## License

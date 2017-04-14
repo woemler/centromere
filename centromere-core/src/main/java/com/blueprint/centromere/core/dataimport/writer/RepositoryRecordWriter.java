@@ -66,11 +66,11 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
   }
 
   @Override
-	public void doBefore(Object... args) throws DataImportException {
+	public void doBefore(Object... args)  {
 		try {
 		  afterPropertiesSet();
     } catch (Exception e){
-		  throw new DataImportException(e.getMessage());
+		  throw new DataImportException(e);
     }
     records = new ArrayList<>();
 	}
@@ -81,7 +81,7 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
 	 * @param entity
 	 */ 
 	@SuppressWarnings("unchecked")
-	public void writeRecord(T entity) throws DataImportException {
+	public void writeRecord(T entity)  {
     if (batchSize > 1){
       records.add(entity);
       if (records.size() >= batchSize) {
@@ -110,7 +110,7 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
   }
 
 	@Override
-	public void doAfter(Object... args) throws DataImportException {
+	public void doAfter(Object... args)  {
 			if (records.size() > 0) repository.save(records);
 	}
 

@@ -39,7 +39,7 @@ public class RecordCollectionReader<T extends Model<?>> implements RecordReader<
 		this.records.addAll(records);
 	}
 
-  public T readRecord() throws DataImportException {
+  public T readRecord()  {
 		if (!records.isEmpty()) return records.remove(0);
 		return null;
 	}

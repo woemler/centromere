@@ -45,8 +45,7 @@ public class FileImportExecutor implements EnvironmentAware {
 	
 	private static final Logger logger = LoggerFactory.getLogger(FileImportExecutor.class);
 	
-	public void run(String dataType, String filePath, DataSet dataSet, DataFile dataFile) 
-      throws DataImportException {
+	public void run(String dataType, String filePath, DataSet dataSet, DataFile dataFile){
 		
 	  // Check to make sure the target data type is supported
 	  if (!processorRegistry.isSupportedDataType(dataType)){
@@ -134,7 +133,7 @@ public class FileImportExecutor implements EnvironmentAware {
     return dataSet;
   }
 
-  public void run(String dataType, String filePath) throws DataImportException {
+  public void run(String dataType, String filePath) {
 	  run(dataType, filePath, null, null);
   }
 

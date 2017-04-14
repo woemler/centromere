@@ -45,7 +45,7 @@ public class ManifestImportExecutor {
 	private static final String PROPERTY_PREFIX = "centromere.import.";
 	private static final String MANIFEST_PROPERTY_PREFIX = PROPERTY_PREFIX + "manifest.";
 	
-	public void run(String filePath) throws DataImportException {
+	public void run(String filePath) {
 		
 		// Get the manifest file
 		File file = null;
@@ -54,8 +54,7 @@ public class ManifestImportExecutor {
 			Assert.isTrue(file.isFile(), String.format("File cannot be found: %s", filePath));
 			Assert.isTrue(file.canRead(), String.format("File is not readable: %s", filePath));
 		} catch (Exception e){
-			e.printStackTrace();
-			throw new DataImportException(e.getMessage());
+			throw new DataImportException(e);
 		}
 		File directory = file.getParentFile();
 		logger.info(String.format("Reading manifest file: %s", filePath));
@@ -68,8 +67,7 @@ public class ManifestImportExecutor {
 			manifest = objectMapper.readValue(file, ImportManifest.class);
 			Assert.notNull(manifest, "Could not parse manifest file.");
 		} catch (Exception e){
-			e.printStackTrace();
-			throw new DataImportException(e.getMessage());
+			throw new DataImportException(e);
 		}
 		
 		// Set environemntal properties from manifest options.

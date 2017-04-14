@@ -55,14 +55,14 @@ public class DelimtedTextFileWriter<T extends Model<?>> extends AbstractRecordFi
   }
 
   @Override
-  public void doBefore(Object... args) throws DataImportException {
+  public void doBefore(Object... args)  {
     super.doBefore(args);
     columns = ModelReflectionUtils.getPersistableNonEntityFieldNames(this.getModel(), ignoredFields);
     fields = columns;
   }
 
   @Override
-  public void writeRecord(T record) throws DataImportException {
+  public void writeRecord(T record)  {
     
     FileWriter writer = this.getWriter();
     StringBuilder stringBuilder = new StringBuilder();
@@ -81,8 +81,7 @@ public class DelimtedTextFileWriter<T extends Model<?>> extends AbstractRecordFi
         writer.write(stringBuilder.toString());
         writer.write(terminatedBy);
       } catch (IOException e){
-        e.printStackTrace();
-        throw new DataImportException(e.getMessage());
+        throw new DataImportException(e);
       }
       headerFlag = false;
     }
@@ -108,8 +107,7 @@ public class DelimtedTextFileWriter<T extends Model<?>> extends AbstractRecordFi
       writer.write(stringBuilder.toString());
       writer.write(terminatedBy);
     } catch (IOException e){
-      e.printStackTrace();
-      throw new DataImportException(e.getMessage());
+      throw new DataImportException(e);
     }
     
   }

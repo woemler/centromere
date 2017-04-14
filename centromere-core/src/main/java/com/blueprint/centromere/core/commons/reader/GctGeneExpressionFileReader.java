@@ -60,7 +60,7 @@ public class GctGeneExpressionFileReader
 	private static final Logger logger = LoggerFactory.getLogger(GctGeneExpressionFileReader.class);
 
 	@Override 
-	public void doBefore(Object... args) throws DataImportException {
+	public void doBefore(Object... args) {
         Assert.notNull(sampleRepository, "SampleRepository must not be null.");
         Assert.notNull(geneRepository, "GeneRepository must not be null.");
         Assert.notNull(dataFile, "DataFile cannot be null.");
@@ -69,7 +69,7 @@ public class GctGeneExpressionFileReader
 	}
 
 	@Override 
-	protected List<GeneExpression> getRecordsFromLine(String line) throws DataImportException {
+	protected List<GeneExpression> getRecordsFromLine(String line) {
 		List<GeneExpression> records = new ArrayList<>();
 		String[] bits = line.trim().split(this.getDelimiter());
 		if (bits.length > 1){
@@ -88,7 +88,7 @@ public class GctGeneExpressionFileReader
 					record = this.getModel().newInstance();
 				} catch (Exception e){
 					throw new DataImportException(String.format("Unable to create instance of model object: %s"
-							, model.getName()));
+							, model.getName()), e);
 				}
 				Sample sample = null;
 				if (sampleMap.containsKey(this.getHeaders().get(i))){

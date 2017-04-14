@@ -62,16 +62,14 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
 	 * Opens a new output file for writing.
 	 * 
  	 * @param args
-	 * @throws DataImportException
 	 */
 	@Override
-	public void doBefore(Object... args) throws DataImportException {
+	public void doBefore(Object... args)  {
 		
 	  try {
 			Assert.notEmpty(args, "One or more arguments is required.");
 		} catch (IllegalArgumentException e){
-			e.printStackTrace();
-			throw new DataImportException(e.getMessage());
+			throw new DataImportException(e);
 		}
 
     String filePath;
@@ -100,9 +98,8 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
    *
    * @param outputFile
    * @param args
-   * @throws DataImportException
    */
-  public void doBefore(File outputFile, Object... args) throws DataImportException {
+  public void doBefore(File outputFile, Object... args)  {
     List<Object> objects = Collections.singletonList(outputFile);
     objects.addAll(Arrays.asList(args));
     Object[] arguments = new Object[objects.size()];
@@ -117,10 +114,9 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
    * @param dataFile
    * @param dataSet
    * @param args
-   * @throws DataImportException
    */
   public void doBefore(File outputFile, DataFile dataFile, DataSet dataSet, Object... args)
-      throws DataImportException {
+       {
     List<Object> objects = Arrays.asList(outputFile, dataFile, dataSet);
     objects.addAll(Arrays.asList(args));
     Object[] arguments = new Object[objects.size()];
@@ -132,10 +128,9 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
 	 * Closes the open file writer.
 	 * 
 	 * @param args
- 	 * @throws DataImportException
 	 */
 	@Override
-	public void doAfter(Object... args) throws DataImportException {
+	public void doAfter(Object... args)  {
 		this.close();
 	}
 
@@ -143,16 +138,14 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
 	 * Creates or overwrites an output file, creates a {@link FileWriter} for writing records to the file.
 	 * 
 	 * @param outputFilePath
-	 * @throws DataImportException
 	 */
-	protected void open(String outputFilePath) throws DataImportException{
+	protected void open(String outputFilePath) {
 		outputFilePath = cleanFilePath(outputFilePath);
 		this.close();
 		try {
 			writer = new FileWriter(outputFilePath);
 		} catch (IOException e){
-			e.printStackTrace();
-			throw new DataImportException(String.format("Cannot open output file: %s", outputFilePath));
+			throw new DataImportException(String.format("Cannot open output file: %s", outputFilePath), e);
 		}
 	}
 
@@ -176,7 +169,7 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
    * @return
    */
   @Override
-  public String getTempFilePath(String inputFilePath) throws DataImportException {
+  public String getTempFilePath(String inputFilePath)  {
     File tempDir = new File(options.getTempFilePath());
     if (!tempDir.isDirectory() || !tempDir.canWrite()){
       throw new DataImportException(String.format("Unable to read or write to temp directory: %s",

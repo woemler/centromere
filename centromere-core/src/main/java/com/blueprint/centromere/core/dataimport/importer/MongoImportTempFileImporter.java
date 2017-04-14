@@ -49,7 +49,7 @@ public class MongoImportTempFileImporter<T extends Model<?>> extends AbstractFil
   }
 
   @Override
-  public void doBefore(Object... args) throws DataImportException {
+  public void doBefore(Object... args)  {
     Assert.isTrue(environment.containsProperty(Properties.DB_HOST),
         String.format("Environment property must not be null: %s", Properties.DB_HOST));
     Assert.isTrue(environment.containsProperty(Properties.DB_NAME),
@@ -64,9 +64,8 @@ public class MongoImportTempFileImporter<T extends Model<?>> extends AbstractFil
    * Performs the temporary file import and captures all output.
    *
    * @param filePath
-   * @throws DataImportException
    */
-  public void importFile(String filePath) throws DataImportException {
+  public void importFile(String filePath) {
 
     Process process;
     String[] commands = new String[]{ "/bin/bash", "-c", buildImportCommand(filePath) }; // TODO: Support for Windows and other shells
@@ -108,8 +107,7 @@ public class MongoImportTempFileImporter<T extends Model<?>> extends AbstractFil
       }
 
     } catch (Exception e){
-      e.printStackTrace();
-      throw new DataImportException(String.format("Unable to import temp file: %s", filePath));
+      throw new DataImportException(String.format("Unable to import temp file: %s", filePath), e);
     }
     logger.debug(String.format("CENTROMERE: MongoImport complete: %s", filePath));
   }

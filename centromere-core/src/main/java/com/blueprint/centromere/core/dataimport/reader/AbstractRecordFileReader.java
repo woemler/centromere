@@ -73,10 +73,9 @@ public abstract class AbstractRecordFileReader<T extends Model<?>>
 	 * Closes any open reader and opens the new target file.  Assigns local variables, if available.
 	 * 
 	 * @param args
-	 * @throws DataImportException
 	 */
 	@Override
-	public void doBefore(Object... args) throws DataImportException{
+	public void doBefore(Object... args) {
 		
 	  this.close();
 		Assert.isTrue(args.length > 0, "Must be at least one argument.");
@@ -106,9 +105,8 @@ public abstract class AbstractRecordFileReader<T extends Model<?>>
    * 
    * @param inputFile
    * @param args
-   * @throws DataImportException
    */
-	public void doBefore(File inputFile, Object... args) throws DataImportException {
+	public void doBefore(File inputFile, Object... args)  {
     List<Object> objects = Collections.singletonList(inputFile);
     objects.addAll(Arrays.asList(args));
     Object[] arguments = new Object[objects.size()];
@@ -123,10 +121,9 @@ public abstract class AbstractRecordFileReader<T extends Model<?>>
    * @param dataFile
    * @param dataSet
    * @param args
-   * @throws DataImportException
    */
   public void doBefore(File inputFile, DataFile dataFile, DataSet dataSet, Object... args) 
-      throws DataImportException {
+       {
     List<Object> objects = Arrays.asList(inputFile, dataFile, dataSet);
     objects.addAll(Arrays.asList(args));
     Object[] arguments = new Object[objects.size()];
@@ -147,22 +144,20 @@ public abstract class AbstractRecordFileReader<T extends Model<?>>
 	 *   getter method.
 	 * 
 	 * @param inputFilePath
-	 * @throws DataImportException
 	 */
-	protected void open(String inputFilePath) throws DataImportException{
+	protected void open(String inputFilePath) {
 		File file = new File(inputFilePath);
 		if (!file.canRead() || !file.isFile()){
 			try {
 				file = new File(ClassLoader.getSystemClassLoader().getResource(inputFilePath).getPath());
 			} catch (NullPointerException e){
-				throw new DataImportException(String.format("Cannot locate file: %s", inputFilePath));
+				throw new DataImportException(String.format("Cannot locate file: %s", inputFilePath), e);
 			}
 		}
 		try {
 			reader = new BufferedReader(new FileReader(file));
 		} catch (IOException e){
-			e.printStackTrace();
-			throw new DataImportException(String.format("Cannot read file: %s", inputFilePath));
+			throw new DataImportException(String.format("Cannot read file: %s", inputFilePath), e);
 		}
 	}
 

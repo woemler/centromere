@@ -43,7 +43,7 @@ public abstract class ColumnRecordFileReader<T extends Model<?>> extends
   }
 
   @Override
-  public void doBefore(Object... args) throws DataImportException {
+  public void doBefore(Object... args)  {
 
     super.doBefore(args);
     
@@ -65,7 +65,7 @@ public abstract class ColumnRecordFileReader<T extends Model<?>> extends
         line = this.getReader().readLine();
       }
     } catch (Exception e){
-      throw new DataImportException(e.getMessage());
+      throw new DataImportException(e);
     }
 
     records = new ArrayList<>(recordMap.values());
@@ -75,7 +75,7 @@ public abstract class ColumnRecordFileReader<T extends Model<?>> extends
     protected abstract void setModelAttribute(T record, String attribute, String value);
 
     @Override
-    public T readRecord() throws DataImportException {
+    public T readRecord()  {
       if (records.size() == 0){
         return null;
       } else {

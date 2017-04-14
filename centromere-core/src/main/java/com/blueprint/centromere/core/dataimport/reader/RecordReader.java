@@ -32,8 +32,7 @@ public interface RecordReader<T extends Model<?>> extends DataImportComponent, M
 	 * Generates and returns a single {@link Model} entity from the input data source.
 	 * 
 	 * @return a single {@link Model} record.
-	 * @throws DataImportException
 	 */
-	T readRecord() throws DataImportException;
+	T readRecord() ;
 
 }

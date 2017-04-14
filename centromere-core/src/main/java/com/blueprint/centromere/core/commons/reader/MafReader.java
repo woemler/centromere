@@ -16,16 +16,15 @@
 
 package com.blueprint.centromere.core.commons.reader;
 
-import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Mutation;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
-import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.reader.StandardRecordFileReader;
 import com.blueprint.centromere.core.model.ModelSupport;
+import com.mysema.commons.lang.Assert;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +44,6 @@ public class MafReader extends StandardRecordFileReader<Mutation>
 
   private final TcgaSupport tcgaSupport;
   private final GeneRepository geneRepository;
-  private DataFile dataFile;
   private Class<Mutation> model = Mutation.class;
 
   private Map<String, Integer> columnMap = new HashMap<>();
@@ -59,11 +57,11 @@ public class MafReader extends StandardRecordFileReader<Mutation>
   }
 
   @Override
-  protected Mutation getRecordFromLine(String line) throws DataImportException {
+  protected Mutation getRecordFromLine(String line) {
 
-    Mutation mutation = null;
-    mutation.setDataFile(dataFile);
-    mutation.setDataFileId(dataFile.getId());
+    Mutation mutation = new Mutation();
+    mutation.setDataFile(this.getDataFile());
+    mutation.setDataFileId(this.getDataFile().getId());
 
     Sample sample = getSampleFromLine(line);
     if (this.getImportOptions().isInvalidSample(sample)) {
@@ -120,13 +118,15 @@ public class MafReader extends StandardRecordFileReader<Mutation>
       // TODO: get general sample name, not just TCGA
     }
 
+    Assert.notNull(sampleName, "Sample name must not be null.");
+
     if (sampleMap.containsKey(sampleName)){
       return sampleMap.get(sampleName);
     }
 
     Sample sample = tcgaSupport.findSample(sampleName);
     if (sample == null) {
-      sample = tcgaSupport.createSample(sampleName, dataFile.getDataSet());
+      sample = tcgaSupport.createSample(sampleName, this.getDataSet());
     }
     sampleMap.put(sampleName, sample);
 
@@ -180,16 +180,6 @@ public class MafReader extends StandardRecordFileReader<Mutation>
 
   private boolean hasColumn(String column){
     return columnMap.containsKey(column);
-  }
-
-  @Override
-  public void setDataFile(DataFile dataFile) {
-    this.dataFile = dataFile;
-  }
-
-  @Override
-  public DataFile getDataFile() {
-    return dataFile;
   }
 
   @Override

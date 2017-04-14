@@ -36,7 +36,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 	 * {@link RecordReader#readRecord()}
 	 */
 	@Override
-	public T readRecord() throws DataImportException {
+	public T readRecord()  {
 		try {
 			String line = this.getReader().readLine();
 			while (line != null) {
@@ -69,7 +69,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 	 * @param line
 	 * @return
 	 */
-	abstract protected T getRecordFromLine(String line) throws DataImportException;
+	abstract protected T getRecordFromLine(String line) ;
 
 	/**
 	 * Performs a test to see if the line should be skipped.

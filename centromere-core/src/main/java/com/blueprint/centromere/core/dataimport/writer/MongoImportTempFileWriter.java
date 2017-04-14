@@ -65,16 +65,14 @@ public class MongoImportTempFileWriter<T extends Model<?>> extends AbstractRecor
    * Writes a {@link com.blueprint.centromere.core.model.Model} record to a temp file, formatted into JSON.
    *
    * @param record
-   * @throws DataImportException
    */
-  public void writeRecord(T record) throws DataImportException {
+  public void writeRecord(T record)  {
     FileWriter writer = this.getWriter();
     try {
       writer.write(convertEntityToJson(record));
       writer.write("\n");
     } catch (IOException e){
-      e.printStackTrace();
-      throw new DataImportException(e.getMessage());
+      throw new DataImportException(e);
     }
   }
 

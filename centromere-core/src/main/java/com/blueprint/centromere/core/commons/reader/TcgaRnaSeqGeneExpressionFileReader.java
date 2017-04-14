@@ -61,7 +61,7 @@ public class TcgaRnaSeqGeneExpressionFileReader
 	}
 
 	@Override
-	public void doBefore(Object... args) throws DataImportException {
+	public void doBefore(Object... args) {
 		super.doBefore(args);
     Assert.notNull(this.getDataSet(), "DataSet record must not be null.");
     Assert.notNull(this.getDataFile(), "DataFile record must not be null.");
@@ -73,7 +73,7 @@ public class TcgaRnaSeqGeneExpressionFileReader
 	}
 
   @Override
-	protected List<GeneExpression> getRecordsFromLine(String line) throws DataImportException {
+	protected List<GeneExpression> getRecordsFromLine(String line) {
 		List<GeneExpression> records = new ArrayList<>();
 		String[] bits = line.trim().split(this.getDelimiter());
 		if (bits.length > 1){

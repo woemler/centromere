@@ -23,7 +23,7 @@ public class ListCommandExecutor implements EnvironmentAware {
   private DataFileRepository dataFileRepository;
   private Environment environment;
 
-  public void run(String arg) throws DataImportException {
+  public void run(String arg){
 
     arg = arg.trim().toLowerCase().replaceAll("-", "");
     if (!listable.contains(arg)){

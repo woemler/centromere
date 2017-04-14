@@ -31,7 +31,6 @@ public interface RecordImporter extends DataImportComponent {
 	 * Runs the data import on the specified temp file.
 	 * 
 	 * @param filePath
-	 * @throws DataImportException
 	 */
-	void importFile(String filePath) throws DataImportException;
+	void importFile(String filePath);
 }

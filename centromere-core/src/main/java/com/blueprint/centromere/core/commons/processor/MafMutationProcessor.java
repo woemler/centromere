@@ -45,7 +45,7 @@ public class MafMutationProcessor extends GenericRecordProcessor<Mutation> {
         Environment environment
     ) {
       this.setReader(new MafReader(geneRepository, tcgaSupport));
-      this.setValidator(new GeneExpressionValidator());
+      //this.setValidator(new()); // TODO: mutation validator
       this.setWriter(new MongoImportTempFileWriter<>(mongoOperations));
       this.setImporter(new MongoImportTempFileImporter<Mutation>(Mutation.class, environment));
       this.setModel(Mutation.class);

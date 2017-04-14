@@ -91,16 +91,15 @@ public class GenericRecordProcessor<T extends Model<?>>
    *   options and metadata objects to the individual processing components that are expecting them.
    * 
    * @param args an array of objects of any type.
-   * @throws DataImportException
    */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void doBefore(Object... args) throws DataImportException{
+	public void doBefore(Object... args) {
 	  
 	  try {
       afterPropertiesSet();
     } catch (Exception e){
-	    throw new DataImportException(e.getMessage());
+	    throw new DataImportException(e);
     }
     
     if (args.length > 1 && args[1] instanceof DataFile){
@@ -138,10 +137,9 @@ public class GenericRecordProcessor<T extends Model<?>>
    * @param dataFile
    * @param dataSet
    * @param args
-   * @throws DataImportException
    */
 	public void doBefore(File inputFile, DataFile dataFile, DataSet dataSet, Object... args) 
-      throws DataImportException {
+       {
 	  List<Object> objects = Arrays.asList(inputFile, dataFile, dataSet);
 	  objects.addAll(Arrays.asList(args));
 	  Object[] arguments = new Object[objects.size()];
@@ -152,9 +150,8 @@ public class GenericRecordProcessor<T extends Model<?>>
 	/**
 	 * {@link RecordProcessor#run(Object...)}
 	 * @param args
-	 * @throws DataImportException
 	 */
-	public void run(Object... args) throws DataImportException {
+	public void run(Object... args)  {
 	  
 	  Integer count = 0;
 		if (!isConfigured) logger.warn("Processor configuration method has not run!"); // TODO: Should this return or throw exception?
@@ -167,8 +164,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 		try {
 			Assert.notEmpty(args, "One or more arguments required.");
 		} catch (IllegalArgumentException e){
-			e.printStackTrace();
-			throw new DataImportException(e.getMessage());
+			throw new DataImportException(e);
 		}
 		
 		String inputFilePath;

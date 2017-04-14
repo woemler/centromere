@@ -29,14 +29,13 @@ public class EntrezGeneInfoReader extends StandardRecordFileReader<Gene>
 
 	private Class<Gene> model = Gene.class;
 
-	protected Gene getRecordFromLine(String line) throws DataImportException {
+	protected Gene getRecordFromLine(String line) {
 		String[] bits = line.split("\\t");
 		Gene gene;
 		try {
 			gene = new Gene();
 		} catch (Exception e){
-			e.printStackTrace();
-			throw new DataImportException(String.format("Cannot create instance of model class: %s", model.getName()));
+			throw new DataImportException(String.format("Cannot create instance of model class: %s", model.getName()), e);
 		}
 		gene.setTaxId(Integer.parseInt(bits[0]));
 		gene.setPrimaryReferenceId(bits[1]);

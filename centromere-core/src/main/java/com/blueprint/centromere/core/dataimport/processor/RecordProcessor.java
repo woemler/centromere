@@ -38,9 +38,8 @@ public interface RecordProcessor<T extends Model<?>>
 	 * Executes the pipeline and processes the input through the individual components.
 	 * 
 	 * @param args
-	 * @throws DataImportException
 	 */
-	void run(Object... args) throws DataImportException;
+	void run(Object... args) ;
 	
 	/* Getters and Setters */
 	void setReader(RecordReader<T> reader);

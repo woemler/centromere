@@ -31,7 +31,7 @@ public interface TempFileWriter {
    * @param inputFilePath
    * @return
    */
-  default String getTempFilePath(String inputFilePath) throws DataImportException {
+  default String getTempFilePath(String inputFilePath)  {
     File tempDir = new File(System.getProperty("java.io.tmpdir"));
     File tempFile = new File(tempDir, inputFilePath + ".tmp");
     return tempFile.getAbsolutePath();

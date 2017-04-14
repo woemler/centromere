@@ -55,10 +55,9 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
    * {@link AbstractRecordFileReader#readRecord()}
    * 
    * @return model record
-   * @throws DataImportException
    */
 	@Override 
-	public T readRecord() throws DataImportException {
+	public T readRecord()  {
 		try {
 			String line = this.getReader().readLine();
 			while (line != null){
@@ -85,10 +84,9 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	 * Builds two maps by inspecting the target {@link Model class}.  The first map links field and 
 	 *   alias names to the actual field name to have data mapped to in the instantiated object.  The 
 	 *   second map links the actual field name to the field type parsed data must be converted to.
-	 * 
-	 * @throws DataImportException
+	 *
 	 */
-	private void determineMappableModelFields() throws DataImportException {
+	private void determineMappableModelFields()  {
 		fieldNameMap = new HashMap<>();
 		fieldTypeMap = new HashMap<>();
 		Class<?> current = this.getModel();
@@ -108,9 +106,8 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	 *   a header cannot be matched to a field, this column will be ignored.
 	 *
 	 * @param line header line from file
-	 * @throws DataImportException
 	 */
-	private void parseHeader(String line) throws DataImportException {
+	private void parseHeader(String line)  {
 		determineMappableModelFields();
 		String[] bits = line.split(delimiter);
 		for (int i = 0; i < bits.length; i++){
@@ -127,9 +124,8 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	 * 
 	 * @param headerName parsed header name
 	 * @return field name that header matches, or null.
-	 * @throws DataImportException
 	 */
-	private String getMatchedHeaderFieldName(String headerName) throws DataImportException {
+	private String getMatchedHeaderFieldName(String headerName)  {
 		if (headerName == null || headerName.equals("")){
 			logger.warn("Column header has no name.");
 			return null;
@@ -149,10 +145,9 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	 * 
 	 * @param line line from the file
 	 * @return
-	 * @throws DataImportException
 	 */
 	@SuppressWarnings("unchecked")
-	private T getRecordFromLine(String line) throws DataImportException{
+	private T getRecordFromLine(String line) {
 		
 	  BeanWrapperImpl wrapper = new BeanWrapperImpl(this.getModel());
 		String[] bits = line.split(delimiter);
@@ -190,9 +185,8 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	 * @param s string column value
 	 * @param type type to convert to
 	 * @return converted object
-	 * @throws DataImportException
 	 */
-	private Object convertFieldValue(String s, Class<?> type) throws DataImportException {
+	private Object convertFieldValue(String s, Class<?> type)  {
 		if (type.equals(String.class)) return s;
 		if (conversionService.canConvert(String.class, type)){
 			return conversionService.convert(s, type);
@@ -202,7 +196,7 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	}
 
 	@Override 
-	public void doBefore(Object... args) throws DataImportException {
+	public void doBefore(Object... args)  {
 		super.doBefore(args);
 		headerFlag = true;
 	}
