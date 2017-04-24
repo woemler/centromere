@@ -19,6 +19,7 @@ package com.blueprint.centromere.tests.ws.test;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -84,12 +85,13 @@ public class ModelControllerTests extends AbstractRepositoryTests {
     }
 
   }
+  
+  // Guess tests
 	
 	@Test
 	public void guessTest() throws Exception {
 		mockMvc.perform(get(BASE_URL + "/guess?keyword=ABC"))
 				.andExpect(status().isOk())
-				.andDo(print())
 				.andExpect(jsonPath("$", hasKey("_embedded")))
 				.andExpect(jsonPath("$._embedded", hasKey("genes")))
 				.andExpect(jsonPath("$._embedded.genes", hasSize(1)))
@@ -105,11 +107,198 @@ public class ModelControllerTests extends AbstractRepositoryTests {
 				.andExpect(jsonPath("$._embedded.genes[0]._links", hasKey("self")));
 	}
 	
+	// Distinct Tests
+	
 	@Test
 	public void distinctTest() throws Exception {
 		mockMvc.perform(get(BASE_URL + "/distinct?field=geneType"))
 				.andExpect(status().isOk())
 				.andDo(print());
 	}
+	
+	// Query tests
+	
+	@Test
+  public void findAllQueryTest() throws Exception {
+    mockMvc.perform(get(BASE_URL + "/query"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasKey("content")))
+        .andExpect(jsonPath("$.content", hasSize(5)))
+        .andExpect(jsonPath("$", hasKey("totalPages")))
+        .andExpect(jsonPath("$", hasKey("totalElements")))
+        .andExpect(jsonPath("$", hasKey("last")))
+        .andExpect(jsonPath("$", hasKey("size")))
+        .andExpect(jsonPath("$", hasKey("number")))
+        .andExpect(jsonPath("$", hasKey("sort")))
+        .andExpect(jsonPath("$", hasKey("numberOfElements")))
+        .andExpect(jsonPath("$", hasKey("first")))
+        .andExpect(jsonPath("$", not(hasKey("_embedded"))))
+        .andExpect(jsonPath("$", not(hasKey("_links"))));
+  }
+  // TODO
+//  @Test
+//  public void findAllFieldFilteredQueryTest() throws Exception {
+//    mockMvc.perform(get(BASE_URL + "/query?fields=id,primaryGeneSymbol"))
+//        .andExpect(status().isOk())
+//        .andExpect(jsonPath("$", hasKey("content")))
+//        .andExpect(jsonPath("$.content", hasSize(5)))
+//        .andExpect(jsonPath("$.content[0]", hasKey("id")))
+//        .andExpect(jsonPath("$.content[0]", hasKey("primaryGeneSymbol")))
+//        .andExpect(jsonPath("$.content[0]", not(hasKey("primaryReferenceId"))));
+//  }
+
+  @Test
+  public void findBySimpleStringAttributeQueryTest() throws Exception {
+    mockMvc.perform(get(BASE_URL + "/query?primaryGeneSymbol=GeneB"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasKey("content")))
+        .andExpect(jsonPath("$.content", hasSize(1)))
+        .andExpect(jsonPath("$.content[0]", hasKey("primaryReferenceId")))
+        .andExpect(jsonPath("$.content[0].primaryReferenceId", is("2")))
+        .andExpect(jsonPath("$.content[0]", hasKey("aliases")))
+        .andExpect(jsonPath("$.content[0].aliases", hasSize(1)))
+        .andExpect(jsonPath("$.content[0].aliases[0]", is("DEF")))
+        .andExpect(jsonPath("$.content[0]", hasKey("attributes")))
+        .andExpect(jsonPath("$.content[0].attributes", hasKey("isKinase")))
+        .andExpect(jsonPath("$.content[0].attributes.isKinase", is("N")))
+        .andExpect(jsonPath("$.content[0]", not(hasKey("_links"))));
+  }
+
+  @Test
+  public void findBySimpleCollectionQueryElement() throws Exception {
+    mockMvc.perform(get(BASE_URL + "/query?aliases=GHI"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasKey("content")))
+        .andExpect(jsonPath("$.content", hasSize(1)))
+        .andExpect(jsonPath("$.content[0]", hasKey("primaryReferenceId")))
+        .andExpect(jsonPath("$.content[0].primaryReferenceId", is("3")))
+        .andExpect(jsonPath("$.content[0]", hasKey("aliases")))
+        .andExpect(jsonPath("$.content[0].aliases", hasSize(1)))
+        .andExpect(jsonPath("$.content[0].aliases[0]", is("GHI")))
+        .andExpect(jsonPath("$.content[0]", hasKey("attributes")))
+        .andExpect(jsonPath("$.content[0].attributes", hasKey("isKinase")))
+        .andExpect(jsonPath("$.content[0].attributes.isKinase", is("N")))
+        .andExpect(jsonPath("$.content[0]", not(hasKey("_links"))));
+  }
+
+  @Test
+  public void findBySimpleMapElementQueryTest() throws Exception {
+    mockMvc.perform(get(BASE_URL + "/query?attributes=isKinase:Y"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasKey("content")))
+        .andExpect(jsonPath("$.content", hasSize(2)))
+        .andExpect(jsonPath("$.content[0]", hasKey("primaryReferenceId")))
+        .andExpect(jsonPath("$.content[0].primaryReferenceId", is("1")))
+        .andExpect(jsonPath("$.content[0]", hasKey("aliases")))
+        .andExpect(jsonPath("$.content[0].aliases", hasSize(1)))
+        .andExpect(jsonPath("$.content[0].aliases[0]", is("ABC")))
+        .andExpect(jsonPath("$.content[0]", hasKey("attributes")))
+        .andExpect(jsonPath("$.content[0].attributes", hasKey("isKinase")))
+        .andExpect(jsonPath("$.content[0].attributes.isKinase", is("Y")))
+        .andExpect(jsonPath("$.content[0]", not(hasKey("_links"))));
+  }
+
+  @Test
+  public void findByMultipleStringAttributesQueryTest() throws Exception {
+    mockMvc.perform(get(BASE_URL + "/query?primaryGeneSymbol=GeneB,GeneD"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasKey("content")))
+        .andExpect(jsonPath("$.content", hasSize(2)))
+        .andExpect(jsonPath("$.content[1]", hasKey("primaryReferenceId")))
+        .andExpect(jsonPath("$.content[1].primaryReferenceId", is("4")))
+        .andExpect(jsonPath("$.content[1]", hasKey("aliases")))
+        .andExpect(jsonPath("$.content[1].aliases", hasSize(1)))
+        .andExpect(jsonPath("$.content[1].aliases[0]", is("JKL")))
+        .andExpect(jsonPath("$.content[1]", hasKey("attributes")))
+        .andExpect(jsonPath("$.content[1].attributes", hasKey("isKinase")))
+        .andExpect(jsonPath("$.content[1].attributes.isKinase", is("Y")))
+        .andExpect(jsonPath("$.content[1]", not(hasKey("_links"))));
+  }
+
+  @Test
+  public void findByMultipleCollectionElementsQueryTest() throws Exception {
+    mockMvc.perform(get(BASE_URL + "/query?aliases=DEF,GHI"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasKey("content")))
+        .andExpect(jsonPath("$.content", hasSize(2)))
+        .andExpect(jsonPath("$.content[1]", hasKey("primaryReferenceId")))
+        .andExpect(jsonPath("$.content[1].primaryReferenceId", is("3")))
+        .andExpect(jsonPath("$.content[1]", hasKey("aliases")))
+        .andExpect(jsonPath("$.content[1].aliases", hasSize(1)))
+        .andExpect(jsonPath("$.content[1].aliases[0]", is("GHI")))
+        .andExpect(jsonPath("$.content[1]", hasKey("attributes")))
+        .andExpect(jsonPath("$.content[1].attributes", hasKey("isKinase")))
+        .andExpect(jsonPath("$.content[1].attributes.isKinase", is("N")))
+        .andExpect(jsonPath("$.content[1]", not(hasKey("_links"))));
+  }
+
+  @Test
+  public void findByMultipleMapElementsQueryTest() throws Exception {
+    mockMvc.perform(get(BASE_URL + "/query?attributes=isKinase:Y,N"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasKey("content")))
+        .andExpect(jsonPath("$.content", hasSize(5)))
+        .andExpect(jsonPath("$.content[0]", hasKey("primaryReferenceId")))
+        .andExpect(jsonPath("$.content[0].primaryReferenceId", is("1")))
+        .andExpect(jsonPath("$.content[0]", hasKey("aliases")))
+        .andExpect(jsonPath("$.content[0].aliases", hasSize(1)))
+        .andExpect(jsonPath("$.content[0].aliases[0]", is("ABC")))
+        .andExpect(jsonPath("$.content[0]", hasKey("attributes")))
+        .andExpect(jsonPath("$.content[0].attributes", hasKey("isKinase")))
+        .andExpect(jsonPath("$.content[0].attributes.isKinase", is("Y")))
+        .andExpect(jsonPath("$.content[0]", not(hasKey("_links"))));
+  }
+
+  @Test
+  public void findByStringLikeQueryTest() throws Exception {
+    mockMvc.perform(get(BASE_URL + "/query?primaryGeneSymbol=*B"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasKey("content")))
+        .andExpect(jsonPath("$.content", hasSize(1)))
+        .andExpect(jsonPath("$.content[0]", hasKey("primaryReferenceId")))
+        .andExpect(jsonPath("$.content[0].primaryReferenceId", is("2")))
+        .andExpect(jsonPath("$.content[0]", hasKey("aliases")))
+        .andExpect(jsonPath("$.content[0].aliases", hasSize(1)))
+        .andExpect(jsonPath("$.content[0].aliases[0]", is("DEF")))
+        .andExpect(jsonPath("$.content[0]", hasKey("attributes")))
+        .andExpect(jsonPath("$.content[0].attributes", hasKey("isKinase")))
+        .andExpect(jsonPath("$.content[0].attributes.isKinase", is("N")))
+        .andExpect(jsonPath("$.content[0]", not(hasKey("_links"))));
+  }
+
+  @Test
+  public void findByStringNotLikeQueryTest() throws Exception {
+    mockMvc.perform(get(BASE_URL + "/query?primaryGeneSymbol=!*B"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasKey("content")))
+        .andExpect(jsonPath("$.content", hasSize(4)))
+        .andExpect(jsonPath("$.content[0]", hasKey("primaryReferenceId")))
+        .andExpect(jsonPath("$.content[0].primaryReferenceId", is("1")))
+        .andExpect(jsonPath("$.content[0]", hasKey("aliases")))
+        .andExpect(jsonPath("$.content[0].aliases", hasSize(1)))
+        .andExpect(jsonPath("$.content[0].aliases[0]", is("ABC")))
+        .andExpect(jsonPath("$.content[0]", hasKey("attributes")))
+        .andExpect(jsonPath("$.content[0].attributes", hasKey("isKinase")))
+        .andExpect(jsonPath("$.content[0].attributes.isKinase", is("Y")))
+        .andExpect(jsonPath("$.content[0]", not(hasKey("_links"))));
+  }
+
+  @Test
+  public void findByStringEqualsQueryTest() throws Exception {
+    mockMvc.perform(get(BASE_URL + "/query?geneType=!protein-coding"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasKey("content")))
+        .andExpect(jsonPath("$.content", hasSize(2)))
+        .andExpect(jsonPath("$.content[0]", hasKey("primaryReferenceId")))
+        .andExpect(jsonPath("$.content[0].primaryReferenceId", is("3")))
+        .andExpect(jsonPath("$.content[0]", hasKey("aliases")))
+        .andExpect(jsonPath("$.content[0].aliases", hasSize(1)))
+        .andExpect(jsonPath("$.content[0].aliases[0]", is("GHI")))
+        .andExpect(jsonPath("$.content[0]", hasKey("attributes")))
+        .andExpect(jsonPath("$.content[0].attributes", hasKey("isKinase")))
+        .andExpect(jsonPath("$.content[0].attributes.isKinase", is("N")))
+        .andExpect(jsonPath("$.content[0]", not(hasKey("_links"))));
+  }
+
 
 }

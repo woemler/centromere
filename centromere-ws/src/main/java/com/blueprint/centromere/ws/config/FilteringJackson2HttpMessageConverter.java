@@ -17,21 +17,21 @@
 package com.blueprint.centromere.ws.config;
 
 import com.blueprint.centromere.ws.controller.ResponseEnvelope;
+import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.mvc.TypeConstrainedMappingJackson2HttpMessageConverter;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.converter.HttpMessageNotWritableException;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 /**
  * Uses {@link ResponseEnvelope} to identify filterable entities and
@@ -40,13 +40,15 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
  * @author woemler 
  */
 
-public class FilteringJackson2HttpMessageConverter extends MappingJackson2HttpMessageConverter {
+public class FilteringJackson2HttpMessageConverter extends
+    TypeConstrainedMappingJackson2HttpMessageConverter {
 
-	private boolean prefixJson = false;
+  public FilteringJackson2HttpMessageConverter() {
+    super(ResponseEnvelope.class);
+  }
 
-	@Override
+  @Override
 	public void setPrefixJson(boolean prefixJson) {
-		this.prefixJson = prefixJson;
 		super.setPrefixJson(prefixJson);
 	}
 
@@ -55,24 +57,24 @@ public class FilteringJackson2HttpMessageConverter extends MappingJackson2HttpMe
 			throws IOException, HttpMessageNotWritableException {
 
 		ObjectMapper objectMapper = getObjectMapper();
-		JsonGenerator jsonGenerator = objectMapper.getFactory().createGenerator(outputMessage.getBody());
+    JsonEncoding encoding = this.getJsonEncoding(outputMessage.getHeaders().getContentType());
+		JsonGenerator jsonGenerator = objectMapper.getFactory().createGenerator(outputMessage.getBody(), encoding);
 
 		try {
-
-			if (this.prefixJson) {
-				jsonGenerator.writeRaw(")]}', ");
-			}
+      
+      ObjectWriter writer;
+      Object content = object;
 
 			if (object instanceof ResponseEnvelope) {
 
 				ResponseEnvelope envelope = (ResponseEnvelope) object;
-				Object entity = envelope.getEntity();
+				content = envelope.getEntity();
 				Set<String> fieldSet = envelope.getFieldSet();
 				Set<String> exclude = envelope.getExclude();
-				FilterProvider filters = null;
+        FilterProvider filters = null;
 				
 				if (fieldSet != null && !fieldSet.isEmpty()) {
-					if (entity instanceof ResourceSupport){
+					if (content instanceof ResourceSupport){
 						fieldSet.add("content"); // Don't filter out the wrapped content.
 					}
 					filters = new SimpleFilterProvider()
@@ -88,16 +90,16 @@ public class FilteringJackson2HttpMessageConverter extends MappingJackson2HttpMe
 								.setFailOnUnknownId(false);
 				}
 				
-				objectMapper.setFilterProvider(filters);
-				objectMapper.writeValue(jsonGenerator, entity);
+				writer = objectMapper.writer(filters);
 
-			} else if (object == null){
-			  jsonGenerator.writeNull();
 			} else {
-				FilterProvider filters = new SimpleFilterProvider().setFailOnUnknownId(false);
-				objectMapper.setFilterProvider(filters);
-				objectMapper.writeValue(jsonGenerator, object);
-			}
+			  writer = objectMapper.writer();
+      }
+
+      writePrefix(jsonGenerator, content);
+			writer.writeValue(jsonGenerator, content);
+			writeSuffix(jsonGenerator, content);
+			jsonGenerator.flush();
 
 		} catch (JsonProcessingException e){
 			e.printStackTrace();

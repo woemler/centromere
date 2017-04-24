@@ -41,7 +41,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity
-//@ComponentScan(basePackageClasses = { SecurityControllers.class })
 @Profile({ Profiles.WEB_PROFILE })
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     

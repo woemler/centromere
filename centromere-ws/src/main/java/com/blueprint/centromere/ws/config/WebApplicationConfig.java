@@ -134,8 +134,8 @@ public class WebApplicationConfig {
 		
 		List<HttpMessageConverter<?>> converters = new ArrayList<>();
 		
-		FilteringJackson2HttpMessageConverter jsonConverter
-				= new FilteringJackson2HttpMessageConverter();
+		FilteringJackson2HttpMessageConverter jsonConverter 
+        = new FilteringJackson2HttpMessageConverter();
 		jsonConverter.setSupportedMediaTypes(Arrays.asList(
 				MediaType.APPLICATION_JSON,
 				MediaType.APPLICATION_JSON_UTF8, 
