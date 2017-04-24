@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 /**
  * @author woemler
@@ -39,9 +40,10 @@ public interface GeneRepository extends
 		MetadataOperations<Gene>,
 		AttributeOperations<Gene> {
 
-  Optional<Gene> findByPrimaryReferenceId(@Param("refId") String refId);
-	//List<Gene> findByPrimaryReferenceId(@Param("refId") String refId);
+	Optional<Gene> findByPrimaryReferenceId(@Param("refId") String refId);
+
 	List<Gene> findByPrimaryGeneSymbol(@Param("symbol") String symbol);
+
 	List<Gene> findByAliases(@Param("alias") String alias);
 
 	default List<Gene> findByExternalReference(@Param("source") String source, @Param("value") String value){

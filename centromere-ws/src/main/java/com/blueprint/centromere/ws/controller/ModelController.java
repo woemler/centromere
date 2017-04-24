@@ -19,17 +19,24 @@ package com.blueprint.centromere.ws.controller;
 import com.blueprint.centromere.core.commons.repository.MetadataOperations;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import com.blueprint.centromere.core.repository.QueryCriteria;
+import com.google.common.collect.Sets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.repository.support.Repositories;
+import org.springframework.data.repository.support.RepositoryInvoker;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.core.mapping.ResourceMetadata;
 import org.springframework.data.rest.core.mapping.SearchResourceMappings;
@@ -39,13 +46,16 @@ import org.springframework.data.rest.webmvc.ProfileResourceProcessor;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.rest.webmvc.RootResourceInformation;
+import org.springframework.data.rest.webmvc.support.DefaultedPageable;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -63,6 +73,8 @@ public class ModelController {
   private static final Logger logger = LoggerFactory.getLogger(ModelController.class);
   private static final String BASE_URL = "/{repository}";
 
+  private final List<String> halMediaTypes = Arrays.asList(MediaTypes.HAL_JSON_VALUE, "application/hal+json;charset=utf8");
+
   @Autowired private PagedResourcesAssembler pagedResourcesAssembler;
   @Autowired private Repositories repositories;
   @Autowired private RepositoryEntityLinks entityLinks;
@@ -73,7 +85,7 @@ public class ModelController {
   @RequestMapping(value = BASE_URL+"/guess", method = RequestMethod.GET)
   public HttpEntity guess(
       RootResourceInformation resourceInformation,
-      @RequestParam String keyword,
+      @RequestParam(name = "keyword") String keyword,
       PersistentEntityResourceAssembler assembler
   ) throws ResourceNotFoundException, HttpRequestMethodNotSupportedException {
     Class<?> model = resourceInformation.getDomainType();
@@ -112,115 +124,44 @@ public class ModelController {
     return new ResponseEntity<>(distinct, HttpStatus.OK);
 
   }
-  
 
-//    @RequestMapping(value = BASE_URL+"/query", method = RequestMethod.GET)
-//    public HttpEntity dynamic(
-//        @QuerydslPredicate RootResourceInformation resourceInformation,
-//        DefaultedPageable pageable,
-//        Sort sort,
-//        PersistentEntityResourceAssembler assembler,
-//        HttpServletRequest request
-//    ) throws ResourceNotFoundException, HttpRequestMethodNotSupportedException {
-//
-//
-//        Class<?> model = resourceInformation.getDomainType();
-//        if (model == null) throw new ResourceNotFoundException();
-//        Object repo = repositories.getRepositoryFor(model);
-//        if (repo == null || !(repo instanceof QueryDslPredicateExecutor)) throw new ResourceNotFoundException();
-//        QueryDslPredicateExecutor repository = (QueryDslPredicateExecutor) repo;
-//        Predicate predicate = getPredicateFromRequest(model, request);
-//
-//        if (pageable.getPageable() != null){
-//            Page<?> page = repository.findAll(predicate, pageable.getPageable());
-//            return new ResponseEntity<>(page, HttpStatus.OK);
-//        } else {
-//            Iterable<?> results = repository.findAll(predicate, sort);
-//            return new ResponseEntity<>(results, HttpStatus.OK);
-//        }
-//    }
-//
-//    protected Predicate getPredicateFromRequest(Class<?> model, HttpServletRequest request) {
-//
-//        logger.info(String.format("Generating dynamic query for model: %s", model.getName()));
-//        BooleanBuilder builder = new BooleanBuilder();
-//
-//        for (Map.Entry<String, String[]> param: request.getParameterMap().entrySet()){
-//
-//            logger.info(String.format("Inspecting query parameter: key=%s  value=%s",
-//                    param.getKey(), Arrays.asList(param.getValue()).toString()));
-//
-//            if (param.getValue().length == 0 || param.getValue()[0].trim().equals("")) continue;
-//
-//            // Is the param name a valid model field?
-//              // Is it a direct match to field name?
-//                // return default criteria path
-//              // Is it a suffixed field name?
-//                // return evaluation criteria
-//
-//            QueryCriteria criteria = QueryUtil.getCriteriaFromParameter(param.getKey(), model);
-//            if (criteria == null) throw new QueryParameterException(
-//                    String.format("Invalid query parameter: %s", param.getKey()));
-//
-//            // Convert parameter value in to target type.
-//        }
-//
-//        return builder.getValue();
-//
-//    }
-    
+  @RequestMapping(value = BASE_URL + "/query", method = RequestMethod.GET)
+  public HttpEntity<?> find(
+      @QuerydslPredicate RootResourceInformation resourceInformation,
+      PersistentEntityResourceAssembler assembler,
+      DefaultedPageable pageable,
+      Sort sort,
+      HttpServletRequest request
+  ){
+    RepositoryInvoker invoker = resourceInformation.getInvoker();
+    Class<?> model = resourceInformation.getDomainType();
+    Map<String, String[]> params = request.getParameterMap();
+    Set<String> fieldSet = params.containsKey("fields") ?
+        Sets.newHashSet(params.get("fields")) : new HashSet<>();
+    Set<String> exclude = params.containsKey("exclude") ?
+        Sets.newHashSet(params.get("exclude")) : new HashSet<>();
+    if (null == invoker) {
+      throw new ResourceNotFoundException();
+    }
+    Iterable<?> results = pageable.getPageable() != null ? invoker.invokeFindAll(pageable.getPageable())
+        : invoker.invokeFindAll(sort);
+    ResponseEnvelope<?> envelope;
+    if (isHalMediaType(request.getHeader("Accept"))){
+      Link link = entityLinks.linkToPagedResource(model, null);
+      Resources<?> resources = pageable.getPageable() != null ?
+          toPagedResources((Page<?>) results, model, assembler, link) :
+          toResources(iterableToList(results), model, assembler, link);
+      envelope = new ResponseEnvelope<>(resources, fieldSet, exclude);
+    } else {
+      envelope = new ResponseEnvelope<>(results, fieldSet, exclude);
+    }
+    return new ResponseEntity<>(envelope, HttpStatus.OK);
+  }
 
-//    // TODO: Do we still need this?
-//    @RequestMapping(value = BASE_URL+"/query", method = RequestMethod.GET)
-//    public HttpEntity dynamic(@QuerydslPredicate RootResourceInformation resourceInformation,
-//                              DefaultedPageable pageable,
-//                              Sort sort,
-//                              PersistentEntityResourceAssembler assembler,
-//                              HttpServletRequest request)
-//            throws ResourceNotFoundException, HttpRequestMethodNotSupportedException {
-//
-//        Class<?> model = resourceInformation.getDomainType();
-//        if (model == null) throw new ResourceNotFoundException();
-//        Object repo = repositories.getRepositoryFor(model);
-//        if (repo == null || !(repo instanceof QueryDslPredicateExecutor)) throw new ResourceNotFoundException();
-//        QueryDslPredicateExecutor repository = (QueryDslPredicateExecutor) repo;
-//        Predicate predicate = getPredicateFromRequest(model, request);
-//
-//        if (pageable.getPageable() != null){
-//            Page<?> page = repository.findAll(predicate, pageable.getPageable());
-//            return new ResponseEntity<>(page, HttpStatus.OK);
-//        } else {
-//            Iterable<?> results = repository.findAll(predicate, sort);
-//            return new ResponseEntity<>(results, HttpStatus.OK);
-//        }
-//    }
+  protected boolean isHalMediaType(String mediaType){
+    return halMediaTypes.contains(mediaType);
+  }
 
-//    protected Predicate getPredicateFromRequest(Class<?> model, HttpServletRequest request) {
-//
-//        logger.info(String.format("Generating dynamic query for model: %s", model.getName()));
-//        QueryParameterDescriptors descriptors = QueryUtil.getAvailableQueryParameters(model);
-//        BooleanBuilder builder = new BooleanBuilder();
-//
-//        for (Map.Entry<String, String[]> param: request.getParameterMap().entrySet()){
-//
-//            logger.info(String.format("Inspecting query parameter: key=%s  value=%s",
-//                    param.getKey(), Arrays.asList(param.getValue()).toString()));
-//
-//            if (param.getValue().length == 0 || param.getValue()[0].trim().equals("")) continue;
-//
-//            if (descriptors.matches(param.getKey())){
-//                QueryParameterDescriptor descriptor = descriptors.get(param.getKey());
-//                logger.info(String.format("Matched descriptor: %s", descriptor.toString()));
-//                Predicate predicate = QueryUtil.getParameterPredicate(param.getKey(),
-//                        param.getValue()[0], descriptor, conversionService);
-//                if (predicate != null) builder.and(predicate);
-//            }
-//        }
-//
-//        return builder.getValue();
-//
-//    }
-    
   @SuppressWarnings("unchecked")
   protected Resources<?> toPagedResources(
       Page<?> page,
@@ -261,6 +202,14 @@ public class ModelController {
           .withRel(searchMappings.getRel()));
     }
     return links;
+  }
+
+  protected List<Object> iterableToList(Iterable<?> iterable){
+    List<Object> list = new ArrayList<>();
+    for (Object obj: iterable){
+      list.add(obj);
+    }
+    return list;
   }
 
 }

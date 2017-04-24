@@ -16,10 +16,12 @@
 
 package com.blueprint.centromere.ws.controller;
 
+import com.blueprint.centromere.core.model.Filterable;
 import com.blueprint.centromere.ws.config.FilteringJackson2HttpMessageConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.HashSet;
 import java.util.Set;
+import org.springframework.context.annotation.ComponentScan.Filter;
 
 /**
  * Wrapper for GET request responses to allow for field filtering via 

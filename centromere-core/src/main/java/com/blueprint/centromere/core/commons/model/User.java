@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,7 +37,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class User extends AbstractModel implements UserDetails {
 	
 	@Indexed(unique = true) private String username;
-	private String password;
+	@RestResource(exported = false) private String password;
 	private boolean accountNonExpired = true;
 	private boolean accountNonLocked = true;
 	private boolean enabled = false;

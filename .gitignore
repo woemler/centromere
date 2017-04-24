@@ -3,3 +3,4 @@ target/
 .idea/
 *.log
 centromere-data-import
+.DS_Store

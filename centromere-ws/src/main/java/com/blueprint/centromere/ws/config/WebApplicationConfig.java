@@ -75,7 +75,7 @@ public class WebApplicationConfig {
 
     @Override
     public void configureHttpMessageConverters(List<HttpMessageConverter<?>> converters) {
-      converters.addAll(httpMessageConverters());
+      converters.addAll(0, httpMessageConverters());
     }
 
     @Override
@@ -88,6 +88,11 @@ public class WebApplicationConfig {
 		public LinkedResourceProcessor linkedResourceProcessor(){
     	return new LinkedResourceProcessor();
 		}
+
+		@Bean
+    public SearchResourceProcessor searchResourceProcessor(){
+		  return new SearchResourceProcessor();
+    }
 		
 	}
 	
@@ -100,7 +105,7 @@ public class WebApplicationConfig {
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-      converters.addAll(httpMessageConverters());
+      converters.addAll(0, httpMessageConverters());
     }
 
     @Override

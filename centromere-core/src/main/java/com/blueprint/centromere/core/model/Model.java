@@ -25,7 +25,7 @@ import java.io.Serializable;
  * 
  * @author woemler
  */
-@Filterable
+//@Filterable
 public interface Model<ID extends Serializable> {
 	ID getId();
 }

@@ -35,7 +35,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Subject extends AbstractModel implements Attributes {
 	
-	@Indexed private String name;
+	@Indexed(unique = true) private String name;
 	private String species;
 	private String gender;
 	private String notes;

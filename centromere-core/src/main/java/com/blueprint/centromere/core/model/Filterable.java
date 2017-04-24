@@ -17,6 +17,7 @@
 package com.blueprint.centromere.core.model;
 
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
+import com.fasterxml.jackson.annotation.JsonFilter;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -32,7 +33,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @JacksonAnnotationsInside
-//@JsonFilter("fieldFilter") //TODO JsonFIlter handling for standard SDR endpoints
+@JsonFilter("fieldFilter") //TODO JsonFIlter handling for standard SDR endpoints
 @Inherited
 public @interface Filterable {
 }

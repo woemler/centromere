@@ -26,6 +26,8 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.hateoas.ResourceSupport;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.converter.HttpMessageNotWritableException;
@@ -61,8 +63,8 @@ public class FilteringJackson2HttpMessageConverter extends MappingJackson2HttpMe
 				jsonGenerator.writeRaw(")]}', ");
 			}
 
-			if (object.getClass().isAssignableFrom(ResourceSupport.class)) {
-				
+			if (object instanceof ResponseEnvelope) {
+
 				ResponseEnvelope envelope = (ResponseEnvelope) object;
 				Object entity = envelope.getEntity();
 				Set<String> fieldSet = envelope.getFieldSet();
@@ -90,7 +92,7 @@ public class FilteringJackson2HttpMessageConverter extends MappingJackson2HttpMe
 				objectMapper.writeValue(jsonGenerator, entity);
 
 			} else if (object == null){
-				jsonGenerator.writeNull();
+			  jsonGenerator.writeNull();
 			} else {
 				FilterProvider filters = new SimpleFilterProvider().setFailOnUnknownId(false);
 				objectMapper.setFilterProvider(filters);
