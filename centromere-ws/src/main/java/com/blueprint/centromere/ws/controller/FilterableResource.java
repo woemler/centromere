@@ -29,13 +29,13 @@ import org.springframework.hateoas.Resource;
 
 @Filterable
 public class FilterableResource<T> extends Resource<T> {
-	
+
 	public FilterableResource(T content, Link... links) {
 		super(content, links);
 	}
-	
+
 	public FilterableResource(T content, Iterable<Link> links) {
 		super(content, links);
 	}
-	
+
 }

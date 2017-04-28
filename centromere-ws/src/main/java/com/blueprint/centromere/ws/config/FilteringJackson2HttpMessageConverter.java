@@ -44,7 +44,7 @@ public class FilteringJackson2HttpMessageConverter extends
     TypeConstrainedMappingJackson2HttpMessageConverter {
 
   public FilteringJackson2HttpMessageConverter() {
-    super(ResponseEnvelope.class);
+    super(Object.class);
   }
 
   @Override
@@ -64,6 +64,7 @@ public class FilteringJackson2HttpMessageConverter extends
       
       ObjectWriter writer;
       Object content = object;
+      FilterProvider filters;
 
 			if (object instanceof ResponseEnvelope) {
 
@@ -71,7 +72,6 @@ public class FilteringJackson2HttpMessageConverter extends
 				content = envelope.getEntity();
 				Set<String> fieldSet = envelope.getFieldSet();
 				Set<String> exclude = envelope.getExclude();
-        FilterProvider filters = null;
 				
 				if (fieldSet != null && !fieldSet.isEmpty()) {
 					if (content instanceof ResourceSupport){
@@ -89,13 +89,14 @@ public class FilteringJackson2HttpMessageConverter extends
 							.addFilter("fieldFilter", SimpleBeanPropertyFilter.serializeAllExcept())
 								.setFailOnUnknownId(false);
 				}
-				
-				writer = objectMapper.writer(filters);
 
 			} else {
-			  writer = objectMapper.writer();
+        filters = new SimpleFilterProvider()
+            .addFilter("fieldFilter", SimpleBeanPropertyFilter.serializeAllExcept())
+            .setFailOnUnknownId(false);
       }
 
+      writer = objectMapper.writer(filters);
       writePrefix(jsonGenerator, content);
 			writer.writeValue(jsonGenerator, content);
 			writeSuffix(jsonGenerator, content);

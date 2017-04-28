@@ -29,4 +29,8 @@ public interface DataOperations<T extends Model<?>> {
 	List<T> findBySampleId(String sampleId);
 	List<T> findByGeneId(String geneId);
 	List<T> findByDataSetId(String dataSetId);
+	void deleteByDataFileId(String dataFileId);
+  void deleteBySampleId(String sampleId);
+  void deleteByGeneId(String geneId);
+  void deleteByDataSetId(String dataSetId);
 }

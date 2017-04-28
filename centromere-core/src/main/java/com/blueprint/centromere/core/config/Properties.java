@@ -40,6 +40,7 @@ public class Properties {
   public static final String SKIP_INVALID_GENES = IMPORT_PREFIX + "skip-invalid-genes";
   public static final String SKIP_INVALID_FILES = IMPORT_PREFIX + "skip-invalid-files";
   public static final String SKIP_EXISTING_FILES = IMPORT_PREFIX + "skip-existing-files";
+  public static final String OVERWRITE_EXISTING_FILES = IMPORT_PREFIX + "overwrite-existing-files";
   public static final String TEMP_DIR = IMPORT_PREFIX + "temp-dir";
   
   public static final String DB_HOST = DB_PREFIX + "host";

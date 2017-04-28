@@ -127,6 +127,13 @@ public interface ImportOptions {
   boolean skipExistingFiles();
 
   /**
+   * WHen true, will overwrite data files that already exist in the database.
+   *
+   * @return
+   */
+  boolean overwriteExistingFiles();
+
+  /**
    * Returns the directory path to be used for storing temporary files.
    *
    * @return

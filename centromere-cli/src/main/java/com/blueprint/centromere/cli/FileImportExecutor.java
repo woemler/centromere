@@ -19,18 +19,23 @@ package com.blueprint.centromere.cli;
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
+import com.blueprint.centromere.core.commons.repository.DataOperations;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
 import com.blueprint.centromere.core.dataimport.processor.RecordProcessor;
+import com.blueprint.centromere.core.repository.ModelRepository;
 import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.repository.support.Repositories;
 
 /**
  * @author woemler
@@ -42,10 +47,13 @@ public class FileImportExecutor implements EnvironmentAware {
 	private DataSetRepository dataSetRepository;
 	private DataFileRepository dataFileRepository;
 	private Environment environment;
+	private Repositories repositories;
 	
 	private static final Logger logger = LoggerFactory.getLogger(FileImportExecutor.class);
 	
 	public void run(String dataType, String filePath, DataSet dataSet, DataFile dataFile){
+
+    ImportOptions importOptions = new ImportOptionsImpl(environment);
 		
 	  // Check to make sure the target data type is supported
 	  if (!processorRegistry.isSupportedDataType(dataType)){
@@ -81,14 +89,31 @@ public class FileImportExecutor implements EnvironmentAware {
       dataFile = dataFileRepository.insert(dataFile);
       logger.info(String.format("Creating new DataFile record: %s", dataFile.toString()));
     } else {
-      dataFile = df;
-      logger.info(String.format("Using existing DataFile record: %s", dataFile.toString()));
+      if (importOptions.skipExistingFiles()) {
+        logger.warn(String.format("DataFile record already exists.  Skipping import: %s",
+            df.getFilePath()));
+        return;
+      } else if (importOptions.overwriteExistingFiles()){
+        logger.info(String.format("Overwriting existing data file record: %s", df.getFilePath()));
+        ModelRepository r = (ModelRepository) repositories.getRepositoryFor(df.getModel());
+        if (r instanceof DataOperations) {
+          ((DataOperations) r).deleteByDataFileId(df.getId());
+        } else {
+          logger.warn(String.format("Data is not overwritable.  Exiting."));
+          return;
+        }
+        dataFileRepository.delete(df);
+        dataFile = dataFileRepository.insert(dataFile);
+      } else {
+        dataFile = df;
+        logger.info(String.format("Using existing DataFile record: %s", dataFile.toString()));
+      }
     }
     
     // Get the requested processor
 	  RecordProcessor processor = processorRegistry.getByDataType(dataType);
     logger.info(String.format("Using record processor: %s", processor.getClass().getName()));
-		processor.setImportOptions(new ImportOptionsImpl(environment));
+		processor.setImportOptions(importOptions);
 		
 		if (processor instanceof DataSetAware){
       ((DataSetAware) processor).setDataSet(dataSet);
@@ -158,5 +183,10 @@ public class FileImportExecutor implements EnvironmentAware {
   @Autowired
   public void setDataFileRepository(DataFileRepository dataFileRepository) {
     this.dataFileRepository = dataFileRepository;
+  }
+
+  @Autowired
+  public void setRepositories(Repositories repositories) {
+    this.repositories = repositories;
   }
 }

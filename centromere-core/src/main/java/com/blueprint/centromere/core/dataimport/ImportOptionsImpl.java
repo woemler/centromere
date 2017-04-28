@@ -29,6 +29,7 @@ public class ImportOptionsImpl implements ImportOptions {
   private boolean skipInvalidGenes = false;
   private boolean skipInvalidFiles = false;
   private boolean skipExistingFiles = false;
+  private boolean overwriteExistingFiles = false;
   private String tempFilePath = System.getProperty("java.io.tmpdir");
 
   public ImportOptionsImpl() {
@@ -49,6 +50,9 @@ public class ImportOptionsImpl implements ImportOptions {
     }
     if (environment.containsProperty(Properties.SKIP_EXISTING_FILES)){
       skipExistingFiles = environment.getProperty(Properties.SKIP_EXISTING_FILES, Boolean.class);
+    }
+    if (environment.containsProperty(Properties.OVERWRITE_EXISTING_FILES)){
+      overwriteExistingFiles = environment.getProperty(Properties.OVERWRITE_EXISTING_FILES, Boolean.class);
     }
     if (environment.containsProperty(Properties.TEMP_DIR)){
       String tempPath = environment.getProperty(Properties.TEMP_DIR);
@@ -82,6 +86,11 @@ public class ImportOptionsImpl implements ImportOptions {
   }
 
   @Override
+  public boolean overwriteExistingFiles() {
+    return false;
+  }
+
+  @Override
   public String getTempFilePath() {
     return tempFilePath;
   }
@@ -104,6 +113,10 @@ public class ImportOptionsImpl implements ImportOptions {
 
   public void setSkipExistingFiles(boolean skipExistingFiles) {
     this.skipExistingFiles = skipExistingFiles;
+  }
+
+  public void setOverwriteExistingFiles(boolean overwriteExistingFiles) {
+    this.overwriteExistingFiles = overwriteExistingFiles;
   }
 
   public void setTempFilePath(String tempFilePath) {
