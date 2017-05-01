@@ -17,11 +17,13 @@
 package com.blueprint.centromere.cli;
 
 import com.blueprint.centromere.core.config.Profiles;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
+import org.springframework.data.repository.support.Repositories;
 
 /**
  * @author woemler
@@ -57,6 +59,11 @@ public class CommandLineInputConfiguration {
 	@Bean
   public ListCommandExecutor listCommandExecutor(){
 	  return new ListCommandExecutor();
+  }
+
+  @Bean
+  public Repositories repositories(ApplicationContext context){
+    return new Repositories(context);
   }
 
 //	@Profile({Schema.DEFAULT_PROFILE})

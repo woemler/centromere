@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 /**
  * @author woemler
@@ -33,5 +34,5 @@ public interface DataFileRepository extends ModelRepository<DataFile, String> {
   DataFile findOneByFilePath(String filePath);
 	List<DataFile> findByDataType(String dataType);
 	List<DataFile> findByDataSetId(String dataSetId);
-	List<DataFile> findByModel(Class<? extends Model<?>> model);
+	@RestResource(exported = false) List<DataFile> findByModel(String model);
 }

@@ -19,6 +19,7 @@ package com.blueprint.centromere.core.commons.model;
 import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Linked;
 import com.blueprint.centromere.core.model.Model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class DataFile extends AbstractModel implements Attributes {
 	
 	@Indexed(unique = true) private String filePath;
 	private String dataType;
-	private Class<? extends Model<?>> model;
+	private String model;
 	private Date dateCreated;
 	private Date dateUpdated;
 	@Indexed @Linked(model = DataSet.class) private String dataSetId;
@@ -58,12 +59,17 @@ public class DataFile extends AbstractModel implements Attributes {
 		this.dataType = dataType;
 	}
 
-  public Class<? extends Model<?>> getModel() {
+	@JsonIgnore
+  public Class<?> getModelType() throws ClassNotFoundException {
+    return Class.forName(model);
+  }
+
+  public String getModel() {
     return model;
   }
 
-  public void setModel(Class<? extends Model<?>> model){
-	  this.model = model;
+  public void setModel(Class<?> modelType){
+	  this.model = modelType.getName();
   }
 
   public Date getDateCreated() {
@@ -124,7 +130,7 @@ public class DataFile extends AbstractModel implements Attributes {
 		return "DataFile{" +
 				"filePath='" + filePath + '\'' +
 				", dataType='" + dataType + '\'' +
-        ", model='" + model.getName() + '\'' +
+        ", model='" + model + '\'' +
 				", dateCreated=" + dateCreated +
 				", dateUpdated=" + dateUpdated +
 				", dataSetId='" + dataSetId + '\'' +

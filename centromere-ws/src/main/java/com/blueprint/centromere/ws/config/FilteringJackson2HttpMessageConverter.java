@@ -16,6 +16,7 @@
 
 package com.blueprint.centromere.ws.config;
 
+import com.blueprint.centromere.ws.controller.FilterableResource;
 import com.blueprint.centromere.ws.controller.ResponseEnvelope;
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -44,7 +45,7 @@ public class FilteringJackson2HttpMessageConverter extends
     TypeConstrainedMappingJackson2HttpMessageConverter {
 
   public FilteringJackson2HttpMessageConverter() {
-    super(Object.class);
+    super(ResponseEnvelope.class);
   }
 
   @Override

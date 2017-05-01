@@ -36,6 +36,7 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.support.Repositories;
+import org.springframework.web.context.request.NativeWebRequest;
 
 /**
  * @author woemler
@@ -60,6 +61,8 @@ public class FileImportExecutor implements EnvironmentAware {
 			throw new DataImportException(String.format("Data type %s is not supported by a registered " 
 					+ "record processor.", dataType));
 		}
+    RecordProcessor processor = processorRegistry.getByDataType(dataType);
+    logger.info(String.format("Using record processor: %s", processor.getClass().getName()));
 		logger.info(String.format("Running file import: data-type=%s  file=%s", dataType, filePath));
 		
 	  // Get the data set object
@@ -80,6 +83,7 @@ public class FileImportExecutor implements EnvironmentAware {
       dataFile = new DataFile();
       dataFile.setFilePath(filePath);
       dataFile.setDataType(dataType);
+      dataFile.setModel(processor.getModel());
       dataFile.setDateCreated(new Date());
       dataFile.setDateUpdated(new Date());
       dataFile.setDataSetId(dataSet.getId());
@@ -95,7 +99,12 @@ public class FileImportExecutor implements EnvironmentAware {
         return;
       } else if (importOptions.overwriteExistingFiles()){
         logger.info(String.format("Overwriting existing data file record: %s", df.getFilePath()));
-        ModelRepository r = (ModelRepository) repositories.getRepositoryFor(df.getModel());
+        ModelRepository r;
+        try {
+          r = (ModelRepository) repositories.getRepositoryFor(df.getModelType());
+        } catch (ClassNotFoundException e){
+          throw new DataImportException(e);
+        }
         if (r instanceof DataOperations) {
           ((DataOperations) r).deleteByDataFileId(df.getId());
         } else {
@@ -109,12 +118,9 @@ public class FileImportExecutor implements EnvironmentAware {
         logger.info(String.format("Using existing DataFile record: %s", dataFile.toString()));
       }
     }
-    
-    // Get the requested processor
-	  RecordProcessor processor = processorRegistry.getByDataType(dataType);
-    logger.info(String.format("Using record processor: %s", processor.getClass().getName()));
-		processor.setImportOptions(importOptions);
-		
+
+		// Configure the processor
+    processor.setImportOptions(importOptions);
 		if (processor instanceof DataSetAware){
       ((DataSetAware) processor).setDataSet(dataSet);
     }
