@@ -23,6 +23,7 @@ import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
+import com.blueprint.centromere.core.commons.support.DataSetSupport;
 import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.config.Properties;
 import com.blueprint.centromere.core.dataimport.DataImportException;
@@ -56,6 +57,7 @@ public class GctGeneExpressionFileReader
 	private Map<String, Sample> sampleMap;
 	private Class<GeneExpression> model;
 	private Environment environment;
+	private DataSetSupport dataSetSupport;
 	
 	private static final Logger logger = LoggerFactory.getLogger(GctGeneExpressionFileReader.class);
 
@@ -190,4 +192,13 @@ public class GctGeneExpressionFileReader
 	public void setEnvironment(Environment environment) {
 		this.environment = environment;
 	}
+
+  public DataSetSupport getDataSetSupport() {
+    return dataSetSupport;
+  }
+
+  public void setDataSetSupport(
+      DataSetSupport dataSetSupport) {
+    this.dataSetSupport = dataSetSupport;
+  }
 }

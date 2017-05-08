@@ -92,13 +92,19 @@ public class CommandLineInputExecutor implements CommandLineRunner {
 		ImportCommandArguments importCommandArguments = new ImportCommandArguments();
 		ImportFileCommandArguments importFileCommandArguments = new ImportFileCommandArguments();
 		ImportManifestCommandArguments importManifestCommandArguments = new ImportManifestCommandArguments();
+		
 		jc.addCommand(IMPORT_COMMAND, importCommandArguments);
+		jc.setProgramName("Centromere data import CLI");
+		
 		JCommander importJc = jc.getCommands().get(IMPORT_COMMAND);
+		importJc.setProgramName("File import");
 		importJc.addCommand(IMPORT_FILE_COMMAND, importFileCommandArguments);
 		importJc.addCommand(IMPORT_BATCH_COMMAND, importManifestCommandArguments);
 
     ListCommandArguments listCommandArguments = new ListCommandArguments();
     jc.addCommand(LIST_COMMAND, listCommandArguments);
+    JCommander listJc = jc.getCommands().get(LIST_COMMAND);
+    listJc.setProgramName("Component and file listing");
 		
 		int code = 1;
 		
@@ -172,7 +178,7 @@ public class CommandLineInputExecutor implements CommandLineRunner {
    * @param jc JCommander object
    */
 	private void printUsage(JCommander jc){
-		JCommander importJc = jc.getCommands().get(IMPORT_COMMAND);
+	  JCommander importJc = jc.getCommands().get(IMPORT_COMMAND);
 		importJc.usage(IMPORT_FILE_COMMAND);
 		importJc.usage(IMPORT_BATCH_COMMAND);
 		JCommander listJc = jc.getCommands().get(LIST_COMMAND);

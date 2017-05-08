@@ -122,9 +122,12 @@ public class MafReader extends StandardRecordFileReader<Mutation>
       return sampleMap.get(sampleName);
     }
 
-    Sample sample = tcgaSupport.findSample(sampleName);
-    if (sample == null) {
+    Sample sample;
+    Optional<Sample> optional = tcgaSupport.findSample(sampleName, this.getDataSet());
+    if (!optional.isPresent()) {
       sample = tcgaSupport.createSample(sampleName, this.getDataSet());
+    } else {
+      sample = optional.get();
     }
     sampleMap.put(sampleName, sample);
 

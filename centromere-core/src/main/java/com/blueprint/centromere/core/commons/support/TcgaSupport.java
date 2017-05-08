@@ -21,6 +21,7 @@ import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.model.Subject;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
@@ -31,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author woemler
  * @since 0.5.0
  */
-public class TcgaSupport {
+public class TcgaSupport implements DataSetSupport {
 
   private static final Logger logger = LoggerFactory.getLogger(TcgaSupport.class);
 
@@ -54,6 +55,22 @@ public class TcgaSupport {
       return null;
     }
 
+    return createSample(sampleName, subject, dataSet);
+
+  }
+
+  /**
+   * Creates a new sample record, given a name, {@link Subject} record, and an associated
+   * {@link DataSet} record.
+   *
+   * @param sampleName sample name
+   * @param dataSet DataSet record  @return a new Sample record
+   */
+  @Override
+  public Sample createSample(String sampleName, Subject subject, DataSet dataSet) {
+
+    sampleName = sampleName.toLowerCase();
+    
     Sample sample = new Sample();
     sample.setName(sampleName);
     sample.setSubjectId(subject.getId());
@@ -63,11 +80,12 @@ public class TcgaSupport {
     sampleRepository.insert(sample);
 
     return sample;
-
+    
   }
 
-  public Sample findSample(String sampleName){
-    return sampleRepository.findOneByName(sampleName);
+  @Override
+  public Optional<Sample> findSample(String sampleName, DataSet dataSet){
+    return sampleRepository.findByNameAndDataSetId(sampleName, dataSet.getId());
   }
 
   private static final Pattern subjectNamePattern =
@@ -83,14 +101,12 @@ public class TcgaSupport {
   }
 
   @Autowired
-  public void setSubjectRepository(
-      SubjectRepository subjectRepository) {
+  public void setSubjectRepository(SubjectRepository subjectRepository) {
     this.subjectRepository = subjectRepository;
   }
 
   @Autowired
-  public void setSampleRepository(
-      SampleRepository sampleRepository) {
+  public void setSampleRepository(SampleRepository sampleRepository) {
     this.sampleRepository = sampleRepository;
   }
 }

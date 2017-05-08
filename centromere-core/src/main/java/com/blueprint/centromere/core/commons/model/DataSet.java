@@ -47,6 +47,7 @@ public class DataSet extends AbstractModel implements Attributes {
 	private List<String> sampleIds = new ArrayList<>();
 	
 	private Map<String, String> attributes = new HashMap<>();
+	private Map<String, String> parameters = new HashMap<>();
 
   public String getDisplayName() {
     return displayName;
@@ -117,6 +118,30 @@ public class DataSet extends AbstractModel implements Attributes {
 		return attributes.containsKey(name) ? attributes.get(name) : null;
 	}
 
+  public Map<String, String> getParameters() {
+    return parameters;
+  }
+
+  public void setParameters(Map<String, String> parameters) {
+    this.parameters = parameters;
+  }
+
+  public void addParameter(String name, String value) {
+    parameters.put(name, value);
+  }
+
+  public void addParameters(Map<String, String> parameters) {
+    this.parameters.putAll(parameters);
+  }
+
+  public boolean hasParameter(String name) {
+    return parameters.containsKey(name);
+  }
+
+  public String getParameter(String name) {
+    return parameters.containsKey(name) ? parameters.get(name) : null;
+  }
+
   public List<String> getDataFileIds() {
     return dataFileIds;
   }
@@ -144,6 +169,7 @@ public class DataSet extends AbstractModel implements Attributes {
         ", dataFileIds=" + dataFileIds +
         ", sampleIds=" + sampleIds +
         ", attributes=" + attributes +
+        ", parameters=" + parameters +
         '}';
   }
 }

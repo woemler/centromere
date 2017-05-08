@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -122,10 +123,12 @@ public class TcgaRnaSeqGeneExpressionFileReader
 		if (sampleMap.containsKey(sampleName)){
 			sample = sampleMap.get(sampleName);
 		} else {
-			sample = tcgaSupport.findSample(sampleName);
-			if (sample == null){
+			Optional<Sample> optional = tcgaSupport.findSample(sampleName, this.getDataSet());
+			if (!optional.isPresent()){
 			  sample = tcgaSupport.createSample(sampleName, this.getDataSet());
-			}
+			} else {
+			  sample = optional.get();
+      }
 			sampleMap.put(this.getHeaders().get(index), sample);
 		}
 		return sample;

@@ -30,7 +30,7 @@ public class Term extends AbstractModel {
 	
 	private String term;
 	private String source;
-	private String cetegory;
+	private String category;
 	private String subCategory;
 	private String referenceId;
 
@@ -50,12 +50,12 @@ public class Term extends AbstractModel {
 		this.source = source;
 	}
 
-	public String getCetegory() {
-		return cetegory;
+	public String getCategory() {
+		return category;
 	}
 
-	public void setCetegory(String cetegory) {
-		this.cetegory = cetegory;
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
 	public String getSubCategory() {
