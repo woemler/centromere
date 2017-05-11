@@ -16,10 +16,8 @@
 
 package com.blueprint.centromere.core.config;
 
-import com.blueprint.centromere.core.commons.support.TcgaSupport;
 import com.blueprint.centromere.core.repository.MongoModelRepository;
 import com.blueprint.centromere.core.repository.MongoModelRepositoryFactoryBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -35,11 +33,6 @@ public class CoreConfiguration {
 	@Configuration
 	public static class DefaultModelConfiguration {
 
-		@Bean
-		public TcgaSupport tcgaSupport(){
-			return new TcgaSupport();
-		}
-
 		@Configuration
 		@EnableMongoRepositories(basePackages = {
 				"com.blueprint.centromere.core.commons.repository"},
@@ -47,13 +40,15 @@ public class CoreConfiguration {
 				repositoryFactoryBeanClass = MongoModelRepositoryFactoryBean.class)
 		public static class DefaultMongoSchemaConfiguration { }
 
-		@Profile({ Profiles.CLI_PROFILE })
+    @Profile({ Profiles.CLI_PROFILE })
 		@Configuration
 		@ComponentScan(basePackages = {
 				"com.blueprint.centromere.core.commons.reader",
 				"com.blueprint.centromere.core.commons.processor"
 		})
-		public static class CommandLineComponentConfiguration { }
+		public static class CommandLineComponentConfiguration {
+
+    }
 
 	}
 

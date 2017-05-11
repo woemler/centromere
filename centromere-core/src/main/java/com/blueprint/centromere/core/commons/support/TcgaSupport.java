@@ -26,19 +26,26 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author woemler
  * @since 0.5.0
  */
-public class TcgaSupport implements DataSetSupport {
+public class TcgaSupport extends GenericDataSetSupport {
 
   private static final Logger logger = LoggerFactory.getLogger(TcgaSupport.class);
+  private static final Pattern subjectNamePattern =
+      Pattern.compile("(tcga-[a-zA-Z0-9]+-[a-zA-Z0-9]+)-.+", Pattern.CASE_INSENSITIVE);
 
-  private SubjectRepository subjectRepository;
-  private SampleRepository sampleRepository;
+  public TcgaSupport(
+      SubjectRepository subjectRepository,
+      SampleRepository sampleRepository) {
+    super(subjectRepository, sampleRepository);
+  }
 
+  /**
+   * {@link #createSample(String, Subject, DataSet)}
+   */
   public Sample createSample(String sampleName, DataSet dataSet){
 
     sampleName = sampleName.toLowerCase();
@@ -48,12 +55,13 @@ public class TcgaSupport implements DataSetSupport {
       logger.warn(String.format("Unable to extract subject name from sample name: %s", sampleName));
       return null;
     }
-
-    Subject subject = subjectRepository.findOneByName(subjectName);
-    if (subject == null){
+    
+    Optional<Subject> optional = this.getSubjectRepository().findByName(subjectName);
+    if (!optional.isPresent()){
       logger.warn(String.format("No registered subject exists for name: %s", subjectName));
       return null;
     }
+    Subject subject = optional.get();
 
     return createSample(sampleName, subject, dataSet);
 
@@ -77,7 +85,7 @@ public class TcgaSupport implements DataSetSupport {
     sample.setDataSetId(dataSet.getId());
     sample.setTissue(subject.getAttribute("tumor_tissue_site"));
     sample.setHistology(subject.getAttribute("histological_type"));
-    sampleRepository.insert(sample);
+    this.getSampleRepository().insert(sample);
 
     return sample;
     
@@ -85,13 +93,10 @@ public class TcgaSupport implements DataSetSupport {
 
   @Override
   public Optional<Sample> findSample(String sampleName, DataSet dataSet){
-    return sampleRepository.findByNameAndDataSetId(sampleName, dataSet.getId());
+    return this.getSampleRepository().findByNameAndDataSetId(sampleName, dataSet.getId());
   }
 
-  private static final Pattern subjectNamePattern =
-      Pattern.compile("(tcga-[a-zA-Z0-9]+-[a-zA-Z0-9]+)-.+", Pattern.CASE_INSENSITIVE);
-
-  public static String getSubjectNameFromSampleName(String sample){
+  private static String getSubjectNameFromSampleName(String sample){
     Matcher matcher = subjectNamePattern.matcher(sample);
     if (matcher.matches()) {
       return matcher.group(1);
@@ -100,13 +105,4 @@ public class TcgaSupport implements DataSetSupport {
     }
   }
 
-  @Autowired
-  public void setSubjectRepository(SubjectRepository subjectRepository) {
-    this.subjectRepository = subjectRepository;
-  }
-
-  @Autowired
-  public void setSampleRepository(SampleRepository sampleRepository) {
-    this.sampleRepository = sampleRepository;
-  }
 }

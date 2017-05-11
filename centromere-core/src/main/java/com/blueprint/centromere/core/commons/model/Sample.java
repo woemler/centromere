@@ -20,8 +20,6 @@ import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Linked;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -32,20 +30,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * 
  * @author woemler
  */
-@CompoundIndexes({
-    @CompoundIndex(name = "sample_name_datasetid_idx", def = "{ 'name': 1, 'dataSetId': 1 }", unique = true)
-})
 @Document
 public class Sample extends AbstractModel implements Attributes {
 
-	@Indexed(unique = true) private String name;
+	@Indexed private String name;
 	private String sampleType;
 	private String tissue;
 	private String histology;
 	private String notes;
 	private Map<String, String> attributes = new HashMap<>();
-	@Linked(model = Subject.class) private String subjectId;
-	@Linked(model = DataSet.class) private String dataSetId;
+	@Indexed @Linked(model = Subject.class) private String subjectId;
+	@Indexed @Linked(model = DataSet.class) private String dataSetId;
 
 	public String getSubjectId() {
 		return subjectId;
@@ -55,7 +50,15 @@ public class Sample extends AbstractModel implements Attributes {
 		this.subjectId = subjectId;
 	}
 
-	@Override
+  public String getDataSetId() {
+    return dataSetId;
+  }
+
+  public void setDataSetId(String dataSetId) {
+    this.dataSetId = dataSetId;
+  }
+
+  @Override
 	public Map<String, String> getAttributes() {
 		return attributes;
 	}
@@ -104,14 +107,6 @@ public class Sample extends AbstractModel implements Attributes {
 		this.notes = notes;
 	}
 
-	public String getDataSetId() {
-		return dataSetId;
-	}
-
-	public void setDataSetId(String dataSetId) {
-		this.dataSetId = dataSetId;
-	}
-
 	@Override
 	public void addAttribute(String name, String value) {
 		attributes.put(name, value);
@@ -142,7 +137,7 @@ public class Sample extends AbstractModel implements Attributes {
 				", notes='" + notes + '\'' +
 				", attributes=" + attributes +
 				", subjectId='" + subjectId + '\'' +
-				", dataSetId='" + dataSetId + '\'' +
+        ", dataSetId='" + dataSetId + '\'' +
 				'}';
 	}
 }

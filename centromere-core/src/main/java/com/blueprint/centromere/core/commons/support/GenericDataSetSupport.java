@@ -22,20 +22,30 @@ import com.blueprint.centromere.core.commons.model.Subject;
 import com.blueprint.centromere.core.commons.model.Subject.Attributes;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
+import java.util.Map.Entry;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * Default {@link DataSetSupport} implementation.  Handles generic sample creation and fetching,
+ *   given {@link Subject} and {@link DataSet} records.  
+ * 
  * @author woemler
  */
 public class GenericDataSetSupport implements DataSetSupport {
 
   private static final Logger logger = LoggerFactory.getLogger(GenericDataSetSupport.class);
 
-  private SubjectRepository subjectRepository;
-  private SampleRepository sampleRepository;
+  private final SubjectRepository subjectRepository;
+  private final SampleRepository sampleRepository;
+
+  public GenericDataSetSupport(
+      SubjectRepository subjectRepository,
+      SampleRepository sampleRepository) {
+    this.subjectRepository = subjectRepository;
+    this.sampleRepository = sampleRepository;
+  }
 
   /**
    * Creates a new sample record, given only a name and an associated {@link DataSet} record.
@@ -49,10 +59,10 @@ public class GenericDataSetSupport implements DataSetSupport {
     Sample sample = new Sample();
     sample.setName(name);
     sample.setSubjectId(subject.getId());
-    sample.setDataSetId(dataSet.getId());
     sample.setHistology(getSampleAttribute(Attributes.SAMPLE_HISTOLOGY, subject, dataSet));
     sample.setTissue(getSampleAttribute(Attributes.SAMPLE_TISSUE, subject, dataSet));
     sample.setSampleType(getSampleAttribute(Attributes.SAMPLE_TYPE, subject, dataSet));
+    setSampleAttributes(sample, subject);
     return sample;
   }
   
@@ -63,6 +73,15 @@ public class GenericDataSetSupport implements DataSetSupport {
       return dataSet.getParameter("default." + key);
     } else {
       return "n/a";
+    }
+  }
+  
+  private void setSampleAttributes(Sample sample, Subject subject){
+    for (Entry<String,String> entry: subject.getAttributes().entrySet()){
+      if (entry.getKey().startsWith(Attributes.SAMPLE_ATTRIBUTE_PREFIX)){
+        String key = entry.getKey().replace(Attributes.SAMPLE_ATTRIBUTE_PREFIX, "");
+        if (!sample.hasAttribute(key)) sample.addAttribute(key, entry.getValue());
+      }
     }
   }
 
@@ -89,22 +108,17 @@ public class GenericDataSetSupport implements DataSetSupport {
     return sampleRepository.findByNameAndDataSetId(name, dataSet.getId());
   }
 
-  public SubjectRepository getSubjectRepository() {
+  @Override
+  public Optional<Sample> findSample(String name, Subject subject) {
+    return sampleRepository.findByNameAndSubjectId(name, subject.getId());
+  }
+
+  protected SubjectRepository getSubjectRepository() {
     return subjectRepository;
   }
 
-  public SampleRepository getSampleRepository() {
+  protected SampleRepository getSampleRepository() {
     return sampleRepository;
-  }
-
-  @Autowired
-  public void setSubjectRepository(SubjectRepository subjectRepository) {
-    this.subjectRepository = subjectRepository;
-  }
-
-  @Autowired
-  public void setSampleRepository(SampleRepository sampleRepository) {
-    this.sampleRepository = sampleRepository;
   }
 
 }

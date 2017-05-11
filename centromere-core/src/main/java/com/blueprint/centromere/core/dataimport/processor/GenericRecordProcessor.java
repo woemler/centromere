@@ -18,8 +18,15 @@ package com.blueprint.centromere.core.dataimport.processor;
 
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
+import com.blueprint.centromere.core.commons.model.Sample;
+import com.blueprint.centromere.core.commons.model.Subject;
+import com.blueprint.centromere.core.commons.repository.DataFileRepository;
+import com.blueprint.centromere.core.commons.repository.DataSetRepository;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
+import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
+import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.DataTypeSupport;
 import com.blueprint.centromere.core.dataimport.DataTypes;
@@ -36,6 +43,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.util.Assert;
 import org.springframework.validation.BindingResult;
@@ -54,6 +62,11 @@ public class GenericRecordProcessor<T extends Model<?>>
 
   private static final Logger logger = LoggerFactory.getLogger(GenericRecordProcessor.class);
 
+  private SampleRepository sampleRepository;
+  private SubjectRepository subjectRepository;
+  private DataFileRepository dataFileRepository;
+  private DataSetRepository dataSetRepository;
+  
 	private Class<T> model;
 	
 	private RecordReader<T> reader;
@@ -132,11 +145,6 @@ public class GenericRecordProcessor<T extends Model<?>>
 
   /**
    * {@link #doBefore(Object...)}
-   * 
-   * @param inputFile
-   * @param dataFile
-   * @param dataSet
-   * @param args
    */
 	public void doBefore(File inputFile, DataFile dataFile, DataSet dataSet, Object... args) 
        {
@@ -147,7 +155,43 @@ public class GenericRecordProcessor<T extends Model<?>>
 	  doBefore(arguments);
   }
 
-	/**
+  /**
+   * To be executed after the main component method is called for the last time.  Handles job cleanup
+   *   and association of metadata records.
+   *
+   * @param args an array of objects of any type.
+   */
+  @Override
+  public void doAfter(Object... args) {
+    if (reader instanceof SampleAware) {
+      List<Sample> samples = ((SampleAware) reader).getSamples();
+      for (Sample sample : samples) {
+        Subject subject = subjectRepository.findOne(sample.getSubjectId());
+        List<String> sampleIds = subject.getSampleIds();
+        if (!sampleIds.contains(sample.getId())) {
+          sampleIds.add(sample.getId());
+          subject.setSampleIds(new ArrayList<>(sampleIds));
+          subjectRepository.update(subject);
+        }
+        sampleIds = dataSet.getSampleIds();
+        if (!sampleIds.contains(sample.getId())) {
+          sampleIds.add(sample.getId());
+          dataSet.setSampleIds(new ArrayList<>(sampleIds));
+          dataSetRepository.update(dataSet);
+        }
+      }
+    }
+    
+    List<String> dataFileIds = dataSet.getDataFileIds();
+    if (!dataFileIds.contains(dataFile.getId())) {
+      dataFileIds.add(dataFile.getId());
+      dataSet.setDataFileIds(new ArrayList<>(dataFileIds));
+      dataSetRepository.update(dataSet);
+    }
+    
+  }
+
+  /**
 	 * {@link RecordProcessor#run(Object...)}
 	 * @param args
 	 */
@@ -255,7 +299,31 @@ public class GenericRecordProcessor<T extends Model<?>>
 		return supportedDataTypes;
 	}
 
-	public Class<T> getModel() {
+	@Autowired
+  public void setSampleRepository(
+      SampleRepository sampleRepository) {
+    this.sampleRepository = sampleRepository;
+  }
+
+  @Autowired
+  public void setSubjectRepository(
+      SubjectRepository subjectRepository) {
+    this.subjectRepository = subjectRepository;
+  }
+
+  @Autowired
+  public void setDataFileRepository(
+      DataFileRepository dataFileRepository) {
+    this.dataFileRepository = dataFileRepository;
+  }
+
+  @Autowired
+  public void setDataSetRepository(
+      DataSetRepository dataSetRepository) {
+    this.dataSetRepository = dataSetRepository;
+  }
+
+  public Class<T> getModel() {
 		return model;
 	}
 

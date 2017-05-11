@@ -27,6 +27,8 @@ import java.util.Optional;
  * @author woemler
  */
 public interface DataSetSupport {
+  
+  //Sample fetchOrCreateSample(String name, Subject subject, DataSet dataSet);
 
   /**
    * Creates a new sample record, given a name, {@link Subject} record, and an associated 
@@ -47,5 +49,15 @@ public interface DataSetSupport {
    * @return an optional sample record
    */
   Optional<Sample> findSample(String name, DataSet dataSet);
+
+  /**
+   * Finds and returns a {@link Sample} record for the given name and {@link Subject} record, 
+   *   if one exists.
+   * 
+   * @param name
+   * @param subject
+   * @return
+   */
+  Optional<Sample> findSample(String name, Subject subject);
 
 }

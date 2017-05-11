@@ -20,6 +20,8 @@ import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
+import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
@@ -55,10 +57,11 @@ public class TcgaRnaSeqGeneExpressionFileReader
 
 	public TcgaRnaSeqGeneExpressionFileReader(
       GeneRepository geneRepository,
-      TcgaSupport tcgaSupport
+      SampleRepository sampleRepository,
+      SubjectRepository subjectRepository
 	){
     this.geneRepository = geneRepository;
-    this.tcgaSupport = tcgaSupport;
+    this.tcgaSupport = new TcgaSupport(subjectRepository, sampleRepository);
 	}
 
 	@Override
@@ -119,16 +122,12 @@ public class TcgaRnaSeqGeneExpressionFileReader
 
 	private Sample getSample(int index) {
 		String sampleName = this.getHeaders().get(index).toLowerCase();
-		Sample sample = null;
+		Sample sample;
 		if (sampleMap.containsKey(sampleName)){
 			sample = sampleMap.get(sampleName);
 		} else {
 			Optional<Sample> optional = tcgaSupport.findSample(sampleName, this.getDataSet());
-			if (!optional.isPresent()){
-			  sample = tcgaSupport.createSample(sampleName, this.getDataSet());
-			} else {
-			  sample = optional.get();
-      }
+			sample = optional.isPresent() ? optional.get() : tcgaSupport.createSample(sampleName, this.getDataSet());
 			sampleMap.put(this.getHeaders().get(index), sample);
 		}
 		return sample;

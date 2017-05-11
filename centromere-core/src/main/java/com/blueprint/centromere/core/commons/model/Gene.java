@@ -31,7 +31,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Gene extends AbstractModel implements Attributes {
 
 	@Indexed(unique = true) private String primaryReferenceId;
-	private String primaryGeneSymbol;
+	@Indexed private String primaryGeneSymbol;
 	private Integer taxId;
 	private String chromosome;
 	private String chromosomeLocation;
@@ -39,7 +39,7 @@ public class Gene extends AbstractModel implements Attributes {
 	private String description;
 	private String referenceSource;
 
-	private List<String> aliases = new ArrayList<>();
+	@Indexed private List<String> aliases = new ArrayList<>();
 	private Map<String, String> attributes = new HashMap<>();
 	private Map<String, String> externalReferences = new HashMap<>();
 

@@ -94,18 +94,15 @@ public class CommandLineInputExecutor implements CommandLineRunner {
 		ImportManifestCommandArguments importManifestCommandArguments = new ImportManifestCommandArguments();
 		
 		jc.addCommand(IMPORT_COMMAND, importCommandArguments);
-		jc.setProgramName("Centromere data import CLI");
 		
 		JCommander importJc = jc.getCommands().get(IMPORT_COMMAND);
-		importJc.setProgramName("File import");
 		importJc.addCommand(IMPORT_FILE_COMMAND, importFileCommandArguments);
 		importJc.addCommand(IMPORT_BATCH_COMMAND, importManifestCommandArguments);
 
     ListCommandArguments listCommandArguments = new ListCommandArguments();
     jc.addCommand(LIST_COMMAND, listCommandArguments);
     JCommander listJc = jc.getCommands().get(LIST_COMMAND);
-    listJc.setProgramName("Component and file listing");
-		
+    
 		int code = 1;
 		
 		try {

@@ -17,10 +17,11 @@
 package com.blueprint.centromere.core.commons.processor;
 
 import com.blueprint.centromere.core.commons.model.Mutation;
-import com.blueprint.centromere.core.commons.reader.MafReader;
+import com.blueprint.centromere.core.commons.reader.TcgaMafReader;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
+import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
-import com.blueprint.centromere.core.commons.validator.GeneExpressionValidator;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.importer.MongoImportTempFileImporter;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
@@ -39,15 +40,16 @@ public class MafMutationProcessor extends GenericRecordProcessor<Mutation> {
 
     @Autowired
     public MafMutationProcessor(
-        TcgaSupport tcgaSupport,
+        SampleRepository sampleRepository,
+        SubjectRepository subjectRepository,
         GeneRepository geneRepository,
         MongoOperations mongoOperations,
         Environment environment
     ) {
-      this.setReader(new MafReader(geneRepository, tcgaSupport));
+      this.setReader(new TcgaMafReader(geneRepository, new TcgaSupport(subjectRepository, sampleRepository)));
       //this.setValidator(new()); // TODO: mutation validator
       this.setWriter(new MongoImportTempFileWriter<>(mongoOperations));
-      this.setImporter(new MongoImportTempFileImporter<Mutation>(Mutation.class, environment));
+      this.setImporter(new MongoImportTempFileImporter<>(Mutation.class, environment));
       this.setModel(Mutation.class);
     }
 }

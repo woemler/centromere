@@ -21,6 +21,7 @@ import com.blueprint.centromere.core.repository.ModelRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
@@ -34,13 +35,16 @@ public interface SubjectRepository
  		AttributeOperations<Subject> {
 	
   Optional<Subject> findByName(@Param("name") String name);
-	Subject findOneByName(@Param("name") String name);
 	List<Subject> findBySpecies(@Param("species") String species);
+  @Query("{ 'sampleIds': ?0 }") Optional<Subject> findBySampleId(String sampleId);
+  @Query("{ 'aliases': ?0 }") List<Subject> findByAlias(String alias);
 	
 	@Override
 	default List<Subject> guess(@Param("keyword") String keyword){
 		List<Subject> subjects = new ArrayList<>();
-		subjects.add(findOneByName(keyword));
+		Optional<Subject> optional = findByName(keyword);
+    optional.ifPresent(subjects::add);
+		subjects.addAll(findByAlias(keyword));
 		return subjects;
 	}
 	

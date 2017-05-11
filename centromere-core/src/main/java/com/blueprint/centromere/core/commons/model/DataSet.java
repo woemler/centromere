@@ -39,13 +39,8 @@ public class DataSet extends AbstractModel implements Attributes {
 	@Indexed private String source;
 	private String version;
 	private String description;
-
-	@Linked(model = DataFile.class)
-	private List<String> dataFileIds = new ArrayList<>();
-
-	@Linked(model = Sample.class)
-	private List<String> sampleIds = new ArrayList<>();
-	
+	@Linked(model = DataFile.class) private List<String> dataFileIds = new ArrayList<>();
+  @Linked(model = Sample.class) private List<String> sampleIds = new ArrayList<>();
 	private Map<String, String> attributes = new HashMap<>();
 	private Map<String, String> parameters = new HashMap<>();
 
@@ -156,6 +151,14 @@ public class DataSet extends AbstractModel implements Attributes {
 
   public void setSampleIds(List<String> sampleIds) {
     this.sampleIds = sampleIds;
+  }
+  
+  public void addSampleId(String sampleId){
+    if (!sampleIds.contains(sampleId)) sampleIds.add(sampleId);
+  }
+  
+  public void addDataFileId(String dataFileId){
+    if (!dataFileIds.contains(dataFileId)) dataFileIds.add(dataFileId);
   }
 
   @Override

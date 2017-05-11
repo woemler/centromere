@@ -16,21 +16,16 @@
 
 package com.blueprint.centromere.core.commons.repository;
 
-import com.blueprint.centromere.core.commons.model.DataSet;
+import com.blueprint.centromere.core.commons.model.Mutation;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import java.util.List;
-import java.util.Optional;
-import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 /**
  * @author woemler
  */
-@RepositoryRestResource(path = "datasets", collectionResourceRel = "dataSets")
-public interface DataSetRepository extends ModelRepository<DataSet, String> {
-	Optional<DataSet> findByShortName(String shortName); 
-	List<DataSet> findByDisplayName(String name);
-	List<DataSet> findBySource(String source);
-	@Query("{ 'sampleIds': ?0 }")  List<DataSet> findBySampleId(String sampleId);
-  @Query("{ 'dataFileIds': ?0 }")  List<DataSet> findByDataFileId(String dataFileId);
+@RepositoryRestResource(path = "mutations", collectionResourceRel = "mutations")
+public interface MutationRepository extends ModelRepository<Mutation, String>,
+    DataOperations<Mutation> {
+  List<Mutation> findByVariantClassification(String variantClassification);
 }

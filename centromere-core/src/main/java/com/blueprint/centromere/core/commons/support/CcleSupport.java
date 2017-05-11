@@ -24,52 +24,55 @@ import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author woemler
  */
-public class CcleSupport implements DataSetSupport {
+public class CcleSupport extends GenericDataSetSupport {
 
   private static final Logger logger = LoggerFactory.getLogger(CcleSupport.class);
+  private static final String SAMPLE_TYPE = "cell line";
 
-  private SubjectRepository subjectRepository;
-  private SampleRepository sampleRepository;
+  public CcleSupport(
+      SubjectRepository subjectRepository,
+      SampleRepository sampleRepository) {
+    super(subjectRepository, sampleRepository);
+  }
 
   /**
-   * Creates a new sample record, given a name, {@link Subject} record, and an associated
-   * {@link DataSet} record.
+   * Creates a new sample record, given only a name and an associated {@link DataSet} record.
    *
    * @param name sample name
    * @param dataSet DataSet record  @return a new Sample record
    */
   @Override
   public Sample createSample(String name, Subject subject, DataSet dataSet) {
-    return null;
+    Sample sample = super.createSample(name, subject, dataSet);
+    sample.setSampleType(SAMPLE_TYPE);
+    return sample;
   }
 
   /**
-   * Finds and returns a {@link Sample} record for the given name and {@link DataSet} record,
-   * if one exists.
+   * Creates a new sample record, given only a name and an associated {@link DataSet} record.
    *
-   * @param name sample name
    * @param dataSet DataSet record
-   * @return an optional sample record
+   * @return a new Sample record
    */
   @Override
-  public Optional<Sample> findSample(String name, DataSet dataSet) {
-    return null;
+  public Sample createSample(Subject subject, DataSet dataSet) {
+    Sample sample = super.createSample(subject, dataSet);
+    sample.setSampleType(SAMPLE_TYPE);
+    return sample;
   }
-
-  @Autowired
-  public void setSubjectRepository(
-      SubjectRepository subjectRepository) {
-    this.subjectRepository = subjectRepository;
-  }
-
-  @Autowired
-  public void setSampleRepository(
-      SampleRepository sampleRepository) {
-    this.sampleRepository = sampleRepository;
+  
+  public Optional<Sample> fetchOrCreateSample(String name, DataSet dataSet){
+    Optional<Sample> optional = this.findSample(name, dataSet);
+    if (optional.isPresent()) return optional;
+    Optional<Subject> subjectOptional = getSubjectRepository().findByName(name);
+    if (subjectOptional.isPresent()){
+      return Optional.ofNullable(createSample(name, subjectOptional.get(), dataSet));
+    } else {
+      return Optional.empty();
+    }
   }
 }

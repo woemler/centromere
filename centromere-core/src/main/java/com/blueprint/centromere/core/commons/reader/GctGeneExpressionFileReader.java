@@ -22,10 +22,11 @@ import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
+import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetSupport;
+import com.blueprint.centromere.core.commons.support.GenericDataSetSupport;
 import com.blueprint.centromere.core.commons.support.SampleAware;
-import com.blueprint.centromere.core.config.Properties;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.reader.MultiRecordLineFileReader;
 import com.blueprint.centromere.core.model.ModelSupport;
@@ -33,11 +34,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 
 /**
@@ -49,61 +48,73 @@ import org.springframework.util.Assert;
  */
 public class GctGeneExpressionFileReader
 		extends MultiRecordLineFileReader<GeneExpression>
-		implements ModelSupport<GeneExpression>, DataFileAware, SampleAware, EnvironmentAware {
+		implements ModelSupport<GeneExpression>, DataFileAware, SampleAware {
 
-	private SampleRepository sampleRepository;
-	private GeneRepository geneRepository;
+	private final GeneRepository geneRepository;
+	private final DataSetSupport dataSetSupport;
+	
 	private DataFile dataFile;
 	private Map<String, Sample> sampleMap;
 	private Class<GeneExpression> model;
-	private Environment environment;
-	private DataSetSupport dataSetSupport;
 	
 	private static final Logger logger = LoggerFactory.getLogger(GctGeneExpressionFileReader.class);
 
-	@Override 
+  public GctGeneExpressionFileReader(
+      GeneRepository geneRepository,
+      SampleRepository sampleRepository,
+      SubjectRepository subjectRepository) {
+    this.geneRepository = geneRepository;
+    this.dataSetSupport = new GenericDataSetSupport(subjectRepository, sampleRepository);
+  }
+
+  public GctGeneExpressionFileReader(
+      GeneRepository geneRepository,
+      DataSetSupport dataSetSupport) {
+    this.geneRepository = geneRepository;
+    this.dataSetSupport = dataSetSupport;
+  }
+
+  @Override 
 	public void doBefore(Object... args) {
-        Assert.notNull(sampleRepository, "SampleRepository must not be null.");
-        Assert.notNull(geneRepository, "GeneRepository must not be null.");
-        Assert.notNull(dataFile, "DataFile cannot be null.");
-        Assert.notNull(dataFile.getId(), "DataFile ID cannot be null.");
-        sampleMap = new HashMap<>();
+    Assert.notNull(dataFile, "DataFile cannot be null.");
+    Assert.notNull(dataFile.getId(), "DataFile ID cannot be null.");
+    sampleMap = new HashMap<>();
 	}
 
 	@Override 
 	protected List<GeneExpression> getRecordsFromLine(String line) {
+	  
 		List<GeneExpression> records = new ArrayList<>();
 		String[] bits = line.trim().split(this.getDelimiter());
+		
 		if (bits.length > 1){
-			Gene gene = getGene(line);
+			
+		  Gene gene = getGene(line);
 			if (gene == null){
-				if (environment.getRequiredProperty(Properties.SKIP_INVALID_GENES, Boolean.class)){
+				if (this.getImportOptions().skipInvalidGenes()){
 					logger.warn(String.format("Skipping line due to invalid gene: %s", line));
 					return new ArrayList<>();
 				} else {
 					throw new DataImportException(String.format("Invalid gene in line: %s", line));
 				}
 			}
+			
 			for (int i = 2; i < bits.length; i++){
-				GeneExpression record;
-				try {
-					record = this.getModel().newInstance();
-				} catch (Exception e){
-					throw new DataImportException(String.format("Unable to create instance of model object: %s"
-							, model.getName()), e);
-				}
+				
+			  GeneExpression record = new GeneExpression();
+			  
 				Sample sample = null;
 				if (sampleMap.containsKey(this.getHeaders().get(i))){
 					sample = sampleMap.get(this.getHeaders().get(i));
 				} else {
-					List<Sample> samples = sampleRepository.guess(this.getHeaders().get(i));
-					if (samples != null && !samples.isEmpty()){
-						sample = samples.get(0);
+					Optional<Sample> optional = dataSetSupport.findSample(this.getHeaders().get(i), this.getDataSet());
+					if (optional.isPresent()){
+						sample = optional.get();
 						sampleMap.put(this.getHeaders().get(i), sample);
 					}
 				}
 				if (sample == null){
-					if (environment.getRequiredProperty(Properties.SKIP_INVALID_SAMPLES, Boolean.class)){
+					if (this.getImportOptions().skipInvalidSamples()){
 						logger.warn(String.format("Skipping record due to invalid sample: %s", 
 								this.getHeaders().get(i)));
 						continue;
@@ -111,20 +122,23 @@ public class GctGeneExpressionFileReader
 						throw new DataImportException(String.format("Invalid sample: %s", this.getHeaders().get(i)));
 					}
 				}
+				
 				try {
 					record.setValue(Double.parseDouble(bits[i]));
 				} catch (NumberFormatException e){
-					if (environment.getRequiredProperty(Properties.SKIP_INVALID_RECORDS, Boolean.class)){
+					if (this.getImportOptions().skipInvalidRecords()){
 						logger.warn(String.format("Invalid record, cannot parse value: %s", bits[i]));
 						continue;
 					} else {
 						throw new DataImportException(String.format("Cannot parse value: %s", bits[i]));
 					}
 				}
+				
 				record.setDataFileId(dataFile.getId());
 				record.setGeneId(gene.getId());
 				record.setSampleId(sample.getId());
 				records.add(record);
+				
 			}
 			
 		}
@@ -154,16 +168,6 @@ public class GctGeneExpressionFileReader
 		return false;
 	}
 
-	@Autowired
-	public void setSampleRepository(SampleRepository sampleRepository) {
-		this.sampleRepository = sampleRepository;
-	}
-
-	@Autowired
-	public void setGeneRepository(GeneRepository geneRepository) {
-		this.geneRepository = geneRepository;
-	}
-
 	public DataFile getDataFile() {
 		return dataFile;
 	}
@@ -187,18 +191,4 @@ public class GctGeneExpressionFileReader
 		return new ArrayList<>(sampleMap.values());
 	}
 
-	@Override
-	@Autowired
-	public void setEnvironment(Environment environment) {
-		this.environment = environment;
-	}
-
-  public DataSetSupport getDataSetSupport() {
-    return dataSetSupport;
-  }
-
-  public void setDataSetSupport(
-      DataSetSupport dataSetSupport) {
-    this.dataSetSupport = dataSetSupport;
-  }
 }

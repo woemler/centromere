@@ -16,34 +16,42 @@
 
 package com.blueprint.centromere.core.commons.model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * TODO: add reference transcript and alternate transcript mutations
- *
  * @author woemler
  */
 @Document
+@CompoundIndexes({
+    @CompoundIndex(def = "{'sampleId': 1, 'dataFileId': 1}"),
+    @CompoundIndex(def = "{'geneId': 1, 'dataFileId': 1}")
+})
 public class Mutation extends Data implements Attributes {
-	
-	private String chromosome;
+  
 	private String referenceGenome;
+  private String chromosome;
+  private Integer dnaStartPosition;
+  private Integer dnaStopPosition;
 	private String strand;
-	private Integer dnaStartPosition;
-	private Integer dnaStopPosition;
+	@Indexed private String variantClassification;
+	private String variantType;
 	private String referenceAllele;
 	private String alternateAllele;
+	private Map<String, ExternalReference> externalReferenes = new HashMap<>();
 	private String cDnaChange;
 	private String codonChange;
-	
-	private String proteinChange;
-	
-	private String mutationClassification;
-	private String mutationType;
-	
-	private Map<String, String> attributes = new HashMap<>();
+	private String aminoAcidChange;
+	private String mrnaTranscript;
+	private String proteinTranscript;
+	private List<AlternateTranscript> alternateTranscripts = new ArrayList<>();
+	private Map<String,String> attributes = new HashMap<>();
 
 	public String getChromosome() {
 		return chromosome;
@@ -69,7 +77,23 @@ public class Mutation extends Data implements Attributes {
 		this.strand = strand;
 	}
 
-	public Integer getDnaStartPosition() {
+  public String getVariantClassification() {
+    return variantClassification;
+  }
+
+  public void setVariantClassification(String variantClassification) {
+    this.variantClassification = variantClassification;
+  }
+
+  public String getVariantType() {
+    return variantType;
+  }
+
+  public void setVariantType(String variantType) {
+    this.variantType = variantType;
+  }
+
+  public Integer getDnaStartPosition() {
 		return dnaStartPosition;
 	}
 
@@ -117,29 +141,63 @@ public class Mutation extends Data implements Attributes {
 		this.codonChange = codonChange;
 	}
 
-	public String getProteinChange() {
-		return proteinChange;
-	}
+  public Map<String, ExternalReference> getExternalReferenes() {
+    return externalReferenes;
+  }
 
-	public void setProteinChange(String proteinChange) {
-		this.proteinChange = proteinChange;
-	}
+  public void setExternalReferenes(
+      Map<String, ExternalReference> externalReferenes) {
+    this.externalReferenes = externalReferenes;
+  }
 
-	public String getMutationClassification() {
-		return mutationClassification;
-	}
+  public String getAminoAcidChange() {
+    return aminoAcidChange;
+  }
 
-	public void setMutationClassification(String mutationClassification) {
-		this.mutationClassification = mutationClassification;
-	}
+  public void setAminoAcidChange(String aminoAcidChange) {
+    this.aminoAcidChange = aminoAcidChange;
+  }
 
-	public String getMutationType() {
-		return mutationType;
-	}
+  public String getMrnaTranscript() {
+    return mrnaTranscript;
+  }
 
-	public void setMutationType(String mutationType) {
-		this.mutationType = mutationType;
-	}
+  public void setMrnaTranscript(String mrnaTranscript) {
+    this.mrnaTranscript = mrnaTranscript;
+  }
+
+  public String getProteinTranscript() {
+    return proteinTranscript;
+  }
+
+  public void setProteinTranscript(String proteinTranscript) {
+    this.proteinTranscript = proteinTranscript;
+  }
+
+  public List<AlternateTranscript> getAlternateTranscripts() {
+    return alternateTranscripts;
+  }
+
+  public void setAlternateTranscripts(
+      List<AlternateTranscript> alternateTranscripts) {
+    this.alternateTranscripts = alternateTranscripts;
+  }
+  
+  public void addExternalReference(ExternalReference reference){
+	  this.externalReferenes.put(reference.getSource(), reference);
+  }
+
+  public void addExternalReference(String source, ExternalReference reference){
+    this.externalReferenes.put(source, reference);
+  }
+  
+  public ExternalReference getExternalReference(String source){
+    return this.externalReferenes.getOrDefault(source, null);
+  }
+  
+  public void addAlternateTranscript(AlternateTranscript alternateTranscript){
+    this.alternateTranscripts.add(alternateTranscript);
+  }
 
   @Override
   public Map<String, String> getAttributes() {
@@ -193,9 +251,52 @@ public class Mutation extends Data implements Attributes {
   }
 
   /**
+   * Nested class for referencing external database references for variants.
+   */
+  public static class ExternalReference {
+    
+    private String source;
+    private String referenceId;
+    private String notes;
+
+    public String getSource() {
+      return source;
+    }
+
+    public void setSource(String source) {
+      this.source = source;
+    }
+
+    public String getReferenceId() {
+      return referenceId;
+    }
+
+    public void setReferenceId(String referenceId) {
+      this.referenceId = referenceId;
+    }
+
+    public String getNotes() {
+      return notes;
+    }
+
+    public void setNotes(String notes) {
+      this.notes = notes;
+    }
+
+    @Override
+    public String toString() {
+      return "ExternalReference{" +
+          "source='" + source + '\'' +
+          ", referenceId='" + referenceId + '\'' +
+          ", notes='" + notes + '\'' +
+          '}';
+    }
+  }
+
+  /**
    * Nested class for capturing additional transcript variants.
    */
-	public static class OtherTranscripts {
+	public static class AlternateTranscript {
 
 		private String geneSymbol;
 		private String transcriptId;
@@ -234,7 +335,8 @@ public class Mutation extends Data implements Attributes {
 			this.proteinChange = proteinChange;
 		}
 
-		@Override public String toString() {
+
+    @Override public String toString() {
 			return "OtherTranscripts{" +
 					"geneSymbol='" + geneSymbol + '\'' +
 					", transcriptId='" + transcriptId + '\'' +

@@ -18,13 +18,17 @@ package com.blueprint.centromere.core.commons.reader;
 
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Mutation;
+import com.blueprint.centromere.core.commons.model.Mutation.AlternateTranscript;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
+import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
+import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.reader.StandardRecordFileReader;
 import com.blueprint.centromere.core.model.ModelSupport;
-import com.mysema.commons.lang.Assert;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,10 +42,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author woemler
  */
-public class MafReader extends StandardRecordFileReader<Mutation>
+public class TcgaMafReader extends StandardRecordFileReader<Mutation>
     implements ModelSupport<Mutation>, DataFileAware {
 
-  private static final Logger logger = LoggerFactory.getLogger(MafReader.class);
+  private static final Logger logger = LoggerFactory.getLogger(TcgaMafReader.class);
 
   private final TcgaSupport tcgaSupport;
   private final GeneRepository geneRepository;
@@ -52,8 +56,14 @@ public class MafReader extends StandardRecordFileReader<Mutation>
   private String delimiter = "\t";
   private boolean headerFlag = true;
 
-  public MafReader(GeneRepository geneRepository, TcgaSupport tcgaSupport) {
+  public TcgaMafReader(GeneRepository geneRepository, TcgaSupport tcgaSupport) {
     this.tcgaSupport = tcgaSupport;
+    this.geneRepository = geneRepository;
+  }
+
+  public TcgaMafReader(GeneRepository geneRepository, SubjectRepository subjectRepository, 
+      SampleRepository sampleRepository) {
+    this.tcgaSupport = new TcgaSupport(subjectRepository, sampleRepository);
     this.geneRepository = geneRepository;
   }
 
@@ -62,36 +72,50 @@ public class MafReader extends StandardRecordFileReader<Mutation>
 
     Mutation mutation = new Mutation();
     mutation.setDataFileId(this.getDataFile().getId());
+    mutation.setDataSetId(this.getDataSet().getId());
 
     Sample sample = getSampleFromLine(line);
     if (this.getImportOptions().isInvalidSample(sample)) {
-      logger.info("Skipping line due to invalid sample: " + line);
-      return null;
+      if (this.getImportOptions().skipInvalidSamples()) {
+        logger.info("Skipping line due to invalid sample: " + line);
+        return null;
+      } else {
+        throw new DataImportException(String.format("Unable to identify sample from line: %s", line));
+      }
     } else {
       mutation.setSampleId(sample.getId());
     }
 
     Gene gene = getGeneFromLine(line);
     if (this.getImportOptions().isInvalidGene(gene)){
-      logger.info("Skipping line due to invalid gene: " + line);
-      return null;
+      if (this.getImportOptions().skipInvalidGenes()) {
+        logger.info("Skipping line due to invalid gene: " + line);
+        return null;
+      } else {
+        throw new DataImportException(String.format("Unable to identify gene in line: %s", line));
+      }
     } else {
       mutation.setGeneId(gene.getId());
     }
 
     mutation.setReferenceGenome(parseReferenceGenome(line));
     mutation.setChromosome(getColumnValue(line, "chromosome"));
-    mutation.setStrand(getColumnValue(line, "strand"));
     mutation.setDnaStartPosition(Integer.parseInt(getColumnValue(line, "start_position")));
     mutation.setDnaStopPosition(Integer.parseInt(getColumnValue(line, "end_position")));
+    mutation.setStrand(getColumnValue(line, "strand"));
+    mutation.setVariantClassification(getColumnValue(line, "variant_classification"));
+    mutation.setVariantType(getColumnValue(line, "variant_type"));
     mutation.setReferenceAllele(getColumnValue(line, "reference_allele"));
     mutation.setAlternateAllele(getColumnValue(line, "tumor_seq_allele2"));
     mutation.setcDnaChange(getColumnValue(line, "cdna_change"));
     mutation.setCodonChange(getColumnValue(line, "codon_change"));
-    mutation.setProteinChange(getColumnValue(line, "protein_change"));
-    mutation.setMutationClassification(getColumnValue(line, "variant_classification"));
-    mutation.setMutationType(getColumnValue(line, "variant_type"));
-
+    mutation.setAminoAcidChange(getColumnValue(line, "protein_change"));
+    mutation.setMrnaTranscript(getColumnValue(line, "refseq_mrna_id"));
+    mutation.setProteinTranscript(getColumnValue(line, "refseq_prot_id"));
+    mutation.setAlternateTranscripts(parseAlternateTranscripts(line));
+    mutation.setExternalReferenes(null);
+    mutation.setAttributes(null);
+    
     return mutation;
   }
 
@@ -109,14 +133,12 @@ public class MafReader extends StandardRecordFileReader<Mutation>
   }
 
   private Sample getSampleFromLine(String line){
-    String sampleName = null;
+    String sampleName;
     if (hasColumn("tumor_sample_barcode")){
       sampleName = getColumnValue(line, "tumor_sample_barcode");
     } else {
-      // TODO: get general sample name, not just TCGA
+      return null;
     }
-
-    Assert.notNull(sampleName, "Sample name must not be null.");
 
     if (sampleMap.containsKey(sampleName)){
       return sampleMap.get(sampleName);
@@ -134,13 +156,26 @@ public class MafReader extends StandardRecordFileReader<Mutation>
     return sample;
 
   }
+  
+  private List<AlternateTranscript> parseAlternateTranscripts(String line){
+    List<AlternateTranscript> transcripts = new ArrayList<>();
+    String otherTranscripts = getColumnValue(line, "other_transcripts");
+    for (String ot: otherTranscripts.split("\\|")){
+      String[] bits = ot.split("_");
+      AlternateTranscript transcript = new AlternateTranscript();
+      transcript.setGeneSymbol(bits[0]);
+      transcript.setTranscriptId(bits[1]);
+      //transcript.set
+      transcripts.add(transcript);
+    }
+    return transcripts;
+  }
 
   private String parseReferenceGenome(String line){
     String ref = null;
     if (hasColumn("ncbi_build")){
       ref = "hg" + getColumnValue(line, "ncbi_build");
     }
-    // TODO: support for mroe than TCGA
     return ref;
   }
 

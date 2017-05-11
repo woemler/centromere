@@ -30,9 +30,6 @@ public class ImportFileCommandArguments {
 	@Parameter(names = { "-t", "--type" }, required = true, description = "Data type label for the target file.  Required.")
 	private String dataType;
 	
-//	@Parameter(description = "Data type label and file path.")
-//	private List<String> args = new ArrayList<>();
-
 	public String getFilePath() {
 		return filePath;
 	}
@@ -49,21 +46,6 @@ public class ImportFileCommandArguments {
 		this.dataType = dataType;
 	}
 
-//	public List<String> getArgs() {
-//		return args;
-//	}
-//
-//	public void setArgs(List<String> args) {
-//		this.args = args;
-//	}
-//	
-//	public String getDataType(){
-//		return args.size() > 0 ? args.get(0) : null;
-//	}
-//	
-//	public String getFilePath(){
-//		return args.size() > 1 ? args.get(1) : null;
-//	}
 
 	@Override 
 	public String toString() {

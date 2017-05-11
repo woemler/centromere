@@ -29,14 +29,13 @@ import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
 import com.blueprint.centromere.core.dataimport.processor.RecordProcessor;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import java.util.Date;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.support.Repositories;
-import org.springframework.web.context.request.NativeWebRequest;
 
 /**
  * @author woemler
@@ -69,12 +68,12 @@ public class FileImportExecutor implements EnvironmentAware {
     if (dataSet == null){
       dataSet = getDataSetFromEnvironment();
     }
-    DataSet ds = dataSetRepository.findOneByShortName(dataSet.getShortName());
-    if (ds == null){
+    Optional<DataSet> optional = dataSetRepository.findByShortName(dataSet.getShortName());
+    if (!optional.isPresent()){
       dataSet = dataSetRepository.insert(dataSet);
       logger.info(String.format("Creating new DataSet record: %s", dataSet.toString()));
     } else {
-      dataSet = ds;
+      dataSet = optional.get();
       logger.info(String.format("Using existing DataSet record: %s", dataSet.toString()));
     }
     
@@ -88,11 +87,12 @@ public class FileImportExecutor implements EnvironmentAware {
       dataFile.setDateUpdated(new Date());
       dataFile.setDataSetId(dataSet.getId());
     }
-    DataFile df = dataFileRepository.findOneByFilePath(filePath);
-    if (df == null){
+    Optional<DataFile> dfOptional = dataFileRepository.findByFilePath(filePath);
+    if (!dfOptional.isPresent()){
       dataFile = dataFileRepository.insert(dataFile);
       logger.info(String.format("Creating new DataFile record: %s", dataFile.toString()));
     } else {
+      DataFile df = dfOptional.get();
       if (importOptions.skipExistingFiles()) {
         logger.warn(String.format("DataFile record already exists.  Skipping import: %s",
             df.getFilePath()));
