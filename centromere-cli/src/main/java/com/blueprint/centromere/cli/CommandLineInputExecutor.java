@@ -18,12 +18,15 @@ package com.blueprint.centromere.cli;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.MissingCommandException;
+import com.blueprint.centromere.cli.Printer.Level;
+import com.blueprint.centromere.cli.arguments.DeleteCommandArguments;
 import com.blueprint.centromere.cli.arguments.ImportCommandArguments;
 import com.blueprint.centromere.cli.arguments.ImportFileCommandArguments;
 import com.blueprint.centromere.cli.arguments.ImportManifestCommandArguments;
 import com.blueprint.centromere.cli.arguments.ListCommandArguments;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +50,7 @@ public class CommandLineInputExecutor implements CommandLineRunner {
 	public static final String IMPORT_BATCH_COMMAND = "batch";
 
 	public static final String LIST_COMMAND = "list";
+	public static final String DELETE_COMMAND = "delete";
 
 	private static final Logger logger = LoggerFactory.getLogger(CommandLineInputExecutor.class);
 
@@ -65,13 +69,16 @@ public class CommandLineInputExecutor implements CommandLineRunner {
 			code = processArguments(args);
 		} finally {
 			Date end = new Date();
+			String message;
 			if (code > 0){
-				logger.info(String.format("Command line execution exited with errors.  Elapsed time: %s", 
-						formatInterval(end.getTime() - start.getTime())));
+			  message = String.format("Command line execution exited with errors.  Elapsed time: %s",
+            formatInterval(end.getTime() - start.getTime()));
+				
 			} else {
-				logger.info(String.format("Command line execution finished.  Elapsed time: %s", 
-						formatInterval(end.getTime() - start.getTime())));
+				message = String.format("Command line execution finished.  Elapsed time: %s", 
+						formatInterval(end.getTime() - start.getTime()));
 			}
+			logger.info(message);
 		}
 		
 	}
@@ -102,14 +109,17 @@ public class CommandLineInputExecutor implements CommandLineRunner {
     ListCommandArguments listCommandArguments = new ListCommandArguments();
     jc.addCommand(LIST_COMMAND, listCommandArguments);
     JCommander listJc = jc.getCommands().get(LIST_COMMAND);
+
+    DeleteCommandArguments deleteCommandArguments = new DeleteCommandArguments();
+    jc.addCommand(DELETE_COMMAND, deleteCommandArguments);
+    JCommander deleteJc = jc.getCommands().get(DELETE_COMMAND);
     
 		int code = 1;
 		
 		try {
 			jc.parse(args);
 		} catch (MissingCommandException e){
-			logger.error("Invalid arguments.");
-			printUsage(jc);
+      unknownCommand();
 			return code;
 		}
 		
@@ -146,41 +156,56 @@ public class CommandLineInputExecutor implements CommandLineRunner {
       
 		  } else {
 		    
-        logger.error(String.format("Unknown import command: %s", importCommand));
-        printUsage(jc);
+        Printer.print(String.format("Unknown import command: %s", importCommand), logger, Level.ERROR);
+        System.out.println("\nAvailable import commands: ");
+        System.out.println("\n    file: Imports a single file.");
+        importJc.usage(IMPORT_FILE_COMMAND);
+        System.out.println("\n    batch: Imports multiple files, defined using a manifest file.");
+        importJc.usage(IMPORT_BATCH_COMMAND);
         
       }
       
     } else if (LIST_COMMAND.equals(mainCommand)) {
 
-		  if (listCommandArguments.getArgs() == null || listCommandArguments.getArgs().isEmpty()){
-		    printUsage(jc);
-      } else {
-		    String arg = listCommandArguments.getArgs().get(0);
-		    listCommandExecutor.run(arg);
+      String listable = "";
+      if (listCommandArguments.getArgs() != null && !listCommandArguments.getArgs().isEmpty()) {
+        listable = listCommandArguments.getArgs().get(0);
       }
+      listCommandExecutor.run(listable, listCommandArguments.getShowDetails());
+      code = 0;
 
+    } else if (DELETE_COMMAND.equals(mainCommand)){
+
+		  String deleteable = "";
+      List<String> toDelete = deleteCommandArguments.getArgs();
+		  if (toDelete != null && !toDelete.isEmpty()){
+        deleteable = toDelete.remove(0);
+		    if (toDelete.size() > 0) {
+
+          code = 0;
+        } else {
+		      Printer.print(String.format("No items selected for deletion: %s", deleteable), logger, Level.WARN);
+        }
+		    
+      } else {
+		    deleteJc.usage();
+      }
+		  
 		} else {
-			logger.error(String.format("Unknown command: %s", mainCommand));
-			printUsage(jc);
+			unknownCommand();
 		}
 		
 		return code;
 		
 	}
-
-  /**
-   * Prints the command line application usage.
-   * 
-   * @param jc JCommander object
-   */
-	private void printUsage(JCommander jc){
-	  JCommander importJc = jc.getCommands().get(IMPORT_COMMAND);
-		importJc.usage(IMPORT_FILE_COMMAND);
-		importJc.usage(IMPORT_BATCH_COMMAND);
-		JCommander listJc = jc.getCommands().get(LIST_COMMAND);
-    listJc.usage();
-	}
+	
+	private void unknownCommand(){
+    logger.error("Invalid command");
+    System.out.println("ERROR: Invalid command");
+    System.out.println("Available commands: import, list");
+    System.out.println("    import: Imports one or more files into the data warehouse.");
+    System.out.println("    list:   List available data models, file processors, imported files, and other resources");
+  }
 
 	/**
 	 * From http://stackoverflow.com/a/6710604/1458983

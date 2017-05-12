@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  * @author woemler
  * @since 0.5.0
  */
-@DataTypes("entrez_gene")
+@DataTypes(value = "entrez_gene", description = "Entrez Gene records")
 @Component
 public class EntrezGeneInfoProcessor extends GenericRecordProcessor<Gene> {
 

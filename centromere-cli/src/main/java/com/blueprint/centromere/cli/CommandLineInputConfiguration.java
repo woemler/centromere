@@ -31,7 +31,7 @@ import org.springframework.data.repository.support.Repositories;
 @Configuration
 @PropertySources({
 		@PropertySource({"classpath:centromere-defaults.properties"}),
-		@PropertySource(value = {"classpath:centromere.properties"},ignoreResourceNotFound = true)
+		@PropertySource(value = {"classpath:centromere.properties"}, ignoreResourceNotFound = true)
 })
 @Profile({ Profiles.CLI_PROFILE })
 public class CommandLineInputConfiguration {

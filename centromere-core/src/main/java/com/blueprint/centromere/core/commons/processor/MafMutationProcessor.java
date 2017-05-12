@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author woemler
  */
-@DataTypes({ "maf_mutation" })
+@DataTypes(value = { "tcga_maf_mutation" }, description = "MAF mutation records from the TCGA")
 @Component
 public class MafMutationProcessor extends GenericRecordProcessor<Mutation> {
 

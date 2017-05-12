@@ -1,12 +1,19 @@
 package com.blueprint.centromere.cli;
 
+import com.blueprint.centromere.cli.Printer.Level;
+import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.model.Model;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
@@ -16,14 +23,16 @@ import org.springframework.core.env.Environment;
  */
 public class ListCommandExecutor implements EnvironmentAware {
 
-  private static final List<String> listable = Arrays.asList("datatype", "dataset", "model");
+  private static final Logger logger = LoggerFactory.getLogger(ListCommandExecutor.class);
+  private static final List<String> listable = Arrays.asList("datatype", "dataset", "model", 
+      "datafile");
 
   private ModelProcessorBeanRegistry processorRegistry;
   private DataSetRepository dataSetRepository;
   private DataFileRepository dataFileRepository;
   private Environment environment;
 
-  public void run(String arg){
+  public void run(String arg, boolean showDetails){
 
     arg = arg.trim().toLowerCase().replaceAll("-", "");
     if (!listable.contains(arg)){
@@ -33,46 +42,84 @@ public class ListCommandExecutor implements EnvironmentAware {
     switch (arg){
 
       case "datatype":
-        List<String> dataTypes = processorRegistry.getRegisteredDataTypes();
+        List<String> dataTypes = new ArrayList<>();
+        for (Map.Entry<String, String> entry: processorRegistry.getDataTypeDescriptionMap().entrySet()){
+          dataTypes.add(entry.getKey() + (showDetails ? ": " + entry.getValue() : ""));
+        }
         if (!dataTypes.isEmpty()){
-          System.out.println("Registered data types:");
+          Collections.sort(dataTypes);
+          System.out.println("Registered data types:\n");
           for (String type: dataTypes){
             System.out.println("  " + type);
           }
         } else {
           System.out.println("No data types are currently registered!");
         }
+        System.out.println();
         return;
 
       case "model":
-        List<Class<? extends Model>> models = processorRegistry.getRegisteredModels();
+        List<String> models = new ArrayList<>();
+        for (Class<? extends Model> model: processorRegistry.getRegisteredModels()){
+          models.add(showDetails ? model.getName() : model.getSimpleName());
+        }
         if (!models.isEmpty()){
-          System.out.println("Registered models:");
-          for (Class<? extends Model> model: models){
-            System.out.println("  " + model.getName());
+          Collections.sort(models);
+          System.out.println("Registered models:\n");
+          for (String model: models){
+            System.out.println("  " + model);
           }
         } else {
           System.out.println("No models are currently registered!");
         }
+        System.out.println();
         return;
 
       case "dataset":
-        List<DataSet> dataSets = (List<DataSet>) dataSetRepository.findAll();
+        
+        List<String> dataSets = new ArrayList<>();
+        for (DataSet dataSet: dataSetRepository.findAll()){
+          dataSets.add(showDetails ? dataSet.toString() : dataSet.getDisplayName());
+        }
         if (!dataSets.isEmpty()){
-          System.out.println("Registered data sets:");
-          for (DataSet dataSet: dataSets){
-            System.out.println("  " + dataSet.getDisplayName());
+          Collections.sort(dataSets);
+          System.out.println("Registered data sets:\n");
+          for (String dataSet: dataSets){
+            System.out.println("  " + dataSet);
           }
         } else {
           System.out.println("No data sets registered!");
         }
+        System.out.println();
+        return;
+
+      case "datafile":
+        List<String> dataFiles = new ArrayList<>();
+        for (DataFile dataFile: dataFileRepository.findAll()){
+          dataFiles.add(showDetails ? dataFile.toString() : dataFile.getFilePath());
+        }
+        if (!dataFiles.isEmpty()){
+          Collections.sort(dataFiles);
+          System.out.println("Registered data files:\n");
+          for (String dataFile: dataFiles){
+            System.out.println("  " + dataFile);
+          }
+        } else {
+          System.out.println("No data files registered!");
+        }
+        System.out.println();
         return;
 
       default:
-        throw new DataImportException("Unknown listable option: " + arg);
+        Printer.print("Unknown listable option: " + arg, logger, Level.WARN);
+        System.out.println(String.format("Available list commands: %s", listable));
 
     }
 
+  }
+
+  public void run(String arg){
+    run(arg, false);
   }
 
   @Autowired

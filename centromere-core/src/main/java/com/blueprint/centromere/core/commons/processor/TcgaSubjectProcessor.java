@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author woemler
  */
-@DataTypes("tcga_subjects")
+@DataTypes(value = "tcga_subjects", description = "TCGA subject metadata")
 @Component
 public class TcgaSubjectProcessor extends GenericRecordProcessor<Subject> {
 

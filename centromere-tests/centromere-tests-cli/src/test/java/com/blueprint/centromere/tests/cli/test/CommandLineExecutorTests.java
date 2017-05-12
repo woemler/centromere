@@ -32,7 +32,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ActiveProfiles;
@@ -57,7 +56,6 @@ public class CommandLineExecutorTests {
 	@Autowired private CommandLineInputExecutor executor;
 	@Autowired private GeneRepository geneRepository;
 	@Autowired private GeneExpressionRepository geneExpressionRepository;
-	@Autowired private Environment environment;
 	
 	@Before
 	public void setup(){

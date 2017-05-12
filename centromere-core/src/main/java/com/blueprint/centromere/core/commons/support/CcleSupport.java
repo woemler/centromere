@@ -65,6 +65,15 @@ public class CcleSupport extends GenericDataSetSupport {
     return sample;
   }
   
+  public Sample createSample(String sampleName, DataSet dataSet){
+    Optional<Subject> optional = getSubjectRepository().findByName(sampleName);
+    if (optional.isPresent()){
+      return createSample(sampleName, optional.get(), dataSet);
+    } else {
+      return null;
+    }
+  }
+  
   public Optional<Sample> fetchOrCreateSample(String name, DataSet dataSet){
     Optional<Sample> optional = this.findSample(name, dataSet);
     if (optional.isPresent()) return optional;

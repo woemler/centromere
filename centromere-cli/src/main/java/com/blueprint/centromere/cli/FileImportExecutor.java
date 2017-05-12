@@ -16,6 +16,9 @@
 
 package com.blueprint.centromere.cli;
 
+import static com.blueprint.centromere.cli.Printer.Level.INFO;
+import static com.blueprint.centromere.cli.Printer.Level.WARN;
+
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
@@ -62,7 +65,7 @@ public class FileImportExecutor implements EnvironmentAware {
 		}
     RecordProcessor processor = processorRegistry.getByDataType(dataType);
     logger.info(String.format("Using record processor: %s", processor.getClass().getName()));
-		logger.info(String.format("Running file import: data-type=%s  file=%s", dataType, filePath));
+		Printer.print(String.format("Running file import: data-type=%s  file=%s", dataType, filePath), logger, INFO);
 		
 	  // Get the data set object
     if (dataSet == null){
@@ -71,10 +74,10 @@ public class FileImportExecutor implements EnvironmentAware {
     Optional<DataSet> optional = dataSetRepository.findByShortName(dataSet.getShortName());
     if (!optional.isPresent()){
       dataSet = dataSetRepository.insert(dataSet);
-      logger.info(String.format("Creating new DataSet record: %s", dataSet.toString()));
+      Printer.print(String.format("Creating new DataSet record: %s", dataSet.toString()), logger, INFO);
     } else {
       dataSet = optional.get();
-      logger.info(String.format("Using existing DataSet record: %s", dataSet.toString()));
+      Printer.print(String.format("Using existing DataSet record: %s", dataSet.toString()), logger, INFO);
     }
     
     // Get the data file object
@@ -90,15 +93,15 @@ public class FileImportExecutor implements EnvironmentAware {
     Optional<DataFile> dfOptional = dataFileRepository.findByFilePath(filePath);
     if (!dfOptional.isPresent()){
       dataFile = dataFileRepository.insert(dataFile);
-      logger.info(String.format("Creating new DataFile record: %s", dataFile.toString()));
+      Printer.print(String.format("Creating new DataFile record: %s", dataFile.toString()), logger, INFO);
     } else {
       DataFile df = dfOptional.get();
       if (importOptions.skipExistingFiles()) {
-        logger.warn(String.format("DataFile record already exists.  Skipping import: %s",
-            df.getFilePath()));
+        Printer.print(String.format("DataFile record already exists.  Skipping import: %s",
+            df.getFilePath()), logger, WARN);
         return;
       } else if (importOptions.overwriteExistingFiles()){
-        logger.info(String.format("Overwriting existing data file record: %s", df.getFilePath()));
+        Printer.print(String.format("Overwriting existing data file record: %s", df.getFilePath()), logger, INFO);
         ModelRepository r;
         try {
           r = (ModelRepository) repositories.getRepositoryFor(df.getModelType());
@@ -108,14 +111,14 @@ public class FileImportExecutor implements EnvironmentAware {
         if (r instanceof DataOperations) {
           ((DataOperations) r).deleteByDataFileId(df.getId());
         } else {
-          logger.warn(String.format("Data is not overwritable.  Exiting."));
+          Printer.print(String.format("Data is not overwritable.  Exiting."), logger, WARN);
           return;
         }
         dataFileRepository.delete(df);
         dataFile = dataFileRepository.insert(dataFile);
       } else {
         dataFile = df;
-        logger.info(String.format("Using existing DataFile record: %s", dataFile.toString()));
+        Printer.print(String.format("Using existing DataFile record: %s", dataFile.toString()), logger, INFO);
       }
     }
 
@@ -136,7 +139,7 @@ public class FileImportExecutor implements EnvironmentAware {
 
     logger.info("Running processor doAfter method");
 		processor.doAfter(filePath);
-    logger.info("File processing complete.");
+    Printer.print("File processing complete.", logger, INFO);
 	}
 
   private DataSet getDataSetFromEnvironment() {
@@ -161,6 +164,23 @@ public class FileImportExecutor implements EnvironmentAware {
     if (environment.containsProperty("dataSet.description")){
       dataSet.setDescription(environment.getRequiredProperty("dataSet.description"));
     }
+    
+    if (dataSet.getDisplayName() == null){
+      dataSet.setDisplayName(environment.getRequiredProperty("centromere.import.dataset.default-display-name"));
+    }
+    if (dataSet.getShortName() == null){
+      dataSet.setShortName(environment.getRequiredProperty("centromere.import.dataset.default-short-name"));
+    }
+    if (dataSet.getSource() == null){
+      dataSet.setSource(environment.getRequiredProperty("centromere.import.dataset.default-source"));
+    }
+    if (dataSet.getVersion() == null){
+      dataSet.setVersion(environment.getRequiredProperty("centromere.import.dataset.default-version"));
+    }
+    if (dataSet.getDescription() == null){
+      dataSet.setDescription(environment.getRequiredProperty("centromere.import.dataset.default-description"));
+    }
+    
     return dataSet;
   }
 

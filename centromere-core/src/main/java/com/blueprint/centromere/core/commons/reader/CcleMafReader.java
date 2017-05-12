@@ -23,7 +23,7 @@ import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
-import com.blueprint.centromere.core.commons.support.TcgaSupport;
+import com.blueprint.centromere.core.commons.support.CcleSupport;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.reader.StandardRecordFileReader;
 import java.util.ArrayList;
@@ -35,16 +35,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * File reader for mutation annotation format (MAF) files.  Supports generic MAF files, as well
- *   as files from specific data sets (eg. TCGA).
- *
  * @author woemler
  */
-public class TcgaMafReader extends StandardRecordFileReader<Mutation>  {
+public class CcleMafReader extends StandardRecordFileReader<Mutation> {
 
-  private static final Logger logger = LoggerFactory.getLogger(TcgaMafReader.class);
+  private static final Logger logger = LoggerFactory.getLogger(CcleMafReader.class);
 
-  private final TcgaSupport tcgaSupport;
+  private final CcleSupport ccleSupport;
   private final GeneRepository geneRepository;
 
   private Map<String, Integer> columnMap = new HashMap<>();
@@ -52,15 +49,15 @@ public class TcgaMafReader extends StandardRecordFileReader<Mutation>  {
   private String delimiter = "\t";
   private boolean headerFlag = true;
 
-  public TcgaMafReader(GeneRepository geneRepository, TcgaSupport tcgaSupport) {
-    this.tcgaSupport = tcgaSupport;
+  public CcleMafReader(GeneRepository geneRepository, CcleSupport ccleSupport) {
+    this.ccleSupport = ccleSupport;
     this.geneRepository = geneRepository;
   }
-
-  public TcgaMafReader(GeneRepository geneRepository, SubjectRepository subjectRepository, 
-      SampleRepository sampleRepository) {
-    this.tcgaSupport = new TcgaSupport(subjectRepository, sampleRepository);
+  
+  public CcleMafReader(GeneRepository geneRepository, SubjectRepository subjectRepository,
+      SampleRepository sampleRepository){
     this.geneRepository = geneRepository;
+    this.ccleSupport = new CcleSupport(subjectRepository, sampleRepository);
   }
 
   @Override
@@ -94,24 +91,25 @@ public class TcgaMafReader extends StandardRecordFileReader<Mutation>  {
       mutation.setGeneId(gene.getId());
     }
 
-    mutation.setReferenceGenome(parseReferenceGenome(line));
-    mutation.setChromosome(getColumnValue(line, "chromosome"));
-    mutation.setDnaStartPosition(Integer.parseInt(getColumnValue(line, "start_position")));
-    mutation.setDnaStopPosition(Integer.parseInt(getColumnValue(line, "end_position")));
-    mutation.setStrand(getColumnValue(line, "strand"));
-    mutation.setVariantClassification(getColumnValue(line, "variant_classification"));
-    mutation.setVariantType(getColumnValue(line, "variant_type"));
-    mutation.setReferenceAllele(getColumnValue(line, "reference_allele"));
-    mutation.setAlternateAllele(getColumnValue(line, "tumor_seq_allele2"));
-    mutation.setcDnaChange(getColumnValue(line, "cdna_change"));
-    mutation.setCodonChange(getColumnValue(line, "codon_change"));
-    mutation.setAminoAcidChange(getColumnValue(line, "protein_change"));
-    mutation.setMrnaTranscript(getColumnValue(line, "refseq_mrna_id"));
-    mutation.setProteinTranscript(getColumnValue(line, "refseq_prot_id"));
-    mutation.setAlternateTranscripts(parseAlternateTranscripts(line));
-    mutation.setExternalReferenes(null);
-    mutation.setAttributes(null);
-    
+    // TODO
+//    mutation.setReferenceGenome(parseReferenceGenome(line));
+//    mutation.setChromosome(getColumnValue(line, "chromosome"));
+//    mutation.setDnaStartPosition(Integer.parseInt(getColumnValue(line, "start_position")));
+//    mutation.setDnaStopPosition(Integer.parseInt(getColumnValue(line, "end_position")));
+//    mutation.setStrand(getColumnValue(line, "strand"));
+//    mutation.setVariantClassification(getColumnValue(line, "variant_classification"));
+//    mutation.setVariantType(getColumnValue(line, "variant_type"));
+//    mutation.setReferenceAllele(getColumnValue(line, "reference_allele"));
+//    mutation.setAlternateAllele(getColumnValue(line, "tumor_seq_allele2"));
+//    mutation.setcDnaChange(getColumnValue(line, "cdna_change"));
+//    mutation.setCodonChange(getColumnValue(line, "codon_change"));
+//    mutation.setAminoAcidChange(getColumnValue(line, "protein_change"));
+//    mutation.setMrnaTranscript(getColumnValue(line, "refseq_mrna_id"));
+//    mutation.setProteinTranscript(getColumnValue(line, "refseq_prot_id"));
+//    mutation.setAlternateTranscripts(parseAlternateTranscripts(line));
+//    mutation.setExternalReferenes(null);
+//    mutation.setAttributes(null);
+
     return mutation;
   }
 
@@ -141,18 +139,18 @@ public class TcgaMafReader extends StandardRecordFileReader<Mutation>  {
     }
 
     Sample sample;
-    Optional<Sample> optional = tcgaSupport.findSample(sampleName, this.getDataSet());
+    Optional<Sample> optional = ccleSupport.findSample(sampleName, this.getDataSet());
     if (!optional.isPresent()) {
-      sample = tcgaSupport.createSample(sampleName, this.getDataSet());
+      sample = ccleSupport.createSample(sampleName, this.getDataSet());
     } else {
       sample = optional.get();
     }
-    sampleMap.put(sampleName, sample);
-
+    if (sample != null) sampleMap.put(sampleName, sample);
+      
     return sample;
 
   }
-  
+
   private List<AlternateTranscript> parseAlternateTranscripts(String line){
     List<AlternateTranscript> transcripts = new ArrayList<>();
     String otherTranscripts = getColumnValue(line, "other_transcripts");
@@ -218,5 +216,5 @@ public class TcgaMafReader extends StandardRecordFileReader<Mutation>  {
   public Class<Mutation> getModel() {
     return Mutation.class;
   }
-
+  
 }

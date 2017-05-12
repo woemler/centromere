@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author woemler
  */
-@DataTypes({ "tcga_gene_expression" })
+@DataTypes(value = { "tcga_gene_expression" }, description = "Gene-normalized RNA-Seq expression data from the TCGA")
 @Component
 public class TcgaGeneExpressionProcessor extends GenericRecordProcessor<GeneExpression> {
 

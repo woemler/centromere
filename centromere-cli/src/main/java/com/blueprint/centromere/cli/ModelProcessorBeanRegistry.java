@@ -45,6 +45,7 @@ public class ModelProcessorBeanRegistry implements BeanPostProcessor, Applicatio
 	
 	private ApplicationContext applicationContext;
 	private Map<String, RecordProcessor> dataTypeMap = new HashMap<>();
+	private Map<String, String> dataTypeDescriptionMap = new HashMap<>();
 	private Map<Class<? extends Model>, List<RecordProcessor>> modelProcessorMap = new HashMap<>();
 	private static final Logger logger = LoggerFactory.getLogger(ModelProcessorBeanRegistry.class);
 
@@ -79,6 +80,8 @@ public class ModelProcessorBeanRegistry implements BeanPostProcessor, Applicatio
 				if (dataTypes.value().length > 0) {
 					for (String dataType : dataTypes.value()) {
 						dataTypeMap.put(dataType, component);
+						dataTypeDescriptionMap.put(dataType, dataTypes.description().equals("") 
+                ? "No description given." : dataTypes.description());
 						logger.info(String.format("Registering RecordProcessor bean %s for data type %s for model %s",
 								component.getClass().getName(), dataType, model.getName()));
 					}
@@ -203,7 +206,11 @@ public class ModelProcessorBeanRegistry implements BeanPostProcessor, Applicatio
 		return new ArrayList<>(modelProcessorMap.keySet());
 	}
 
-	@Override 
+  public Map<String, String> getDataTypeDescriptionMap() {
+    return dataTypeDescriptionMap;
+  }
+
+  @Override 
 	@Autowired
 	public void setApplicationContext(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;

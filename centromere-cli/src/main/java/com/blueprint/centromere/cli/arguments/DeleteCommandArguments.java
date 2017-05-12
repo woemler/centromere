@@ -8,13 +8,10 @@ import java.util.List;
  * @since 0.5.0
  * @author woemler
  */
-public class ListCommandArguments extends GenericCommandArguments {
+public class DeleteCommandArguments extends GenericCommandArguments {
 
-  @Parameter(description = "Listable item")
+  @Parameter(description = "Deletable items")
   private List<String> args = new ArrayList<>();
-
-  @Parameter(names = { "-d", "--details" }, description = "Boolean flag, shows more details when true")
-  private boolean showDetails = false;
 
   public List<String> getArgs() {
     return args;
@@ -22,14 +19,6 @@ public class ListCommandArguments extends GenericCommandArguments {
 
   public void setArgs(List<String> args) {
     this.args = args;
-  }
-
-  public boolean getShowDetails() {
-    return showDetails;
-  }
-
-  public void setShowDetails(boolean showDetails) {
-    this.showDetails = showDetails;
   }
 
   @Override

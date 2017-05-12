@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 William Oemler, Blueprint Medicines
+ * Copyright 2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.blueprint.centromere.core.dataimport;
 
 import com.blueprint.centromere.core.dataimport.processor.RecordProcessor;
-import com.blueprint.centromere.core.model.Model;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -38,12 +37,10 @@ public @interface DataTypes {
 	 */
 	String[] value();
 
-	/**
-	 * When true, will default the annotated processor to handling record processing for the 
-	 *   appropriate {@link Model}, when a data type is not
-	 *   supplied.
-	 * 
-	 * @return
-	 */
-	boolean defaultForModel() default false;
+  /**
+   * Brief description of the data types.
+   * 
+   * @return data type descriptions
+   */
+	String description() default "";
 }
