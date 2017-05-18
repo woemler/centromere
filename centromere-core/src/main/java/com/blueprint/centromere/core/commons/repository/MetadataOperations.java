@@ -19,6 +19,7 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.model.Model;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.repository.query.Param;
 
 /**
@@ -26,5 +27,21 @@ import org.springframework.data.repository.query.Param;
  * @since 0.5.0
  */
 public interface MetadataOperations<T extends Model<?>> {
-	List<T> guess(@Param("keyword") String keyword);
+
+  /**
+   * Returns all records that could potentially match the input keyword.
+   * 
+   * @param keyword
+   * @return
+   */
+  List<T> guess(@Param("keyword") String keyword);
+
+  /**
+   * Returns at most one record that best matches the input keyword.
+   * 
+   * @param keyword
+   * @return
+   */
+	Optional<T> bestGuess(String keyword);
+	
 }

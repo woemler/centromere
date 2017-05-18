@@ -47,5 +47,16 @@ public interface SubjectRepository
 		subjects.addAll(findByAlias(keyword));
 		return subjects;
 	}
+
+  @Override
+  default Optional<Subject> bestGuess(String keyword){
+    Optional<Subject> optional = findByName(keyword);
+    if (optional.isPresent()) return optional;
+    List<Subject> subjects = findByAlias(keyword);
+    if (!subjects.isEmpty()){
+      return Optional.of(subjects.get(0));
+    }
+    return Optional.empty();
+  }
 	
 }

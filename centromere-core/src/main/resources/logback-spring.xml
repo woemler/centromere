@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <!--
   ~ Copyright 2017 the original author or authors
   ~
@@ -15,30 +16,31 @@
   -->
 
 <configuration>
+  
+  <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-      <encoder>
-          <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-      </encoder>
-  </appender>
-
-  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>centromere.log</file>
+  <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>centromere.cli.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>centromere.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>centromere.cli.%d{yyyy-MM-dd}.log</fileNamePattern>
       <maxHistory>30</maxHistory>
     </rollingPolicy>
-
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
   </appender>
-
-  <logger name="com.blueprint" level="INFO" />
-  <logger name="org.springframework" level="WARN" />
-
-  <root level="warn">
+  
+  <springProfile name="mode_cli">
+    <root level="INFO">
+      <appender-ref ref="ROLLING_FILE" />
+    </root>
+  </springProfile>
+  
+  <springProfile name="mode_web">
+    <root level="INFO">
+      <appender-ref ref="CONSOLE" />
       <appender-ref ref="FILE" />
-  </root>
-
+    </root>
+  </springProfile>
+  
 </configuration>

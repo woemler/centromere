@@ -22,8 +22,7 @@ import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
-import com.blueprint.centromere.core.commons.support.DataFileAware;
-import com.blueprint.centromere.core.commons.support.DataSetAware;
+import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.reader.MultiRecordLineFileReader;
@@ -45,7 +44,7 @@ import org.springframework.util.Assert;
  */
 public class TcgaRnaSeqGeneExpressionFileReader
 		extends MultiRecordLineFileReader<GeneExpression>
-		implements ModelSupport<GeneExpression>, DataFileAware, DataSetAware {
+		implements ModelSupport<GeneExpression>, SampleAware {
 
 	private static final Logger logger = LoggerFactory.getLogger(TcgaRnaSeqGeneExpressionFileReader.class);
 
@@ -140,9 +139,9 @@ public class TcgaRnaSeqGeneExpressionFileReader
 			if (geneMap.containsKey(b[1])){
 			  gene = geneMap.get(b[1]);
       } else if (!b[0].equals("?")){
-				List<Gene> genes = geneRepository.guess(b[0]);
-        if (genes.size() > 0){
-          gene = genes.get(0);
+				Optional<Gene> optional = geneRepository.bestGuess(b[0]);
+        if (optional.isPresent()){
+          gene = optional.get();
         }
 			} 
 		}
@@ -164,4 +163,8 @@ public class TcgaRnaSeqGeneExpressionFileReader
 		this.model = model;
 	}
 
+  @Override
+  public List<Sample> getSamples() {
+    return new ArrayList<>(sampleMap.values());
+  }
 }

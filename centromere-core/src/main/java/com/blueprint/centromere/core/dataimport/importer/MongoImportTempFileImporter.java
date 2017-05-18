@@ -147,6 +147,7 @@ public class MongoImportTempFileImporter<T extends Model<?>> extends AbstractFil
   
   private String getCollectionName(){
     String name = this.getModel().getSimpleName();
+    name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
     if (this.getModel().isAnnotationPresent(Document.class)){
       Document document = this.getModel().getAnnotation(Document.class);
       if (!document.collection().equals("")) name = document.collection();

@@ -24,6 +24,7 @@ import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.CcleSupport;
+import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.reader.StandardRecordFileReader;
 import java.util.ArrayList;
@@ -37,7 +38,8 @@ import org.slf4j.LoggerFactory;
 /**
  * @author woemler
  */
-public class CcleMafReader extends StandardRecordFileReader<Mutation> {
+public class CcleMafReader extends StandardRecordFileReader<Mutation> 
+    implements SampleAware {
 
   private static final Logger logger = LoggerFactory.getLogger(CcleMafReader.class);
 
@@ -216,5 +218,9 @@ public class CcleMafReader extends StandardRecordFileReader<Mutation> {
   public Class<Mutation> getModel() {
     return Mutation.class;
   }
-  
+
+  @Override
+  public List<Sample> getSamples() {
+    return new ArrayList<>(sampleMap.values());
+  }
 }

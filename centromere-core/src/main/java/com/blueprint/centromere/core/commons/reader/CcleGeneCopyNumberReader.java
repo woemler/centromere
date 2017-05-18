@@ -23,6 +23,7 @@ import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.CcleSupport;
+import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.reader.MultiRecordLineFileReader;
 import java.util.ArrayList;
@@ -36,13 +37,14 @@ import org.slf4j.LoggerFactory;
 /**
  * @author woemler
  */
-public class CcleGeneCopyNumberReader extends MultiRecordLineFileReader<GeneCopyNumber> {
+public class CcleGeneCopyNumberReader extends MultiRecordLineFileReader<GeneCopyNumber> 
+    implements SampleAware {
   
   private static final Logger logger = LoggerFactory.getLogger(CcleGeneCopyNumberReader.class);
   
   private final GeneRepository geneRepository;
   private final CcleSupport support;
-  private Map<Integer, String> samples = new HashMap<>();
+  private Map<Integer, Sample> samples = new HashMap<>();
 
   public CcleGeneCopyNumberReader(SubjectRepository subjectRepository,
       SampleRepository sampleRepository, GeneRepository geneRepository) {
@@ -61,15 +63,10 @@ public class CcleGeneCopyNumberReader extends MultiRecordLineFileReader<GeneCopy
     List<GeneCopyNumber> records = new ArrayList<>();
 
     Gene gene = null;
-    Optional<Gene> optional = geneRepository.findByPrimaryReferenceId(bits[0]);
+    Optional<Gene> optional = geneRepository.bestGuess(bits[0]);
     if (optional.isPresent()){
       gene = optional.get();
-    } else {
-      List<Gene> genes = geneRepository.guess(bits[1]);
-      if (!genes.isEmpty()){
-        gene = genes.get(0);
-      }
-    }
+    } 
     if (this.getImportOptions().isInvalidGene(gene)){
       if (this.getImportOptions().skipInvalidGenes()){
         logger.warn("Skipping unknown gene: %s %s", bits[0], bits[1]);
@@ -82,7 +79,7 @@ public class CcleGeneCopyNumberReader extends MultiRecordLineFileReader<GeneCopy
     for (int i = 2; i < bits.length; i++){
       GeneCopyNumber record = new GeneCopyNumber();
       if (samples.containsKey(i)){
-        record.setSampleId(samples.get(i));
+        record.setSampleId(samples.get(i).getId());
       } else {
         continue;
       }
@@ -116,7 +113,7 @@ public class CcleGeneCopyNumberReader extends MultiRecordLineFileReader<GeneCopy
     for (int i = 2; i < bits.length; i++){
       Optional<Sample> optional = support.fetchOrCreateSample(bits[i], this.getDataSet());
       if (optional.isPresent()){
-        samples.put(i, optional.get().getId());
+        samples.put(i, optional.get());
       } else {
         if (!this.getImportOptions().skipInvalidSamples()){
           throw new DataImportException(String.format("Unable to identify subject for sample: %s", bits[i]));
@@ -132,5 +129,9 @@ public class CcleGeneCopyNumberReader extends MultiRecordLineFileReader<GeneCopy
   protected boolean isSkippableLine(String line) {
     return line.trim().split(this.getDelimiter()).length < 3;
   }
-  
+
+  @Override
+  public List<Sample> getSamples() {
+    return new ArrayList<>(samples.values());
+  }
 }

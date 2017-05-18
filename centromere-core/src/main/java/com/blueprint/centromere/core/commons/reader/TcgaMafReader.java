@@ -23,6 +23,7 @@ import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
+import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.reader.StandardRecordFileReader;
@@ -40,7 +41,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author woemler
  */
-public class TcgaMafReader extends StandardRecordFileReader<Mutation>  {
+public class TcgaMafReader extends StandardRecordFileReader<Mutation> implements SampleAware {
 
   private static final Logger logger = LoggerFactory.getLogger(TcgaMafReader.class);
 
@@ -219,4 +220,8 @@ public class TcgaMafReader extends StandardRecordFileReader<Mutation>  {
     return Mutation.class;
   }
 
+  @Override
+  public List<Sample> getSamples() {
+    return new ArrayList<>(sampleMap.values());
+  }
 }

@@ -51,5 +51,18 @@ public interface SampleRepository extends
 		samples.addAll(findBySampleType(keyword));
 		return samples;
 	}
+
+  @Override
+  default Optional<Sample> bestGuess(String keyword){
+    List<Sample> samples = findByName(keyword);
+    if (!samples.isEmpty()) return Optional.of(samples.get(0));
+    samples = findByTissue(keyword);
+    if (!samples.isEmpty()) return Optional.of(samples.get(0));
+    samples = findByHistology(keyword);
+    if (!samples.isEmpty()) return Optional.of(samples.get(0));
+    samples = findBySampleType(keyword);
+    if (!samples.isEmpty()) return Optional.of(samples.get(0));
+    return Optional.empty();
+  }
 	
 }

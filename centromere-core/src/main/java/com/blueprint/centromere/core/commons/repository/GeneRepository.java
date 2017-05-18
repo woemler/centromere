@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.data.rest.core.annotation.RestResource;
 
 /**
  * @author woemler
@@ -78,5 +77,36 @@ public interface GeneRepository extends
 		return genes;
 
 	}
+
+  @Override
+  default Optional<Gene> bestGuess(String keyword){
+
+    PathBuilder<Gene> pathBuilder = new PathBuilder<>(Gene.class, "gene");
+    Expression constant = Expressions.constant(keyword);
+
+    Predicate predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE,
+        pathBuilder.getString("primaryReferenceId"), constant);
+    List<Gene> genes = (List<Gene>) findAll(predicate);
+    if (!genes.isEmpty()){
+      return Optional.of(genes.get(0));
+    }
+
+    predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE,
+        pathBuilder.getString("primaryGeneSymbol"), constant);
+    genes = (List<Gene>) findAll(predicate);
+    if (!genes.isEmpty()){
+      return Optional.of(genes.get(0));
+    }
+
+    predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE,
+        pathBuilder.getList("aliases", String.class).any(), constant);
+    genes = (List<Gene>) findAll(predicate);
+    if (!genes.isEmpty()){
+      return Optional.of(genes.get(0));
+    }
+
+    return Optional.empty();
+
+  }
 
 }

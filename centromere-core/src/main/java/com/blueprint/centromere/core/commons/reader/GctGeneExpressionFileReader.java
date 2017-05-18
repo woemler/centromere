@@ -149,15 +149,14 @@ public class GctGeneExpressionFileReader
 		Gene gene = null;
 		String[] b = line.split(getDelimiter());
 		if (b.length > 1){
-			List<Gene> genes = null;
+			Optional<Gene> optional;
 			if (!b[0].equals("")){
-				genes = geneRepository.guess(b[0]);
+				optional = geneRepository.bestGuess(b[0]);
+				if (optional.isPresent()) gene = optional.get();
 			}
-			if (genes == null || genes.isEmpty()){
-				genes = geneRepository.guess(b[1]);
-			}
-			if (genes.size() > 0){
-				gene = genes.get(0);
+			if (gene == null){
+				optional = geneRepository.bestGuess(b[1]);
+				if (optional.isPresent()) gene = optional.get();
 			}
 		}
 		return gene;

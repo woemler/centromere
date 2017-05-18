@@ -146,8 +146,7 @@ public class GenericRecordProcessor<T extends Model<?>>
   /**
    * {@link #doBefore(Object...)}
    */
-	public void doBefore(File inputFile, DataFile dataFile, DataSet dataSet, Object... args) 
-       {
+	public void doBefore(File inputFile, DataFile dataFile, DataSet dataSet, Object... args) {
 	  List<Object> objects = Arrays.asList(inputFile, dataFile, dataSet);
 	  objects.addAll(Arrays.asList(args));
 	  Object[] arguments = new Object[objects.size()];

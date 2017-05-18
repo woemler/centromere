@@ -114,6 +114,7 @@ public class FileImportExecutor implements EnvironmentAware {
           Printer.print(String.format("Data is not overwritable.  Exiting."), logger, WARN);
           return;
         }
+        dataFile.setDateCreated(df.getDateCreated());
         dataFileRepository.delete(df);
         dataFile = dataFileRepository.insert(dataFile);
       } else {
