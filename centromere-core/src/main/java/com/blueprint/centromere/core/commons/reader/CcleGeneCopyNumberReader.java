@@ -80,6 +80,7 @@ public class CcleGeneCopyNumberReader extends MultiRecordLineFileReader<GeneCopy
       GeneCopyNumber record = new GeneCopyNumber();
       if (samples.containsKey(i)){
         record.setSampleId(samples.get(i).getId());
+        record.setSubjectId(samples.get(i).getSubjectId());
       } else {
         continue;
       }

@@ -18,6 +18,7 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.model.Model;
 import java.util.List;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 /**
  * @author woemler
@@ -27,10 +28,12 @@ import java.util.List;
 public interface DataOperations<T extends Model<?>> {
 	List<T> findByDataFileId(String dataFileId);
 	List<T> findBySampleId(String sampleId);
+	List<T> findBySubjectId(String subjectId);
 	List<T> findByGeneId(String geneId);
 	List<T> findByDataSetId(String dataSetId);
-	void deleteByDataFileId(String dataFileId);
-  void deleteBySampleId(String sampleId);
-  void deleteByGeneId(String geneId);
-  void deleteByDataSetId(String dataSetId);
+	@RestResource(exported = false) void deleteByDataFileId(String dataFileId);
+  @RestResource(exported = false) void deleteBySampleId(String sampleId);
+  @RestResource(exported = false) void deleteBySubjectId(String subjectId);
+  @RestResource(exported = false) void deleteByGeneId(String geneId);
+  @RestResource(exported = false) void deleteByDataSetId(String dataSetId);
 }

@@ -2,6 +2,7 @@ package com.blueprint.centromere.tests.ws;
 
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import com.blueprint.centromere.ws.CentromereWebInitializer;
+import com.blueprint.centromere.ws.config.SwaggerConfig;
 import com.blueprint.centromere.ws.config.WebApplicationConfig;
 import com.blueprint.centromere.ws.config.WebSecurityConfig;
 import org.springframework.boot.SpringApplication;
@@ -14,7 +15,12 @@ import org.springframework.context.annotation.Import;
  */
 @SpringBootApplication
 @Configuration
-@Import({ MongoDataSourceConfig.class, WebApplicationConfig.class, WebSecurityConfig.class})
+@Import({
+    MongoDataSourceConfig.class,
+    WebApplicationConfig.class,
+    WebSecurityConfig.class,
+    SwaggerConfig.class
+})
 public class TestInitializer extends CentromereWebInitializer {
 
   public static void main(String[] args) {

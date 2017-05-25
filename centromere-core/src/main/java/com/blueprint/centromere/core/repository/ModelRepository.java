@@ -110,7 +110,7 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
   }
 
   /**
-   * Searches for all records that satisfy the requested criteria, and returns them in the 
+   * Searches for all records that satisfy the requested criteria, and returns them in the
    *   requested order.
    *
    * @param queryCriterias {@link QueryCriteria}
@@ -128,7 +128,7 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
    *
    * @param queryCriterias {@link QueryCriteria}
    * @param pageable {@link Pageable}
-   * @return {@link Page} containing the desired set of records. 
+   * @return {@link Page} containing the desired set of records.
    */
   default Page<T> find(Iterable<QueryCriteria> queryCriterias, Pageable pageable){
     return this.findAll(getPredicateFromQueryCriteria(queryCriterias), pageable);
@@ -216,18 +216,18 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
   <S extends T> Iterable<S> update(Iterable<S> entities);
 
   /**
-   * Converts one or more {@link QueryCriteria} objects into a Querydsl {@link Predicate} for 
+   * Converts one or more {@link QueryCriteria} objects into a Querydsl {@link Predicate} for
    *   query execution.
-   * 
+   *
    * @param queryCriterias
    * @return
    */
   default Predicate getPredicateFromQueryCriteria(Iterable<QueryCriteria> queryCriterias){
 
     BooleanBuilder builder = new BooleanBuilder();
-    
+
     for (QueryCriteria queryCriteria: queryCriterias) {
-      
+
       BooleanExpression expression = null;
       Path path = queryCriteria.getPath();
 
@@ -301,7 +301,7 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
       }
       if (expression != null) builder.and(expression);
     }
-    
+
     return builder.getValue();
 
   }

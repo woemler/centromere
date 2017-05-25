@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 /**
  * File reader for mutation annotation format (MAF) files.  Supports generic MAF files, as well
@@ -157,13 +158,15 @@ public class TcgaMafReader extends StandardRecordFileReader<Mutation> implements
   private List<AlternateTranscript> parseAlternateTranscripts(String line){
     List<AlternateTranscript> transcripts = new ArrayList<>();
     String otherTranscripts = getColumnValue(line, "other_transcripts");
-    for (String ot: otherTranscripts.split("\\|")){
-      String[] bits = ot.split("_");
-      AlternateTranscript transcript = new AlternateTranscript();
-      transcript.setGeneSymbol(bits[0]);
-      transcript.setTranscriptId(bits[1]);
-      //transcript.set
-      transcripts.add(transcript);
+    if (otherTranscripts != null && !otherTranscripts.trim().equals("")) {
+      for (String ot : otherTranscripts.split("\\|")) {
+        String[] bits = ot.split("_");
+        AlternateTranscript transcript = new AlternateTranscript();
+        transcript.setGeneSymbol(bits[0]);
+        transcript.setTranscriptId(bits[1]);
+        //transcript.set
+        transcripts.add(transcript);
+      }
     }
     return transcripts;
   }

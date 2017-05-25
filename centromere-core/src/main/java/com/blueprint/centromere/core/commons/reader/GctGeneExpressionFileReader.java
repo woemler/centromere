@@ -135,8 +135,10 @@ public class GctGeneExpressionFileReader
 				}
 				
 				record.setDataFileId(dataFile.getId());
+				record.setDataSetId(getDataSet().getId());
 				record.setGeneId(gene.getId());
 				record.setSampleId(sample.getId());
+				record.setSubjectId(sample.getSubjectId());
 				records.add(record);
 				
 			}

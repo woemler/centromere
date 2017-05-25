@@ -33,6 +33,10 @@ public abstract class Data extends AbstractModel {
 	@Linked(model = Sample.class)
 	private String sampleId;
 
+  @Indexed
+  @Linked(model = Subject.class)
+  private String subjectId;
+
 	@Indexed
 	@Linked(model = DataFile.class)
 	private String dataFileId;
@@ -53,7 +57,15 @@ public abstract class Data extends AbstractModel {
 		this.sampleId = sampleId;
 	}
 
-	public String getDataFileId() {
+  public String getSubjectId() {
+    return subjectId;
+  }
+
+  public void setSubjectId(String subjectId) {
+    this.subjectId = subjectId;
+  }
+
+  public String getDataFileId() {
 		return dataFileId;
 	}
 

@@ -17,6 +17,7 @@
 package com.blueprint.centromere.ws.controller;
 
 import com.blueprint.centromere.core.commons.repository.MetadataOperations;
+import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.google.common.collect.Sets;
@@ -71,7 +72,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class ModelController {
 
   private static final Logger logger = LoggerFactory.getLogger(ModelController.class);
-  private static final String BASE_URL = "/{repository}";
+  private static final String BASE_URL = "/{repository}/search";
 
   private final List<String> halMediaTypes = Arrays.asList(MediaTypes.HAL_JSON_VALUE, "application/hal+json;charset=utf8");
 
@@ -80,18 +81,26 @@ public class ModelController {
   @Autowired private RepositoryEntityLinks entityLinks;
   @Autowired private RepositoryRestConfiguration config;
 
-
   @SuppressWarnings("unchecked")
   @RequestMapping(value = BASE_URL+"/guess", method = RequestMethod.GET)
-  public HttpEntity guess(
+  public HttpEntity<Resources<?>> guess(
       RootResourceInformation resourceInformation,
       @RequestParam(name = "keyword") String keyword,
       PersistentEntityResourceAssembler assembler
   ) throws ResourceNotFoundException, HttpRequestMethodNotSupportedException {
+
     Class<?> model = resourceInformation.getDomainType();
+    if (model == null) {
+      throw new ResourceNotFoundException();
+    }
+
     Object repo = repositories.getRepositoryFor(model);
-    if (repo == null || !(repo instanceof MetadataOperations)) throw new ResourceNotFoundException();
+    if (repo == null || !(repo instanceof MetadataOperations)) {
+      throw new ResourceNotFoundException();
+    }
+
     List<Object> results = (List<Object>) ((MetadataOperations) repo).guess(keyword);
+
     Link baseLink = entityLinks.linkToPagedResource(resourceInformation.getDomainType(), null);
     Resources<?> resources = toResources(results, model, assembler,  baseLink);
     resources.add(getCollectionResourceLinks(resourceInformation));
@@ -101,11 +110,11 @@ public class ModelController {
 
   @SuppressWarnings("unchecked")
   @RequestMapping(value = BASE_URL+"/distinct", method = RequestMethod.GET)
-  public HttpEntity distinct(
+  public HttpEntity<Collection<Object>> distinct(
       @QuerydslPredicate RootResourceInformation resourceInformation,
       @RequestParam MultiValueMap<String, String> parameters
   ) throws ResourceNotFoundException, NoSuchMethodException {
-      
+
     if (!parameters.containsKey("field") || parameters.get("field").isEmpty() ||
         parameters.get("field").get(0).trim().equals("")) {
         throw new ResourceNotFoundException("Parameter 'field' not present.");
@@ -114,9 +123,22 @@ public class ModelController {
     parameters.remove("field");
 
     Class<?> model = resourceInformation.getDomainType();
-    if (model == null) throw new ResourceNotFoundException();
+    if (model == null) {
+      throw new ResourceNotFoundException();
+    }
+
+//    try {
+//      model.getClass().getDeclaredField(field);
+//    } catch (NoSuchFieldException e){
+//      logger.warn(String.format("Unable to find field %s for model %s", field, model.getName()));
+//      return new ResponseEntity<>(HttpStatus.BAD_REQUEST); //TODO: more informative response and/or exception
+//    }
+
     Object repo = repositories.getRepositoryFor(model);
-    if (repo == null || !(repo instanceof ModelRepository)) throw new ResourceNotFoundException();
+    if (repo == null || !(repo instanceof ModelRepository)) {
+      throw new ResourceNotFoundException();
+    }
+
     ModelRepository repository = (ModelRepository) repo;
     List<QueryCriteria> criterias = QueryUtils.getQueryCriteriaFromRequestParameters(model, parameters);
     Set<Object> distinct =  repository.distinct(field, criterias);

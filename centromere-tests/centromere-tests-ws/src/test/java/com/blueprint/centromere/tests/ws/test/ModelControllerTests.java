@@ -56,7 +56,7 @@ import org.springframework.web.context.WebApplicationContext;
 		MongoDataSourceConfig.class,
 		WebApplicationConfig.class
 })
-@ActiveProfiles({ Profiles.WEB_PROFILE, Profiles.NO_SECURITY })
+@ActiveProfiles({ Profiles.WEB_PROFILE, Profiles.NO_SECURITY, Profiles.API_DOCUMENTATION_DISABLED_PROFILE })
 public class ModelControllerTests extends AbstractRepositoryTests {
 	
 	private static final String BASE_URL = "/api/genes";

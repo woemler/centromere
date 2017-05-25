@@ -60,7 +60,7 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestInitializer.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(value = { Profiles.WEB_PROFILE, Profiles.NO_SECURITY })
+@ActiveProfiles(value = { Profiles.WEB_PROFILE, Profiles.NO_SECURITY, Profiles.API_DOCUMENTATION_DISABLED_PROFILE })
 @AutoConfigureMockMvc
 public class DefaultControllerTests extends AbstractRepositoryTests {
 

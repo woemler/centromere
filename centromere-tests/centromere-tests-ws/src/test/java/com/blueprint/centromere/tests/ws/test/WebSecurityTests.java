@@ -52,7 +52,7 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { TestInitializer.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(value = {Profiles.WEB_PROFILE, Profiles.SECURE_READ_WRITE_PROFILE})
+@ActiveProfiles(value = {Profiles.WEB_PROFILE, Profiles.SECURE_READ_WRITE_PROFILE, Profiles.API_DOCUMENTATION_DISABLED_PROFILE})
 @AutoConfigureMockMvc
 @SuppressWarnings("SpringJavaAutowiringInspection")
 public class WebSecurityTests {

@@ -30,8 +30,19 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface Linked {
 
+  /**
+   * The {@link Model} class type that the annotated field references.
+   *
+   * @return
+   */
   Class<?> model();
-  
+
+  /**
+   * Field name in the source {@link Model} type that the annotated field references.  Used to
+   *   construct the query string parameters in the assembled link.
+   *
+   * @return
+   */
   String field() default "id";
   
 }

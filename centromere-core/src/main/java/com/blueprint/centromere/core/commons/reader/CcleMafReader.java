@@ -79,6 +79,7 @@ public class CcleMafReader extends StandardRecordFileReader<Mutation>
       }
     } else {
       mutation.setSampleId(sample.getId());
+      mutation.setSubjectId(sample.getSubjectId());
     }
 
     Gene gene = getGeneFromLine(line);
