@@ -18,41 +18,28 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Ops;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.MapPath;
-import com.querydsl.core.types.dsl.PathBuilder;
+import com.blueprint.centromere.core.repository.Evaluation;
+import com.blueprint.centromere.core.repository.ModelRepository;
+import com.blueprint.centromere.core.repository.QueryCriteria;
+import java.util.Collections;
 import java.util.List;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
 /**
  * @author woemler
  */
-public interface AttributeOperations<T extends Model<?>> 
-    extends ModelSupport<T>, QueryDslPredicateExecutor<T> {
+public interface AttributeOperations<T extends Model<?>> extends ModelSupport<T>{
 
 	@SuppressWarnings("unchecked")
 	default List<T> findWithAttribute(@Param("name") String name){
-		PathBuilder<T> pathBuilder = new PathBuilder<>(this.getModel(),
-				this.getModel().getSimpleName().toLowerCase());
-		MapPath<String, String, PathBuilder<String>> mapPath
-				= pathBuilder.getMap("attributes", String.class, String.class);
-		Predicate predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE, mapPath.containsKey(name));
-		return (List<T>) ((QueryDslPredicateExecutor) this).findAll(predicate);
+    QueryCriteria criteria = new QueryCriteria("attributes."+name, null, Evaluation.NOT_NULL);
+    return (List<T>) ((ModelRepository) this).find(Collections.singleton(criteria));
 	}
 
 	@SuppressWarnings("unchecked")
 	default List<T> findByAttribute(@Param("name") String name, @Param("value") String value){
-    PathBuilder<T> pathBuilder = new PathBuilder<>(this.getModel(),
-        this.getModel().getSimpleName().toLowerCase());
-    MapPath<String, String, PathBuilder<String>> mapPath
-        = pathBuilder.getMap("attributes", String.class, String.class);
-    Expression<String> constant = Expressions.constant(value);
-    Predicate predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE, mapPath.get(name), constant);
-    return (List<T>) ((QueryDslPredicateExecutor) this).findAll(predicate);
+    QueryCriteria criteria = new QueryCriteria("attributes."+name, value);
+    return (List<T>) ((ModelRepository) this).find(Collections.singleton(criteria));
 	}
 
 }

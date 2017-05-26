@@ -18,17 +18,17 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.Subject;
 import com.blueprint.centromere.core.repository.ModelRepository;
+import com.blueprint.centromere.core.repository.ModelResource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 /**
  * @author woemler
  */
-@RepositoryRestResource(path = "subjects", collectionResourceRel = "subjects")
+@ModelResource("subjects")
 public interface SubjectRepository
 		extends ModelRepository<Subject, String>,
 		MetadataOperations<Subject>,

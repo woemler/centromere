@@ -35,7 +35,7 @@ public @interface Linked {
    *
    * @return
    */
-  Class<?> model();
+  Class<? extends Model<?>> model();
 
   /**
    * Field name in the source {@link Model} type that the annotated field references.  Used to
@@ -44,5 +44,7 @@ public @interface Linked {
    * @return
    */
   String field() default "id";
+
+  String rel() default "";
   
 }

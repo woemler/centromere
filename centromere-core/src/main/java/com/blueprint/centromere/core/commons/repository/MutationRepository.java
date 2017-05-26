@@ -18,13 +18,13 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.Mutation;
 import com.blueprint.centromere.core.repository.ModelRepository;
+import com.blueprint.centromere.core.repository.ModelResource;
 import java.util.List;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 /**
  * @author woemler
  */
-@RepositoryRestResource(path = "mutations", collectionResourceRel = "mutations")
+@ModelResource("mutations")
 public interface MutationRepository extends ModelRepository<Mutation, String>,
     DataOperations<Mutation> {
   List<Mutation> findByVariantClassification(String variantClassification);

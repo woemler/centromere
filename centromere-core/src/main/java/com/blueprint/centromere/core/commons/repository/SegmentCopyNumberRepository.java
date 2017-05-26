@@ -18,12 +18,12 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.SegmentCopyNumber;
 import com.blueprint.centromere.core.repository.ModelRepository;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import com.blueprint.centromere.core.repository.ModelResource;
 
 /**
  * @author woemler
  */
-@RepositoryRestResource(path = "segmentcopynumber", collectionResourceRel = "segmentCopyNumber")
+@ModelResource("segmentcopynumber")
 public interface SegmentCopyNumberRepository extends ModelRepository<SegmentCopyNumber, String>,
 		DataOperations<SegmentCopyNumber> {
 }

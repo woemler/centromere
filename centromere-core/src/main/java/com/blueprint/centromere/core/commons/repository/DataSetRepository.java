@@ -18,15 +18,15 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.repository.ModelRepository;
+import com.blueprint.centromere.core.repository.ModelResource;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 /**
  * @author woemler
  */
-@RepositoryRestResource(path = "datasets", collectionResourceRel = "dataSets")
+@ModelResource("datasets")
 public interface DataSetRepository extends ModelRepository<DataSet, String> {
 	Optional<DataSet> findByShortName(String shortName); 
 	List<DataSet> findByDisplayName(String name);

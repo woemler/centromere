@@ -18,16 +18,16 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.repository.ModelRepository;
+import com.blueprint.centromere.core.repository.ModelResource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 /**
  * @author woemler
  */
-@RepositoryRestResource(path = "samples", collectionResourceRel = "samples")
+@ModelResource("samples")
 public interface SampleRepository extends
 		ModelRepository<Sample, String>,
 		MetadataOperations<Sample>,

@@ -16,17 +16,14 @@
 
 package com.blueprint.centromere.core.repository;
 
+import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Model;
-import com.querydsl.core.types.Path;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.PathBuilder;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.rest.core.annotation.RestResource;
 
 /**
  * POJO that describes a model query parameter, used when reflecting {@link com.blueprint.centromere.core.model.Model}
@@ -38,16 +35,13 @@ import org.springframework.data.rest.core.annotation.RestResource;
 public class QueryParameterDescriptor {
 
   private String name;
-  private Path path;
   private Class<?> type;
   private Evaluation evaluation;
 
   public QueryParameterDescriptor() { }
 
-  public QueryParameterDescriptor(String name, Path path, Class<?> type,
-      Evaluation evaluation) {
+  public QueryParameterDescriptor(String name, Class<?> type, Evaluation evaluation) {
     this.name = name;
-    this.path = path;
     this.type = type;
     this.evaluation = evaluation;
   }
@@ -58,14 +52,6 @@ public class QueryParameterDescriptor {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public Path getPath() {
-    return path;
-  }
-
-  public void setPath(Path path) {
-    this.path = path;
   }
 
   public Class<?> getType() {
@@ -88,7 +74,6 @@ public class QueryParameterDescriptor {
   public String toString() {
     return "QueryParameterDescriptor{" +
         "name='" + name + '\'' +
-        ", path=" + path +
         ", type=" + type +
         ", evaluation=" + evaluation +
         '}';
@@ -104,48 +89,32 @@ public class QueryParameterDescriptor {
   public static Map<String,QueryParameterDescriptor> getModelQueryDescriptors(Class<?> model){
 
     Map<String,QueryParameterDescriptor> paramMap = new HashMap<>();
-    PathBuilder pathBuilder = new PathBuilder<>(model, model.getSimpleName());
-    Path root = Expressions.path(model, model.getSimpleName());
     Class<?> currentClass = model;
 
     while (currentClass.getSuperclass() != null) {
 
       for (Field field : currentClass.getDeclaredFields()) {
 
-        String fieldName = field.getName();
-        String paramName = fieldName;
+        String paramName = field.getName();
         Class<?> type = field.getType();
         Class<?> paramType = type;
-        Path path = null;
 
-        if (field.isSynthetic() || field.isAnnotationPresent(Transient.class))
-          continue;
-        if (field.isAnnotationPresent(RestResource.class)) {
-          RestResource restResource = field.getAnnotation(RestResource.class);
-          if (!restResource.exported())
-            continue;
-        }
+        if (field.isSynthetic() || field.isAnnotationPresent(Transient.class)) continue;
+        if (field.isAnnotationPresent(Ignored.class)) continue;
 
-        if (String.class.isAssignableFrom(type)){
-          path = Expressions.stringPath(root, fieldName);
-        } else if (Number.class.isAssignableFrom(type)) {
-          path = pathBuilder.getNumber(fieldName, type);
-        } else if (Map.class.isAssignableFrom(type)){
+        if (Map.class.isAssignableFrom(type)){
           ParameterizedType pType = (ParameterizedType) field.getGenericType();
           Class<?> keyType = pType.getActualTypeArguments()[0].getClass();
           Class<?> valueType = pType.getActualTypeArguments()[1].getClass();
-          path = pathBuilder.getMap(fieldName, keyType, valueType);
           paramType = valueType;
         } else if (Collection.class.isAssignableFrom(type)) {
           ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
           paramType = (Class<?>) parameterizedType.getActualTypeArguments()[0];
-          path = pathBuilder.getList(fieldName, paramType);
         }
 
         QueryParameterDescriptor descriptor = new QueryParameterDescriptor();
         descriptor.setName(paramName);
         descriptor.setType(paramType);
-        descriptor.setPath(path);
         descriptor.setEvaluation(Evaluation.EQUALS);
         paramMap.put(paramName, descriptor);
 

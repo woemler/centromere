@@ -18,22 +18,18 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.repository.ModelRepository;
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Ops;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.MapPath;
-import com.querydsl.core.types.dsl.PathBuilder;
+import com.blueprint.centromere.core.repository.ModelResource;
+import com.blueprint.centromere.core.repository.QueryCriteria;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 /**
  * @author woemler
  */
-@RepositoryRestResource(path = "genes", collectionResourceRel = "genes")
+@ModelResource("genes")
 public interface GeneRepository extends
 		ModelRepository<Gene, String>,
 		MetadataOperations<Gene>,
@@ -46,34 +42,19 @@ public interface GeneRepository extends
 	List<Gene> findByAliases(@Param("alias") String alias);
 
 	default List<Gene> findByExternalReference(@Param("source") String source, @Param("value") String value){
-		PathBuilder<Gene> pathBuilder = new PathBuilder<>(Gene.class, "gene");
-		MapPath<String, String, PathBuilder<String>> mapPath
-				= pathBuilder.getMap("externalReferences", String.class, String.class);
-		Expression<String> constant = Expressions.constant(value);
-		Predicate predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE, mapPath.get(source), constant);
-		return (List<Gene>) this.findAll(predicate);
+    QueryCriteria criteria = new QueryCriteria("externalReferences."+source, value);
+	  return (List<Gene>) this.find(Collections.singleton(criteria));
 	}
 
 	@Override
 	default List<Gene> guess(@Param("keyword") String keyword){
-
 		List<Gene> genes = new ArrayList<>();
-
-		PathBuilder<Gene> pathBuilder = new PathBuilder<>(Gene.class, "gene");
-		Expression constant = Expressions.constant(keyword);
-
-		Predicate predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE,
-				pathBuilder.getString("primaryReferenceId"), constant);
-		genes.addAll((List<Gene>) findAll(predicate));
-
-		predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE,
-				pathBuilder.getString("primaryGeneSymbol"), constant);
-		genes.addAll((List<Gene>) findAll(predicate));
-
-		predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE,
-				pathBuilder.getList("aliases", String.class).any(), constant);
-		genes.addAll((List<Gene>) findAll(predicate));
-
+		QueryCriteria criteria = new QueryCriteria("primaryReferenceId", keyword);
+		genes.addAll((List<Gene>) find(Collections.singleton(criteria)));
+    criteria = new QueryCriteria("primaryGeneSymbol", keyword);
+    genes.addAll((List<Gene>) find(Collections.singleton(criteria)));
+    criteria = new QueryCriteria("aliases", keyword);
+    genes.addAll((List<Gene>) find(Collections.singleton(criteria)));
 		return genes;
 
 	}
@@ -81,26 +62,22 @@ public interface GeneRepository extends
   @Override
   default Optional<Gene> bestGuess(String keyword){
 
-    PathBuilder<Gene> pathBuilder = new PathBuilder<>(Gene.class, "gene");
-    Expression constant = Expressions.constant(keyword);
+    List<Gene> genes = new ArrayList<>();
 
-    Predicate predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE,
-        pathBuilder.getString("primaryReferenceId"), constant);
-    List<Gene> genes = (List<Gene>) findAll(predicate);
+    QueryCriteria criteria = new QueryCriteria("primaryReferenceId", keyword);
+    genes.addAll((List<Gene>) find(Collections.singleton(criteria)));
     if (!genes.isEmpty()){
       return Optional.of(genes.get(0));
     }
 
-    predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE,
-        pathBuilder.getString("primaryGeneSymbol"), constant);
-    genes = (List<Gene>) findAll(predicate);
+    criteria = new QueryCriteria("primaryGeneSymbol", keyword);
+    genes.addAll((List<Gene>) find(Collections.singleton(criteria)));
     if (!genes.isEmpty()){
       return Optional.of(genes.get(0));
     }
 
-    predicate = Expressions.predicate(Ops.EQ_IGNORE_CASE,
-        pathBuilder.getList("aliases", String.class).any(), constant);
-    genes = (List<Gene>) findAll(predicate);
+    criteria = new QueryCriteria("aliases", keyword);
+    genes.addAll((List<Gene>) find(Collections.singleton(criteria)));
     if (!genes.isEmpty()){
       return Optional.of(genes.get(0));
     }

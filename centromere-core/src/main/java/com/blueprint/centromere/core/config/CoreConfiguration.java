@@ -18,10 +18,13 @@ package com.blueprint.centromere.core.config;
 
 import com.blueprint.centromere.core.repository.MongoModelRepository;
 import com.blueprint.centromere.core.repository.MongoModelRepositoryFactoryBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.data.repository.support.Repositories;
 
 /**
  * Configures required components, such as repositories and data import beans.
@@ -51,5 +54,15 @@ public class CoreConfiguration {
     }
 
 	}
+
+	@Configuration
+  public static class CommonConfiguration {
+
+    @Bean
+    public ModelRepositoryRegistry modelRepositoryRegistry(ApplicationContext applicationContext){
+      return new ModelRepositoryRegistry(applicationContext);
+    }
+
+  }
 
 }

@@ -18,13 +18,8 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.User;
 import com.blueprint.centromere.core.repository.ModelRepository;
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Ops;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.PathBuilder;
-import com.querydsl.core.types.dsl.StringPath;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import com.blueprint.centromere.core.repository.ModelResource;
+import java.util.Optional;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -32,17 +27,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
  * @author woemler
  * @since 0.5.0
  */
-@RepositoryRestResource(path = "users", collectionResourceRel = "users", exported = false)
+@ModelResource(name = "users", ignored = true)
 public interface UserRepository extends ModelRepository<User, String>, UserDetailsService {
+
+  Optional<User> findByUsername(String username);
 
 	@Override 
 	default User loadUserByUsername(String username) throws UsernameNotFoundException {
-		PathBuilder<User> pathBuilder = new PathBuilder<>(User.class, "user");
-		StringPath stringPath = pathBuilder.getString("username");
-		Expression<String> constant = Expressions.constant(username);
-		Predicate predicate = Expressions.predicate(Ops.EQ, stringPath, constant);
-		User user = this.findOne(predicate);
-		if (user == null) throw new UsernameNotFoundException(String.format("Cannot find user: %s", username));
-		return user;
+    Optional<User> optional = findByUsername(username);
+		return optional.isPresent() ? optional.get() : null;
 	}
 }

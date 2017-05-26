@@ -18,12 +18,12 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.repository.ModelRepository;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import com.blueprint.centromere.core.repository.ModelResource;
 
 /**
  * @author woemler
  */
-@RepositoryRestResource(path = "geneexpression", collectionResourceRel = "geneExpression")
+@ModelResource("geneexpression")
 public interface GeneExpressionRepository extends ModelRepository<GeneExpression, String>,
 		DataOperations<GeneExpression> {
 }

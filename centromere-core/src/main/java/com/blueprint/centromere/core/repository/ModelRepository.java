@@ -20,16 +20,6 @@ import com.blueprint.centromere.core.exceptions.QueryParameterException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
 import com.google.common.collect.Iterables;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.EntityPath;
-import com.querydsl.core.types.Path;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.ListPath;
-import com.querydsl.core.types.dsl.MapPath;
-import com.querydsl.core.types.dsl.NumberPath;
-import com.querydsl.core.types.dsl.SimplePath;
-import com.querydsl.core.types.dsl.StringPath;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +27,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,9 +35,6 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
-import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -58,13 +44,46 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  */
 @NoRepositoryBean
 public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
-		extends PagingAndSortingRepository<T, ID>, ModelSupport<T>,
-    QueryDslPredicateExecutor<T>, QuerydslBinderCustomizer {
+		extends PagingAndSortingRepository<T, ID>, ModelSupport<T> {
   
   Logger logger = LoggerFactory.getLogger(ModelRepository.class);
 
-  default long count(Predicate predicate){
-    return Iterables.size(findAll(predicate));
+  /**
+   * Searches for all records that satisfy the requested criteria.
+   *
+   * @param queryCriterias {@link QueryCriteria}
+   * @return all matching {@code T} records.
+   */
+  Iterable<T> find(Iterable<QueryCriteria> queryCriterias);
+
+  /**
+   * Searches for all records that satisfy the requested criteria, and returns them in the
+   *   requested order.
+   *
+   * @param queryCriterias {@link QueryCriteria}
+   * @param sort {@link Sort}
+   * @return all matching {@code T} records.
+   */
+  Iterable<T> find(Iterable<QueryCriteria> queryCriterias, Sort sort);
+
+  /**
+   * Searches for all records that satisfy the requested criteria, and returns them as a paged
+   *   collection.
+   *
+   * @param queryCriterias {@link QueryCriteria}
+   * @param pageable {@link Pageable}
+   * @return {@link Page} containing the desired set of records.
+   */
+  Page<T> find(Iterable<QueryCriteria> queryCriterias, Pageable pageable);
+
+  /**
+   * Returns a count of all records that satify the requested criteria.
+   *
+   * @param criterias {@link QueryCriteria}
+   * @return a count of {@code T} records.
+   */
+  default long count(Iterable<QueryCriteria> criterias){
+    return Iterables.size(find(criterias));
   }
 
   /**
@@ -85,78 +104,6 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
     }
     return distinct;
   }
-
-  default Set<Object> distinct(String field, Predicate predicate){
-    HashSet<Object> distinct = new HashSet<>();
-    Sort sort = new Sort(Sort.Direction.ASC, field);
-    for (T obj: findAll(predicate, sort)){
-      BeanWrapper wrapper = new BeanWrapperImpl(obj);
-      if (!wrapper.isReadableProperty(field)){
-        throw new QueryParameterException(String.format("Submitted parameter is not valid entity field: %s", field));
-      }
-      distinct.add(wrapper.getPropertyValue(field));
-    }
-    return distinct;
-  }
-
-  /**
-   * Searches for all records that satisfy the requested criteria.
-   *
-   * @param queryCriterias {@link QueryCriteria}
-   * @return all matching {@code T} records.
-   */
-  default Iterable<T> find(Iterable<QueryCriteria> queryCriterias){
-    return this.findAll(getPredicateFromQueryCriteria(queryCriterias));
-  }
-
-  /**
-   * Searches for all records that satisfy the requested criteria, and returns them in the
-   *   requested order.
-   *
-   * @param queryCriterias {@link QueryCriteria}
-   * @param sort {@link Sort}
-   * @return all matching {@code T} records.
-   */
-  default Iterable<T> find(Iterable<QueryCriteria> queryCriterias, Sort sort){
-    Predicate predicate = getPredicateFromQueryCriteria(queryCriterias);
-    return this.findAll(predicate, sort);
-  }
-
-  /**
-   * Searches for all records that satisfy the requested criteria, and returns them as a paged
-   *   collection.
-   *
-   * @param queryCriterias {@link QueryCriteria}
-   * @param pageable {@link Pageable}
-   * @return {@link Page} containing the desired set of records.
-   */
-  default Page<T> find(Iterable<QueryCriteria> queryCriterias, Pageable pageable){
-    return this.findAll(getPredicateFromQueryCriteria(queryCriterias), pageable);
-  }
-
-  /**
-   * Returns a count of all records that satify the requested criteria.
-   *
-   * @param criterias {@link QueryCriteria}
-   * @return a count of {@code T} records.
-   */
-  default long count(Iterable<QueryCriteria> criterias){
-    return Iterables.size(find(criterias));
-  }
-
-
-//  default Iterable<Object> distinct(String field){
-//    Sort sort = new Sort(Sort.Direction.ASC, field);
-//    HashSet<Object> distinct = new HashSet<>();
-//    for (T obj: findAll(sort)){
-//      BeanWrapper wrapper = new BeanWrapperImpl(obj);
-//      if (!wrapper.isReadableProperty(field)){
-//        throw new QueryParameterException(String.format("Submitted parameter is not valid entity field: %s", field));
-//      }
-//      distinct.add(wrapper.getPropertyValue(field));
-//    }
-//    return distinct;
-//  }
 
   /**
    * Returns a unsorted list of distinct values of the requested field, filtered using a {@link QueryCriteria}
@@ -215,96 +162,7 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
    */
   <S extends T> Iterable<S> update(Iterable<S> entities);
 
-  /**
-   * Converts one or more {@link QueryCriteria} objects into a Querydsl {@link Predicate} for
-   *   query execution.
-   *
-   * @param queryCriterias
-   * @return
-   */
-  default Predicate getPredicateFromQueryCriteria(Iterable<QueryCriteria> queryCriterias){
 
-    BooleanBuilder builder = new BooleanBuilder();
-
-    for (QueryCriteria queryCriteria: queryCriterias) {
-
-      BooleanExpression expression = null;
-      Path path = queryCriteria.getPath();
-
-      if (path instanceof MapPath) {
-        MapPath p = (MapPath) path;
-        String[] bits = queryCriteria.getKey().split("\\.");
-        if (isMultiValue(queryCriteria.getValue())) {
-          expression = p.get(bits[1]).in(queryCriteria.getValue());
-        } else {
-          expression = p.get(bits[1]).eq(queryCriteria.getValue());
-        }
-      } else if (path instanceof ListPath){
-        ListPath p = (ListPath) path;
-        if (isMultiValue(queryCriteria.getValue())){
-          expression = p.any().in(queryCriteria.getValue());
-        } else {
-          expression = p.any().eq(queryCriteria.getValue());
-        }
-      } else if (path instanceof StringPath) {
-        StringPath p = (StringPath) path;
-        switch (queryCriteria.getEvaluation()) {
-          case STARTS_WITH:
-            expression = p.startsWithIgnoreCase((String) queryCriteria.getValue());
-            break;
-          case ENDS_WITH:
-            expression = p.endsWithIgnoreCase((String) queryCriteria.getValue());
-            break;
-          case LIKE:
-            expression = p.likeIgnoreCase((String) queryCriteria.getValue());
-            break;
-          case NOT_LIKE:
-            expression = p.notLike((String) queryCriteria.getValue());
-            break;
-          default:
-            if (isMultiValue(queryCriteria.getValue())){
-              expression = p.in((Collection<? extends String>) queryCriteria.getValue());
-            } else {
-              expression = p.equalsIgnoreCase((String) queryCriteria.getValue());
-            }
-        }
-      } else if (path instanceof NumberPath) {
-        NumberPath p = (NumberPath) path;
-        switch (queryCriteria.getEvaluation()) {
-          case GREATER_THAN:
-            expression = p.gt((Number) queryCriteria.getValue());
-            break;
-          case LESS_THAN:
-            expression = p.lt((Number) queryCriteria.getValue());
-            break;
-          case GREATER_THAN_EQUALS:
-            expression = p.goe((Number) queryCriteria.getValue());
-            break;
-          case LESS_THAN_EQUALS:
-            expression = p.loe((Number) queryCriteria.getValue());
-            break;
-          case BETWEEN:
-            // TODO
-            //List<Number> n =  (List<Number>) getCollection(queryCriteria.getValue());
-            //expression = p.between((Number) queryCriteria.getValue());
-            break;
-          case OUTSIDE:
-            // TODO
-            //expression = p.notBetween();
-            break;
-          default:
-            expression = p.eq((Number) queryCriteria.getValue());
-        }
-      } else {
-        SimplePath p = (SimplePath) path;
-        expression = p.eq(queryCriteria.getValue());
-      }
-      if (expression != null) builder.and(expression);
-    }
-
-    return builder.getValue();
-
-  }
 
   static List<Object> getCollection(Object val){
     if (val instanceof Collection){
@@ -320,80 +178,7 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
     return val.getClass().isArray() || val instanceof Collection;
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  default void customize(QuerydslBindings bindings, EntityPath entityPath){
 
-    // String properties
-    bindings.bind(String.class).all((path, strings) -> {
-      logger.info(String.format("Path=%s  Values=%s", path.toString(), strings.toString()));
-      List<Object> value = new ArrayList<>(strings);
-      List<String> values;
-      Object o = value.get(0); // only the first occurrence of a query parameter is accepted
-      if (path instanceof MapPath) {
-        MapPath p = (MapPath) path;
-        if (o instanceof String) {
-          String s = (String) o;
-          String key = s.split(":")[0];
-          values = Arrays.asList(s.split(":")[1].split(","));
-          if (values.size() > 1) {
-            return p.get(key).in(values);
-          } else {
-            return p.get(key).eq(values.get(0));
-          }
-        } else if (o instanceof Map){
-          String key = null;
-          values = new ArrayList<>();
-          Map<String, String> map = (Map<String, String>) o;
-          for (Map.Entry<String, String> entry: map.entrySet()){
-            key = entry.getKey();
-            values = Arrays.asList(entry.getValue().split(","));
-          }
-          if (values.size() > 1) {
-            return p.get(key).in(values);
-          } else {
-            return p.get(key).eq(values.get(0));
-          }
-        } else {
-          throw new IllegalArgumentException("Cannot determine map key from non-string parameter object.");
-        }
-      } else if (path instanceof ListPath){
-        ListPath p = (ListPath) path;
-        if (o instanceof List){
-          List<Object> l = (List<Object>) o;
-          return p.any().in(l);
-        } else {
-          return p.any().in(o);
-        }
-      } else {
-        if (o instanceof String){
-          String s = (String) o;
-          StringPath p = (StringPath) path;
-          values = Arrays.asList(s.split(","));
-          if (values.size() > 1){
-            return p.in(values);
-          } else {
-            String v = values.get(0);
-            if (v.startsWith("*")) {
-              v = "%" + v.replaceFirst("\\*", "") + "%";
-              return p.like(v);
-            } else if (v.startsWith("!*")){
-              v = "%" + v.replaceFirst("!\\*", "") + "%";
-              return p.notLike(v);
-            } else if (v.startsWith("!")){
-              v = v.replaceFirst("!", "");
-              return p.ne(v);
-            } else {
-              return p.eq(v); // defaults to equality test
-            }
-          }
-        } else {
-          return ((SimplePath) path).eq(o);
-        }
-      }
-    });
-
-  }
   
 
 }
