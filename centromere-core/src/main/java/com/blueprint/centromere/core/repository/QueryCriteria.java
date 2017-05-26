@@ -72,7 +72,7 @@ public class QueryCriteria {
   public String toString() {
     return "QueryCriteria{" +
         "key='" + key + '\'' +
-        ", value=" + value +
+        ", value=" + value.toString() +
         ", evaluation=" + evaluation +
         '}';
   }

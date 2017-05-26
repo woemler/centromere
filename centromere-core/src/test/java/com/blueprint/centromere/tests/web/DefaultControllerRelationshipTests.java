@@ -29,21 +29,19 @@ import com.blueprint.centromere.core.commons.model.Subject;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.web.config.WebApplicationConfig;
 import com.blueprint.centromere.tests.common.AbstractRepositoryTests;
-import com.blueprint.centromere.tests.common.MongoDataSourceConfig;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -53,11 +51,8 @@ import org.springframework.web.context.WebApplicationContext;
  * @author woemler
  */
 @RunWith(SpringRunner.class)
-@WebAppConfiguration
-@SpringBootTest(classes = {
-		MongoDataSourceConfig.class,
-		WebApplicationConfig.class
-})
+@AutoConfigureMockMvc
+@SpringBootTest(classes = WebTestInitializer.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({ Profiles.WEB_PROFILE, Profiles.NO_SECURITY, Profiles.API_DOCUMENTATION_DISABLED_PROFILE })
 public class DefaultControllerRelationshipTests extends AbstractRepositoryTests {
 
@@ -68,14 +63,13 @@ public class DefaultControllerRelationshipTests extends AbstractRepositoryTests 
 	@Autowired private WebApplicationContext context;
 	@Autowired private SampleRepository sampleRepository;
 	@Autowired private SubjectRepository subjectRepository;
-
-	private MockMvc mockMvc;
+	@Autowired private MockMvc mockMvc;
 
 	@Before
 	@Override
 	public void setup() throws Exception {
 		super.setup();
-		mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+		//mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
 	}
 
 	@Test

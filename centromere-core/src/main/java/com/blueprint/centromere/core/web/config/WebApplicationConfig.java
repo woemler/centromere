@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors
+ * Copyright 2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,10 @@
 package com.blueprint.centromere.core.web.config;
 
 import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
-import com.blueprint.centromere.core.web.controller.ModelResourceAssembler;
 import com.blueprint.centromere.core.web.controller.ModelCrudController;
+import com.blueprint.centromere.core.web.controller.ModelResourceAssembler;
 import com.blueprint.centromere.core.web.controller.UserAuthenticationController;
 import com.blueprint.centromere.core.web.exception.RestExceptionHandler;
-import com.sun.jdi.connect.Connector;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,9 +28,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
-import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomizer;
-import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -134,23 +130,24 @@ public class WebApplicationConfig extends WebMvcConfigurerAdapter {
 //    super.addFormatters(registry);
 //  }
 
-  @Bean
-  public EmbeddedServletContainerCustomizer servletContainerCustomizer(){
-    return configurableEmbeddedServletContainer ->
-        ((TomcatEmbeddedServletContainerFactory) configurableEmbeddedServletContainer).addConnectorCustomizers(
-            new TomcatConnectorCustomizer() {
-              @Override
-              public void customize(Connector connector) {
-                AbstractHttp11Protocol httpProtocol = (AbstractHttp11Protocol) connector.getProtocolHandler();
-                httpProtocol.setCompression("on");
-                httpProtocol.setCompressionMinSize(256);
-                String mimeTypes = httpProtocol.getCompressableMimeType();
-                String mimeTypesWithJson = mimeTypes + "," + MediaType.APPLICATION_JSON_VALUE;
-                httpProtocol.setCompressableMimeType(mimeTypesWithJson);
-              }
-            }
-        );
-  }
+  //TODO resolve this dependency
+//  @Bean
+//  public EmbeddedServletContainerCustomizer servletContainerCustomizer(){
+//    return configurableEmbeddedServletContainer ->
+//        ((TomcatEmbeddedServletContainerFactory) configurableEmbeddedServletContainer).addConnectorCustomizers(
+//            new TomcatConnectorCustomizer() {
+//              @Override
+//              public void customize(Connector connector) {
+//                AbstractHttp11Protocol httpProtocol = (AbstractHttp11Protocol) connector.getProtocolHandler();
+//                httpProtocol.setCompression("on");
+//                httpProtocol.setCompressionMinSize(256);
+//                String mimeTypes = httpProtocol.getCompressableMimeType();
+//                String mimeTypesWithJson = mimeTypes + "," + MediaType.APPLICATION_JSON_VALUE;
+//                httpProtocol.setCompressableMimeType(mimeTypesWithJson);
+//              }
+//            }
+//        );
+//  }
 
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 the original author or authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.blueprint.centromere.core.web.controller;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -26,6 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
@@ -57,7 +74,7 @@ public class ModelCrudController {
 
   @Autowired private ModelRepositoryRegistry registry;
   @Autowired private ModelResourceAssembler assembler;
-  @Autowired private ConversionService conversionService;
+  @Autowired @Qualifier("defaultConversionService") private ConversionService conversionService;
   @Autowired private ObjectMapper objectMapper;
 
   @Value("${centromere.api.root-url}")
@@ -205,23 +222,31 @@ public class ModelCrudController {
       PagedResourcesAssembler pagedResourcesAssembler,
       HttpServletRequest request)
   {
+    
     if (!registry.isRegisteredResource(uri)){
       logger.error(String.format("URI does not map to a registered model: %s", uri));
       throw new ResourceNotFoundException();
     }
+    
     Class<T> model = (Class<T>) registry.getModelByResource(uri);
     ModelRepository<T, ID> repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+    
     ResponseEnvelope<T> envelope;
     Set<String> fields = RequestUtils.getFilteredFieldsFromRequest(request);
     Set<String> exclude = RequestUtils.getExcludedFieldsFromRequest(request);
     pageable = RequestUtils.remapPageable(pageable, model);
     Map<String,String[]> parameterMap = request.getParameterMap();
-    List<QueryCriteria> criterias = RequestUtils.getQueryCriteriaFromFindRequest(model, request);
     String mediaType = request.getHeader("Accept");
+    
+    List<QueryCriteria> criterias = RequestUtils.getQueryCriteriaFromFindRequest(model, request);
+    
     Link selfLink = new Link(rootUrl + "/" + uri +
         (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
+    
     if (parameterMap.containsKey("page") || parameterMap.containsKey("size")){
+      
       Page<T> page = repository.find(criterias, pageable);
+      
       if (ApiMediaTypes.isHalMediaType(mediaType)){
         PagedResources<FilterableResource> pagedResources
             = pagedResourcesAssembler.toResource(page, assembler, selfLink);
@@ -229,14 +254,18 @@ public class ModelCrudController {
       } else {
         envelope = new ResponseEnvelope<>(page, fields, exclude);
       }
+      
     } else {
+      
       Sort sort = pageable.getSort();
       List<T> entities = null;
+      
       if (sort != null){
         entities = (List<T>) repository.find(criterias, sort);
       } else {
         entities = (List<T>) repository.find(criterias);
       }
+      
       if (ApiMediaTypes.isHalMediaType(mediaType)){
         List<FilterableResource> resourceList = assembler.toResources(entities);
         Resources<FilterableResource> resources = new Resources<>(resourceList);
@@ -245,6 +274,7 @@ public class ModelCrudController {
       } else {
         envelope = new ResponseEnvelope<>(entities, fields, exclude);
       }
+      
     }
     return new ResponseEntity<>(envelope, HttpStatus.OK);
   }
