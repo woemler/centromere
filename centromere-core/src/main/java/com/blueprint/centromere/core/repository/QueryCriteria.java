@@ -41,9 +41,6 @@ public class QueryCriteria {
     this.evaluation = Evaluation.EQUALS;
   }
 
-  public QueryCriteria() {
-  }
-
   public String getKey() {
     return key;
   }
@@ -72,7 +69,7 @@ public class QueryCriteria {
   public String toString() {
     return "QueryCriteria{" +
         "key='" + key + '\'' +
-        ", value=" + value.toString() +
+        ", value=" + value +
         ", evaluation=" + evaluation +
         '}';
   }

@@ -167,7 +167,8 @@ public class Gene extends AbstractModel implements Attributes {
 	@Override
 	public String toString() {
 		return "Gene{" +
-				"primaryReferenceId='" + primaryReferenceId + '\'' +
+        "id='" + this.getId() + "\'" +
+				", primaryReferenceId='" + primaryReferenceId + '\'' +
 				", primaryGeneSymbol='" + primaryGeneSymbol + '\'' +
 				", taxId=" + taxId +
 				", chromosome='" + chromosome + '\'' +

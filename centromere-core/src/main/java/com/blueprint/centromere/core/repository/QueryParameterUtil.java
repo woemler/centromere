@@ -51,42 +51,75 @@ public class QueryParameterUtil {
   public static Map<String,QueryParameterDescriptor> getAvailableQueryParameters(
       Class<? extends Model> model, boolean recursive)
   {
+
     logger.debug(String.format("Determining available query parameters for model: %s", model.getName()));
     Class<?> current = model;
     Map<String,QueryParameterDescriptor> paramMap = new HashMap<>();
+
     while (current.getSuperclass() != null) {
+
       for (Field field : current.getDeclaredFields()) {
+
         String fieldName = field.getName();
+        String paramName = field.getName();
         Class<?> type = field.getType();
-        if (Collection.class.isAssignableFrom(field.getType())) {
+        Class<?> keyType = type;
+        boolean regex = false;
+        boolean dynamic = true;
+
+        if (Collection.class.isAssignableFrom(type)) {
+
           ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
           type = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+
+        } else if (Map.class.isAssignableFrom(type)){
+
+          ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+          keyType = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+          type = (Class<?>) parameterizedType.getActualTypeArguments()[1];
+          paramName = paramName + ".\\w+";
+          regex = true;
+
         }
+
         if (field.isSynthetic()) continue;
-        if (!field.isAnnotationPresent(Ignored.class)) {
-          QueryParameterDescriptor descriptor = new QueryParameterDescriptor(fieldName,
-              type, Evaluation.EQUALS);
-          paramMap.put(fieldName, descriptor);
-          logger.debug(String.format("Adding default query parameter: %s = %s",
-              fieldName, descriptor.toString()));
-        }
-        if (field.isAnnotationPresent(Linked.class)) {
-          if (!recursive)
-            continue;
-          Linked linked = field.getAnnotation(Linked.class);
-          logger.debug(String.format("Adding foreign key parameters for model: %s",
-              linked.model().getName()));
-          String relField = !"".equals(linked.rel()) ? linked.rel() : fieldName;
-          Map<String, QueryParameterDescriptor> foreignModelMap =
-              getAvailableQueryParameters(linked.model(), false);
-          for (QueryParameterDescriptor descriptor : foreignModelMap.values()) {
-            String newParamName = relField + "." + descriptor.getName();
-            descriptor.setName(newParamName);
-            paramMap.put(newParamName, descriptor);
-            logger.debug(String.format("Adding foreign key parameter: %s = %s",
-                newParamName, descriptor.toString()));
-          }
-        }
+
+        if (field.isAnnotationPresent(Ignored.class)) continue;
+
+        QueryParameterDescriptor descriptor = new QueryParameterDescriptor(paramName, fieldName,
+            type, Evaluation.EQUALS, regex, dynamic);
+        paramMap.put(paramName, descriptor);
+
+        logger.debug(String.format("Adding default query parameter: %s = %s",
+            fieldName, descriptor.toString()));
+
+        // TODO: Linked model queries?
+//        if (field.isAnnotationPresent(Linked.class)) {
+//
+//          if (!recursive) continue;
+//
+//          Linked linked = field.getAnnotation(Linked.class);
+//
+//          logger.debug(String.format("Adding foreign key parameters for model: %s",
+//              linked.model().getName()));
+//
+//          String relField = !"".equals(linked.rel()) ? linked.rel() : fieldName;
+//          Map<String, QueryParameterDescriptor> foreignModelMap =
+//              getAvailableQueryParameters(linked.model(), false);
+//
+//          for (QueryParameterDescriptor descriptor : foreignModelMap.values()) {
+//
+//            String newParamName = relField + "." + descriptor.getParamName();
+//            descriptor.setParamName(newParamName);
+//            paramMap.put(newParamName, descriptor);
+//
+//            logger.debug(String.format("Adding foreign key parameter: %s = %s",
+//                newParamName, descriptor.toString()));
+//
+//          }
+//
+//        }
+
       }
       current = current.getSuperclass();
     }
@@ -115,7 +148,12 @@ public class QueryParameterUtil {
    * @param evaluation
    * @return
    */
-  public static QueryCriteria getQueryCriteriaFromParameter(String param, Object[] values, Class<?> type, Evaluation evaluation){
+  public static QueryCriteria getQueryCriteriaFromParameter(
+      String param,
+      Object[] values,
+      Class<?> type,
+      Evaluation evaluation
+  ){
     if (evaluation.equals(Evaluation.EQUALS) && values.length > 1) evaluation = Evaluation.IN;
     switch (evaluation){
       case EQUALS:
