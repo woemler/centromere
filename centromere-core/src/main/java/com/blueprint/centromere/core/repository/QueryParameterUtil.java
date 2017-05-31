@@ -18,7 +18,6 @@ package com.blueprint.centromere.core.repository;
 
 import com.blueprint.centromere.core.exceptions.QueryParameterException;
 import com.blueprint.centromere.core.model.Ignored;
-import com.blueprint.centromere.core.model.Linked;
 import com.blueprint.centromere.core.model.Model;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -93,33 +92,6 @@ public class QueryParameterUtil {
         logger.debug(String.format("Adding default query parameter: %s = %s",
             fieldName, descriptor.toString()));
 
-        // TODO: Linked model queries?
-//        if (field.isAnnotationPresent(Linked.class)) {
-//
-//          if (!recursive) continue;
-//
-//          Linked linked = field.getAnnotation(Linked.class);
-//
-//          logger.debug(String.format("Adding foreign key parameters for model: %s",
-//              linked.model().getName()));
-//
-//          String relField = !"".equals(linked.rel()) ? linked.rel() : fieldName;
-//          Map<String, QueryParameterDescriptor> foreignModelMap =
-//              getAvailableQueryParameters(linked.model(), false);
-//
-//          for (QueryParameterDescriptor descriptor : foreignModelMap.values()) {
-//
-//            String newParamName = relField + "." + descriptor.getParamName();
-//            descriptor.setParamName(newParamName);
-//            paramMap.put(newParamName, descriptor);
-//
-//            logger.debug(String.format("Adding foreign key parameter: %s = %s",
-//                newParamName, descriptor.toString()));
-//
-//          }
-//
-//        }
-
       }
       current = current.getSuperclass();
     }
@@ -154,6 +126,12 @@ public class QueryParameterUtil {
       Class<?> type,
       Evaluation evaluation
   ){
+    
+    if (!dynamicParamEvalutationMatchesType(evaluation, type)){
+      throw new QueryParameterException(String.format("Evaluation %s cannot be applied to field type %s",
+          evaluation.toString(), type.getName()));
+    }
+    
     if (evaluation.equals(Evaluation.EQUALS) && values.length > 1) evaluation = Evaluation.IN;
     switch (evaluation){
       case EQUALS:
@@ -163,7 +141,7 @@ public class QueryParameterUtil {
       case IN:
         return new QueryCriteria(param, convertParameterArray(values, type), Evaluation.IN);
       case NOT_IN:
-        return new QueryCriteria(param, Arrays.asList(values), Evaluation.NOT_IN);
+        return new QueryCriteria(param, convertParameterArray(values, type), Evaluation.NOT_IN);
       case LIKE :
         return new QueryCriteria(param, values[0], Evaluation.LIKE);
       case NOT_LIKE:
@@ -202,6 +180,60 @@ public class QueryParameterUtil {
         return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.ENDS_WITH);
       default:
         return null;
+    }
+  }
+
+  /**
+   * Tests to see whether the selected {@link Evaluation} can be applied to the target attribute
+   *   type.
+   * 
+   * @param evaluation query evaluation
+   * @param type parameter type
+   * @return true if evaluation can be applied to type
+   */
+  public static boolean dynamicParamEvalutationMatchesType(Evaluation evaluation, Class<?> type){
+    if (String.class.isAssignableFrom(type)){
+      return Arrays.asList(
+          Evaluation.EQUALS, 
+          Evaluation.NOT_EQUALS,
+          Evaluation.IN,
+          Evaluation.NOT_IN,
+          Evaluation.LIKE,
+          Evaluation.NOT_LIKE,
+          Evaluation.STARTS_WITH,
+          Evaluation.ENDS_WITH
+      ).contains(evaluation);
+    } else if (Number.class.isAssignableFrom(type)){
+      return Arrays.asList(
+          Evaluation.EQUALS,
+          Evaluation.NOT_EQUALS,
+          Evaluation.IN,
+          Evaluation.NOT_IN,
+          Evaluation.GREATER_THAN,
+          Evaluation.GREATER_THAN_EQUALS,
+          Evaluation.LESS_THAN,
+          Evaluation.LESS_THAN_EQUALS,
+          Evaluation.OUTSIDE,
+          Evaluation.OUTSIDE_INCLUSIVE,
+          Evaluation.BETWEEN,
+          Evaluation.BETWEEN_INCLUSIVE
+      ).contains(evaluation);
+    } else if (Boolean.class.isAssignableFrom(type)){
+      return Arrays.asList(
+          Evaluation.EQUALS,
+          Evaluation.NOT_EQUALS,
+          Evaluation.IN,
+          Evaluation.NOT_IN,
+          Evaluation.IS_TRUE,
+          Evaluation.IS_FALSE
+      ).contains(evaluation);
+    } else {
+      return Arrays.asList(
+          Evaluation.EQUALS,
+          Evaluation.NOT_EQUALS,
+          Evaluation.IN,
+          Evaluation.NOT_IN
+      ).contains(evaluation);
     }
   }
 

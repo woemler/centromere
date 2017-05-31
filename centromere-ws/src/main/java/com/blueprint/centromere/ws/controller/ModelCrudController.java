@@ -28,7 +28,6 @@ import com.blueprint.centromere.ws.exception.MalformedEntityException;
 import com.blueprint.centromere.ws.exception.RequestFailureException;
 import com.blueprint.centromere.ws.exception.ResourceNotFoundException;
 import com.blueprint.centromere.ws.exception.RestError;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -221,8 +220,8 @@ public class ModelCrudController {
       @PageableDefault(size = 1000) Pageable pageable,
       @PathVariable String uri,
       PagedResourcesAssembler pagedResourcesAssembler,
-      HttpServletRequest request)
-  {
+      HttpServletRequest request
+  ) {
     
     if (!registry.isRegisteredResource(uri)){
       logger.error(String.format("URI does not map to a registered model: %s", uri));
@@ -233,7 +232,6 @@ public class ModelCrudController {
     ModelRepository<T, ID> repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
     logger.info(String.format("Resolved request to model %s and repository %s",
         model.getName(), repository.getClass().getName()));
-    
 
     Set<String> fields = RequestUtils.getFilteredFieldsFromRequest(request);
     Set<String> exclude = RequestUtils.getExcludedFieldsFromRequest(request);
@@ -241,7 +239,6 @@ public class ModelCrudController {
     if (!exclude.isEmpty()) logger.info(String.format("Excluded fields: %s", exclude.toString()));
 
     ResponseEnvelope<T> envelope;
-    //pageable = RequestUtils.remapPageable(pageable, model);
     Map<String,String[]> parameterMap = request.getParameterMap();
     String mediaType = request.getHeader("Accept");
     
@@ -255,11 +252,15 @@ public class ModelCrudController {
       Page<T> page = repository.find(criterias, pageable);
       
       if (ApiMediaTypes.isHalMediaType(mediaType)){
+        
         PagedResources<FilterableResource> pagedResources
             = pagedResourcesAssembler.toResource(page, assembler, selfLink);
         envelope = new ResponseEnvelope<>(pagedResources, fields, exclude);
+        
       } else {
+        
         envelope = new ResponseEnvelope<>(page, fields, exclude);
+        
       }
       
     } else {
@@ -272,8 +273,6 @@ public class ModelCrudController {
       } else {
         entities = (List<T>) repository.find(criterias);
       }
-
-      logger.info(entities.toString());
       
       if (ApiMediaTypes.isHalMediaType(mediaType)){
         List<FilterableResource> resourceList = assembler.toResources(entities);
@@ -285,7 +284,9 @@ public class ModelCrudController {
       }
       
     }
+    
     return new ResponseEntity<>(envelope, HttpStatus.OK);
+    
   }
 
   /**

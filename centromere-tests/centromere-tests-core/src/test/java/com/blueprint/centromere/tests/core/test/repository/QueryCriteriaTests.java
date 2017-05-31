@@ -1,6 +1,7 @@
 package com.blueprint.centromere.tests.core.test.repository;
 
 import com.blueprint.centromere.core.commons.model.Gene;
+import com.blueprint.centromere.core.exceptions.QueryParameterException;
 import com.blueprint.centromere.core.repository.Evaluation;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.core.repository.QueryParameterDescriptor;
@@ -71,21 +72,43 @@ public class QueryCriteriaTests {
 
   @Test
   public void dynamicQueryParameterDescriptorTest(){
+    
     QueryParameterDescriptor descriptor = new QueryParameterDescriptor();
     descriptor.setEvaluation(Evaluation.EQUALS);
     descriptor.setParamName("value");
     descriptor.setDynaimicParameters(true);
     descriptor.setFieldName("value");
     descriptor.setType(Double.class);
-    Assert.isTrue(descriptor.parameterNameMatches("value"));
-    Assert.isTrue(Evaluation.EQUALS.equals(descriptor.getDynamicEvaluation("value")));
-    Assert.isTrue(!descriptor.parameterNameMatches("values"));
-    Assert.isTrue(descriptor.parameterNameMatches("valueGreaterThan"));
+    
+    Assert.isTrue(descriptor.parameterNameMatches("value"), "Parameter name does not match");
+    Assert.isTrue(Evaluation.EQUALS.equals(descriptor.getDynamicEvaluation("value")), "Evaluation does not match");
+    Assert.isTrue(!descriptor.parameterNameMatches("values"), "Param name should not be 'values'");
+    Assert.isTrue(descriptor.parameterNameMatches("valueGreaterThan"), "Dynamic param name does not match");
     Assert.isTrue(Evaluation.GREATER_THAN.equals(descriptor.getDynamicEvaluation("valueGreaterThan")),
         String.format("Expected GREATER_THAN, was %s", descriptor.getDynamicEvaluation("valueGreaterThan").toString()));
-    Assert.isTrue(descriptor.parameterNameMatches("valueBetweenIncluding"));
+    Assert.isTrue(descriptor.parameterNameMatches("valueBetweenIncluding"), "Dynamic param name does not match");
     Assert.isTrue(Evaluation.BETWEEN_INCLUSIVE.equals(descriptor.getDynamicEvaluation("valueBetweenIncluding")),
         String.format("Expected BETWEEN_INCLUSIVE, was %s", descriptor.getDynamicEvaluation("valueBetweenIncluding").toString()));
+    
+    QueryCriteria criteria = descriptor.createQueryCriteria(1.23);
+    Assert.isTrue("value".equals(criteria.getKey()), "Key should be 'value'");
+    Assert.isTrue(criteria.getValue().equals(1.23), "Value does not match");
+    Assert.isTrue(Evaluation.EQUALS.equals(criteria.getEvaluation()), "Evaluation does not match");
+    
+    criteria = descriptor.createQueryCriteria("valueGreaterThan", 1.23);
+    Assert.isTrue("value".equals(criteria.getKey()), "Key should be 'value'");
+    Assert.isTrue(criteria.getValue().equals(1.23), "Value does not match");
+    Assert.isTrue(Evaluation.GREATER_THAN.equals(criteria.getEvaluation()), "Evaluation does not match");
+    
+    Exception exception = null;
+    try {
+      criteria = descriptor.createQueryCriteria("valueBadSuffix", 1.23);
+    } catch (Exception e){
+      exception = e;
+    }
+    Assert.notNull(exception, "Exception is null");
+    Assert.isTrue(exception instanceof QueryParameterException, "Exception must be QueryParameterException");
+    
   }
 
   @Test

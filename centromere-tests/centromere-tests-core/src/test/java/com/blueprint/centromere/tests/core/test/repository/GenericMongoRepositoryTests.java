@@ -17,15 +17,16 @@
 package com.blueprint.centromere.tests.core.test.repository;
 
 import com.blueprint.centromere.core.commons.model.Gene;
+import com.blueprint.centromere.core.commons.model.GeneExpression;
+import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.config.CoreConfiguration;
+import com.blueprint.centromere.core.repository.Evaluation;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +54,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired private GeneRepository geneRepository;
+  @Autowired private GeneExpressionRepository expressionRepository;
 
   @Test
   public void findOneByBadIdTest(){
@@ -244,6 +246,190 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     Assert.isTrue(gene.getPrimaryReferenceId().equals("4"));
 
   }
+  
+  @Test
+  public void findByCriteriaNotEqualsTest(){
+    QueryCriteria criteria = new QueryCriteria("geneType", "protein-coding", Evaluation.NOT_EQUALS);
+    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singleton(criteria));
+    Assert.notNull(genes, "Result set must not be null");
+    Assert.notEmpty(genes, "Result set must not be empty");
+    Assert.isTrue(genes.size() == 2, "Expected result set size of 2");
+    Gene gene = genes.get(0);
+    Assert.isTrue("GeneC".equals(gene.getPrimaryGeneSymbol()), "Record does not have expected value");
+  }
+
+  @Test
+  public void findByCriteriaInTest(){
+    QueryCriteria criteria = new QueryCriteria("primaryGeneSymbol", Arrays.asList("GeneA", "GeneB"), Evaluation.IN);
+    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singleton(criteria));
+    Assert.notNull(genes, "Result set must not be null");
+    Assert.notEmpty(genes, "Result set must not be empty");
+    Assert.isTrue(genes.size() == 2, "Expected result set size of 2");
+    Gene gene = genes.get(0);
+    Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()), "Record does not have expected value");
+  }
+
+  @Test
+  public void findByCriteriaNotInTest(){
+    QueryCriteria criteria = new QueryCriteria("primaryGeneSymbol", Arrays.asList("GeneA", "GeneB"), Evaluation.NOT_IN);
+    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singleton(criteria));
+    Assert.notNull(genes, "Result set must not be null");
+    Assert.notEmpty(genes, "Result set must not be empty");
+    Assert.isTrue(genes.size() == 3, "Expected result set size of 3");
+    Gene gene = genes.get(0);
+    Assert.isTrue("GeneC".equals(gene.getPrimaryGeneSymbol()), "Record does not have expected value");
+  }
+
+  @Test
+  public void findByCriteriaLikeTest(){
+    QueryCriteria criteria = new QueryCriteria("geneType", "protein", Evaluation.LIKE);
+    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singleton(criteria));
+    Assert.notNull(genes, "Result set must not be null");
+    Assert.notEmpty(genes, "Result set must not be empty");
+    Assert.isTrue(genes.size() == 3, "Expected result set size of 3");
+    Gene gene = genes.get(0);
+    Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()), "Record does not have expected value");
+  }
+
+  @Test
+  public void findByCriteriaNotLikeTest(){
+    QueryCriteria criteria = new QueryCriteria("geneType", "protein", Evaluation.NOT_LIKE);
+    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singleton(criteria));
+    Assert.notNull(genes, "Result set must not be null");
+    Assert.notEmpty(genes, "Result set must not be empty");
+    Assert.isTrue(genes.size() == 2, "Expected result set size of 2");
+    Gene gene = genes.get(0);
+    Assert.isTrue("GeneC".equals(gene.getPrimaryGeneSymbol()), "Record does not have expected value");
+  }
+
+  @Test
+  public void findByCriteriaStartsWithTest(){
+    QueryCriteria criteria = new QueryCriteria("geneType", "protein", Evaluation.STARTS_WITH);
+    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singleton(criteria));
+    Assert.notNull(genes, "Result set must not be null");
+    Assert.notEmpty(genes, "Result set must not be empty");
+    Assert.isTrue(genes.size() == 3, "Expected result set size of 3");
+    Gene gene = genes.get(0);
+    Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()), "Record does not have expected value");
+  }
+
+  @Test
+  public void findByCriteriaEndsWithTest(){
+    QueryCriteria criteria = new QueryCriteria("geneType", "coding", Evaluation.ENDS_WITH);
+    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singleton(criteria));
+    Assert.notNull(genes, "Result set must not be null");
+    Assert.notEmpty(genes, "Result set must not be empty");
+    Assert.isTrue(genes.size() == 3, "Expected result set size of 3");
+    Gene gene = genes.get(0);
+    Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()), "Record does not have expected value");
+  }
+  
+  @Test
+  public void findByNumberGreaterThanTest(){
+    QueryCriteria criteria = new QueryCriteria("value", 5.0, Evaluation.GREATER_THAN);
+    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singleton(criteria));
+    Assert.notNull(records, "Result set must not be null");
+    Assert.notEmpty(records, "Result set must not be empty");
+    Assert.isTrue(records.size() == 3, "Expected result set size of 3");
+    GeneExpression record = records.get(0);
+    Assert.isTrue(record.getValue() == 6.78, "Record does not have expected value");
+  }
+
+  @Test
+  public void findByNumberGreaterThanOrEqualsTest(){
+    QueryCriteria criteria = new QueryCriteria("value", 4.56, Evaluation.GREATER_THAN_EQUALS);
+    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singleton(criteria));
+    Assert.notNull(records, "Result set must not be null");
+    Assert.notEmpty(records, "Result set must not be empty");
+    Assert.isTrue(records.size() == 4, "Expected result set size of 4");
+    GeneExpression record = records.get(0);
+    Assert.isTrue(record.getValue() == 4.56, "Record does not have expected value");
+  }
+
+  @Test
+  public void findByNumberLessThanTest(){
+    QueryCriteria criteria = new QueryCriteria("value", 5.0, Evaluation.LESS_THAN);
+    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singleton(criteria));
+    Assert.notNull(records, "Result set must not be null");
+    Assert.notEmpty(records, "Result set must not be empty");
+    Assert.isTrue(records.size() == 3, "Expected result set size of 3");
+    GeneExpression record = records.get(0);
+    Assert.isTrue(record.getValue() == 1.23, "Record does not have expected value");
+  }
+
+  @Test
+  public void findByNumberLessThanOrEqualsTest(){
+    QueryCriteria criteria = new QueryCriteria("value", 4.56, Evaluation.LESS_THAN_EQUALS);
+    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singleton(criteria));
+    Assert.notNull(records, "Result set must not be null");
+    Assert.notEmpty(records, "Result set must not be empty");
+    Assert.isTrue(records.size() == 3, "Expected result set size of 3");
+    GeneExpression record = records.get(2);
+    Assert.isTrue(record.getValue() == 4.56, "Record does not have expected value");
+  }
+
+  @Test
+  public void findByNumberBetweenTest(){
+    QueryCriteria criteria = new QueryCriteria("value", Arrays.asList(3.0, 7.0), Evaluation.BETWEEN);
+    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singleton(criteria));
+    Assert.notNull(records, "Result set must not be null");
+    Assert.notEmpty(records, "Result set must not be empty");
+    Assert.isTrue(records.size() == 2, "Expected result set size of 2");
+    GeneExpression record = records.get(0);
+    Assert.isTrue(record.getValue() == 4.56, "Record does not have expected value");
+  }
+
+  @Test
+  public void findByNumberOutsideTest(){
+    QueryCriteria criteria = new QueryCriteria("value", Arrays.asList(3.0, 7.0), Evaluation.OUTSIDE);
+    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singleton(criteria));
+    Assert.notNull(records, "Result set must not be null");
+    Assert.notEmpty(records, "Result set must not be empty");
+    Assert.isTrue(records.size() == 4, "Expected result set size of 2");
+    GeneExpression record = records.get(0);
+    Assert.isTrue(record.getValue() == 1.23, "Record does not have expected value");
+  }
+
+  @Test
+  public void findByNumberEqualsTest(){
+    QueryCriteria criteria = new QueryCriteria("value", 4.56, Evaluation.EQUALS);
+    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singleton(criteria));
+    Assert.notNull(records, "Result set must not be null");
+    Assert.notEmpty(records, "Result set must not be empty");
+    Assert.isTrue(records.size() == 1, "Expected result set size of 1");
+    GeneExpression record = records.get(0);
+    Assert.isTrue(record.getValue() == 4.56, "Record does not have expected value");
+  }
+
+  @Test
+  public void findByNumberInTest(){
+    QueryCriteria criteria = new QueryCriteria("value", Arrays.asList(2.34, 4.56), Evaluation.IN);
+    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singleton(criteria));
+    Assert.notNull(records, "Result set must not be null");
+    Assert.notEmpty(records, "Result set must not be empty");
+    Assert.isTrue(records.size() == 2, "Expected result set size of 2");
+    GeneExpression record = records.get(0);
+    Assert.isTrue(record.getValue() == 2.34, "Record does not have expected value");
+  }
+
+  @Test
+  public void findByNumberNotInTest(){
+    QueryCriteria criteria = new QueryCriteria("value", Arrays.asList(2.34, 4.56), Evaluation.NOT_IN);
+    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singletonList(criteria));
+    Assert.notNull(records, "Result set must not be null");
+    Assert.notEmpty(records, "Result set must not be empty");
+    Assert.isTrue(records.size() == 4, "Expected result set size of 4");
+    GeneExpression record = records.get(0);
+    Assert.isTrue(record.getValue() == 1.23, "Record does not have expected value");
+  }
+
+  @Test
+  public void findByNumberNotInTest2(){
+    QueryCriteria criteria = new QueryCriteria("taxId", Arrays.asList(9606, 1000), Evaluation.NOT_IN);
+    List<Gene> records = (List<Gene>) geneRepository.find(Collections.singletonList(criteria));
+    Assert.notNull(records, "Result set must not be null");
+    Assert.isTrue(records.size() == 0, "Result set must be empty");
+  }
 
   @Test
   public void insertTest(){
@@ -388,7 +574,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
   @Test
   public void distinctTest(){
-    Set<Object> geneSymbols = (Set<Object>) geneRepository.distinct("primaryGeneSymbol");
+    Set<Object> geneSymbols = geneRepository.distinct("primaryGeneSymbol");
     Assert.notNull(geneSymbols);
     Assert.notEmpty(geneSymbols);
     Assert.isTrue(geneSymbols.size() == 5);

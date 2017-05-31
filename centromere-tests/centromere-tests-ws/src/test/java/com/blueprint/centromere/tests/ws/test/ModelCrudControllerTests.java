@@ -30,33 +30,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.blueprint.centromere.core.commons.model.Gene;
-import com.blueprint.centromere.core.commons.repository.DataFileRepository;
-import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.ws.WebTestInitializer;
 import com.blueprint.centromere.ws.config.ApiMediaTypes;
-import com.blueprint.centromere.ws.exception.RestError;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import java.util.List;
-import java.util.Optional;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -70,14 +60,13 @@ import org.springframework.util.Assert;
 @SpringBootTest(classes = WebTestInitializer.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(value = { Profiles.WEB_PROFILE, Profiles.NO_SECURITY, Profiles.API_DOCUMENTATION_DISABLED_PROFILE })
 @AutoConfigureMockMvc
-public class DefaultControllerTests extends AbstractRepositoryTests {
+public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   private static final String BASE_URL = "/api/genes";
   private static final String EXPRESSION_URL = "/api/geneexpression";
 
   @Autowired private GeneRepository geneRepository;
   @Autowired private GeneExpressionRepository geneExpressionRepository;
-  //@Autowired @Qualifier("objectMapper") private ObjectMapper objectMapper;
   @Autowired private MockMvc mockMvc;
 
   @Test
@@ -85,6 +74,8 @@ public class DefaultControllerTests extends AbstractRepositoryTests {
     mockMvc.perform(head(BASE_URL))
         .andExpect(status().isOk());
   }
+  
+  // Find
 
   @Test
   public void findById() throws Exception {
@@ -269,6 +260,206 @@ public class DefaultControllerTests extends AbstractRepositoryTests {
         .andExpect(jsonPath("$.content[0]", hasKey("primaryReferenceId")))
         .andExpect(jsonPath("$.content[0].primaryReferenceId", is("5")));
   }
+  
+  // Dynamic Find Params
+  
+  @Test
+  public void findByStringLike() throws Exception {
+    mockMvc.perform(get(BASE_URL + "?primaryGeneSymbolLike=eneB"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(1)))
+        .andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
+        .andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneB")));
+  }
+
+  @Test
+  public void invalidFindByStringLike() throws Exception {
+    mockMvc.perform(get(BASE_URL + "?taxIdLike=06"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$", hasKey("code")))
+        .andExpect(jsonPath("$.code", is(400)));
+  }
+
+  @Test
+  public void findByStringStartsWith() throws Exception {
+    mockMvc.perform(get(BASE_URL + "?geneTypeStartsWith=protein"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(3)))
+        .andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
+        .andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneA")));
+  }
+
+  @Test
+  public void invalidFindByStringStartsWith() throws Exception {
+    mockMvc.perform(get(BASE_URL + "?taxIdStartsWith=96"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$", hasKey("code")))
+        .andExpect(jsonPath("$.code", is(400)));
+  }
+
+  @Test
+  public void findByStringEndsWith() throws Exception {
+    mockMvc.perform(get(BASE_URL + "?primaryGeneSymbolEndsWith=eneB"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(1)))
+        .andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
+        .andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneB")));
+  }
+
+  @Test
+  public void invalidFindByStringEndsWith() throws Exception {
+    mockMvc.perform(get(BASE_URL + "?taxIdEndsWith=06"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$", hasKey("code")))
+        .andExpect(jsonPath("$.code", is(400)));
+  }
+
+  @Test
+  public void findByStringIn() throws Exception {
+    mockMvc.perform(get(BASE_URL + "?primaryGeneSymbolIn=GeneA,GeneB"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
+        .andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneA")));
+  }
+
+  @Test
+  public void findByNumberIn() throws Exception {
+    mockMvc.perform(get(BASE_URL + "?taxIdIn=9606,1000"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(5)))
+        .andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
+        .andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneA")));
+  }
+
+  @Test
+  public void findByStringNotIn() throws Exception {
+    mockMvc.perform(get(BASE_URL + "?primaryGeneSymbolNotIn=GeneA,GeneB"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(3)))
+        .andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
+        .andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneC")));
+  }
+
+  @Test
+  public void findByNumberNotIn() throws Exception {
+    mockMvc.perform(get(BASE_URL + "?taxIdNotIn=9606,1000"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(0)));
+  }
+
+  @Test
+  public void findByNumberNotInTest() throws Exception {
+    mockMvc.perform(get(EXPRESSION_URL + "?valueNotIn=2.34,4.56"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(4)))
+        .andExpect(jsonPath("$[0]", hasKey("value")))
+        .andExpect(jsonPath("$[0].value", is(1.23)));
+  }
+  
+  @Test
+  public void findByNumberGreaterThanTest() throws Exception {
+    mockMvc.perform(get(EXPRESSION_URL + "?valueGreaterThan=5.0"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(3)))
+        .andExpect(jsonPath("$[0]", hasKey("value")))
+        .andExpect(jsonPath("$[0].value", is(6.78)));
+  }
+
+  @Test
+  public void findByNumberGreaterThanOrEqualsTest() throws Exception {
+    mockMvc.perform(get(EXPRESSION_URL + "?valueGreaterThanOrEquals=9.1"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$[0]", hasKey("value")))
+        .andExpect(jsonPath("$[0].value", is(9.1)));
+  }
+
+  @Test
+  public void findByNumberLessThanTest() throws Exception {
+    mockMvc.perform(get(EXPRESSION_URL + "?valueLessThan=5.0"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(3)))
+        .andExpect(jsonPath("$[0]", hasKey("value")))
+        .andExpect(jsonPath("$[0].value", is(1.23)));
+  }
+
+  @Test
+  public void findByNumberLessThanOrEqualsTest() throws Exception {
+    mockMvc.perform(get(EXPRESSION_URL + "?valueLessThanOrEquals=2.34"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$[0]", hasKey("value")))
+        .andExpect(jsonPath("$[0].value", is(1.23)));
+  }
+
+  @Test
+  public void invalidGreaterThanNumberTest() throws Exception {
+    mockMvc.perform(get(BASE_URL + "?primaryReferenceIdGreaterThan=100"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$", hasKey("code")))
+        .andExpect(jsonPath("$.code", is(400)));
+  }
+
+  @Test
+  public void invalidGreaterThanOrEqualsNumberTest() throws Exception {
+    mockMvc.perform(get(BASE_URL + "?primaryReferenceIdGreaterThanOrEquals=100"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$", hasKey("code")))
+        .andExpect(jsonPath("$.code", is(400)));
+  }
+
+  @Test
+  public void invalidLessThanNumberTest() throws Exception {
+    mockMvc.perform(get(BASE_URL + "?primaryReferenceIdLessThan=100"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$", hasKey("code")))
+        .andExpect(jsonPath("$.code", is(400)));
+  }
+
+  @Test
+  public void invalidLessThanOrEqualsNumberTest() throws Exception {
+    mockMvc.perform(get(BASE_URL + "?primaryReferenceIdLessThanOrEquals=100"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$", hasKey("code")))
+        .andExpect(jsonPath("$.code", is(400)));
+  }
+  
+  @Test
+  public void findByNumberBetweenTest() throws Exception {
+    mockMvc.perform(get(EXPRESSION_URL + "?valueBetween=3.0,7.0"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$[0]", hasKey("value")))
+        .andExpect(jsonPath("$[0].value", is(4.56)));
+  }
+
+  @Test
+  public void findByNumberOutsideTest() throws Exception {
+    mockMvc.perform(get(EXPRESSION_URL + "?valueOutside=3.0,7.0"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(4)))
+        .andExpect(jsonPath("$[0]", hasKey("value")))
+        .andExpect(jsonPath("$[0].value", is(1.23)));
+  }
+
+  @Test
+  public void invalidOutsideNumberTest() throws Exception {
+    mockMvc.perform(get(BASE_URL + "?primaryReferenceIdOutside=100,10000"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$", hasKey("code")))
+        .andExpect(jsonPath("$.code", is(400)));
+  }
+
+  @Test
+  public void invalidBetweenNumberTest() throws Exception {
+    mockMvc.perform(get(BASE_URL + "?primaryReferenceIdBetween=100,10000"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$", hasKey("code")))
+        .andExpect(jsonPath("$.code", is(400)));
+  }
+  
+  // Distinct
 
   @Test
   public void findDistinct() throws Exception {
@@ -284,6 +475,8 @@ public class DefaultControllerTests extends AbstractRepositoryTests {
         .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[2]", is("GeneD")));
   }
+  
+  // Create
 
   @Test
   public void createTest() throws Exception {
@@ -315,6 +508,8 @@ public class DefaultControllerTests extends AbstractRepositoryTests {
     geneRepository.delete(newGene);
 
   }
+  
+  // Update
 
   @Test
   public void updateTest() throws Exception {
@@ -353,6 +548,8 @@ public class DefaultControllerTests extends AbstractRepositoryTests {
         .andExpect(jsonPath("$.primaryGeneSymbol", is("GeneX")));
 
   }
+  
+  // Delete
 
   @Test
   public void deleteTest() throws Exception {
@@ -381,6 +578,8 @@ public class DefaultControllerTests extends AbstractRepositoryTests {
 //				.andReturn();
 //		System.out.println("Response: " + result.getResponse().getContentAsString());
 //	}
+  
+  // Exceptions
 
   @Test
   public void resourceNotFoundExceptionTest() throws Exception {

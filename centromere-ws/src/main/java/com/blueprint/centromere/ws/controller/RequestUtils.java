@@ -16,7 +16,6 @@
 
 package com.blueprint.centromere.ws.controller;
 
-import com.blueprint.centromere.core.exceptions.QueryParameterException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.core.repository.QueryParameterDescriptor;
@@ -33,9 +32,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 /**
  * @author woemler
@@ -83,12 +79,17 @@ public class RequestUtils {
   public static List<QueryCriteria> getQueryCriteriaFromFindRequest(Class<? extends Model<?>> model,
       HttpServletRequest request
   ){
+    
     logger.info(String.format("Generating QueryCriteria for 'find' request parameters: model=%s params=%s",
         model.getName(), request.getQueryString()));
-    List<String> defaultParameters = findAllParameters();
-    Map<String, QueryParameterDescriptor> paramMap = QueryParameterUtil.getAvailableQueryParameters(model);
-    List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(paramMap, defaultParameters, request.getParameterMap());
+    
+    List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(
+        QueryParameterUtil.getAvailableQueryParameters(model), 
+        findAllParameters(), 
+        request.getParameterMap());
+    
     logger.info(String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
+    
     return criteriaList;
   }
 
@@ -140,41 +141,58 @@ public class RequestUtils {
       List<String> defaultParameters,
       Map<String, String[]> paramMap
   ){
+    
     List<QueryCriteria> criteriaList = new ArrayList<>();
+    
     for (Map.Entry<String, String[]> entry: paramMap.entrySet()){
+      
       String paramName = entry.getKey();
       String[] paramValue = entry.getValue()[0] != null
           ? entry.getValue()[0].split(",") : new String[]{""};
-      if (!defaultParameters.contains(paramName)) {
-        QueryCriteria criteria = null;
-        for (Map.Entry<String, QueryParameterDescriptor> e: validParams.entrySet()){
-          String p = e.getKey();
-          QueryParameterDescriptor descriptor = e.getValue();
+      QueryCriteria criteria = null;
+          
+      if (defaultParameters.contains(paramName)) continue;
+      
+      for (Map.Entry<String, QueryParameterDescriptor> e: validParams.entrySet()){
+        
+        QueryParameterDescriptor descriptor = e.getValue();
+
+        if (descriptor.parameterNameMatches(paramName)) {
+
+          logger.info(String.format("Request param '%s' matches model parameter: %s",
+              paramName, descriptor.toString()));
+          
           try {
-            if (descriptor.parameterNameMatches(paramName)) {
-              logger.info(String.format("Request param '%s' matches model parameter: %s",
-                  paramName, descriptor.toString()));
-              criteria = QueryParameterUtil.getQueryCriteriaFromParameter(
-                  descriptor.getQueryableFieldName(paramName),
-                  paramValue,
-                  descriptor.getType(),
-                  descriptor.getDynamicEvaluation(paramName));
-              break;
-            }
-          } catch (QueryParameterException ex){
+            criteria = QueryParameterUtil.getQueryCriteriaFromParameter(
+                descriptor.getQueryableFieldName(paramName),
+                paramValue,
+                descriptor.getType(),
+                descriptor.getDynamicEvaluation(paramName));
+            break;
+          } catch (Exception ex) {
             throw new ParameterMappingException(ex.getMessage());
           }
+
         }
-        if (criteria != null){
-          criteriaList.add(criteria);
-        } else {
-          logger.warn(String.format("Unable to map request parameter to available model parameters: "
-              + "%s", paramName));
-          throw new InvalidParameterException("Invalid request parameter: " + paramName);
-        }
+        
       }
+      
+      if (criteria != null){
+        
+        criteriaList.add(criteria);
+        
+      } else {
+        
+        logger.warn(String.format("Unable to map request parameter to available model parameters: "
+            + "%s", paramName));
+        throw new InvalidParameterException("Invalid request parameter: " + paramName);
+        
+      }
+      
     }
+    
     return criteriaList;
+    
   }
 
 

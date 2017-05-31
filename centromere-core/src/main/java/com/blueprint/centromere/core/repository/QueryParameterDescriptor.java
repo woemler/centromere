@@ -17,15 +17,7 @@
 package com.blueprint.centromere.core.repository;
 
 import com.blueprint.centromere.core.exceptions.QueryParameterException;
-import com.blueprint.centromere.core.model.Ignored;
-import com.blueprint.centromere.core.model.Model;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
-import org.springframework.data.annotation.Transient;
 
 /**
  * POJO that describes a model query parameter, used when reflecting {@link com.blueprint.centromere.core.model.Model}
@@ -111,10 +103,6 @@ public class QueryParameterDescriptor {
     this.dynaimicParameters = dynaimicParameters;
   }
 
-  public QueryCriteria createQueryCriteria(Object value){
-    return new QueryCriteria(fieldName, value, evaluation);
-  }
-
   /**
    * Tests whether the submitted parameter name matches that described by the object.  If regex is
    *   enabled, evaluation is performed by a regex match test.  If dynamic parameters is enabled,
@@ -162,25 +150,47 @@ public class QueryParameterDescriptor {
    *   evaluation suffix to determine which should be returned.  If no match is made, an
    *   {@link QueryParameterException} will be thrown.
    *
-   * @param p
+   * @param parameterName parameter name
    * @return
    * @throws QueryParameterException
    */
-  public Evaluation getDynamicEvaluation(String p) throws QueryParameterException {
+  public Evaluation getDynamicEvaluation(String parameterName) throws QueryParameterException {
     if (regexMatch || !dynaimicParameters) return evaluation; // dynamic parameters is not enabled
-    if (paramName.equals(p)) return evaluation; // submitted parameter is default
+    if (paramName.equals(parameterName)) return evaluation; // submitted parameter is default
     Evaluation eval = null;
-    if (parameterNameMatches(p)){
+    if (parameterNameMatches(parameterName)){
       for (String suffix: Evaluation.SUFFIX_STRINGS) {
-        if ((paramName + suffix).equals(p)) eval = Evaluation.fromSuffix(suffix);
+        if ((paramName + suffix).equals(parameterName)) eval = Evaluation.fromSuffix(suffix);
       }
     }
     if (eval != null){
       return eval;
     } else {
       throw new QueryParameterException(String.format("Not a valid dynamic parameter for defined "
-          + "parameter %s: %s", paramName, p));
+          + "parameter %s: %s", paramName, parameterName));
     }
+  }
+
+  /**
+   * Returns a {@link QueryCriteria} with the default {@link Evaluation} for the supplied value.
+   * 
+   * @param value value to use for filtering
+   * @return
+   */
+  public QueryCriteria createQueryCriteria(Object value){
+    return new QueryCriteria(fieldName, value, evaluation);
+  }
+
+  /**
+   * Returns a {@link QueryCriteria} object with an {@link Evaluation} value determined by the 
+   *   supplied parameter name.
+   * 
+   * @param parameterName
+   * @param value
+   * @return
+   */
+  public QueryCriteria createQueryCriteria(String parameterName, Object value){
+    return new QueryCriteria(fieldName, value, getDynamicEvaluation(parameterName));
   }
 
   @Override
