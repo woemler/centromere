@@ -17,6 +17,7 @@
 package com.blueprint.centromere.core.commons.model;
 
 import com.blueprint.centromere.core.model.AbstractModel;
+import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Linked;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,10 +38,10 @@ public class Sample extends AbstractModel implements Attributes {
 	private String sampleType;
 	private String tissue;
 	private String histology;
-	private String notes;
+	@Ignored private String notes;
 	private Map<String, String> attributes = new HashMap<>();
-	@Indexed @Linked(model = Subject.class) private String subjectId;
-	@Indexed @Linked(model = DataSet.class) private String dataSetId;
+	@Indexed @Linked(model = Subject.class, rel = "subject") private String subjectId;
+	@Indexed @Linked(model = DataSet.class, rel = "dataSet") private String dataSetId;
 
 	public String getSubjectId() {
 		return subjectId;

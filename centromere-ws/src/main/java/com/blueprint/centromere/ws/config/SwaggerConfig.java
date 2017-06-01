@@ -1,9 +1,15 @@
 package com.blueprint.centromere.ws.config;
 
+import com.blueprint.centromere.core.commons.model.User;
+import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.ws.documentation.ModelApiListingPlugin;
 import com.blueprint.centromere.ws.documentation.ModelParameterBuilderPlugin;
+import com.fasterxml.classmate.ResolvedType;
+import com.fasterxml.classmate.TypeResolver;
 import com.google.common.base.Predicate;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,13 +33,12 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @Profile({ Profiles.API_DOCUMENTATION_ENABLED_PROFILE })
 @EnableSwagger2
-@Import({
-    //SpringDataRestConfiguration.class,
-    BeanValidatorPluginsConfiguration.class
-})
+@Import({ BeanValidatorPluginsConfiguration.class })
 public class SwaggerConfig {
 
   @Autowired private Environment env;
+  @Autowired private TypeResolver typeResolver;
+  @Autowired private ModelRepositoryRegistry registry;
 
   @Bean
   public Docket api(){
@@ -43,6 +48,7 @@ public class SwaggerConfig {
         .paths(apiPaths())
         .build()
         .apiInfo(apiInfo())
+        .additionalModels(typeResolver.resolve(User.class), getModelTypes())
         .enableUrlTemplating(true);
   }
 
@@ -64,6 +70,15 @@ public class SwaggerConfig {
 
   private Predicate<String> apiPaths(){
     return PathSelectors.regex(env.getRequiredProperty("centromere.api.regex-url"));
+  }
+  
+  private ResolvedType[] getModelTypes(){
+    List<Class<?>> models = new ArrayList<>(registry.getRegisteredModels());
+    ResolvedType[] types = new ResolvedType[models.size()];
+    for (int i = 0; i < models.size(); i++){
+      types[i] = typeResolver.resolve(models.get(i));
+    }
+    return types;
   }
 
   @Bean

@@ -30,23 +30,23 @@ import org.springframework.data.mongodb.core.index.Indexed;
 public abstract class Data extends AbstractModel {
 
 	@Indexed
-	@Linked(model = Sample.class)
+	@Linked(model = Sample.class, rel = "sample")
 	private String sampleId;
 
   @Indexed
-  @Linked(model = Subject.class)
+  @Linked(model = Subject.class, rel = "subject")
   private String subjectId;
 
 	@Indexed
-	@Linked(model = DataFile.class)
+	@Linked(model = DataFile.class, rel = "dataFile")
 	private String dataFileId;
 	
 	@Indexed
-	@Linked(model = DataSet.class)
+	@Linked(model = DataSet.class, rel = "dataSet")
   private String dataSetId;
 
 	@Indexed
-	@Linked(model = Gene.class)
+	@Linked(model = Gene.class, rel = "gene")
 	private String geneId;
 
 	public String getSampleId() {

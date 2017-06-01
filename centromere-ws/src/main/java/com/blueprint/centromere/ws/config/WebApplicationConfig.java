@@ -23,9 +23,6 @@ import com.blueprint.centromere.ws.controller.ModelResourceAssembler;
 import com.blueprint.centromere.ws.controller.UserAuthenticationController;
 import com.blueprint.centromere.ws.exception.RestExceptionHandler;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,17 +35,13 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
-import org.springframework.data.rest.webmvc.RestMediaTypes;
-import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.hateoas.config.EnableEntityLinks;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
 import org.springframework.oxm.xstream.XStreamMarshaller;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -59,7 +52,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @Profile({Profiles.WEB_PROFILE})
 @SuppressWarnings("SpringJavaAutowiringInspection")
 @Configuration
-//@EnableWebMvc
 @EnableSpringDataWebSupport
 @EnableHypermediaSupport(type = { EnableHypermediaSupport.HypermediaType.HAL })
 @EnableEntityLinks
@@ -68,7 +60,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 		@PropertySource(value = {"classpath:centromere.properties"},ignoreResourceNotFound = true)
 })
 @Import({
-		RepositoryRestMvcConfiguration.class,
+		//RepositoryRestMvcConfiguration.class,
 		WebSecurityConfig.class,
 		SwaggerConfig.class
 })
@@ -123,8 +115,8 @@ public class WebApplicationConfig extends WebMvcConfigurerAdapter {
   @Override
   public void configureContentNegotiation(ContentNegotiationConfigurer configurer){
     configurer
-        .favorPathExtension(false)
-        .favorParameter(true)
+        //.favorPathExtension(false)
+        //.favorParameter(true)
         .defaultContentType(MediaType.APPLICATION_JSON);
   }
 
@@ -187,105 +179,5 @@ public class WebApplicationConfig extends WebMvcConfigurerAdapter {
       }
     }
   }
-  
-//  @Configuration
-//	public static class SpringDataRestCustomConfig extends RepositoryRestConfigurerAdapter{
-//
-//    @Autowired private Environment env;
-//
-//    @Override
-//    public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
-//      config.setBasePath(env.getRequiredProperty("centromere.api.root-url"));
-//      config.setReturnBodyForPutAndPost(true);
-//      config.exposeIdsFor(AbstractModel.class);
-//    }
-//
-//    @Override
-//    public void configureHttpMessageConverters(List<HttpMessageConverter<?>> converters) {
-//      converters.addAll(0, httpMessageConverters());
-//    }
-//
-//    @Override
-//    public void configureConversionService(ConfigurableConversionService conversionService) {
-//      super.configureConversionService(conversionService);
-//      conversionService.addConverter(new StringToMapParameterConverter());
-//    }
-//
-//    @Bean
-//		public LinkedResourceProcessor linkedResourceProcessor(){
-//    	return new LinkedResourceProcessor();
-//		}
-//
-//		@Bean
-//    public SearchResourceProcessor searchResourceProcessor(){
-//		  return new SearchResourceProcessor();
-//    }
-//
-//	}
-//
-//	@Configuration
-//	public static class SpringMvcCustomConfig extends WebMvcConfigurerAdapter {
-//
-//	  private static final Logger logger = LoggerFactory.getLogger(SpringMvcCustomConfig.class);
-//
-//    @Autowired private Environment env;
-//
-//    @Override
-//    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-//      converters.addAll(0, httpMessageConverters());
-//    }
-//
-//    @Override
-//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//      registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
-//      registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
-//      if (env.getRequiredProperty("centromere.web.enable-static-content", Boolean.class)){
-//        registry.addResourceHandler("/static/**").addResourceLocations("/static/");
-//        if (env.getRequiredProperty("centromere.web.home-page") != null
-//            && !"".equals(env.getRequiredProperty("centromere.web.home-page"))
-//            && env.getRequiredProperty("centromere.web.home-page-location") != null
-//            && !"".equals(env.getRequiredProperty("centromere.web.home-page"))){
-//          registry.addResourceHandler(env.getRequiredProperty("centromere.web.home-page"))
-//              .addResourceLocations(env.getRequiredProperty("centromere.web.home-page-location"));
-//          logger.info(String.format("Static home page configured at URL: /%s",
-//              env.getRequiredProperty("centromere.web.home-page")));
-//        } else {
-//          logger.warn("Static home page location not properly configured.");
-//        }
-//      }
-//    }
-//
-//	}
-	
-	static List<HttpMessageConverter<?>> httpMessageConverters(){
-		
-		List<HttpMessageConverter<?>> converters = new ArrayList<>();
-		
-		FilteringJackson2HttpMessageConverter jsonConverter 
-        = new FilteringJackson2HttpMessageConverter();
-		jsonConverter.setSupportedMediaTypes(Arrays.asList(
-				MediaType.APPLICATION_JSON,
-				MediaType.APPLICATION_JSON_UTF8, 
-				RestMediaTypes.ALPS_JSON,
-        RestMediaTypes.HAL_JSON,
-        RestMediaTypes.JSON_PATCH_JSON,
-        RestMediaTypes.MERGE_PATCH_JSON,
-        RestMediaTypes.SPRING_DATA_COMPACT_JSON,
-        RestMediaTypes.SPRING_DATA_VERBOSE_JSON
-		));
-		converters.add(jsonConverter);
-
-		FilteringTextMessageConverter filteringTextMessageConverter =
-				new FilteringTextMessageConverter(new MediaType("text", "plain", Charset.forName("utf-8")));
-		filteringTextMessageConverter.setSupportedMediaTypes(Arrays.asList(
-				new MediaType("text", "plain", Charset.forName("utf-8")), 
-				MediaType.TEXT_PLAIN
-		));
-		filteringTextMessageConverter.setDelimiter("\t");
-		converters.add(filteringTextMessageConverter);
-		
-		return converters;
-		
-	}
 	
 }

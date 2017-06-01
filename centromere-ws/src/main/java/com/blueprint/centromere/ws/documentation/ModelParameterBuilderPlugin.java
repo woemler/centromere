@@ -7,11 +7,9 @@ import com.blueprint.centromere.core.repository.QueryParameterUtil;
 import com.fasterxml.classmate.TypeResolver;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.Operation;
@@ -58,7 +56,7 @@ public class ModelParameterBuilderPlugin implements OperationBuilderPlugin {
 
   private Parameter createParameterFromDescriptior(QueryParameterDescriptor descriptor){
     return new ParameterBuilder()
-        .name(descriptor.getParamName())
+        .name(descriptor.getFieldName())
         .type(typeResolver.resolve(typeResolver.resolve(descriptor.getType())))
         .modelRef(new ModelRef("string"))
         .parameterType("query")

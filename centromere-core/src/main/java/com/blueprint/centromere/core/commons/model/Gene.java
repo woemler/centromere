@@ -17,6 +17,7 @@
 package com.blueprint.centromere.core.commons.model;
 
 import com.blueprint.centromere.core.model.AbstractModel;
+import com.blueprint.centromere.core.model.Ignored;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,11 +35,10 @@ public class Gene extends AbstractModel implements Attributes {
 	@Indexed private String primaryGeneSymbol;
 	private Integer taxId;
 	private String chromosome;
-	private String chromosomeLocation;
+	@Ignored private String chromosomeLocation;
 	private String geneType;
-	private String description;
+	@Ignored private String description;
 	private String referenceSource;
-
 	@Indexed private List<String> aliases = new ArrayList<>();
 	private Map<String, String> attributes = new HashMap<>();
 	private Map<String, String> externalReferences = new HashMap<>();

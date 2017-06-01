@@ -16,18 +16,16 @@
 
 package com.blueprint.centromere.core.commons.model;
 
-import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * @author woemler
  */
 @Document
-@CompoundIndexes({
-    @CompoundIndex(def = "{'sampleId': 1, 'dataFileId': 1}"),
-    @CompoundIndex(def = "{'geneId': 1, 'dataFileId': 1}")
-})
+//@CompoundIndexes({
+//    @CompoundIndex(def = "{'sampleId': 1, 'dataFileId': 1}"),
+//    @CompoundIndex(def = "{'geneId': 1, 'dataFileId': 1}")
+//})
 public class GeneExpression extends Data {
 	
 	private Double value;

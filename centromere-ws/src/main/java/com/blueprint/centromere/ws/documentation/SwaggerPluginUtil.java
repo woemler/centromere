@@ -47,10 +47,11 @@ public class SwaggerPluginUtil {
             false));
     descriptions.add(
         new ApiDescription(
-            rootUrl + "/distinct",
+            rootUrl + "/search/distinct",
             model.getSimpleName() + " collection resource operations",
             getFindDistinctOperations(model, typeResolver),
             false));
+    //TODO: add other search endpoints programatically
     return descriptions;
   }
 	

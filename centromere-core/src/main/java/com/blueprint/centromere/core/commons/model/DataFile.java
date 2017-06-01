@@ -17,8 +17,8 @@
 package com.blueprint.centromere.core.commons.model;
 
 import com.blueprint.centromere.core.model.AbstractModel;
+import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Linked;
-import com.blueprint.centromere.core.model.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,10 +35,9 @@ public class DataFile extends AbstractModel implements Attributes {
 	@Indexed(unique = true) private String filePath;
 	private String dataType;
 	private String model;
-	private Date dateCreated;
-	private Date dateUpdated;
-	@Indexed @Linked(model = DataSet.class) private String dataSetId;
-	
+	@Ignored private Date dateCreated;
+	@Ignored private Date dateUpdated;
+	@Indexed @Linked(model = DataSet.class, rel = "dataSet") private String dataSetId;
 	private Map<String, String> attributes = new HashMap<>();
 	
 	/* Getters and Setters */ 

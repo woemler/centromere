@@ -17,6 +17,7 @@
 package com.blueprint.centromere.core.commons.model;
 
 import com.blueprint.centromere.core.model.AbstractModel;
+import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Linked;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,12 +38,12 @@ public class DataSet extends AbstractModel implements Attributes {
 	private String displayName;
 	@Indexed(unique = true) private String shortName;
 	@Indexed private String source;
-	private String version;
-	private String description;
-	@Linked(model = DataFile.class) private List<String> dataFileIds = new ArrayList<>();
-  @Linked(model = Sample.class) private List<String> sampleIds = new ArrayList<>();
+	@Ignored private String version;
+	@Ignored private String description;
+	@Linked(model = DataFile.class, rel = "dataFiles") private List<String> dataFileIds = new ArrayList<>();
+  @Linked(model = Sample.class, rel = "samples") private List<String> sampleIds = new ArrayList<>();
 	private Map<String, String> attributes = new HashMap<>();
-	private Map<String, String> parameters = new HashMap<>();
+	@Ignored private Map<String, String> parameters = new HashMap<>();
 
   public String getDisplayName() {
     return displayName;

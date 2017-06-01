@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -29,10 +27,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @author woemler
  */
 @Document
-@CompoundIndexes({
-    @CompoundIndex(def = "{'sampleId': 1, 'dataFileId': 1}"),
-    @CompoundIndex(def = "{'geneId': 1, 'dataFileId': 1}")
-})
+//@CompoundIndexes({
+//    @CompoundIndex(def = "{'sampleId': 1, 'dataFileId': 1}"),
+//    @CompoundIndex(def = "{'geneId': 1, 'dataFileId': 1}")
+//})
 public class Mutation extends Data implements Attributes {
   
 	private String referenceGenome;

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import springfox.documentation.builders.ModelBuilder;
+import springfox.documentation.schema.Model;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.schema.ModelBuilderPlugin;
 import springfox.documentation.spi.schema.contexts.ModelContext;
@@ -24,8 +25,9 @@ public class ResponseModelBuilderPlugin implements ModelBuilderPlugin {
   public void apply(ModelContext modelContext) {
     ModelBuilder builder = modelContext.getBuilder();
     for (Class<?> model: registry.getRegisteredModels()){
+      Model m = null;
       try {
-        springfox.documentation.schema.Model m = builder
+        m = builder
             .type(typeResolver.resolve(model))
             .name(model.getSimpleName())
             .baseModel(model.getSimpleName())
@@ -36,6 +38,7 @@ public class ResponseModelBuilderPlugin implements ModelBuilderPlugin {
       } catch (Exception e){
         e.printStackTrace();
       }
+      
     }
   }
 
