@@ -16,8 +16,6 @@
 
 package com.blueprint.centromere.ws.controller;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-
 import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.ModelRepository;
@@ -62,7 +60,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author woemler
@@ -131,53 +128,6 @@ public class ModelCrudController {
       envelope = new ResponseEnvelope<>(resource, fields, exclude);
     } else {
       envelope = new ResponseEnvelope<>(entity, fields, exclude);
-    }
-    return new ResponseEntity<>(envelope, HttpStatus.OK);
-  }
-
-  /**
-   * {@code GET /distinct}
-   * Fetches the distinct values of the model attribute, {@code field}, which fulfill the given
-   *   query parameters.
-   *
-   * @param field Name of the model attribute to retrieve unique values of.
-   * @param request {@link HttpServletRequest}
-   * @return List of distinct field values.
-   */
-  @ApiResponses({
-      @ApiResponse(code = 200, message = "OK"),
-      @ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
-      @ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
-      @ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
-  })
-  @RequestMapping(
-      value = "/{uri}/distinct",
-      method = RequestMethod.GET,
-      produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
-          ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
-          MediaType.TEXT_PLAIN_VALUE })
-  public <T extends Model<ID>, ID extends Serializable> ResponseEntity<ResponseEnvelope<Object>> findDistinct(
-      @ApiParam(name = "field", value = "Model field name.") @RequestParam String field,
-      @PathVariable String uri,
-      HttpServletRequest request)
-  {
-    if (!registry.isRegisteredResource(uri)){
-      logger.error(String.format("URI does not map to a registered model: %s", uri));
-      throw new ResourceNotFoundException();
-    }
-    Class<T> model = (Class<T>) registry.getModelByResource(uri);
-    ModelRepository<T, ID> repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
-    List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromFindDistinctRequest(model, request);
-    Set<Object> distinct = repository.distinct(field, queryCriterias);
-    ResponseEnvelope<Object> envelope = null;
-    if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))){
-      Link selfLink = new Link(linkTo(this.getClass()).slash("distinct").toString() +
-          (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
-      Resources<Object> resources = new Resources<>(distinct);
-      resources.add(selfLink);
-      envelope = new ResponseEnvelope<>(resources);
-    } else {
-      envelope = new ResponseEnvelope<>(distinct);
     }
     return new ResponseEntity<>(envelope, HttpStatus.OK);
   }

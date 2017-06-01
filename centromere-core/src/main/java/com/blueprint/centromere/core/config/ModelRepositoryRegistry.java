@@ -16,12 +16,12 @@
 
 package com.blueprint.centromere.core.config;
 
+import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import com.blueprint.centromere.core.repository.ModelResource;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +36,8 @@ public class ModelRepositoryRegistry {
   private static final Logger logger = LoggerFactory.getLogger(ModelRepositoryRegistry.class);
 
   private final ApplicationContext context;
-  private Map<String, Class<?>> typeNameMap = new HashMap<>();
-  private Map<Class<?>, ModelRepository<?,?>> repositoryTypeMap = new HashMap<>();
+  private Map<String, Class<? extends Model<?>>> typeNameMap = new HashMap<>();
+  private Map<Class<? extends Model<?>>, ModelRepository<?,?>> repositoryTypeMap = new HashMap<>();
 
   public ModelRepositoryRegistry(ApplicationContext context) {
     this.context = context;
@@ -48,7 +48,7 @@ public class ModelRepositoryRegistry {
     for (Map.Entry entry: context.getBeansOfType(ModelRepository.class, false, false).entrySet()){
       Class<?> type = entry.getValue().getClass();
       ModelRepository repository = (ModelRepository) entry.getValue();
-      Class<?> model = repository.getModel();
+      Class<? extends Model<?>> model = repository.getModel();
       String name = model.getSimpleName().toLowerCase();
       repositoryTypeMap.put(model, repository);
       if (AnnotatedElementUtils.hasAnnotation(type, ModelResource.class)){
@@ -67,7 +67,7 @@ public class ModelRepositoryRegistry {
   }
 
   public String getModelUri(Class<?> model){
-    for (Map.Entry<String, Class<?>> entry: typeNameMap.entrySet()){
+    for (Map.Entry<String, Class<? extends Model<?>>> entry: typeNameMap.entrySet()){
       if (model.equals(entry.getValue())) return entry.getKey();
     }
     return null;
@@ -89,7 +89,7 @@ public class ModelRepositoryRegistry {
     return repositoryTypeMap.containsKey(model) ? repositoryTypeMap.get(model) : null;
   }
 
-  public Collection<Class<?>> getRegisteredModels(){
+  public Collection<Class<? extends Model<?>>> getRegisteredModels(){
     return repositoryTypeMap.keySet();
   }
 

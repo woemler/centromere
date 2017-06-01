@@ -1,12 +1,15 @@
 package com.blueprint.centromere.ws.config;
 
 import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.ws.documentation.ModelApiListingPlugin;
+import com.blueprint.centromere.ws.documentation.ModelParameterBuilderPlugin;
 import com.google.common.base.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
 import springfox.documentation.builders.PathSelectors;
@@ -15,6 +18,7 @@ import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger.common.SwaggerPluginSupport;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
@@ -60,6 +64,18 @@ public class SwaggerConfig {
 
   private Predicate<String> apiPaths(){
     return PathSelectors.regex(env.getRequiredProperty("centromere.api.regex-url"));
+  }
+
+  @Bean
+  @Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER)
+  public ModelParameterBuilderPlugin modelParameterBuilderPlugin(){
+    return new ModelParameterBuilderPlugin();
+  }
+
+  @Bean
+  @Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER)
+  public ModelApiListingPlugin mappedModelApiListingPlugin(){
+    return new ModelApiListingPlugin();
   }
 
 }

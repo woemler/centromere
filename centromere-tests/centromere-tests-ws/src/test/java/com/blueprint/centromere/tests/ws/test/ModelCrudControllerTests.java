@@ -459,23 +459,6 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .andExpect(jsonPath("$.code", is(400)));
   }
   
-  // Distinct
-
-  @Test
-  public void findDistinct() throws Exception {
-    mockMvc.perform(get(BASE_URL + "/distinct?field=geneType"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(2)));
-  }
-
-  @Test
-  public void findDistinctFiltered() throws Exception {
-    mockMvc.perform(get(BASE_URL + "/distinct?field=primaryGeneSymbol&geneType=protein-coding"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(3)))
-        .andExpect(jsonPath("$[2]", is("GeneD")));
-  }
-  
   // Create
 
   @Test
