@@ -1,14 +1,20 @@
 package com.blueprint.centromere.ws.documentation;
 
+import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.QueryParameterDescriptor;
+import com.blueprint.centromere.core.repository.QueryParameterUtil;
 import com.fasterxml.classmate.TypeResolver;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.schema.ModelRef;
+import springfox.documentation.service.Operation;
 import springfox.documentation.service.Parameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.OperationBuilderPlugin;
@@ -25,27 +31,24 @@ import springfox.documentation.swagger.common.SwaggerPluginSupport;
 public class ModelParameterBuilderPlugin implements OperationBuilderPlugin {
 
   @Autowired private TypeResolver typeResolver;
-  @Autowired private ApplicationContext applicationContext;
+  @Autowired private ModelRepositoryRegistry registry;
   private static final String FIND_METHOD = "find";
   private static final Logger logger = LoggerFactory.getLogger(ModelParameterBuilderPlugin.class);
 
   @Override
   public void apply(OperationContext context) {
-    logger.info("RequestMappingPattern: " + context.requestMappingPattern());
-//    Object controller = applicationContext.getBean(context.getHandlerMethod().getBeanType());
-//    if (controller == null) throw new ApiDocumentationException(String.format("Controller bean is null: %s",
-//        context.getHandlerMethod().getBeanType().getName()));
-//    if (context.getHandlerMethod().getMethod().getDeclaringClass().equals(ModelCrudController.class)
-//        && FIND_METHOD.equals(context.getHandlerMethod().getMethod().getName())){
-//      Class<? extends Model<?>> model = ((ModelCrudController) controller).getModel();
-//      Map<String, QueryParameterDescriptor> paramMap = QueryParameterUtil.getAvailableQueryParameters(model);
-//      Operation operation = context.operationBuilder().build();
-//      List<Parameter> parameters = operation.getParameters() != null ? operation.getParameters() : new ArrayList<>();
-//      for (QueryParameterDescriptor descriptor: paramMap.values()){
-//        parameters.add(createParameterFromDescriptior(descriptor));
-//      }
-//      context.operationBuilder().parameters(parameters);
-//    }
+    logger.info("Swagger Plugin - OperationContext - Name: " + context.getName());
+    if (FIND_METHOD.equals(context.getName())){
+      Operation operation = context.operationBuilder().build();
+      List<Parameter> parameters = operation.getParameters() != null
+          ? operation.getParameters() : new ArrayList<>();
+      for (Class<? extends Model<?>> model: registry.getRegisteredModels() ){
+        for (QueryParameterDescriptor descriptor: QueryParameterUtil.getAvailableQueryParameters(model).values()){
+          parameters.add(createParameterFromDescriptior(descriptor));
+        }
+      }
+      context.operationBuilder().parameters(parameters);
+    }
   }
 
   @Override
