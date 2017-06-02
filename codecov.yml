@@ -16,9 +16,7 @@ coverage:
   #      target: auto
         
   ignore:
-    - centromere-core/src/main/java/com/blueprint/centromere/core/commons/models/*
-    - centromere-core/src/main/java/com/blueprint/centromere/core/commons/repositories/*
-    - centromere-core/src/main/java/com/blueprint/centromere/core/commons/support/*
+    - centromere-core/src/main/java/com/blueprint/centromere/core/commons/*
     - centromere-core/src/main/java/com/blueprint/centromere/core/model/*
 
 comment:
