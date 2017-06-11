@@ -35,6 +35,7 @@ public class DataFile extends AbstractModel implements Attributes {
 	@Indexed(unique = true) private String filePath;
 	private String dataType;
 	private String model;
+	@Ignored private String checksum;
 	@Ignored private Date dateCreated;
 	@Ignored private Date dateUpdated;
 	@Indexed @Linked(model = DataSet.class, rel = "dataSet") private String dataSetId;
@@ -69,6 +70,14 @@ public class DataFile extends AbstractModel implements Attributes {
 
   public void setModel(Class<?> modelType){
 	  this.model = modelType.getName();
+  }
+
+  public String getChecksum() {
+    return checksum;
+  }
+
+  public void setChecksum(String checksum) {
+    this.checksum = checksum;
   }
 
   public Date getDateCreated() {
@@ -130,6 +139,7 @@ public class DataFile extends AbstractModel implements Attributes {
 				"filePath='" + filePath + '\'' +
 				", dataType='" + dataType + '\'' +
         ", model='" + model + '\'' +
+        ", checksum='" + checksum + "'" +
 				", dateCreated=" + dateCreated +
 				", dateUpdated=" + dateUpdated +
 				", dataSetId='" + dataSetId + '\'' +

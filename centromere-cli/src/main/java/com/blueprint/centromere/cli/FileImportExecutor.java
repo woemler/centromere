@@ -29,6 +29,11 @@ import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
 import com.blueprint.centromere.core.dataimport.processor.RecordProcessor;
 import com.blueprint.centromere.core.repository.ModelRepository;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
+import com.google.common.io.Files;
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -87,37 +92,69 @@ public class FileImportExecutor implements EnvironmentAware {
       dataFile.setDateCreated(new Date());
       dataFile.setDateUpdated(new Date());
       dataFile.setDataSetId(dataSet.getId());
+      try {
+        HashCode hashCode = Files.hash(new File(filePath), Hashing.md5());
+        dataFile.setChecksum(hashCode.toString());
+      } catch (IOException e){
+        throw new DataImportException(e);
+      }
     }
+    
     Optional<DataFile> dfOptional = dataFileRepository.findByFilePath(filePath);
+    
+    // Does a record with the file path exist already?
     if (!dfOptional.isPresent()){
+      
+      // If not, create a new record
       dataFile = dataFileRepository.insert(dataFile);
       Printer.print(String.format("Creating new DataFile record: %s", dataFile.toString()), logger, Level.INFO);
+      
     } else {
+      
       DataFile df = dfOptional.get();
+      
+      // If file exists and skip-existing-files flag set, skip file and return
       if (importOptions.skipExistingFiles()) {
+        
         Printer.print(String.format("DataFile record already exists.  Skipping import: %s",
             df.getFilePath()), logger, Level.WARN);
         return;
-      } else if (importOptions.overwriteExistingFiles()){
+        
+      } 
+      // Otherwise, overwrite the file
+      else if (importOptions.overwriteExistingFiles()){
+        
+        // If the files have the same checksum, no need to overwrite
+        if (df.getChecksum().equalsIgnoreCase(dataFile.getChecksum())){
+          Printer.print(String.format("File is identical to original, overwrite will be skipped: %s", df.getFilePath()), logger, Level.INFO);
+          return;
+        }
+        
         Printer.print(String.format("Overwriting existing data file record: %s", df.getFilePath()), logger, Level.INFO);
         ModelRepository r;
+        
         try {
           r = (ModelRepository) repositories.getRepositoryFor(df.getModelType());
         } catch (ClassNotFoundException e){
           throw new DataImportException(e);
         }
+        
         if (r instanceof DataOperations) {
           ((DataOperations) r).deleteByDataFileId(df.getId());
         } else {
-          Printer.print(String.format("Data is not overwritable.  Exiting."), logger, Level.WARN);
+          Printer.print("Data is not over-writable.  Exiting.", logger, Level.WARN);
           return;
         }
+        
         dataFile.setDateCreated(df.getDateCreated());
         dataFileRepository.delete(df);
         dataFile = dataFileRepository.insert(dataFile);
+        
       } else {
+        
         dataFile = df;
         Printer.print(String.format("Using existing DataFile record: %s", dataFile.toString()), logger, Level.INFO);
+        
       }
     }
 

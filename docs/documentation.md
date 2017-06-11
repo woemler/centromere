@@ -87,31 +87,19 @@ Artifacts for Centromere release builds are available from the Maven Central Rep
 <dependency>
     <groupId>org.oncoblocks.centromere</groupId>
     <artifactId>centromere-core</artifactId>
-    <version>0.4.0</version>
+    <version>0.5.0</version>
 </dependency>
 
 <dependency>
     <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-data-import-cli</artifactId>
-    <version>0.4.0</version>
-</dependency>
-
-<dependency>
-    <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-mongodb</artifactId>
-    <version>0.4.0</version>
-</dependency>
-
-<dependency>
-    <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-sql</artifactId>
-    <version>0.4.0</version>
+    <artifactId>centromere-cli</artifactId>
+    <version>0.5.0</version>
 </dependency>
 
 <dependency>
     <groupId>org.oncoblocks.centromere</groupId>
     <artifactId>centromere-web</artifactId>
-    <version>0.4.0</version>
+    <version>0.5.0</version>
 </dependency>
 ```
 

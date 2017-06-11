@@ -26,6 +26,9 @@ import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.config.CoreConfiguration;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
+import com.google.common.io.Files;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -122,6 +125,13 @@ public class CommandLineExecutorTests {
     }
     Assert.isTrue(exception == null, "Exception should still be null");
     Assert.isTrue(geneRepository.count() == 0, "No records should be present.");
+  }
+  
+  @Test
+  public void fileOverwritingTest() throws Exception {
+    Resource file = new ClassPathResource("Homo_sapiens.gene_info");
+    HashCode hash = Files.hash(file.getFile(), Hashing.md5());
+    System.out.println(hash.toString());
   }
 
 
