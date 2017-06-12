@@ -18,21 +18,32 @@ package com.blueprint.centromere.ws.controller;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
+import com.blueprint.centromere.core.commons.model.Data;
+import com.blueprint.centromere.core.commons.model.DataFile;
+import com.blueprint.centromere.core.commons.model.DataSet;
+import com.blueprint.centromere.core.commons.model.Gene;
+import com.blueprint.centromere.core.commons.model.Sample;
+import com.blueprint.centromere.core.commons.model.Subject;
 import com.blueprint.centromere.core.commons.repository.MetadataOperations;
 import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.repository.Evaluation;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.ws.config.ApiMediaTypes;
-import com.blueprint.centromere.ws.exception.MalformedEntityException;
 import com.blueprint.centromere.ws.exception.ResourceNotFoundException;
 import com.blueprint.centromere.ws.exception.RestError;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -41,9 +52,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resources;
-import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -75,7 +91,7 @@ public class ModelSearchController {
   private static final Logger logger = LoggerFactory.getLogger(ModelSearchController.class);
 
   /**
-   * {@code GET /search/distinct}
+   * {@code GET /{model}/search/distinct}
    * Fetches the distinct values of the model attribute, {@code field}, which fulfill the given
    *   query parameters.
    *
@@ -130,7 +146,7 @@ public class ModelSearchController {
   }
 
   /**
-   * {@code GET /search/guess}
+   * {@code GET /{model}/search/guess}
    * Fetches the distinct values of the model attribute, {@code field}, which fulfill the given
    *   query parameters.
    *
@@ -192,44 +208,146 @@ public class ModelSearchController {
   }
 
   /**
-   * Converts a String query parameter to the appropriate model ID type.
+   * {@code GET /{uri}/search/{linked}}
+   * Fetches all data records associated with the queried {@link com.blueprint.centromere.core.commons.model.Sample}
+   *   record.
    *
-   * @param param String value of ID parameter.
-   * @param model Model type to interrogate to determine ID type.
-   * @return converted ID object.
+   * @param pagedResourcesAssembler {@link PagedResourcesAssembler}
+   * @param request {@link HttpServletRequest}
+   * @return a {@link List} of {@link Model} objects.
    */
-  protected <T extends Model<ID>, ID extends Serializable> ID convertModelIdParameter(String param, Class<T> model){
-    try {
-      Class<ID> type = (Class<ID>) model.getMethod("getId").getReturnType();
-      if (conversionService.canConvert(String.class, type)){
-        return conversionService.convert(param, type);
+  @ApiImplicitParams({
+      @ApiImplicitParam(name = "page", value = "Page number.", defaultValue = "0", dataType = "int",
+          paramType = "query"),
+      @ApiImplicitParam(name = "size", value = "Number of records per page.", defaultValue = "1000",
+          dataType = "int", paramType = "query"),
+      @ApiImplicitParam(name = "sort", value = "Sort order field and direction.", dataType = "string",
+          paramType = "query", example = "name,asc"),
+      @ApiImplicitParam(name = "fields", value = "List of fields to be included in response objects",
+          dataType = "string", paramType = "query"),
+      @ApiImplicitParam(name = "exclude", value = "List of fields to be excluded from response objects",
+          dataType = "string", paramType = "query")
+  })
+  @ApiResponses({
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
+      @ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
+      @ApiResponse(code = 404, message = "Record not found.", response = RestError.class)
+  })
+  @RequestMapping(
+      value = "/{uri}/search/{meta}",
+      method = RequestMethod.GET,
+      produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
+          ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
+          MediaType.TEXT_PLAIN_VALUE})
+  public <T extends Model<ID>, ID extends Serializable> ResponseEntity<ResponseEnvelope<T>> findByLinkedMetadata(
+      @PageableDefault(size = 1000) Pageable pageable,
+      @PathVariable("uri") String uri,
+      @PathVariable("meta") String meta,
+      PagedResourcesAssembler pagedResourcesAssembler,
+      HttpServletRequest request
+  ) {
+
+    if (!registry.isRegisteredResource(uri)){
+      logger.error(String.format("URI does not map to a registered model: %s", uri));
+      throw new ResourceNotFoundException();
+    }
+    Class<T> model = (Class<T>) registry.getModelByResource(uri);
+
+    if (!Data.class.isAssignableFrom(model)){
+      logger.error(String.format("URI does not map to a valid model: %s", uri));
+      throw new ResourceNotFoundException();
+    }
+
+    ModelRepository<T, ID> repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+    logger.info(String.format("Resolved request to model %s and repository %s",
+        model.getName(), repository.getClass().getName()));
+
+    Set<String> fields = RequestUtils.getFilteredFieldsFromRequest(request);
+    Set<String> exclude = RequestUtils.getExcludedFieldsFromRequest(request);
+    if (!fields.isEmpty()) logger.info(String.format("Selected fields: %s", fields.toString()));
+    if (!exclude.isEmpty()) logger.info(String.format("Excluded fields: %s", exclude.toString()));
+
+    ResponseEnvelope<T> envelope;
+    Map<String,String[]> parameterMap = request.getParameterMap();
+    String mediaType = request.getHeader("Accept");
+
+    Class<? extends Model<?>> metaModel;
+    String metaField;
+    if ("sample".equals(meta.toLowerCase())){
+      metaModel = Sample.class;
+      metaField = "sampleId";
+    } else if ("subject".equals(meta.toLowerCase())){
+      metaModel = Subject.class;
+      metaField = "subjectId";
+    } else if ("gene".equals(meta.toLowerCase())){
+      metaModel = Gene.class;
+      metaField = "geneId";
+    } else if ("datafile".equals(meta.toLowerCase())){
+      metaModel = DataFile.class;
+      metaField = "dataFileId";
+    } else if ("dataset".equals(meta.toLowerCase())){
+      metaModel = DataSet.class;
+      metaField = "dataSetId";
+    } else {
+      logger.error(String.format("URI does not map to a linked metadata model: %s", meta));
+      throw new ResourceNotFoundException();
+    }
+    ModelRepository<?,?> metaRepository = registry.getRepositoryByModel(metaModel);
+    logger.info(String.format("Resolved linked metadata model to %s and repository to %s", 
+        metaModel.getName(), metaRepository.getClass().getName()));
+
+    List<QueryCriteria> metaCriteria = RequestUtils.getQueryCriteriaFromFindRequest(metaModel , request);
+    List<String> metaIds = new ArrayList<>();
+    for (Model m: metaRepository.find(metaCriteria)){
+      metaIds.add((String) m.getId());
+    }
+    List<QueryCriteria> criterias
+        = Collections.singletonList(new QueryCriteria(metaField, metaIds, Evaluation.IN));
+
+    Link selfLink = new Link(rootUrl + "/" + uri + "/sample" +
+        (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
+
+    if (parameterMap.containsKey("page") || parameterMap.containsKey("size")){
+
+      Page<T> page = repository.find(criterias, pageable);
+
+      if (ApiMediaTypes.isHalMediaType(mediaType)){
+
+        PagedResources<FilterableResource> pagedResources
+            = pagedResourcesAssembler.toResource(page, assembler, selfLink);
+        envelope = new ResponseEnvelope<>(pagedResources, fields, exclude);
+
+      } else {
+
+        envelope = new ResponseEnvelope<>(page, fields, exclude);
+
       }
-    } catch (Exception e){
-      e.printStackTrace();
+
+    } else {
+
+      Sort sort = pageable.getSort();
+      List<T> entities;
+
+      if (sort != null){
+        entities = (List<T>) repository.find(criterias, sort);
+      } else {
+        entities = (List<T>) repository.find(criterias);
+      }
+
+      if (ApiMediaTypes.isHalMediaType(mediaType)){
+        List<FilterableResource> resourceList = assembler.toResources(entities);
+        Resources<FilterableResource> resources = new Resources<>(resourceList);
+        resources.add(selfLink);
+        envelope = new ResponseEnvelope<>(resources, fields, exclude);
+      } else {
+        envelope = new ResponseEnvelope<>(entities, fields, exclude);
+      }
+
     }
-    throw new MalformedEntityException(String.format("Cannot convert ID parameter to model ID type: %s", param));
-  }
 
-  /**
-   * Attempts to convert a generic object, supplied in a HTTP request, to the target type.
-   *
-   * @param object object to be converted.
-   * @param type class the object should be converted to.
-   * @param <T>  generic type of the target class.
-   * @return converted object.
-   */
-  protected <T> T convertObjectToModel(Object object, Class<T> type){
-//    objectMapper.setSerializationInclusion(Include.ALWAYS);
-    try {
-      return objectMapper.convertValue(object, type);
-    } catch (Exception e){
-      throw new MalformedEntityException(String.format("Cannot convert object to model type %s: %s",
-          type.getName(), object.toString()));
-    }
-  }
+    return new ResponseEntity<>(envelope, HttpStatus.OK);
 
-  public ResourceAssemblerSupport<Model, FilterableResource> getAssembler() {
-    return assembler;
   }
-
+  
 }

@@ -341,43 +341,55 @@ public abstract class AbstractRepositoryTests {
 
     GeneExpression geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleA.getId());
+    geneExpression.setSubjectId(sampleA.getSubjectId());
     geneExpression.setGeneId(geneA.getId());
     geneExpression.setDataFileId(dataFileA.getId());
+    geneExpression.setDataSetId(dataFileA.getDataSetId());
     geneExpression.setValue(1.23);
     data.add(geneExpression);
 
     geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleA.getId());
+    geneExpression.setSubjectId(sampleA.getSubjectId());
     geneExpression.setGeneId(geneB.getId());
     geneExpression.setDataFileId(dataFileA.getId());
+    geneExpression.setDataSetId(dataFileA.getDataSetId());
     geneExpression.setValue(2.34);
     data.add(geneExpression);
 
     geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleA.getId());
+    geneExpression.setSubjectId(sampleA.getSubjectId());
     geneExpression.setGeneId(geneC.getId());
     geneExpression.setDataFileId(dataFileA.getId());
+    geneExpression.setDataSetId(dataFileA.getDataSetId());
     geneExpression.setValue(4.56);
     data.add(geneExpression);
 
     geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleB.getId());
+    geneExpression.setSubjectId(sampleB.getSubjectId());
     geneExpression.setGeneId(geneA.getId());
     geneExpression.setDataFileId(dataFileA.getId());
+    geneExpression.setDataSetId(dataFileA.getDataSetId());
     geneExpression.setValue(6.78);
     data.add(geneExpression);
 
     geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleB.getId());
+    geneExpression.setSubjectId(sampleB.getSubjectId());
     geneExpression.setGeneId(geneB.getId());
     geneExpression.setDataFileId(dataFileA.getId());
+    geneExpression.setDataSetId(dataFileA.getDataSetId());
     geneExpression.setValue(9.10);
     data.add(geneExpression);
 
     geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleB.getId());
+    geneExpression.setSubjectId(sampleB.getSubjectId());
     geneExpression.setGeneId(geneC.getId());
     geneExpression.setDataFileId(dataFileA.getId());
+    geneExpression.setDataSetId(dataFileA.getDataSetId());
     geneExpression.setValue(12.34);
     data.add(geneExpression);
     

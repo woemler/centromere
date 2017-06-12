@@ -16,14 +16,23 @@
 
 package com.blueprint.centromere.tests.ws.test;
 
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
+import com.blueprint.centromere.core.commons.model.DataFile;
+import com.blueprint.centromere.core.commons.model.DataSet;
+import com.blueprint.centromere.core.commons.model.Gene;
+import com.blueprint.centromere.core.commons.model.Sample;
+import com.blueprint.centromere.core.commons.model.Subject;
+import com.blueprint.centromere.core.commons.repository.DataFileRepository;
+import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
+import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.ws.WebTestInitializer;
@@ -47,9 +56,13 @@ import org.springframework.test.web.servlet.MockMvc;
 public class ModelSearchControllerTests extends AbstractRepositoryTests {
 
   private static final String BASE_URL = "/api/genes/search";
+  private static final String DATA_URL = "/api/geneexpression/search";
 
   @Autowired private GeneRepository geneRepository;
-  @Autowired private GeneExpressionRepository geneExpressionRepository;
+  @Autowired private SampleRepository sampleRepository;
+  @Autowired private SubjectRepository subjectRepository;
+  @Autowired private DataSetRepository dataSetRepository;
+  @Autowired private DataFileRepository dataFileRepository;
   @Autowired private MockMvc mockMvc;
 
   // Distinct
@@ -67,6 +80,87 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[2]", is("GeneD")));
+  }
+  
+  @Test
+  public void guessTest() throws Exception {
+    mockMvc.perform(get(BASE_URL + "/guess?keyword=DEF"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(1)))
+        .andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
+        .andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneB")));
+  }
+  
+  @Test
+  public void invalidGuessTest() throws Exception {
+    mockMvc.perform(get(DATA_URL + "/guess?keyword=DEF"))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  public void findDataByGeneMetadata() throws Exception {
+
+    Gene gene = geneRepository.findByPrimaryGeneSymbol("GeneB").get(0);
+    
+    mockMvc.perform(get(DATA_URL + "/gene?primaryGeneSymbol=GeneB"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$[0]", hasKey("geneId")))
+        .andExpect(jsonPath("$[0].geneId", is(gene.getId())));
+  }
+
+  @Test
+  public void findDataBySampleMetadata() throws Exception {
+
+    Sample sample = sampleRepository.findByName("SampleA").get(0);
+
+    mockMvc.perform(get(DATA_URL + "/sample?name=SampleA"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(3)))
+        .andExpect(jsonPath("$[0]", hasKey("sampleId")))
+        .andExpect(jsonPath("$[0].sampleId", is(sample.getId())));
+  }
+
+  @Test
+  public void findDataBySubjectMetadata() throws Exception {
+
+    Subject subject = subjectRepository.findByName("SubjectA").get();
+
+    mockMvc.perform(get(DATA_URL + "/subject?name=SubjectA"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(6)))
+        .andExpect(jsonPath("$[0]", hasKey("subjectId")))
+        .andExpect(jsonPath("$[0].subjectId", is(subject.getId())));
+  }
+
+  @Test
+  public void findDataByDataFileMetadata() throws Exception {
+
+    DataFile dataFile = dataFileRepository.findByDataType("GCT RNA-Seq gene expression").get(0);
+
+    mockMvc.perform(get(DATA_URL + "/datafile?dataType=GCT RNA-Seq gene expression"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(6)))
+        .andExpect(jsonPath("$[0]", hasKey("dataFileId")))
+        .andExpect(jsonPath("$[0].dataFileId", is(dataFile.getId())));
+  }
+
+  @Test
+  public void findDataByDataSetMetadata() throws Exception {
+
+    DataSet dataSet = dataSetRepository.findByShortName("DataSetA").get();
+
+    mockMvc.perform(get(DATA_URL + "/dataset?shortName=DataSetA"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(6)))
+        .andExpect(jsonPath("$[0]", hasKey("dataSetId")))
+        .andExpect(jsonPath("$[0].dataSetId", is(dataSet.getId())));
+  }
+  
+  @Test
+  public void findInvalidDataByMetadata() throws Exception {
+    mockMvc.perform(get(BASE_URL + "/dataset?shortName=DataSetA"))
+        .andExpect(status().isNotFound());
   }
   
 }
