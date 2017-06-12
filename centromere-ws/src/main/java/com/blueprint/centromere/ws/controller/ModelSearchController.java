@@ -54,7 +54,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
+ * Controller methods for generic {@link Model} implementations and their search methods
+ *
  * @author woemler
+ * @since 0.5.0
  */
 @Controller
 @RequestMapping("${centromere.api.root-url}")
