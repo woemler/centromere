@@ -20,11 +20,21 @@ package com.blueprint.centromere.core.config;
  * @author woemler
  */
 public class Profiles {
+  
+  // Schema and repositories
+  public static final String SCHEMA_CUSTOM = "schema_custom";
+  public static final String SCHEMA_DEFAULT = "!"+SCHEMA_CUSTOM;
+  
 
+  // Application modes
   public static final String WEB_PROFILE = "mode_web";
   public static final String CLI_PROFILE = "mode_cli";
+  
+  // Web API documentation
   public static final String API_DOCUMENTATION_ENABLED_PROFILE = "documentation_enabled";
   public static final String API_DOCUMENTATION_DISABLED_PROFILE = "documentation_disabled";
+  
+  // Web security
   public static final String NO_SECURITY = "security_none";
   public static final String SECURE_WRITE_PROFILE = "security_secure_write";
   public static final String SECURE_READ_WRITE_PROFILE = "security_secure_read_write";

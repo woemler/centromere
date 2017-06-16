@@ -60,4 +60,26 @@ public interface DataSetSupport {
    */
   Optional<Sample> findSample(String name, Subject subject);
 
+  /**
+   * Checks to see if a {@link Sample} with the given name exists in the {@link DataSet} scope.  If 
+   *   one does, it is returned, otherwise, a new record is created and returned.  If no {@link Subject}
+   *   can be found to associate with the sample, an empty {@link Optional} is returned.
+   * 
+   * @param name
+   * @param dataSet
+   * @return
+   */
+  Optional<Sample> findOrCreateSample(String name, DataSet dataSet);
+
+  /**
+   * Checks to see if a {@link Sample} with the given name exists in the {@link DataSet} scope.  If 
+   *   one does, it is returned, otherwise, a new record is created and returned.  
+   *
+   * @param name
+   * @param subject
+   * @param dataSet
+   * @return
+   */
+  Optional<Sample> findOrCreateSample(String name, Subject subject, DataSet dataSet);
+
 }

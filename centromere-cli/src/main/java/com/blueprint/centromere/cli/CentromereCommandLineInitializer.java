@@ -16,35 +16,35 @@
 
 package com.blueprint.centromere.cli;
 
+import com.blueprint.centromere.cli.config.CommandLineInputConfiguration;
 import com.blueprint.centromere.core.config.Profiles;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.Banner.Mode;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 
 /**
  * @author woemler
  */
 @SpringBootApplication
-@Configuration
-@Import({ CommandLineInputConfiguration.class })
 public class CentromereCommandLineInitializer {
 	
 	private static final Logger logger = LoggerFactory.getLogger(CentromereCommandLineInitializer.class);
 
-	public static void run(Class<?> source, String[] args){
-		SpringApplication springApplication = new SpringApplication(source);
-		springApplication.setBannerMode(Mode.LOG);
+  public static void run(Class<?> source, String[] args){
+    SpringApplicationBuilder builder = new SpringApplicationBuilder(source);
+    builder.child(CommandLineInputConfiguration.class);
+    
+    builder.bannerMode((Mode.LOG));
+    builder.web(false);
     String[] profiles = { Profiles.CLI_PROFILE };
-    springApplication.setAdditionalProfiles(profiles);
+    builder.profiles(profiles);
     logger.info(String.format("Running Centromere with profiles: %s", Arrays.asList(profiles)));
-		logger.info(String.format("Running Centromere with arguments: %s", args.toString()));
-		System.out.println("Starting Centromere CLI...\n");
-		springApplication.run(args);
-	}
+    logger.info(String.format("Running Centromere with arguments: %s", args.toString()));
+    System.out.println("Starting Centromere CLI...\n");
+    builder.run(args);
+  }
 	
 }

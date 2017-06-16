@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.cli;
+package com.blueprint.centromere.cli.config;
 
+import com.blueprint.centromere.cli.CommandLineInputExecutor;
+import com.blueprint.centromere.cli.FileImportExecutor;
+import com.blueprint.centromere.cli.ListCommandExecutor;
+import com.blueprint.centromere.cli.ManifestImportExecutor;
+import com.blueprint.centromere.cli.ModelProcessorBeanRegistry;
 import com.blueprint.centromere.core.config.Profiles;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -66,12 +71,4 @@ public class CommandLineInputConfiguration {
     return new Repositories(context);
   }
 
-//	@Profile({Schema.DEFAULT_PROFILE})
-//  @ComponentScan(basePackages = {
-//      "com.blueprince.centromere.core.commons.processor",
-//      "com.blueprince.centromere.core.commons.reader"
-//  })
-//	public static class DefaultSchemaProcessorConfig {
-//  }
-	
 }

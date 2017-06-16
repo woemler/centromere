@@ -108,9 +108,38 @@ public class GenericDataSetSupport implements DataSetSupport {
     return sampleRepository.findByNameAndDataSetId(name, dataSet.getId());
   }
 
+  /**
+   * {@link DataSetSupport#findSample(String, Subject)}
+   */
   @Override
   public Optional<Sample> findSample(String name, Subject subject) {
     return sampleRepository.findByNameAndSubjectId(name, subject.getId());
+  }
+
+  /**
+   * {@link DataSetSupport#findOrCreateSample(String, DataSet)}
+   */
+  @Override
+  public Optional<Sample> findOrCreateSample(String name, DataSet dataSet){
+    Optional<Sample> optional = this.findSample(name, dataSet);
+    if (optional.isPresent()) return optional;
+    Optional<Subject> subjectOptional = getSubjectRepository().findByName(name);
+    if (subjectOptional.isPresent()){
+      return Optional.ofNullable(createSample(name, subjectOptional.get(), dataSet));
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  /**
+   * {@link DataSetSupport#findOrCreateSample(String, Subject, DataSet)}
+   */
+  @Override
+  public Optional<Sample> findOrCreateSample(String name, Subject subject, DataSet dataSet){
+    Optional<Sample> optional = this.findSample(name, subject);
+    if (optional.isPresent()) return optional;
+    return Optional.ofNullable(createSample(name, subject, dataSet));
+    
   }
 
   protected SubjectRepository getSubjectRepository() {

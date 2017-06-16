@@ -46,10 +46,6 @@ public class DelimtedTextFileWriter<T extends Model<?>> extends AbstractRecordFi
   private List<String> fields = new ArrayList<>();
   private boolean headerFlag = true;
 
-  public DelimtedTextFileWriter() {
-    super();
-  }
-
   public DelimtedTextFileWriter(Class<T> model) {
     super(model);
   }

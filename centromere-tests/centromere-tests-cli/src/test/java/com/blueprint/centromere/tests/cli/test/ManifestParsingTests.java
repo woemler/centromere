@@ -16,11 +16,10 @@
 
 package com.blueprint.centromere.tests.cli.test;
 
-import com.blueprint.centromere.cli.CommandLineInputConfiguration;
 import com.blueprint.centromere.cli.manifest.ImportManifest;
 import com.blueprint.centromere.cli.manifest.ManifestFile;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
+import com.blueprint.centromere.tests.cli.CommandLineTestInitializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -39,11 +38,7 @@ import org.springframework.util.Assert;
  * @author woemler
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { 
-		MongoDataSourceConfig.class,
-		CommandLineInputConfiguration.class,
-		CommandLineTestConfig.class
-})
+@SpringBootTest(classes = CommandLineTestInitializer.class)
 @ActiveProfiles({Profiles.CLI_PROFILE})
 @FixMethodOrder
 public class ManifestParsingTests {

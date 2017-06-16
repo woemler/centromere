@@ -17,8 +17,7 @@
 package com.blueprint.centromere.tests.cli;
 
 import com.blueprint.centromere.cli.CentromereCommandLineInitializer;
-import com.blueprint.centromere.cli.CommandLineInputConfiguration;
-import com.blueprint.centromere.core.config.CoreConfiguration;
+import com.blueprint.centromere.core.config.AutoConfigureCentromere;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
@@ -26,10 +25,10 @@ import org.springframework.context.annotation.Import;
 /**
  * @author woemler
  */
-@Import({MongoDataSourceConfig.class, CoreConfiguration.class, CommandLineInputConfiguration.class})
+@Import({MongoDataSourceConfig.class})
+@AutoConfigureCentromere
 @SpringBootApplication
 public class CommandLineTestInitializer extends CentromereCommandLineInitializer {
-
   public static void main(String[] args) {
     CentromereCommandLineInitializer.run(CommandLineTestInitializer.class, args);
   }

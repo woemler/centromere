@@ -32,19 +32,7 @@ import org.springframework.util.Assert;
  */
 public class MongoImportTempFileWriter<T extends Model<?>> extends AbstractRecordFileWriter<T> {
 
-  private MongoOperations mongoOperations;
-
-  public MongoImportTempFileWriter() {
-  }
-
-  public MongoImportTempFileWriter(
-      MongoOperations mongoOperations) {
-    this.mongoOperations = mongoOperations;
-  }
-
-  public MongoImportTempFileWriter(Class<T> model) {
-    super(model);
-  }
+  private final MongoOperations mongoOperations;
 
   public MongoImportTempFileWriter(Class<T> model, MongoOperations mongoOperations) {
     super(model);
@@ -93,7 +81,4 @@ public class MongoImportTempFileWriter<T extends Model<?>> extends AbstractRecor
     return mongoOperations;
   }
 
-  public void setMongoOperations(MongoOperations mongoOperations) {
-    this.mongoOperations = mongoOperations;
-  }
 }

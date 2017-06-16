@@ -49,10 +49,7 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
 	private ImportOptions options = new ImportOptionsImpl();
 	private DataFile dataFile;
 	private DataSet dataSet;
-	private Class<T> model;
-
-  public AbstractRecordFileWriter() {
-  }
+	private final Class<T> model;
 
   public AbstractRecordFileWriter(Class<T> model) {
     this.model = model;
@@ -203,10 +200,8 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
   public Class<T> getModel() {
     return model;
   }
-
-  public void setModel(Class<T> model) {
-    this.model = model;
-  }
+  
+  public void setModel(Class<T> model){}
 
   @Override
   public ImportOptions getImportOptions() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 William Oemler, Blueprint Medicines
+ * Copyright 2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.data.repository.support.Repositories;
 
 /**
  * Configures required components, such as repositories and data import beans.
@@ -36,13 +35,15 @@ public class CoreConfiguration {
 	@Configuration
 	public static class DefaultModelConfiguration {
 
+	  @Profile({ "default", Profiles.SCHEMA_DEFAULT })
 		@Configuration
-		@EnableMongoRepositories(basePackages = {
-				"com.blueprint.centromere.core.commons.repository"},
+		@EnableMongoRepositories(
+		    basePackages = {"com.blueprint.centromere.core.commons.repository"},
 				repositoryBaseClass = MongoModelRepository.class,
 				repositoryFactoryBeanClass = MongoModelRepositoryFactoryBean.class)
 		public static class DefaultMongoSchemaConfiguration { }
 
+		
     @Profile({ Profiles.CLI_PROFILE })
 		@Configuration
 		@ComponentScan(basePackages = {
@@ -54,8 +55,13 @@ public class CoreConfiguration {
     }
 
 	}
-
-	@Configuration
+  
+  @Configuration
+//  @SuppressWarnings("SpringComponentScan")
+//  @ComponentScan(basePackages = {
+//      "com.blueprint.centromere.cli.config",
+//      "com.blueprint.centromere.web.config"
+//  })
   public static class CommonConfiguration {
 
     @Bean

@@ -16,16 +16,14 @@
 
 package com.blueprint.centromere.tests.cli.test;
 
-import com.blueprint.centromere.cli.CommandLineInputConfiguration;
 import com.blueprint.centromere.cli.CommandLineInputExecutor;
 import com.blueprint.centromere.cli.ModelProcessorBeanRegistry;
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.config.CoreConfiguration;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
+import com.blueprint.centromere.tests.cli.CommandLineTestInitializer;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
@@ -35,6 +33,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ActiveProfiles;
@@ -45,12 +44,13 @@ import org.springframework.util.Assert;
  * @author woemler
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { 
-		MongoDataSourceConfig.class,
-		CommandLineInputConfiguration.class,
-		CommandLineTestConfig.class,
-		CoreConfiguration.class
-})
+@SpringBootTest(classes = CommandLineTestInitializer.class, webEnvironment = WebEnvironment.NONE)
+//@SpringBootTest(classes = { 
+//		MongoDataSourceConfig.class,
+//		CommandLineInputConfiguration.class,
+//		CommandLineTestConfig.class,
+//		CoreConfiguration.class
+//})
 @ActiveProfiles({ Profiles.CLI_PROFILE })
 @FixMethodOrder
 public class CommandLineExecutorTests {

@@ -18,41 +18,47 @@ package com.blueprint.centromere.ws;
 
 import com.blueprint.centromere.core.config.AutoConfigureCentromere;
 import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.ws.config.SwaggerConfig;
 import com.blueprint.centromere.ws.config.WebApplicationConfig;
+import com.blueprint.centromere.ws.config.WebSecurityConfig;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 /**
  * @author woemler
  */
 @SpringBootApplication
-@Import({ WebApplicationConfig.class })
-@Configuration
 public class CentromereWebInitializer extends SpringBootServletInitializer {
 
   private static final Logger logger = LoggerFactory.getLogger(CentromereWebInitializer.class);
 
   public static void run(Class<?> source, String[] args){
-    SpringApplication springApplication = new SpringApplication(source);
+    SpringApplicationBuilder builder = new SpringApplicationBuilder(source);
+    builder.child(WebApplicationConfig.class, WebSecurityConfig.class, SwaggerConfig.class);
+    builder.profiles(getActiveProfiles(source));
+    builder.web(true);
+    builder.run(args);
+  }
+  
+  private static String[] getActiveProfiles(Class<?> source){
+    String[] profiles;
     if (source.isAnnotationPresent(AutoConfigureCentromere.class)){
       AutoConfigureCentromere annotation = source.getAnnotation(AutoConfigureCentromere.class);
       String securityProfile = annotation.enableWebSecurity()
           ? Profiles.SECURE_READ_WRITE_PROFILE : Profiles.NO_SECURITY;
       String apiDocumentationProfile = annotation.enableApiDocumentation()
           ? Profiles.API_DOCUMENTATION_ENABLED_PROFILE : Profiles.API_DOCUMENTATION_DISABLED_PROFILE;
-      String[] profiles = { Profiles.WEB_PROFILE, securityProfile, apiDocumentationProfile };
-      springApplication.setAdditionalProfiles(profiles);
+      profiles = new String[] { Profiles.WEB_PROFILE, securityProfile, apiDocumentationProfile };
       logger.info(String.format("Running Centromere with profiles: %s", Arrays.asList(profiles)));
     } else {
       logger.info("Running Centromere with default profiles.");
+      profiles = new String[]{};
     }
-    springApplication.run(args);
+    return profiles;
   }
 
 }

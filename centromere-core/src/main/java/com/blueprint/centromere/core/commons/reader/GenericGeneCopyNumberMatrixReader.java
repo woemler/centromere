@@ -22,7 +22,8 @@ import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
-import com.blueprint.centromere.core.commons.support.CcleSupport;
+import com.blueprint.centromere.core.commons.support.DataSetSupport;
+import com.blueprint.centromere.core.commons.support.GenericDataSetSupport;
 import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.reader.MultiRecordLineFileReader;
@@ -37,19 +38,25 @@ import org.slf4j.LoggerFactory;
 /**
  * @author woemler
  */
-public class CcleGeneCopyNumberReader extends MultiRecordLineFileReader<GeneCopyNumber> 
+public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader<GeneCopyNumber> 
     implements SampleAware {
   
-  private static final Logger logger = LoggerFactory.getLogger(CcleGeneCopyNumberReader.class);
+  private static final Logger logger = LoggerFactory.getLogger(GenericGeneCopyNumberMatrixReader.class);
   
   private final GeneRepository geneRepository;
-  private final CcleSupport support;
+  private final DataSetSupport support;
   private Map<Integer, Sample> samples = new HashMap<>();
 
-  public CcleGeneCopyNumberReader(SubjectRepository subjectRepository,
+  public GenericGeneCopyNumberMatrixReader(SubjectRepository subjectRepository,
       SampleRepository sampleRepository, GeneRepository geneRepository) {
     this.geneRepository = geneRepository;
-    this.support = new CcleSupport(subjectRepository, sampleRepository);
+    this.support = new GenericDataSetSupport(subjectRepository, sampleRepository);
+  }
+
+  public GenericGeneCopyNumberMatrixReader(DataSetSupport dataSetSupport, 
+      GeneRepository geneRepository) {
+    this.geneRepository = geneRepository;
+    this.support = dataSetSupport;
   }
 
   /**
@@ -112,7 +119,7 @@ public class CcleGeneCopyNumberReader extends MultiRecordLineFileReader<GeneCopy
   protected void parseHeader(String line) {
     String[] bits = line.trim().split(this.getDelimiter());
     for (int i = 2; i < bits.length; i++){
-      Optional<Sample> optional = support.fetchOrCreateSample(bits[i], this.getDataSet());
+      Optional<Sample> optional = support.findOrCreateSample(bits[i], this.getDataSet());
       if (optional.isPresent()){
         samples.put(i, optional.get());
       } else {

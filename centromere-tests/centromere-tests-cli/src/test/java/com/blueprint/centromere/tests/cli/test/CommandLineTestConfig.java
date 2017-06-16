@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.tests.cli.test;
 
-import com.blueprint.centromere.cli.CommandLineInputConfiguration;
+import com.blueprint.centromere.cli.config.CommandLineInputConfiguration;
 import com.blueprint.centromere.core.config.CoreConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

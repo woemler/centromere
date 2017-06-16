@@ -16,12 +16,9 @@
 
 package com.blueprint.centromere.tests.ws;
 
-import com.blueprint.centromere.core.config.CoreConfiguration;
+import com.blueprint.centromere.core.config.AutoConfigureCentromere;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import com.blueprint.centromere.ws.CentromereWebInitializer;
-import com.blueprint.centromere.ws.config.SwaggerConfig;
-import com.blueprint.centromere.ws.config.WebApplicationConfig;
-import com.blueprint.centromere.ws.config.WebSecurityConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
@@ -30,14 +27,15 @@ import org.springframework.context.annotation.Import;
 /**
  * @author woemler
  */
-@SpringBootApplication
+@AutoConfigureCentromere
 @Configuration
+@SpringBootApplication
 @Import({
-    CoreConfiguration.class,
-    MongoDataSourceConfig.class,
-    WebApplicationConfig.class,
-    WebSecurityConfig.class,
-    SwaggerConfig.class
+    //CoreConfiguration.class,
+    MongoDataSourceConfig.class//,
+//    WebApplicationConfig.class,
+//    WebSecurityConfig.class,
+//    SwaggerConfig.class
 })
 public class WebTestInitializer extends CentromereWebInitializer {
 

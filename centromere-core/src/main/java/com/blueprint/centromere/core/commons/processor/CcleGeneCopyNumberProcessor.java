@@ -16,40 +16,45 @@
 
 package com.blueprint.centromere.core.commons.processor;
 
-import com.blueprint.centromere.core.commons.model.GeneExpression;
-import com.blueprint.centromere.core.commons.reader.TcgaRnaSeqGeneExpressionFileReader;
+import com.blueprint.centromere.core.commons.model.GeneCopyNumber;
+import com.blueprint.centromere.core.commons.reader.GenericGeneCopyNumberMatrixReader;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
-import com.blueprint.centromere.core.commons.validator.GeneExpressionValidator;
+import com.blueprint.centromere.core.commons.support.CcleSupport;
+import com.blueprint.centromere.core.commons.validator.GeneCopyNumberValidator;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.importer.MongoImportTempFileImporter;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.writer.MongoImportTempFileWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
 /**
  * @author woemler
  */
-@DataTypes(value = { "tcga_gene_expression" }, description = "Gene-normalized RNA-Seq expression data from the TCGA")
+@DataTypes(value = { "ccle_gene_copy_number" }, 
+    description = "Gene-normalized copy number values, in a sample-gene matrix format, from the CCLE.")
 @Component
-public class TcgaGeneExpressionProcessor extends GenericRecordProcessor<GeneExpression> {
+public class CcleGeneCopyNumberProcessor extends GenericRecordProcessor<GeneCopyNumber> {
 
-    @Autowired
-    public TcgaGeneExpressionProcessor(
-        SampleRepository sampleRepository,
-        SubjectRepository subjectRepository,
-        GeneRepository geneRepository,
-        MongoOperations mongoOperations,
-        Environment environment
-    ) {
-      this.setReader(new TcgaRnaSeqGeneExpressionFileReader(geneRepository, sampleRepository, subjectRepository));
-      this.setValidator(new GeneExpressionValidator());
-      this.setWriter(new MongoImportTempFileWriter<>(GeneExpression.class, mongoOperations));
-      this.setImporter(new MongoImportTempFileImporter<>(GeneExpression.class, environment));
-      this.setModel(GeneExpression.class);
-    }
+  @Autowired
+  public CcleGeneCopyNumberProcessor(
+      SampleRepository sampleRepository,
+      SubjectRepository subjectRepository,
+      GeneRepository geneRepository,
+      MongoTemplate mongoTemplate,
+      Environment environment
+  ) {
+    GenericGeneCopyNumberMatrixReader reader = new GenericGeneCopyNumberMatrixReader(
+        new CcleSupport(subjectRepository, sampleRepository), geneRepository);
+    this.setReader(reader);
+    this.setValidator(new GeneCopyNumberValidator());
+    this.setWriter(new MongoImportTempFileWriter<>(GeneCopyNumber.class, mongoTemplate));
+    this.setImporter(new MongoImportTempFileImporter<>(GeneCopyNumber.class, environment));
+    this.setModel(GeneCopyNumber.class);
+  }
+  
 }
