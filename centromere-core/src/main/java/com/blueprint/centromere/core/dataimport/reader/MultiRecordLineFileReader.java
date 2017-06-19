@@ -36,7 +36,7 @@ public abstract class MultiRecordLineFileReader<T extends Model<?>>
 	
 	private List<T> recordList;
 	private List<String> headers;
-	private boolean headerFlag;
+	private boolean headerFlag = true;
 	private String delimiter = "\\t";
 
 	/**

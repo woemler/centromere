@@ -122,8 +122,9 @@ public abstract class AbstractRecordFileReader<T extends Model<?>>
    * @param dataSet
    * @param args
    */
-  public void doBefore(File inputFile, DataFile dataFile, DataSet dataSet, Object... args) 
-       {
+  public void doBefore(File inputFile, DataFile dataFile, DataSet dataSet, Object... args) {
+    this.setDataFile(dataFile);
+    this.setDataSet(dataSet);
     List<Object> objects = Arrays.asList(inputFile, dataFile, dataSet);
     objects.addAll(Arrays.asList(args));
     Object[] arguments = new Object[objects.size()];

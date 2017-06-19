@@ -39,29 +39,29 @@ public class SubjectTests {
 		ClassPathResource resource = new ClassPathResource("samples/tcga_sample_subjects.txt");
 		TcgaSubjectReader reader = new TcgaSubjectReader();
 		Assert.isTrue(Subject.class.equals(reader.getModel()), String.format("Expected %s, got %s",
-				Subject.class.getName(), reader.getModel().getName()));
-        List<Subject> subjects = new ArrayList<>();
+    Subject.class.getName(), reader.getModel().getName()));
+    List<Subject> subjects = new ArrayList<>();
 		try {
 			reader.doBefore(new String[] {resource.getPath()});
 			Subject subject = reader.readRecord();
-            while (subject != null){
-                subjects.add(subject);
-                subject = reader.readRecord();
-            }
+      while (subject != null){
+          subjects.add(subject);
+          subject = reader.readRecord();
+      }
 		} finally {
 			reader.doAfter();
 		}
 		Assert.notEmpty(subjects);
-        System.out.println(subjects.toString());
-        Assert.isTrue(subjects.size() == 5);
-        Subject subject = subjects.get(0);
-        Assert.notNull(subject);
-        Assert.isTrue("tcga-2y-a9gv".equals(subject.getName()));
-        Assert.isTrue("liver".equals(subject.getAttribute("tumor_tissue_site")));
-        subject = subjects.get(4);
-        Assert.notNull(subject);
-        Assert.isTrue("tcga-bc-a110".equals(subject.getName()));
-        Assert.isTrue("black or african american".equals(subject.getAttribute("race")));
+    System.out.println(subjects.toString());
+    Assert.isTrue(subjects.size() == 5);
+    Subject subject = subjects.get(0);
+    Assert.notNull(subject);
+    Assert.isTrue("tcga-2y-a9gv".equals(subject.getName()));
+    Assert.isTrue("liver".equals(subject.getAttribute("tumor_tissue_site")));
+    subject = subjects.get(4);
+    Assert.notNull(subject);
+    Assert.isTrue("tcga-bc-a110".equals(subject.getName()));
+    Assert.isTrue("black or african american".equals(subject.getAttribute("race")));
 	}
 	
 }

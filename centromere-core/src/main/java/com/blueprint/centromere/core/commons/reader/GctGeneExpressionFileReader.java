@@ -76,6 +76,7 @@ public class GctGeneExpressionFileReader
 
   @Override 
 	public void doBefore(Object... args) {
+    super.doBefore(args);
     Assert.notNull(dataFile, "DataFile cannot be null.");
     Assert.notNull(dataFile.getId(), "DataFile ID cannot be null.");
     sampleMap = new HashMap<>();
@@ -152,7 +153,7 @@ public class GctGeneExpressionFileReader
 		String[] b = line.split(getDelimiter());
 		if (b.length > 1){
 			Optional<Gene> optional;
-			if (!b[0].equals("")){
+			if (!b[0].trim().equals("")){
 				optional = geneRepository.bestGuess(b[0]);
 				if (optional.isPresent()) gene = optional.get();
 			}
