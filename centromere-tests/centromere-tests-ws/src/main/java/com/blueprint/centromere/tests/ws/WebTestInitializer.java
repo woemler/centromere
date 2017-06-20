@@ -30,13 +30,7 @@ import org.springframework.context.annotation.Import;
 @AutoConfigureCentromere
 @Configuration
 @SpringBootApplication
-@Import({
-    //CoreConfiguration.class,
-    MongoDataSourceConfig.class//,
-//    WebApplicationConfig.class,
-//    WebSecurityConfig.class,
-//    SwaggerConfig.class
-})
+@Import({ MongoDataSourceConfig.class })
 public class WebTestInitializer extends CentromereWebInitializer {
 
   public static void main(String[] args) {

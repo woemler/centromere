@@ -56,6 +56,10 @@ public class FileImportExecutor implements EnvironmentAware {
 	private Repositories repositories;
 	
 	private static final Logger logger = LoggerFactory.getLogger(FileImportExecutor.class);
+
+  public void run(String dataType, String filePath) {
+    run(dataType, filePath, null, null);
+  }
 	
 	public void run(String dataType, String filePath, DataSet dataSet, DataFile dataFile){
 
@@ -63,8 +67,10 @@ public class FileImportExecutor implements EnvironmentAware {
 		
 	  // Check to make sure the target data type is supported
 	  if (!processorRegistry.isSupportedDataType(dataType)){
-			throw new DataImportException(String.format("Data type %s is not supported by a registered " 
-					+ "record processor.", dataType));
+	    String message = String.format("Data type %s is not supported by a registered "
+          + "record processor.", dataType);
+	    Printer.print(message, logger, Level.WARN);
+			throw new DataImportException(message);
 		}
     RecordProcessor processor = processorRegistry.getByDataType(dataType);
     logger.info(String.format("Using record processor: %s", processor.getClass().getName()));
@@ -86,18 +92,18 @@ public class FileImportExecutor implements EnvironmentAware {
     // Get the data file object
     if (dataFile == null){
       dataFile = new DataFile();
-      dataFile.setFilePath(filePath);
-      dataFile.setDataType(dataType);
-      dataFile.setModel(processor.getModel());
-      dataFile.setDateCreated(new Date());
-      dataFile.setDateUpdated(new Date());
-      dataFile.setDataSetId(dataSet.getId());
-      try {
-        HashCode hashCode = Files.hash(new File(filePath), Hashing.md5());
-        dataFile.setChecksum(hashCode.toString());
-      } catch (IOException e){
-        throw new DataImportException(e);
-      }
+    }
+    dataFile.setFilePath(filePath);
+    dataFile.setDataType(dataType);
+    dataFile.setModel(processor.getModel());
+    dataFile.setDataSetId(dataSet.getId());
+    dataFile.setDateCreated(new Date());
+    dataFile.setDateUpdated(new Date());
+    try {
+      HashCode hashCode = Files.hash(new File(filePath), Hashing.md5());
+      dataFile.setChecksum(hashCode.toString());
+    } catch (IOException e){
+      throw new DataImportException(e);
     }
     
     Optional<DataFile> dfOptional = dataFileRepository.findByFilePath(filePath);
@@ -121,7 +127,7 @@ public class FileImportExecutor implements EnvironmentAware {
         return;
         
       } 
-      // Otherwise, overwrite the file
+      // If overwrite-existing-files flag is set, overwrite the file record and its data
       else if (importOptions.overwriteExistingFiles()){
         
         // If the files have the same checksum, no need to overwrite
@@ -131,14 +137,16 @@ public class FileImportExecutor implements EnvironmentAware {
         }
         
         Printer.print(String.format("Overwriting existing data file record: %s", df.getFilePath()), logger, Level.INFO);
-        ModelRepository r;
         
+        // Get the repository for the file's data type
+        ModelRepository r;
         try {
           r = (ModelRepository) repositories.getRepositoryFor(df.getModelType());
         } catch (ClassNotFoundException e){
           throw new DataImportException(e);
         }
         
+        // If possible, delete the associated records for the file
         if (r instanceof DataOperations) {
           ((DataOperations) r).deleteByDataFileId(df.getId());
         } else {
@@ -146,11 +154,14 @@ public class FileImportExecutor implements EnvironmentAware {
           return;
         }
         
+        // Create a new DataFile record for the file
         dataFile.setDateCreated(df.getDateCreated());
         dataFileRepository.delete(df);
         dataFile = dataFileRepository.insert(dataFile);
         
-      } else {
+      } 
+      // Otherwise, use the existing file record and append to its existing records. 
+      else {
         
         dataFile = df;
         Printer.print(String.format("Using existing DataFile record: %s", dataFile.toString()), logger, Level.INFO);
@@ -218,10 +229,6 @@ public class FileImportExecutor implements EnvironmentAware {
     }
     
     return dataSet;
-  }
-
-  public void run(String dataType, String filePath) {
-	  run(dataType, filePath, null, null);
   }
 
 	@Autowired

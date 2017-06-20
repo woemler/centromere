@@ -17,6 +17,7 @@
 package com.blueprint.centromere.cli.config;
 
 import com.blueprint.centromere.cli.CommandLineInputExecutor;
+import com.blueprint.centromere.cli.DeleteCommandExecutor;
 import com.blueprint.centromere.cli.FileImportExecutor;
 import com.blueprint.centromere.cli.ListCommandExecutor;
 import com.blueprint.centromere.cli.ManifestImportExecutor;
@@ -60,6 +61,11 @@ public class CommandLineInputConfiguration {
 	public ManifestImportExecutor manifestImportExecutor(){
 		return new ManifestImportExecutor();
 	}
+	
+	@Bean
+  public DeleteCommandExecutor deleteCommandExecutor(){
+	  return new DeleteCommandExecutor();
+  }
 
 	@Bean
   public ListCommandExecutor listCommandExecutor(){

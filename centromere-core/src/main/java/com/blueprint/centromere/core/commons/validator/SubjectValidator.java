@@ -34,7 +34,7 @@ public class SubjectValidator implements Validator {
 	@Override 
 	public void validate(Object o, Errors errors) {
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "name.empty");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "species", "species.empty");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "gender", "gender.empty");
+//		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "species", "species.empty");
+//		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "gender", "gender.empty");
 	}
 }

@@ -44,6 +44,7 @@ public class CommandLineInputExecutor implements CommandLineRunner {
   private FileImportExecutor fileImportExecutor;
 	private ManifestImportExecutor manifestImportExecutor;
 	private ListCommandExecutor listCommandExecutor;
+	private DeleteCommandExecutor deleteCommandExecutor;
 	
 	public static final String IMPORT_COMMAND = "import";
 	public static final String IMPORT_FILE_COMMAND = "file";
@@ -181,7 +182,7 @@ public class CommandLineInputExecutor implements CommandLineRunner {
 		  if (toDelete != null && !toDelete.isEmpty()){
         deleteable = toDelete.remove(0);
 		    if (toDelete.size() > 0) {
-
+          deleteCommandExecutor.run(deleteable, toDelete);
           code = 0;
         } else {
 		      Printer.print(String.format("No items selected for deletion: %s", deleteable), logger, Level.WARN);
@@ -202,9 +203,10 @@ public class CommandLineInputExecutor implements CommandLineRunner {
 	private void unknownCommand(){
     logger.error("Invalid command");
     System.out.println("ERROR: Invalid command");
-    System.out.println("Available commands: import, list");
+    System.out.println("Available commands: import, list, delete");
     System.out.println("    import: Imports one or more files into the data warehouse.");
-    System.out.println("    list:   List available data models, file processors, imported files, and other resources");
+    System.out.println("    list:   List available data models, file processors, imported files, and other resources.");
+    System.out.println("    delete:   Remove data sets, data files, and their associated records from the warehouse.");
   }
 
 	/**
@@ -235,5 +237,10 @@ public class CommandLineInputExecutor implements CommandLineRunner {
   @Autowired
   public void setListCommandExecutor(ListCommandExecutor listCommandExecutor) {
     this.listCommandExecutor = listCommandExecutor;
+  }
+
+  @Autowired
+  public void setDeleteCommandExecutor(DeleteCommandExecutor deleteCommandExecutor) {
+    this.deleteCommandExecutor = deleteCommandExecutor;
   }
 }

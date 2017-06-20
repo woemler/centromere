@@ -28,8 +28,9 @@ public class ImportOptionsImpl implements ImportOptions {
   private boolean skipInvalidSamples = false;
   private boolean skipInvalidGenes = false;
   private boolean skipInvalidFiles = false;
-  private boolean skipExistingFiles = false;
-  private boolean overwriteExistingFiles = false;
+  private boolean skipExistingFiles = true;
+  private boolean overwriteExistingFiles = true;
+  private boolean overwriteExistingDataSets = false;
   private String tempFilePath = System.getProperty("java.io.tmpdir");
 
   public ImportOptionsImpl() {
@@ -53,6 +54,9 @@ public class ImportOptionsImpl implements ImportOptions {
     }
     if (environment.containsProperty(Properties.OVERWRITE_EXISTING_FILES)){
       overwriteExistingFiles = environment.getProperty(Properties.OVERWRITE_EXISTING_FILES, Boolean.class);
+    }
+    if (environment.containsProperty(Properties.OVERWRITE_EXISTING_DATA_SETS)){
+      overwriteExistingDataSets = environment.getProperty(Properties.OVERWRITE_EXISTING_DATA_SETS, Boolean.class);
     }
     if (environment.containsProperty(Properties.TEMP_DIR)){
       String tempPath = environment.getProperty(Properties.TEMP_DIR);
@@ -87,7 +91,12 @@ public class ImportOptionsImpl implements ImportOptions {
 
   @Override
   public boolean overwriteExistingFiles() {
-    return false;
+    return overwriteExistingFiles;
+  }
+
+  @Override
+  public boolean overwriteExistingDataSets() {
+    return overwriteExistingDataSets;
   }
 
   @Override
@@ -117,6 +126,10 @@ public class ImportOptionsImpl implements ImportOptions {
 
   public void setOverwriteExistingFiles(boolean overwriteExistingFiles) {
     this.overwriteExistingFiles = overwriteExistingFiles;
+  }
+
+  public void setOverwriteExistingDataSets(boolean overwriteExistingDataSets) {
+    this.overwriteExistingDataSets = overwriteExistingDataSets;
   }
 
   public void setTempFilePath(String tempFilePath) {
