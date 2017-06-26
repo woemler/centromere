@@ -39,8 +39,6 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.hateoas.config.EnableEntityLinks;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
-import org.springframework.oxm.xstream.XStreamMarshaller;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -60,7 +58,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 		@PropertySource(value = {"classpath:centromere.properties"},ignoreResourceNotFound = true)
 })
 @Import({
-		//RepositoryRestMvcConfiguration.class,
 		WebSecurityConfig.class,
 		SwaggerConfig.class
 })
@@ -94,15 +91,15 @@ public class WebApplicationConfig extends WebMvcConfigurerAdapter {
     return jsonConverter;
   }
 
-  @Bean
-  public MarshallingHttpMessageConverter marshallingHttpMessageConverter(){
-    MarshallingHttpMessageConverter xmlConverter = new MarshallingHttpMessageConverter();
-    xmlConverter.setSupportedMediaTypes(ApiMediaTypes.getXmlMediaTypes());
-    XStreamMarshaller xStreamMarshaller = new XStreamMarshaller();
-    xmlConverter.setMarshaller(xStreamMarshaller);
-    xmlConverter.setUnmarshaller(xStreamMarshaller);
-    return xmlConverter;
-  }
+//  @Bean
+//  public MarshallingHttpMessageConverter marshallingHttpMessageConverter(){
+//    MarshallingHttpMessageConverter xmlConverter = new MarshallingHttpMessageConverter();
+//    xmlConverter.setSupportedMediaTypes(ApiMediaTypes.getXmlMediaTypes());
+//    XStreamMarshaller xStreamMarshaller = new XStreamMarshaller();
+//    xmlConverter.setMarshaller(xStreamMarshaller);
+//    xmlConverter.setUnmarshaller(xStreamMarshaller);
+//    return xmlConverter;
+//  }
 
   @Bean
   public FilteringTextMessageConverter filteringTextMessageConverter(){

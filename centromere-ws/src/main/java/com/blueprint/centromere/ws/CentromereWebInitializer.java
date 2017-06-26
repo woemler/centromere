@@ -52,7 +52,9 @@ public class CentromereWebInitializer extends SpringBootServletInitializer {
           ? Profiles.SECURE_READ_WRITE_PROFILE : Profiles.NO_SECURITY;
       String apiDocumentationProfile = annotation.enableApiDocumentation()
           ? Profiles.API_DOCUMENTATION_ENABLED_PROFILE : Profiles.API_DOCUMENTATION_DISABLED_PROFILE;
-      profiles = new String[] { Profiles.WEB_PROFILE, securityProfile, apiDocumentationProfile };
+      profiles = annotation.useCustomSchema() ? 
+          new String[] { Profiles.WEB_PROFILE, securityProfile, apiDocumentationProfile, Profiles.SCHEMA_CUSTOM } : 
+          new String[] { Profiles.WEB_PROFILE, securityProfile, apiDocumentationProfile };
       logger.info(String.format("Running Centromere with profiles: %s", Arrays.asList(profiles)));
     } else {
       logger.info("Running Centromere with default profiles.");

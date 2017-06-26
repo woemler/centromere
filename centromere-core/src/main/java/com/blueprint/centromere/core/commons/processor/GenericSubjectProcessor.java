@@ -24,6 +24,7 @@ import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,9 +35,9 @@ import org.springframework.stereotype.Component;
 public class GenericSubjectProcessor extends GenericRecordProcessor<Subject> {
 
     @Autowired
-    public GenericSubjectProcessor(SubjectRepository repository) {
+    public GenericSubjectProcessor(SubjectRepository repository, Environment environment) {
       this.setModel(Subject.class);
-      this.setReader(new GenericSubjectReader());
+      this.setReader(new GenericSubjectReader(environment));
       this.setValidator(new SubjectValidator());
       this.setWriter(new RepositoryRecordWriter<>(repository));
         

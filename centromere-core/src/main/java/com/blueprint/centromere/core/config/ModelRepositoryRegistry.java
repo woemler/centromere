@@ -29,6 +29,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 
 /**
+ * Creates a registry of {@link ModelRepository} instances that have the {@link ModelResource} annotation,
+ *   and creates a map of {@link Model} classes to repositories, and model URIs to repositories.
+ *   This allows lookup of repository classes by model or by HTTP request URL.
+ * 
  * @author woemler
  */
 public class ModelRepositoryRegistry {
@@ -45,7 +49,7 @@ public class ModelRepositoryRegistry {
 
   @PostConstruct
   public void afterPropertiesSet(){
-    for (Map.Entry entry: context.getBeansOfType(ModelRepository.class, false, false).entrySet()){
+    for (Map.Entry entry: context.getBeansWithAnnotation(ModelResource.class).entrySet()){
       Class<?> type = entry.getValue().getClass();
       ModelRepository repository = (ModelRepository) entry.getValue();
       Class<? extends Model<?>> model = repository.getModel();

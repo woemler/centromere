@@ -22,6 +22,8 @@ import com.blueprint.centromere.core.commons.model.Subject;
 import com.blueprint.centromere.core.commons.model.Subject.Attributes;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -56,14 +58,78 @@ public class GenericDataSetSupport implements DataSetSupport {
    */
   @Override
   public Sample createSample(String name, Subject subject, DataSet dataSet) {
+    
     Sample sample = new Sample();
     sample.setName(name);
     sample.setSubjectId(subject.getId());
-    sample.setHistology(getSampleAttribute(Attributes.SAMPLE_HISTOLOGY, subject, dataSet));
-    sample.setTissue(getSampleAttribute(Attributes.SAMPLE_TISSUE, subject, dataSet));
-    sample.setSampleType(getSampleAttribute(Attributes.SAMPLE_TYPE, subject, dataSet));
+    sample.setHistology(getSampleTissueFromSubject(subject));
+    sample.setTissue(getSampleTissueFromSubject(subject));
+    sample.setSampleType(getSampleTypeFromSubject(subject));
     setSampleAttributes(sample, subject);
+    
+    sample = sampleRepository.insert(sample);
+    
+    List<String> sampleIds = new ArrayList<>(subject.getSampleIds());
+    sampleIds.add(sample.getId());
+    subject.setSampleIds(sampleIds);
+    subjectRepository.update(subject);
+
+    //TODO: Do we need to add sample Ids to data set record here?
+    
     return sample;
+  }
+
+  /**
+   * Creates a new sample record, given only a name and an associated {@link DataSet} record.
+   *
+   * @param dataSet DataSet record
+   * @return a new Sample record
+   */
+  public Sample createSample(Subject subject, DataSet dataSet) {
+    return createSample(subject.getName(), subject, dataSet);
+  }
+
+  /**
+   * Checks the {@link Subject} record to see if it contains sample type information and returns it
+   *   if so.
+   * 
+   * @param subject
+   * @return
+   */
+  protected String getSampleTypeFromSubject(Subject subject){
+    if (subject.hasAttribute("sample.type")) return subject.getAttribute("sample.type");
+    if (subject.hasAttribute("sampleType")) return subject.getAttribute("sampleType");
+    return null;
+  }
+
+  /**
+   * Checks the {@link Subject} record to see if it contains sample type information and returns it
+   *   if so.
+   *
+   * @param subject
+   * @return
+   */
+  protected String getSampleHistologyFromSubject(Subject subject){
+    if (subject.hasAttribute("sample.histology")) return subject.getAttribute("sample.histology");
+    if (subject.hasAttribute("histology")) return subject.getAttribute("histology");
+    return null;
+  }
+
+  /**
+   * Checks the {@link Subject} record to see if it contains tissue type information and returns it
+   *   if so.
+   *
+   * @param subject
+   * @return
+   */
+  protected String getSampleTissueFromSubject(Subject subject){
+    if (subject.hasAttribute("sample.tissue")) return subject.getAttribute("sample.tissue");
+    if (subject.hasAttribute("tissue")) return subject.getAttribute("tissue");
+    if (subject.hasAttribute("sample.primarySite")) return subject.getAttribute("sample.primarySite");
+    if (subject.hasAttribute("primarySite")) return subject.getAttribute("primarySite");
+    if (subject.hasAttribute("sample.primary_site")) return subject.getAttribute("sample.primary_site");
+    if (subject.hasAttribute("primary_site")) return subject.getAttribute("primary_site");
+    return null;
   }
   
   private String getSampleAttribute(String key, Subject subject, DataSet dataSet){
@@ -83,16 +149,6 @@ public class GenericDataSetSupport implements DataSetSupport {
         if (!sample.hasAttribute(key)) sample.addAttribute(key, entry.getValue());
       }
     }
-  }
-
-  /**
-   * Creates a new sample record, given only a name and an associated {@link DataSet} record.
-   *
-   * @param dataSet DataSet record
-   * @return a new Sample record
-   */
-  public Sample createSample(Subject subject, DataSet dataSet) {
-    return createSample(subject.getName(), subject, dataSet);
   }
 
   /**
@@ -125,7 +181,8 @@ public class GenericDataSetSupport implements DataSetSupport {
     if (optional.isPresent()) return optional;
     Optional<Subject> subjectOptional = getSubjectRepository().findByName(name);
     if (subjectOptional.isPresent()){
-      return Optional.ofNullable(createSample(name, subjectOptional.get(), dataSet));
+      Sample sample = createSample(name, subjectOptional.get(), dataSet);
+      return Optional.of(sample);
     } else {
       return Optional.empty();
     }

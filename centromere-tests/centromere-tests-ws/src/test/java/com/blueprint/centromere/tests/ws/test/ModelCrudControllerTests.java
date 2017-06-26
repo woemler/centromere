@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
+import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.ws.WebTestInitializer;
@@ -68,6 +69,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   @Autowired private GeneRepository geneRepository;
   @Autowired private GeneExpressionRepository geneExpressionRepository;
   @Autowired private MockMvc mockMvc;
+  @Autowired private ModelRepositoryRegistry registry;
 
   @Test
   public void headTest() throws Exception {
@@ -79,6 +81,9 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findById() throws Exception {
+    
+    System.out.println("Gene URI: " + registry.getModelUri(Gene.class));
+    System.out.println(String.format("Registered models: %s", registry.getRegisteredModels()));
 
     Gene gene = geneRepository.findByPrimaryReferenceId("1").get();
 

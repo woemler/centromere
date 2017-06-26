@@ -21,16 +21,22 @@ import com.blueprint.centromere.core.dataimport.reader.AbstractRecordFileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.core.env.Environment;
 
 /**
  * @author woemler
  */
 public class GenericSubjectReader extends AbstractRecordFileReader<Subject> {
   
+  private final Environment environment;
   private Map<String, Integer> headerMap = new HashMap<>();
   private String defaultEmptyValue = "n/a";
   private String delimiter = "\t";
-  
+
+  public GenericSubjectReader(Environment environment) {
+    this.environment = environment;
+  }
+
   @Override
   public Subject readRecord() {
     try {
@@ -84,6 +90,17 @@ public class GenericSubjectReader extends AbstractRecordFileReader<Subject> {
       } else {
         subject.addAttribute(entry.getKey(), getColumnValue(entry.getKey(), bits));
       }
+    }
+    subject = setDefaultFields(subject);
+    return subject;
+  }
+  
+  private Subject setDefaultFields(Subject subject){
+    if (environment.containsProperty("default-species") && subject.getSpecies() == null){
+      subject.setSpecies(environment.getRequiredProperty("default-species"));
+    }
+    if (environment.containsProperty("default-gender") && subject.getGender() == null){
+      subject.setGender(environment.getRequiredProperty("default-gender"));
     }
     return subject;
   }

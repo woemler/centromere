@@ -139,7 +139,7 @@ public class ManifestImportExecutor {
         if (importOptions.skipInvalidFiles()){
           logger.warn(String.format("File processing failed, skipping file: %s", 
               df.getAbsolutePath()));
-          e.printStackTrace();
+          logger.error(e.toString());
         } else {
           throw e;
         }

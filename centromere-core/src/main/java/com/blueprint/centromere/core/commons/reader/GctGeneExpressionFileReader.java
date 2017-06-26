@@ -108,11 +108,11 @@ public class GctGeneExpressionFileReader
 				if (sampleMap.containsKey(this.getHeaders().get(i))){
 					sample = sampleMap.get(this.getHeaders().get(i));
 				} else {
-					Optional<Sample> optional = dataSetSupport.findSample(this.getHeaders().get(i), this.getDataSet());
+					Optional<Sample> optional = dataSetSupport.findOrCreateSample(this.getHeaders().get(i), this.getDataSet());
 					if (optional.isPresent()){
 						sample = optional.get();
 						sampleMap.put(this.getHeaders().get(i), sample);
-					}
+					} 
 				}
 				if (sample == null){
 					if (this.getImportOptions().skipInvalidSamples()){
@@ -167,7 +167,7 @@ public class GctGeneExpressionFileReader
 
 	@Override 
 	protected boolean isSkippableLine(String line) {
-		return false;
+		return line.startsWith("#") || line.trim().split(this.getDelimiter()).length < 3;
 	}
 
 	public DataFile getDataFile() {

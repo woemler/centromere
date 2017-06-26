@@ -113,11 +113,11 @@
       <version>${springfox.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>io.springfox</groupId>
-      <artifactId>springfox-data-rest</artifactId>
-      <version>${springfox.version}</version>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>io.springfox</groupId>-->
+      <!--<artifactId>springfox-data-rest</artifactId>-->
+      <!--<version>${springfox.version}</version>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>io.springfox</groupId>

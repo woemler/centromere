@@ -104,7 +104,7 @@ public class ModelResourceAssembler
 
   private String getRelatedModelForeignKeyId(Class<?> source, Class<?> relation){
     Class<?> current = relation;
-    while (relation.getSuperclass() != null) {
+    while (current.getSuperclass() != null) {
       for (Field field : current.getDeclaredFields()) {
         if (field.isAnnotationPresent(Linked.class)) {
           Linked linked = field.getAnnotation(Linked.class);

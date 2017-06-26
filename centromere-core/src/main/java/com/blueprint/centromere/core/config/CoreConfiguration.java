@@ -35,7 +35,7 @@ public class CoreConfiguration {
 	@Configuration
 	public static class DefaultModelConfiguration {
 
-	  @Profile({ "default", Profiles.SCHEMA_DEFAULT })
+	  @Profile({ Profiles.SCHEMA_DEFAULT })
 		@Configuration
 		@EnableMongoRepositories(
 		    basePackages = {"com.blueprint.centromere.core.commons.repository"},
@@ -50,18 +50,11 @@ public class CoreConfiguration {
 				"com.blueprint.centromere.core.commons.reader",
 				"com.blueprint.centromere.core.commons.processor"
 		})
-		public static class CommandLineComponentConfiguration {
-
-    }
+		public static class CommandLineComponentConfiguration { }
 
 	}
   
   @Configuration
-//  @SuppressWarnings("SpringComponentScan")
-//  @ComponentScan(basePackages = {
-//      "com.blueprint.centromere.cli.config",
-//      "com.blueprint.centromere.web.config"
-//  })
   public static class CommonConfiguration {
 
     @Bean

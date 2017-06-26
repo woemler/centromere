@@ -17,6 +17,7 @@
 package com.blueprint.centromere.cli;
 
 import com.blueprint.centromere.cli.config.CommandLineInputConfiguration;
+import com.blueprint.centromere.core.config.AutoConfigureCentromere;
 import com.blueprint.centromere.core.config.Profiles;
 import java.util.Arrays;
 import org.slf4j.Logger;
@@ -36,15 +37,26 @@ public class CentromereCommandLineInitializer {
   public static void run(Class<?> source, String[] args){
     SpringApplicationBuilder builder = new SpringApplicationBuilder(source);
     builder.child(CommandLineInputConfiguration.class);
-    
     builder.bannerMode((Mode.LOG));
     builder.web(false);
-    String[] profiles = { Profiles.CLI_PROFILE };
-    builder.profiles(profiles);
-    logger.info(String.format("Running Centromere with profiles: %s", Arrays.asList(profiles)));
+    builder.profiles(getActiveProfiles(source));
     logger.info(String.format("Running Centromere with arguments: %s", args.toString()));
     System.out.println("Starting Centromere CLI...\n");
     builder.run(args);
+  }
+
+  private static String[] getActiveProfiles(Class<?> source){
+    String[] profiles;
+    if (source.isAnnotationPresent(AutoConfigureCentromere.class)){
+      AutoConfigureCentromere annotation = source.getAnnotation(AutoConfigureCentromere.class);
+      profiles = annotation.useCustomSchema() ?
+          new String[] { Profiles.CLI_PROFILE, Profiles.SCHEMA_CUSTOM } : new String[] { Profiles.CLI_PROFILE};
+      logger.info(String.format("Running Centromere with profiles: %s", Arrays.asList(profiles)));
+    } else {
+      logger.info("Running Centromere with default profiles.");
+      profiles = new String[]{};
+    }
+    return profiles;
   }
 	
 }
