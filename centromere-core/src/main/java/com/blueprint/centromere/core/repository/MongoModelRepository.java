@@ -38,7 +38,7 @@ import org.springframework.data.mongodb.repository.support.SimpleMongoRepository
 public class MongoModelRepository<T extends Model<ID>, ID extends Serializable>
     extends SimpleMongoRepository<T, ID>
     implements ModelRepository<T, ID> {
-
+  
   private final MongoOperations mongoOperations;
   private final MongoEntityInformation<T, ID> metadata;
   private final Class<T> model;
@@ -80,6 +80,22 @@ public class MongoModelRepository<T extends Model<ID>, ID extends Serializable>
     List<T> entities = mongoOperations.find(query.with(pageable), this.getModel());
     long count = count(queryCriterias);
     return new PageImpl<>(entities, pageable, count);
+  }
+
+  /**
+   * Returns a count of all records that satify the requested criteria.
+   *
+   * @param queryCriterias {@link QueryCriteria}
+   * @return a count of {@code T} records.
+   */
+  @Override
+  public long count(Iterable<QueryCriteria> queryCriterias) {
+    Criteria criteria = getQueryFromQueryCriteria(queryCriterias);
+    Query query = new Query();
+    if (criteria != null){
+      query.addCriteria(criteria);
+    }
+    return mongoOperations.count(query, this.getModel());
   }
 
   /**

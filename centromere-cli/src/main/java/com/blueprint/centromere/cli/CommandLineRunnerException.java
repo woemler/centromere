@@ -21,7 +21,7 @@ package com.blueprint.centromere.cli;
  * 
  * @author woemler
  */
-public class CommandLineRunnerException extends RuntimeException {
+public class CommandLineRunnerException extends Exception {
 
 	public CommandLineRunnerException() {
 	}

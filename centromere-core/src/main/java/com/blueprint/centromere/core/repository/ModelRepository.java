@@ -19,7 +19,6 @@ package com.blueprint.centromere.core.repository;
 import com.blueprint.centromere.core.exceptions.QueryParameterException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
-import com.google.common.collect.Iterables;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,9 +81,7 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
    * @param criterias {@link QueryCriteria}
    * @return a count of {@code T} records.
    */
-  default long count(Iterable<QueryCriteria> criterias){
-    return Iterables.size(find(criterias));
-  }
+  long count(Iterable<QueryCriteria> criterias);
 
   /**
    * Returns a unsorted list of distinct values of the requested field.
@@ -161,9 +158,7 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
    * @return updated instances of the entity objects.
    */
   <S extends T> Iterable<S> update(Iterable<S> entities);
-
-
-
+  
   static List<Object> getCollection(Object val){
     if (val instanceof Collection){
       return new ArrayList<Object>((Collection) val);
@@ -177,8 +172,5 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
   static boolean isMultiValue(Object val){
     return val.getClass().isArray() || val instanceof Collection;
   }
-
-
-  
 
 }

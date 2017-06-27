@@ -199,6 +199,7 @@ public class ModelCrudController {
     if (parameterMap.containsKey("page") || parameterMap.containsKey("size")){
       
       Page<T> page = repository.find(criterias, pageable);
+      logger.info(String.format("Query returned %d paged records, out of %d total", page.getSize(), page.getTotalElements()));
       
       if (ApiMediaTypes.isHalMediaType(mediaType)){
         
@@ -222,6 +223,7 @@ public class ModelCrudController {
       } else {
         entities = (List<T>) repository.find(criterias);
       }
+      logger.info(String.format("Query returned %d records", entities.size()));
       
       if (ApiMediaTypes.isHalMediaType(mediaType)){
         List<FilterableResource> resourceList = assembler.toResources(entities);
