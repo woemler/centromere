@@ -20,6 +20,7 @@ import com.blueprint.centromere.cli.CommandLineInputExecutor;
 import com.blueprint.centromere.cli.ModelProcessorBeanRegistry;
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Sample;
+import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.config.Profiles;
@@ -45,12 +46,6 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CommandLineTestInitializer.class, webEnvironment = WebEnvironment.NONE)
-//@SpringBootTest(classes = { 
-//		MongoDataSourceConfig.class,
-//		CommandLineInputConfiguration.class,
-//		CommandLineTestConfig.class,
-//		CoreConfiguration.class
-//})
 @ActiveProfiles({ Profiles.CLI_PROFILE })
 @FixMethodOrder
 public class CommandLineExecutorTests {
@@ -59,9 +54,11 @@ public class CommandLineExecutorTests {
 	@Autowired private CommandLineInputExecutor executor;
 	@Autowired private GeneRepository geneRepository;
 	@Autowired private GeneExpressionRepository geneExpressionRepository;
+	@Autowired private DataFileRepository dataFileRepository;
 	
 	@Before
 	public void setup(){
+	  dataFileRepository.deleteAll();
 		geneExpressionRepository.deleteAll();
 		geneRepository.deleteAll();
 	}
@@ -72,7 +69,8 @@ public class CommandLineExecutorTests {
 		Assert.isTrue(registry.isSupportedDataType("entrez_gene"));
 		Assert.isTrue(registry.isSupportedModel(Gene.class));
 		Assert.isTrue(!registry.isSupportedDataType("samples"));
-		Assert.isTrue(!registry.isSupportedModel(Sample.class));
+    Assert.isTrue(registry.isSupportedDataType("generic_samples"));
+		Assert.isTrue(registry.isSupportedModel(Sample.class));
 	}
 	
 	@Test

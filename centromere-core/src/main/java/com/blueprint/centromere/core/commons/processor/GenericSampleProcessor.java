@@ -16,10 +16,11 @@
 
 package com.blueprint.centromere.core.commons.processor;
 
-import com.blueprint.centromere.core.commons.model.Subject;
-import com.blueprint.centromere.core.commons.reader.GenericSubjectReader;
+import com.blueprint.centromere.core.commons.model.Sample;
+import com.blueprint.centromere.core.commons.reader.GenericSampleReader;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
-import com.blueprint.centromere.core.commons.validator.SubjectValidator;
+import com.blueprint.centromere.core.commons.validator.SampleValidator;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter;
@@ -29,17 +30,16 @@ import org.springframework.stereotype.Component;
 /**
  * @author woemler
  */
-@DataTypes(value = "generic_subjects", description = "Generic subject metadata")
+@DataTypes(value = "generic_samples", description = "Generic sample metadata")
 @Component
-public class GenericSubjectProcessor extends GenericRecordProcessor<Subject> {
+public class GenericSampleProcessor extends GenericRecordProcessor<Sample> {
 
     @Autowired
-    public GenericSubjectProcessor(SubjectRepository repository) {
-      this.setModel(Subject.class);
-      this.setReader(new GenericSubjectReader());
-      this.setValidator(new SubjectValidator());
-      this.setWriter(new RepositoryRecordWriter<>(repository));
-        
+    public GenericSampleProcessor(SubjectRepository subjectRepository, SampleRepository sampleRepository) {
+      this.setModel(Sample.class);
+      this.setReader(new GenericSampleReader(subjectRepository));
+      this.setValidator(new SampleValidator());
+      this.setWriter(new RepositoryRecordWriter<>(sampleRepository));
     }
 
 }

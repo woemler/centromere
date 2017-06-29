@@ -38,7 +38,7 @@ public class MongoImportTempFileImporter<T extends Model<?>> extends AbstractFil
   private boolean stopOnError = true;
   private boolean upsertRecords = false;
   private boolean dropCollection = false;
-  private ImportOptions options = new ImportOptionsImpl();
+  private ImportOptions options;
   private final Environment environment;
 
   private final static Logger logger = LoggerFactory.getLogger(MongoImportTempFileImporter.class);
@@ -46,6 +46,7 @@ public class MongoImportTempFileImporter<T extends Model<?>> extends AbstractFil
   public MongoImportTempFileImporter(Class<T> model, Environment environment) {
     super(model);
     this.environment = environment;
+    this.options = new ImportOptionsImpl(environment);
   }
 
   @Override

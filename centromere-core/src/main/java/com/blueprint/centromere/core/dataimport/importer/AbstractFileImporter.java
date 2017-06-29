@@ -17,7 +17,6 @@
 package com.blueprint.centromere.core.dataimport.importer;
 
 import com.blueprint.centromere.core.dataimport.ImportOptions;
-import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
 import com.blueprint.centromere.core.model.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,7 @@ public abstract class AbstractFileImporter<T extends Model<?>> implements Record
   private final static Logger logger = LoggerFactory.getLogger(AbstractFileImporter.class);
   
   private final Class<T> model;
-  private ImportOptions options = new ImportOptionsImpl();
+  private ImportOptions options;
 
   public AbstractFileImporter(Class<T> model) {
     this.model = model;

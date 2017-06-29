@@ -8,6 +8,7 @@ import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.config.CoreConfiguration;
+import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
 import com.blueprint.centromere.core.dataimport.writer.DelimtedTextFileWriter;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
@@ -42,6 +43,7 @@ public class TempFileWriterTests extends AbstractRepositoryTests {
   public void delimitedTextWriterTest() throws Exception {
     DelimtedTextFileWriter<GeneExpression> writer = 
         new DelimtedTextFileWriter<>(GeneExpression.class);
+    writer.setImportOptions(new ImportOptionsImpl(environment));
     String path = writer.getTempFilePath("/path/to/fake/file.txt");
     System.out.println(String.format("Writing temp file: %s", path));
     writer.doBefore(path);
@@ -51,36 +53,4 @@ public class TempFileWriterTests extends AbstractRepositoryTests {
     writer.doAfter();
   }
   
-  //TODO
-//  @Test
-//  public void mysqlImportTempWriterTest() throws Exception {
-//    MySQLImportTempFileWriter<GeneExpression> writer = new MySQLImportTempFileWriter<>(GeneExpression.class);
-//    writer.setEnvironment(environment);
-//    String path = writer.getTempFilePath("/path/to/fake/file.txt");
-//    System.out.println(String.format("Writing temp file: %s", path));
-//    writer.doBefore(path);
-//    for (GeneExpression data: geneExpressionRepository.findAll()){
-//      writer.writeRecord(data);
-//    }
-//    writer.doAfter();
-//  }
-//
-//  @Test
-//  public void mysqlImportTest() throws Exception {
-//    Assert.isTrue(geneExpressionRepository.count() == 5);
-//    
-//    MySQLImportTempFileWriter<GeneExpression> writer = new MySQLImportTempFileWriter<>(GeneExpression.class);
-//    writer.setEnvironment(environment);
-//    String path = writer.getTempFilePath("/path/to/fake/file.txt");
-//    System.out.println(String.format("Writing temp file: %s", path));
-//    writer.doBefore(path);
-//    for (GeneExpression data: geneExpressionRepository.findAll()){
-//      writer.writeRecord(data);
-//    }
-//    writer.doAfter();
-//
-//    MySqlImportFileImporter importer = new MySqlImportFileImporter("localhost", "", "", "");
-//    
-//  }
-
 }

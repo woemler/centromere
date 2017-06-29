@@ -22,7 +22,6 @@ import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
-import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
 import com.blueprint.centromere.core.model.Model;
 import java.io.BufferedReader;
 import java.io.File;
@@ -50,7 +49,7 @@ public abstract class AbstractRecordFileReader<T extends Model<?>>
 	private BufferedReader reader;
 	private DataFile dataFile;
 	private DataSet dataSet;
-	private ImportOptions options = new ImportOptionsImpl();
+	private ImportOptions options;
 	private Class<T> model;
 
   public AbstractRecordFileReader() {

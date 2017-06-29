@@ -31,7 +31,6 @@ import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.DataTypeSupport;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
-import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
 import com.blueprint.centromere.core.dataimport.importer.RecordImporter;
 import com.blueprint.centromere.core.dataimport.reader.RecordReader;
 import com.blueprint.centromere.core.dataimport.writer.RecordWriter;
@@ -77,7 +76,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 	private DataFile dataFile;
 	private DataSet dataSet;
 	
-	private ImportOptions options = new ImportOptionsImpl();
+	private ImportOptions options;
 	
 	private List<String> supportedDataTypes = new ArrayList<>();
 	

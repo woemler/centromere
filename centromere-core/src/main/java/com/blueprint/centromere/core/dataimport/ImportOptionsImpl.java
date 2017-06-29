@@ -16,13 +16,14 @@
 
 package com.blueprint.centromere.core.dataimport;
 
+import com.blueprint.centromere.core.config.ApplicationOptionsImpl;
 import com.blueprint.centromere.core.config.Properties;
 import org.springframework.core.env.Environment;
 
 /**
  * @author woemler
  */
-public class ImportOptionsImpl implements ImportOptions {
+public class ImportOptionsImpl extends ApplicationOptionsImpl implements ImportOptions {
 
   private boolean skipInvalidRecords = false;
   private boolean skipInvalidSamples = false;
@@ -33,10 +34,8 @@ public class ImportOptionsImpl implements ImportOptions {
   private boolean overwriteExistingDataSets = false;
   private String tempFilePath = System.getProperty("java.io.tmpdir");
 
-  public ImportOptionsImpl() {
-  }
-
   public ImportOptionsImpl(Environment environment) {
+    super(environment);
     if (environment.containsProperty(Properties.SKIP_INVALID_RECORDS)){
       skipInvalidRecords = environment.getProperty(Properties.SKIP_INVALID_RECORDS, Boolean.class);
     }

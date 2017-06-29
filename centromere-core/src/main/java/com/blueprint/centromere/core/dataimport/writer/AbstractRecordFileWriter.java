@@ -22,7 +22,6 @@ import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
-import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
 import com.blueprint.centromere.core.model.Model;
 import java.io.File;
 import java.io.FileWriter;
@@ -46,7 +45,7 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
   private static final Logger logger = LoggerFactory.getLogger(AbstractRecordFileWriter.class);
 	
 	private FileWriter writer;
-	private ImportOptions options = new ImportOptionsImpl();
+	private ImportOptions options;
 	private DataFile dataFile;
 	private DataSet dataSet;
 	private final Class<T> model;
@@ -65,6 +64,7 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
 		
 	  try {
 			Assert.notEmpty(args, "One or more arguments is required.");
+			Assert.notNull(options, "ImportOptions must not be null");
 		} catch (IllegalArgumentException e){
 			throw new DataImportException(e);
 		}

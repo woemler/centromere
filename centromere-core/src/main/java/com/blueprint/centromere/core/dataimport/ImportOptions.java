@@ -19,6 +19,7 @@ package com.blueprint.centromere.core.dataimport;
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Sample;
+import com.blueprint.centromere.core.config.ApplicationOptions;
 import org.springframework.util.StringUtils;
 
 /**
@@ -27,7 +28,7 @@ import org.springframework.util.StringUtils;
  * @author woemler
  * @since 0.5.0
  */
-public interface ImportOptions {
+public interface ImportOptions extends ApplicationOptions {
 
   /**
    * Returns true if invalid records should be skipped, rather than raising an exception.
