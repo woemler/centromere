@@ -35,17 +35,10 @@ public abstract class ColumnRecordFileReader<T extends Model<?>> extends
   private List<T> records = new ArrayList<>();
   private String delimiter = "\\t";
 
-  public ColumnRecordFileReader() {
-  }
-
-  public ColumnRecordFileReader(Class<T> model) {
-    super(model);
-  }
-
   @Override
-  public void doBefore(Object... args)  {
+  public void doBefore()  {
 
-    super.doBefore(args);
+    super.doBefore();
     
     Map<Integer, T> recordMap = new LinkedHashMap<>();
     records = new ArrayList<>();

@@ -46,7 +46,7 @@ public class TempFileWriterTests extends AbstractRepositoryTests {
     writer.setImportOptions(new ImportOptionsImpl(environment));
     String path = writer.getTempFilePath("/path/to/fake/file.txt");
     System.out.println(String.format("Writing temp file: %s", path));
-    writer.doBefore(path);
+    writer.doBefore();
     for (GeneExpression data: geneExpressionRepository.findAll()){
       writer.writeRecord(data);
     }

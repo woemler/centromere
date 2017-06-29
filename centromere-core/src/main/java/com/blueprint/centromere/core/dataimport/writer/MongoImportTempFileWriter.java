@@ -22,10 +22,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import java.io.FileWriter;
 import java.io.IOException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
-import org.springframework.util.Assert;
 
 /**
  * @author woemler
@@ -37,16 +35,6 @@ public class MongoImportTempFileWriter<T extends Model<?>> extends AbstractRecor
   public MongoImportTempFileWriter(Class<T> model, MongoOperations mongoOperations) {
     super(model);
     this.mongoOperations = mongoOperations;
-  }
-
-  /**
-   * Empty default implementation.  The purpose of extending {@link org.springframework.beans.factory.InitializingBean} 
-   * is to trigger bean post-processing by a {@link BeanPostProcessor}.
-   */
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    super.afterPropertiesSet();
-    Assert.notNull(mongoOperations, "MongoOperations must not be null");
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 William Oemler, Blueprint Medicines
+ * Copyright 2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,18 +31,14 @@ public interface DataImportComponent extends ImportOptionsAware, InitializingBea
 	/**
 	 * To be executed before the main component method is first called.  Can be configured to handle 
 	 *   a variety of tasks using flexible input parameters.
-	 *
-	 * @param args an array of objects of any type.
 	 */
-	default void doBefore(Object... args){ }
+	default void doBefore(){ }
 
 	/**
 	 * To be executed after the main component method is called for the last time.  Can be configured 
 	 *   to handle a variety of tasks using flexible input parameters.
-	 *
-	 * @param args an array of objects of any type.
 	 */
-	default void doAfter(Object... args) { }
+	default void doAfter() { }
 
 	/**
 	 * Empty default implementation.  The purpose of extending {@link InitializingBean} is to trigger

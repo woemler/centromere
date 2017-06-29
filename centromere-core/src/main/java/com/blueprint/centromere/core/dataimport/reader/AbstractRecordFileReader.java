@@ -23,16 +23,13 @@ import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.util.Assert;
 
 /**
@@ -42,7 +39,7 @@ import org.springframework.util.Assert;
  * @author woemler
  */
 public abstract class AbstractRecordFileReader<T extends Model<?>> 
-    implements RecordReader<T>, DataSetAware, DataFileAware {
+    implements RecordReader<T>, DataSetAware, DataFileAware, ModelSupport<T> {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractRecordFileReader.class);
   
@@ -52,90 +49,36 @@ public abstract class AbstractRecordFileReader<T extends Model<?>>
 	private ImportOptions options;
 	private Class<T> model;
 
-  public AbstractRecordFileReader() {
-  }
-
-  public AbstractRecordFileReader(Class<T> model) {
-    this.model = model;
-  }
-
-  /**
-   * Empty default implementation.  The purpose of extending {@link org.springframework.beans.factory.InitializingBean} 
-   * is to trigger bean post-processing by a {@link BeanPostProcessor}.
-   */
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    Assert.notNull(model, "Model must not be null.");
-  }
-
   /**
 	 * Closes any open reader and opens the new target file.  Assigns local variables, if available.
-	 * 
-	 * @param args
 	 */
 	@Override
-	public void doBefore(Object... args) {
+	public void doBefore() {
 		
 	  this.close();
-		Assert.isTrue(args.length > 0, "Must be at least one argument.");
-		String path;
-		
-		if (args[0] instanceof String){
-			path = (String) args[0];
-		} else if (args[0] instanceof File){
-			path = ((File) args[0]).getAbsolutePath();
-		} else {
-			throw new DataImportException("No valid file or file path submitted.");
-		}
+
+    try {
+      afterPropertiesSet();
+      Assert.notNull(dataSet, "DataSet record is not set.");
+      Assert.notNull(dataSet.getId(), "DataSet record has not been persisted to the database.");
+      Assert.notNull(dataFile, "DataFile record is not set");
+      Assert.notNull(dataFile.getId(), "DataFile record has not been persisted to the database.");
+      Assert.notNull(dataFile.getFilePath(), "No DataFile file path has been set");
+      Assert.notNull(options, "Import options has not been set.");
+    } catch (Exception e){
+      throw new DataImportException(e);
+    }
+
+    String path = dataFile.getFilePath();
 		this.open(path);
 		
-		if (args.length > 1 && args[1] instanceof DataFile){
-		  this.dataFile = (DataFile) args[1];
-    }
-
-    if (args.length > 2 && args[2] instanceof DataSet){
-      this.dataSet = (DataSet) args[2];
-    }
-		
 	}
-
-  /**
-   * {@link #doBefore(Object...)}
-   * 
-   * @param inputFile
-   * @param args
-   */
-	public void doBefore(File inputFile, Object... args)  {
-    List<Object> objects = Collections.singletonList(inputFile);
-    objects.addAll(Arrays.asList(args));
-    Object[] arguments = new Object[objects.size()];
-    arguments = objects.toArray(arguments);
-    doBefore(arguments);
-  }
-
-  /**
-   * {@link #doBefore(Object...)}
-   * 
-   * @param inputFile
-   * @param dataFile
-   * @param dataSet
-   * @param args
-   */
-  public void doBefore(File inputFile, DataFile dataFile, DataSet dataSet, Object... args) {
-    this.setDataFile(dataFile);
-    this.setDataSet(dataSet);
-    List<Object> objects = Arrays.asList(inputFile, dataFile, dataSet);
-    objects.addAll(Arrays.asList(args));
-    Object[] arguments = new Object[objects.size()];
-    arguments = objects.toArray(arguments);
-    doBefore(arguments);
-  }
 
 	/**
 	 * Calls the close method on the reader.
 	 */
 	@Override
-	public void doAfter(Object... args) {
+	public void doAfter() {
 		this.close();
 	}
 

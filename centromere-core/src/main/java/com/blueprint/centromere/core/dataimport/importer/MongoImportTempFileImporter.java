@@ -50,7 +50,8 @@ public class MongoImportTempFileImporter<T extends Model<?>> extends AbstractFil
   }
 
   @Override
-  public void doBefore(Object... args)  {
+  public void doBefore()  {
+    super.doBefore();
     Assert.isTrue(environment.containsProperty(Properties.DB_HOST),
         String.format("Environment property must not be null: %s", Properties.DB_HOST));
     Assert.isTrue(environment.containsProperty(Properties.DB_NAME),

@@ -66,9 +66,9 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
   }
 
   @Override
-	public void doBefore(Object... args)  {
+	public void doBefore()  {
 		try {
-		  afterPropertiesSet();
+		  doBefore();
     } catch (Exception e){
 		  throw new DataImportException(e);
     }
@@ -110,7 +110,7 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
   }
 
 	@Override
-	public void doAfter(Object... args)  {
+	public void doAfter()  {
 			if (records.size() > 0) repository.save(records);
 	}
 

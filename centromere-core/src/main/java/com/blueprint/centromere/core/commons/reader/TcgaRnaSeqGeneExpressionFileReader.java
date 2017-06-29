@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 
 /**
  * Reads normalized RNA-Seq gene expression data from the TCGA files.
@@ -64,11 +63,9 @@ public class TcgaRnaSeqGeneExpressionFileReader
 	}
 
 	@Override
-	public void doBefore(Object... args) {
-		super.doBefore(args);
-    Assert.notNull(this.getDataSet(), "DataSet record must not be null.");
-    Assert.notNull(this.getDataFile(), "DataFile record must not be null.");
-		sampleMap = new HashMap<>();
+	public void doBefore() {
+		super.doBefore();
+    sampleMap = new HashMap<>();
 		geneMap = new HashMap<>();
 		for (Gene gene: geneRepository.findAll()){
 		  geneMap.put(gene.getPrimaryReferenceId(), gene);

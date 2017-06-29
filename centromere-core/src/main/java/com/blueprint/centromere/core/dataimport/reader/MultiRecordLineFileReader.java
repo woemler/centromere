@@ -41,12 +41,10 @@ public abstract class MultiRecordLineFileReader<T extends Model<?>>
 
 	/**
 	 * Initializes the header and record list objects.
-	 * 
-	 * @param args
 	 */
 	@Override 
-	public void doBefore(Object... args)  {
-		super.doBefore(args);
+	public void doBefore()  {
+		super.doBefore();
 		recordList = new ArrayList<>();
 		headers = new ArrayList<>();
 		headerFlag = true;

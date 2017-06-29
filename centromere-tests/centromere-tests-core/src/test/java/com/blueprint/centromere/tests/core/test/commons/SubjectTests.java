@@ -42,7 +42,7 @@ public class SubjectTests {
     Subject.class.getName(), reader.getModel().getName()));
     List<Subject> subjects = new ArrayList<>();
 		try {
-			reader.doBefore(new String[] {resource.getPath()});
+			reader.doBefore();
 			Subject subject = reader.readRecord();
       while (subject != null){
           subjects.add(subject);

@@ -19,7 +19,6 @@ package com.blueprint.centromere.core.dataimport.writer;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelReflectionUtils;
-import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,8 +33,7 @@ import org.springframework.beans.BeanWrapperImpl;
  * @author woemler
  * @since 0.5.0
  */
-public class DelimtedTextFileWriter<T extends Model<?>> extends AbstractRecordFileWriter<T> 
-    implements ModelSupport<T> {
+public class DelimtedTextFileWriter<T extends Model<?>> extends AbstractRecordFileWriter<T> {
 
   private String delimiter = "\t";
   private String enclosedBy = "";
@@ -51,8 +49,8 @@ public class DelimtedTextFileWriter<T extends Model<?>> extends AbstractRecordFi
   }
 
   @Override
-  public void doBefore(Object... args)  {
-    super.doBefore(args);
+  public void doBefore()  {
+    super.doBefore();
     columns = ModelReflectionUtils.getPersistableNonEntityFieldNames(this.getModel(), ignoredFields);
     fields = columns;
   }

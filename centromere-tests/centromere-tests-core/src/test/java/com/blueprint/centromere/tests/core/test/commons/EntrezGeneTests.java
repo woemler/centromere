@@ -39,7 +39,7 @@ public class EntrezGeneTests {
 		Assert.isTrue(Gene.class.equals(reader.getModel()), String.format("Expected %s, got %s",
 				Gene.class.getName(), reader.getModel().getName()));
 		try {
-			reader.doBefore(new String[] {resource.getPath()});
+			reader.doBefore();
 			Gene gene = reader.readRecord();
 			Assert.notNull(gene);
 			Assert.isTrue(gene instanceof Gene);

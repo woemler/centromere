@@ -26,9 +26,6 @@ import com.blueprint.centromere.core.model.Model;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -56,78 +53,36 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
 
   /**
 	 * Opens a new output file for writing.
-	 * 
- 	 * @param args
 	 */
 	@Override
-	public void doBefore(Object... args)  {
+	public void doBefore()  {
 		
 	  try {
-			Assert.notEmpty(args, "One or more arguments is required.");
-			Assert.notNull(options, "ImportOptions must not be null");
+      try {
+        afterPropertiesSet();
+        Assert.notNull(dataSet, "DataSet record is not set.");
+        Assert.notNull(dataSet.getId(), "DataSet record has not been persisted to the database.");
+        Assert.notNull(dataFile, "DataFile record is not set");
+        Assert.notNull(dataFile.getId(), "DataFile record has not been persisted to the database.");
+        Assert.notNull(dataFile.getFilePath(), "No DataFile file path has been set");
+        Assert.notNull(options, "Import options has not been set.");
+      } catch (Exception e){
+        throw new DataImportException(e);
+      }
 		} catch (IllegalArgumentException e){
 			throw new DataImportException(e);
 		}
 
-    String filePath;
-		if (args[0] instanceof File){
-		  filePath = ((File) args[0]).getAbsolutePath();
-    } else if (args[0] instanceof String) {
-		  filePath = getTempFilePath((String) args[0]);
-    } else {
-		  throw new DataImportException(String.format("Invalid output file path: %s", args[0].toString()));
-    }
-		
-    if (args.length > 1 && args[1] instanceof DataFile){
-		  this.dataFile = (DataFile) args[1];
-    }
-
-    if (args.length > 2 && args[2] instanceof DataSet){
-      this.dataSet = (DataSet) args[2];
-    }
-		
-		this.open(filePath);
+    String filePath = getTempFilePath(dataFile.getFilePath());
+    this.open(filePath);
 		logger.info(String.format("Writing records to file: %s", filePath));
 	}
 
-  /**
-   * {@link #doBefore(Object...)}
-   *
-   * @param outputFile
-   * @param args
-   */
-  public void doBefore(File outputFile, Object... args)  {
-    List<Object> objects = Collections.singletonList(outputFile);
-    objects.addAll(Arrays.asList(args));
-    Object[] arguments = new Object[objects.size()];
-    arguments = objects.toArray(arguments);
-    doBefore(arguments);
-  }
-
-  /**
-   * {@link #doBefore(Object...)}
-   *
-   * @param outputFile
-   * @param dataFile
-   * @param dataSet
-   * @param args
-   */
-  public void doBefore(File outputFile, DataFile dataFile, DataSet dataSet, Object... args)
-       {
-    List<Object> objects = Arrays.asList(outputFile, dataFile, dataSet);
-    objects.addAll(Arrays.asList(args));
-    Object[] arguments = new Object[objects.size()];
-    arguments = objects.toArray(arguments);
-    doBefore(arguments);
-  }
-
 	/**
 	 * Closes the open file writer.
-	 * 
-	 * @param args
 	 */
 	@Override
-	public void doAfter(Object... args)  {
+	public void doAfter()  {
 		this.close();
 	}
 

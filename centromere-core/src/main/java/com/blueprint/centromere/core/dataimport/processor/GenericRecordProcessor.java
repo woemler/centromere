@@ -20,9 +20,7 @@ import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.model.Subject;
-import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
@@ -36,7 +34,6 @@ import com.blueprint.centromere.core.dataimport.reader.RecordReader;
 import com.blueprint.centromere.core.dataimport.writer.RecordWriter;
 import com.blueprint.centromere.core.dataimport.writer.TempFileWriter;
 import com.blueprint.centromere.core.model.Model;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -61,9 +58,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 
   private static final Logger logger = LoggerFactory.getLogger(GenericRecordProcessor.class);
 
-  private SampleRepository sampleRepository;
   private SubjectRepository subjectRepository;
-  private DataFileRepository dataFileRepository;
   private DataSetRepository dataSetRepository;
   
 	private Class<T> model;
@@ -99,29 +94,27 @@ public class GenericRecordProcessor<T extends Model<?>>
 	}
 
   /**
-   * Performs configuration steps prior to each execution of {@link #run(Object...)}.  Assigns
+   * Performs configuration steps prior to each execution of {@link #run()}.  Assigns
    *   options and metadata objects to the individual processing components that are expecting them.
-   * 
-   * @param args an array of objects of any type.
    */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void doBefore(Object... args) {
+	public void doBefore() {
 	  
+	  // Checks that DataSet, DataFile, and ImportOptions are set
 	  try {
       afterPropertiesSet();
+      Assert.notNull(dataSet, "DataSet record is not set.");
+      Assert.notNull(dataSet.getId(), "DataSet record has not been persisted to the database.");
+      Assert.notNull(dataFile, "DataFile record is not set");
+      Assert.notNull(dataFile.getId(), "DataFile record has not been persisted to the database.");
+      Assert.notNull(dataFile.getFilePath(), "No DataFile file path has been set");
+      Assert.notNull(options, "Import options has not been set.");
     } catch (Exception e){
 	    throw new DataImportException(e);
     }
     
-    if (args.length > 1 && args[1] instanceof DataFile){
-      dataFile = (DataFile) args[1];
-    }
-
-    if (args.length > 2 && args[2] instanceof DataSet){
-      dataSet = (DataSet) args[2];
-    }
-    
+    // Passes along DataSet, DataFile, and ImportOptions to components
 		if (writer != null) {
     	writer.setImportOptions(options);
     	if (writer instanceof DataSetAware) ((DataSetAware) writer).setDataSet(dataSet);
@@ -143,24 +136,13 @@ public class GenericRecordProcessor<T extends Model<?>>
 	}
 
   /**
-   * {@link #doBefore(Object...)}
-   */
-	public void doBefore(File inputFile, DataFile dataFile, DataSet dataSet, Object... args) {
-	  List<Object> objects = Arrays.asList(inputFile, dataFile, dataSet);
-	  objects.addAll(Arrays.asList(args));
-	  Object[] arguments = new Object[objects.size()];
-	  arguments = objects.toArray(arguments);
-	  doBefore(arguments);
-  }
-
-  /**
    * To be executed after the main component method is called for the last time.  Handles job cleanup
    *   and association of metadata records.
-   *
-   * @param args an array of objects of any type.
    */
   @Override
-  public void doAfter(Object... args) {
+  public void doAfter() {
+    
+    // If DataFile contained Sample records, associate them with the proper Subject and DataSet record
     if (reader instanceof SampleAware) {
       List<Sample> samples = ((SampleAware) reader).getSamples();
       for (Sample sample : samples) {
@@ -180,6 +162,7 @@ public class GenericRecordProcessor<T extends Model<?>>
       }
     }
     
+    // Associate the DataFile with the appopriate DataSet record
     List<String> dataFileIds = dataSet.getDataFileIds();
     if (!dataFileIds.contains(dataFile.getId())) {
       dataFileIds.add(dataFile.getId());
@@ -190,10 +173,19 @@ public class GenericRecordProcessor<T extends Model<?>>
   }
 
   /**
-	 * {@link RecordProcessor#run(Object...)}
-	 * @param args
+   * Executes if the {@link #run()} method fails to execute properly, in place of the
+   * {@link #doAfter()} method.
+   */
+  @Override
+  public void doOnFailure() {
+    
+  }
+
+  /**
+	 * {@link RecordProcessor#run()}
 	 */
-	public void run(Object... args)  {
+  @Override
+	public void run() {
 	  
 	  Integer count = 0;
 		if (!isConfigured) logger.warn("Processor configuration method has not run!"); // TODO: Should this return or throw exception?
@@ -203,25 +195,12 @@ public class GenericRecordProcessor<T extends Model<?>>
 			return;
 		}
 		
-		try {
-			Assert.notEmpty(args, "One or more arguments required.");
-		} catch (IllegalArgumentException e){
-			throw new DataImportException(e);
-		}
-		
-		String inputFilePath;
-		if (args[0] instanceof String){
-		  inputFilePath = (String) args[0];
-    } else if (args[0] instanceof File){
-		  inputFilePath = ((File) args[0]).getAbsolutePath();
-    } else {
-      throw new DataImportException("First argument must be a string path or file object");
-    }
+		String inputFilePath = dataFile.getFilePath();
     
     logger.info("Running doBefore method for processor components.");
-		reader.doBefore(args);
-    writer.doBefore(args);
-    if (importer != null) importer.doBefore(args);
+		reader.doBefore();
+    writer.doBefore();
+    if (importer != null) importer.doBefore();
 		
     if (isInFailedState) {
 			logger.warn("Record processor is in failed state and is aborting run.");
@@ -244,6 +223,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 						record = reader.readRecord();
 						continue;
 					} else {
+					  isInFailedState = true;
 						throw new DataImportException(bindingResult.toString());
 					}
 				}
@@ -261,8 +241,8 @@ public class GenericRecordProcessor<T extends Model<?>>
 		}
 		
 		logger.info("Running doAfter methods for processor components.");
-		writer.doAfter(args);
-		reader.doAfter(args);
+		writer.doAfter();
+		reader.doAfter();
 		
 		if (importer != null) {
 		  if (TempFileWriter.class.isAssignableFrom(writer.getClass())){
@@ -270,7 +250,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 		    String tempFilePath = ((TempFileWriter) writer).getTempFilePath(inputFilePath);
         importer.importFile(tempFilePath);
         logger.info("Running RecordImporter doAfter method");
-        importer.doAfter(args);
+        importer.doAfter();
       } else {
         logger.warn("RecordWriter instance does not implement TempFileWriter interface, cannot get" 
             + " temp file path from component."); 
@@ -297,22 +277,10 @@ public class GenericRecordProcessor<T extends Model<?>>
 		return supportedDataTypes;
 	}
 
-	@Autowired
-  public void setSampleRepository(
-      SampleRepository sampleRepository) {
-    this.sampleRepository = sampleRepository;
-  }
-
   @Autowired
   public void setSubjectRepository(
       SubjectRepository subjectRepository) {
     this.subjectRepository = subjectRepository;
-  }
-
-  @Autowired
-  public void setDataFileRepository(
-      DataFileRepository dataFileRepository) {
-    this.dataFileRepository = dataFileRepository;
   }
 
   @Autowired
@@ -389,6 +357,7 @@ public class GenericRecordProcessor<T extends Model<?>>
     options = importOptions;
   }
 
+  @Override
   public boolean isInFailedState() {
 		return isInFailedState;
 	}

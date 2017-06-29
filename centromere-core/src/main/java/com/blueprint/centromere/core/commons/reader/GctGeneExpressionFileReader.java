@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 
 /**
  * Reads normalized gene expression data from GCT files
@@ -75,10 +74,8 @@ public class GctGeneExpressionFileReader
   }
 
   @Override 
-	public void doBefore(Object... args) {
-    super.doBefore(args);
-    Assert.notNull(dataFile, "DataFile cannot be null.");
-    Assert.notNull(dataFile.getId(), "DataFile ID cannot be null.");
+	public void doBefore() {
+    super.doBefore();
     sampleMap = new HashMap<>();
 	}
 

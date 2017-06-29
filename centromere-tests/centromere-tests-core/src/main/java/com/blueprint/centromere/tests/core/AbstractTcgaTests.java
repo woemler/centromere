@@ -35,7 +35,7 @@ public class AbstractTcgaTests extends AbstractEntrezGeneTests {
     subjectRepository.deleteAll();
     TcgaSubjectReader reader = new TcgaSubjectReader();
     try {
-      reader.doBefore(new String[] {SUBJECTS_FILE.getPath()});
+      reader.doBefore();
       Subject subject = reader.readRecord();
       while (subject != null){
         subjectRepository.insert(subject);

@@ -18,7 +18,6 @@ package com.blueprint.centromere.core.dataimport.reader;
 
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -37,8 +36,7 @@ import org.springframework.core.convert.support.DefaultConversionService;
  * @author woemler
  * @since 0.4.3
  */
-public class BasicColumnMappingRecordReader<T extends Model<?>> extends AbstractRecordFileReader<T>
-		implements ModelSupport<T> {
+public class BasicColumnMappingRecordReader<T extends Model<?>> extends AbstractRecordFileReader<T> {
 
 	private static final Logger logger = LoggerFactory.getLogger(BasicColumnMappingRecordReader.class);
 	
@@ -49,7 +47,12 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	private boolean headerFlag = true;
 	private String delimiter = "\\t";
 	private ConversionService conversionService = new DefaultConversionService();
-
+  
+  @Override
+  public void doBefore()  {
+    super.doBefore();
+    headerFlag = true;
+  }
 
   /**
    * {@link AbstractRecordFileReader#readRecord()}
@@ -193,12 +196,6 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 		} else {
 			throw new DataImportException(String.format("Cannot convert String type to %s.", type.getName()));
 		}
-	}
-
-	@Override 
-	public void doBefore(Object... args)  {
-		super.doBefore(args);
-		headerFlag = true;
 	}
 
 	public String getDelimiter() {

@@ -16,11 +16,9 @@
 
 package com.blueprint.centromere.core.dataimport.importer;
 
+import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.model.Model;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.util.Assert;
 
 /**
@@ -28,8 +26,6 @@ import org.springframework.util.Assert;
  * @since 0.5.0
  */
 public abstract class AbstractFileImporter<T extends Model<?>> implements RecordImporter {
-
-  private final static Logger logger = LoggerFactory.getLogger(AbstractFileImporter.class);
   
   private final Class<T> model;
   private ImportOptions options;
@@ -39,12 +35,17 @@ public abstract class AbstractFileImporter<T extends Model<?>> implements Record
   }
 
   /**
-   * Empty default implementation.  The purpose of extending {@link org.springframework.beans.factory.InitializingBean} 
-   * is to trigger bean post-processing by a {@link BeanPostProcessor}.
+   * To be executed before the main component method is first called.  Can be configured to handle
+   * a variety of tasks using flexible input parameters.
    */
   @Override
-  public void afterPropertiesSet() throws Exception {
-    Assert.notNull(model, "Model must not be null");
+  public void doBefore() {
+    try {
+      Assert.notNull(model, "Model is not set.");
+      Assert.notNull(options, "ImportOptions is not set.");
+    } catch (Exception e){
+      throw new DataImportException(e);
+    }
   }
 
   @Override

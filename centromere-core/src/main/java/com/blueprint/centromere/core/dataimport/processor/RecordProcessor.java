@@ -16,8 +16,9 @@
 
 package com.blueprint.centromere.core.dataimport.processor;
 
+import com.blueprint.centromere.core.commons.support.DataFileAware;
+import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.dataimport.DataImportComponent;
-import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.importer.RecordImporter;
 import com.blueprint.centromere.core.dataimport.reader.RecordReader;
 import com.blueprint.centromere.core.dataimport.writer.RecordWriter;
@@ -32,14 +33,26 @@ import org.springframework.validation.Validator;
  * @author woemler
  */
 public interface RecordProcessor<T extends Model<?>> 
-		extends DataImportComponent, ModelSupport<T> {
+		extends DataImportComponent, ModelSupport<T>, DataFileAware, DataSetAware {
 
 	/**
 	 * Executes the pipeline and processes the input through the individual components.
-	 * 
-	 * @param args
 	 */
-	void run(Object... args) ;
+	void run();
+
+  /**
+   * Executes if the {@link #run()} method fails to execute properly, in place of the 
+   * {@link #doAfter()} method.
+   */
+	void doOnFailure();
+
+  /**
+   * Indicates whether the processor component has failed its import execution, even if an 
+   *   uncaught exception has not been thrown.
+   * 
+   * @return
+   */
+	boolean isInFailedState();
 	
 	/* Getters and Setters */
 	void setReader(RecordReader<T> reader);

@@ -17,7 +17,11 @@
 package com.blueprint.centromere.core.dataimport;
 
 /**
+ * Ensures that data import components have access to {@link ImportOptions} objects and their embedded
+ *   {@link com.blueprint.centromere.core.config.ApplicationOptions}.
+ * 
  * @author woemler
+ * @since 0.x
  */
 public interface ImportOptionsAware {
   ImportOptions getImportOptions();

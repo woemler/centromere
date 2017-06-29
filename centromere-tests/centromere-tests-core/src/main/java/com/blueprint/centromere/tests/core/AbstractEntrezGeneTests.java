@@ -21,8 +21,9 @@ public abstract class AbstractEntrezGeneTests {
   public void setup(){
     geneRepository.deleteAll();
     EntrezGeneInfoReader reader = new EntrezGeneInfoReader();
+    
     try {
-      reader.doBefore(new String[] {GENE_INFO_FILE.getPath()});
+      reader.doBefore();
       Gene gene = reader.readRecord();
       while (gene != null){
         geneRepository.insert(gene);
