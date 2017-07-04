@@ -58,7 +58,6 @@ public abstract class AbstractRecordFileReader<T extends Model<?>>
 	  this.close();
 
     try {
-      afterPropertiesSet();
       Assert.notNull(dataSet, "DataSet record is not set.");
       Assert.notNull(dataSet.getId(), "DataSet record has not been persisted to the database.");
       Assert.notNull(dataFile, "DataFile record is not set");

@@ -1,5 +1,7 @@
 package com.blueprint.centromere.tests.core.test.dataimport;
 
+import com.blueprint.centromere.core.commons.model.DataFile;
+import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
@@ -45,6 +47,16 @@ public class TempFileWriterTests extends AbstractRepositoryTests {
         new DelimtedTextFileWriter<>(GeneExpression.class);
     writer.setImportOptions(new ImportOptionsImpl(environment));
     String path = writer.getTempFilePath("/path/to/fake/file.txt");
+    DataSet dataSet = new DataSet();
+    dataSet.setShortName("test");
+    dataSet.setDisplayName("Test");
+    dataSet.setId("test");
+    DataFile dataFile = new DataFile();
+    dataFile.setFilePath(path);
+    dataFile.setDataSetId(dataSet.getId());
+    dataFile.setId("test");
+    writer.setDataFile(dataFile);
+    writer.setDataSet(dataSet);
     System.out.println(String.format("Writing temp file: %s", path));
     writer.doBefore();
     for (GeneExpression data: geneExpressionRepository.findAll()){

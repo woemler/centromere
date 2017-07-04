@@ -22,8 +22,6 @@ import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataOperations;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.commons.support.DataFileAware;
-import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
@@ -171,21 +169,17 @@ public class FileImportExecutor implements EnvironmentAware {
 
 		// Configure the processor
     processor.setImportOptions(importOptions);
-		if (processor instanceof DataSetAware){
-      ((DataSetAware) processor).setDataSet(dataSet);
-    }
-    if (processor instanceof DataFileAware){
-		  ((DataFileAware) processor).setDataFile(dataFile);
-    }
+		processor.setDataSet(dataSet);
+    processor.setDataFile(dataFile);
 
     logger.info("Running processor doBefore method");
-		processor.doBefore(filePath, dataFile, dataSet);
+		processor.doBefore();
 
     logger.info("Processing file");
-		processor.run(filePath);
+		processor.run();
 
     logger.info("Running processor doAfter method");
-		processor.doAfter(filePath);
+		processor.doAfter();
     Printer.print("File processing complete.", logger, Level.INFO);
 	}
 

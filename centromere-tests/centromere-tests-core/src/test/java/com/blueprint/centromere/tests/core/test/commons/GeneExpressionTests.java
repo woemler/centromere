@@ -47,7 +47,7 @@ public class GeneExpressionTests extends AbstractTcgaTests {
 
   @Test
   public void configTest(){
-    Assert.notNull(geneExpressionRepository);
+    Assert.notNull(geneExpressionRepository, "Repository must not be null");
   }
 
   @Test

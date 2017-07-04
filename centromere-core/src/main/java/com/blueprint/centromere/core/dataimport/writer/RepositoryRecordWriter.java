@@ -16,7 +16,6 @@
 
 package com.blueprint.centromere.core.dataimport.writer;
 
-import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.ModelRepository;
@@ -67,12 +66,7 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
 
   @Override
 	public void doBefore()  {
-		try {
-		  doBefore();
-    } catch (Exception e){
-		  throw new DataImportException(e);
-    }
-    records = new ArrayList<>();
+		records = new ArrayList<>();
 	}
 
 	/**
