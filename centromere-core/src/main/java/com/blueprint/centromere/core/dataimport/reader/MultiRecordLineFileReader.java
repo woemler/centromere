@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.dataimport.reader;
 
-import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +43,7 @@ public abstract class MultiRecordLineFileReader<T extends Model<?>>
 	 * Initializes the header and record list objects.
 	 */
 	@Override 
-	public void doBefore()  {
+	public void doBefore() throws DataImportException {
 		super.doBefore();
 		recordList = new ArrayList<>();
 		headers = new ArrayList<>();
@@ -54,7 +54,7 @@ public abstract class MultiRecordLineFileReader<T extends Model<?>>
 	 * {@link RecordReader#readRecord()}
 	 */
 	@Override 
-	public T readRecord()  {
+	public T readRecord() throws DataImportException {
 		if (recordList.size() > 0){
 			return recordList.remove(0);
 		} else {
@@ -84,7 +84,7 @@ public abstract class MultiRecordLineFileReader<T extends Model<?>>
 	 * 
 	 * @param line
 	 */
-	protected void parseHeader(String line){
+	protected void parseHeader(String line) throws DataImportException {
 		headers = Arrays.asList(line.trim().split(delimiter));
 	}
 
@@ -95,7 +95,7 @@ public abstract class MultiRecordLineFileReader<T extends Model<?>>
 	 * @param line
 	 * @return
 	 */
-	abstract protected List<T> getRecordsFromLine(String line) ;
+	abstract protected List<T> getRecordsFromLine(String line) throws DataImportException ;
 
 	/**
 	 * Tests whether a given line should be skipped.

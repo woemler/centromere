@@ -17,9 +17,9 @@
 package com.blueprint.centromere.core.dataimport.importer;
 
 import com.blueprint.centromere.core.config.Properties;
-import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -50,7 +50,7 @@ public class MongoImportTempFileImporter<T extends Model<?>> extends AbstractFil
   }
 
   @Override
-  public void doBefore()  {
+  public void doBefore() throws DataImportException {
     super.doBefore();
     Assert.isTrue(environment.containsProperty(Properties.DB_HOST),
         String.format("Environment property must not be null: %s", Properties.DB_HOST));
@@ -67,7 +67,8 @@ public class MongoImportTempFileImporter<T extends Model<?>> extends AbstractFil
    *
    * @param filePath
    */
-  public void importFile(String filePath) {
+  @Override
+  public void importFile(String filePath) throws DataImportException {
 
     Process process;
     String[] commands = new String[]{ "/bin/bash", "-c", buildImportCommand(filePath) }; // TODO: Support for Windows and other shells

@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.dataimport.writer;
 
-import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import java.io.File;
 
 /**
@@ -31,7 +31,7 @@ public interface TempFileWriter {
    * @param inputFilePath
    * @return
    */
-  default String getTempFilePath(String inputFilePath)  {
+  default String getTempFilePath(String inputFilePath) throws DataImportException {
     File tempDir = new File(System.getProperty("java.io.tmpdir"));
     File tempFile = new File(tempDir, inputFilePath + ".tmp");
     return tempFile.getAbsolutePath();

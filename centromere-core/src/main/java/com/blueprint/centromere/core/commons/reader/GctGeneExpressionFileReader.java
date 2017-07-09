@@ -16,7 +16,6 @@
 
 package com.blueprint.centromere.core.commons.reader;
 
-import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.model.Sample;
@@ -27,7 +26,10 @@ import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetSupport;
 import com.blueprint.centromere.core.commons.support.GenericDataSetSupport;
 import com.blueprint.centromere.core.commons.support.SampleAware;
-import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.InvalidGeneException;
+import com.blueprint.centromere.core.dataimport.exception.InvalidRecordException;
+import com.blueprint.centromere.core.dataimport.exception.InvalidSampleException;
 import com.blueprint.centromere.core.dataimport.reader.MultiRecordLineFileReader;
 import com.blueprint.centromere.core.model.ModelSupport;
 import java.util.ArrayList;
@@ -52,7 +54,6 @@ public class GctGeneExpressionFileReader
 	private final GeneRepository geneRepository;
 	private final DataSetSupport dataSetSupport;
 	
-	private DataFile dataFile;
 	private Map<String, Sample> sampleMap;
 	private Class<GeneExpression> model;
 	
@@ -74,13 +75,13 @@ public class GctGeneExpressionFileReader
   }
 
   @Override 
-	public void doBefore() {
+	public void doBefore() throws DataImportException {
     super.doBefore();
     sampleMap = new HashMap<>();
 	}
 
 	@Override 
-	protected List<GeneExpression> getRecordsFromLine(String line) {
+	protected List<GeneExpression> getRecordsFromLine(String line) throws DataImportException {
 	  
 		List<GeneExpression> records = new ArrayList<>();
 		String[] bits = line.trim().split(this.getDelimiter());
@@ -93,7 +94,7 @@ public class GctGeneExpressionFileReader
 					logger.warn(String.format("Skipping line due to invalid gene: %s", line));
 					return new ArrayList<>();
 				} else {
-					throw new DataImportException(String.format("Invalid gene in line: %s", line));
+					throw new InvalidGeneException(String.format("Invalid gene in line: %s", line));
 				}
 			}
 			
@@ -117,7 +118,7 @@ public class GctGeneExpressionFileReader
 								this.getHeaders().get(i)));
 						continue;
 					} else {
-						throw new DataImportException(String.format("Invalid sample: %s", this.getHeaders().get(i)));
+						throw new InvalidSampleException(String.format("Invalid sample: %s", this.getHeaders().get(i)));
 					}
 				}
 				
@@ -128,11 +129,11 @@ public class GctGeneExpressionFileReader
 						logger.warn(String.format("Invalid record, cannot parse value: %s", bits[i]));
 						continue;
 					} else {
-						throw new DataImportException(String.format("Cannot parse value: %s", bits[i]));
+						throw new InvalidRecordException(String.format("Cannot parse value: %s", bits[i]));
 					}
 				}
 				
-				record.setDataFileId(dataFile.getId());
+				record.setDataFileId(this.getDataFile().getId());
 				record.setDataSetId(getDataSet().getId());
 				record.setGeneId(gene.getId());
 				record.setSampleId(sample.getId());
@@ -165,14 +166,6 @@ public class GctGeneExpressionFileReader
 	@Override 
 	protected boolean isSkippableLine(String line) {
 		return line.startsWith("#") || line.trim().split(this.getDelimiter()).length < 3;
-	}
-
-	public DataFile getDataFile() {
-		return dataFile;
-	}
-
-	public void setDataFile(DataFile dataFile) {
-		this.dataFile = dataFile;
 	}
 
 	@Override 

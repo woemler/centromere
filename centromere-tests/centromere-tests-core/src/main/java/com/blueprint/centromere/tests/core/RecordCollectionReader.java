@@ -16,7 +16,6 @@
 
 package com.blueprint.centromere.tests.core;
 
-import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.dataimport.reader.RecordReader;
 import com.blueprint.centromere.core.model.Model;

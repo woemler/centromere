@@ -14,25 +14,31 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.dataimport.writer;
-
-import com.blueprint.centromere.core.dataimport.DataImportComponent;
-import com.blueprint.centromere.core.dataimport.exception.DataImportException;
-import com.blueprint.centromere.core.model.Model;
+package com.blueprint.centromere.core.dataimport.exception;
 
 /**
- * Data import component class for writing imported {@link Model} records to a temporary file or
- *   repository implementation.
- * 
  * @author woemler
+ * @since 0.5.0
  */
-public interface RecordWriter<T extends Model<?>> extends DataImportComponent {
+public class InvalidRecordException extends DataImportException {
 
-	/**
-	 * Writes a single {@link Model} entity to the target destination.
-	 * 
-	 * @param record
-	 */
-	void writeRecord(T record) throws DataImportException;
+  public InvalidRecordException() {
+  }
 
+  public InvalidRecordException(String message) {
+    super(message);
+  }
+
+  public InvalidRecordException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public InvalidRecordException(Throwable cause) {
+    super(cause);
+  }
+
+  public InvalidRecordException(String message, Throwable cause, boolean enableSuppression,
+      boolean writableStackTrace) {
+    super(message, cause, enableSuppression, writableStackTrace);
+  }
 }

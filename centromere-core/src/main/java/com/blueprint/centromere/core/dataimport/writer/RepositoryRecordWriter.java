@@ -17,6 +17,7 @@
 package com.blueprint.centromere.core.dataimport.writer;
 
 import com.blueprint.centromere.core.dataimport.ImportOptions;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import java.io.Serializable;
@@ -24,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.util.Assert;
 
@@ -50,22 +50,20 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
     this.repository = repository;
   }
 
-  public RepositoryRecordWriter(ModelRepository<T, ID> repository, Integer batchSize) {
+  public RepositoryRecordWriter(ModelRepository<T, ID> repository, WriteMode writeMode) {
     this.repository = repository;
+    this.writeMode = writeMode;
+  }
+  
+  public RepositoryRecordWriter(ModelRepository<T, ID> repository, WriteMode writeMode, Integer batchSize) {
+    this.repository = repository;
+    this.writeMode = writeMode;
     this.batchSize = batchSize;
   }
 
-  /**
-   * Empty default implementation.  The purpose of extending {@link org.springframework.beans.factory.InitializingBean}
-   * is to trigger bean post-processing by a {@link BeanPostProcessor}.
-   */
   @Override
-  public void afterPropertiesSet() throws Exception {
+	public void doBefore() throws DataImportException {
     Assert.notNull(repository, "Repository must not be null");
-  }
-
-  @Override
-	public void doBefore()  {
 		records = new ArrayList<>();
 	}
 
@@ -75,7 +73,7 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
 	 * @param entity
 	 */ 
 	@SuppressWarnings("unchecked")
-	public void writeRecord(T entity)  {
+	public void writeRecord(T entity) throws DataImportException {
     if (batchSize > 1){
       records.add(entity);
       if (records.size() >= batchSize) {
@@ -87,7 +85,7 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
     }
 	}
 	
-	protected void writeRecords(Collection<T> records){
+	protected void writeRecords(Collection<T> records) throws DataImportException {
 	  if (writeMode.equals(WriteMode.INSERT)){
 	    repository.insert(records);
     } else if (writeMode.equals(WriteMode.UPDATE)){
@@ -104,7 +102,7 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
   }
 
 	@Override
-	public void doAfter()  {
+	public void doAfter() throws DataImportException {
 			if (records.size() > 0) repository.save(records);
 	}
 
@@ -130,8 +128,7 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
     return writeMode;
   }
 
-  public void setWriteMode(
-      WriteMode writeMode) {
+  public void setWriteMode(WriteMode writeMode) {
     this.writeMode = writeMode;
   }
 }

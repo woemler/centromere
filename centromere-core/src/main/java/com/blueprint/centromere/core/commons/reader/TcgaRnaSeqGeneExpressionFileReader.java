@@ -24,7 +24,8 @@ import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
-import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.InvalidRecordException;
 import com.blueprint.centromere.core.dataimport.reader.MultiRecordLineFileReader;
 import com.blueprint.centromere.core.model.ModelSupport;
 import java.util.ArrayList;
@@ -63,7 +64,7 @@ public class TcgaRnaSeqGeneExpressionFileReader
 	}
 
 	@Override
-	public void doBefore() {
+	public void doBefore() throws DataImportException {
 		super.doBefore();
     sampleMap = new HashMap<>();
 		geneMap = new HashMap<>();
@@ -73,7 +74,7 @@ public class TcgaRnaSeqGeneExpressionFileReader
 	}
 
   @Override
-	protected List<GeneExpression> getRecordsFromLine(String line) {
+	protected List<GeneExpression> getRecordsFromLine(String line) throws DataImportException {
 		List<GeneExpression> records = new ArrayList<>();
 		String[] bits = line.trim().split(this.getDelimiter());
 		if (bits.length > 1){
@@ -97,7 +98,7 @@ public class TcgaRnaSeqGeneExpressionFileReader
 						logger.warn(String.format("Invalid record, cannot parse value: %s", bits[i]));
 						continue;
 					} else {
-						throw new DataImportException(String.format("Cannot parse value: %s", bits[i]));
+						throw new InvalidRecordException(String.format("Cannot parse value: %s", bits[i]));
 					}
 				}
 				record.setDataFileId(this.getDataFile().getId());
@@ -113,9 +114,8 @@ public class TcgaRnaSeqGeneExpressionFileReader
 	}
 
   @Override
-  protected void parseHeader(String line) {
+  protected void parseHeader(String line) throws DataImportException {
     super.parseHeader(line);
-
   }
 
 	private Sample getSample(int index) {

@@ -18,14 +18,13 @@ package com.blueprint.centromere.core.commons.reader;
 
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Mutation;
-import com.blueprint.centromere.core.commons.model.Mutation.AlternateTranscript;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.CcleSupport;
 import com.blueprint.centromere.core.commons.support.SampleAware;
-import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.reader.StandardRecordFileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,7 +62,7 @@ public class CcleMafReader extends StandardRecordFileReader<Mutation>
   }
 
   @Override
-  protected Mutation getRecordFromLine(String line) {
+  protected Mutation getRecordFromLine(String line) throws DataImportException {
 
     Mutation mutation = new Mutation();
     mutation.setDataFileId(this.getDataFile().getId());
@@ -129,6 +128,11 @@ public class CcleMafReader extends StandardRecordFileReader<Mutation>
     return gene;
   }
 
+  private Gene getGene(String identifier){
+    Optional<Gene> optional = geneRepository.bestGuess(identifier);
+    return optional.orElse(null);
+  }
+
   private Sample getSampleFromLine(String line){
     String sampleName;
     if (hasColumn("tumor_sample_barcode")){
@@ -154,16 +158,19 @@ public class CcleMafReader extends StandardRecordFileReader<Mutation>
 
   }
 
-  private List<AlternateTranscript> parseAlternateTranscripts(String line){
-    List<AlternateTranscript> transcripts = new ArrayList<>();
+  private List<Mutation.VariantTranscript> parseAlternateTranscripts(String line){
+    List<Mutation.VariantTranscript> transcripts = new ArrayList<>();
     String otherTranscripts = getColumnValue(line, "other_transcripts");
-    for (String ot: otherTranscripts.split("\\|")){
-      String[] bits = ot.split("_");
-      AlternateTranscript transcript = new AlternateTranscript();
-      transcript.setGeneSymbol(bits[0]);
-      transcript.setTranscriptId(bits[1]);
-      //transcript.set
-      transcripts.add(transcript);
+    if (otherTranscripts != null && !otherTranscripts.trim().equals("")) {
+      for (String ot : otherTranscripts.split("\\|")) {
+        String[] bits = ot.split("_");
+        Mutation.VariantTranscript transcript = new Mutation.VariantTranscript();
+        Gene gene = getGene(bits[0]);
+        if (gene != null) transcript.setGeneId(gene.getId());
+        transcript.setTranscriptId(bits[1]);
+        //transcript.set
+        transcripts.add(transcript);
+      }
     }
     return transcripts;
   }

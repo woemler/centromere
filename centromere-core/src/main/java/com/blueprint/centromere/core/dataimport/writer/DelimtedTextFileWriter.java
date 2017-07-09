@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.dataimport.writer;
 
-import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelReflectionUtils;
 import java.io.FileWriter;
@@ -49,14 +49,14 @@ public class DelimtedTextFileWriter<T extends Model<?>> extends AbstractRecordFi
   }
 
   @Override
-  public void doBefore()  {
+  public void doBefore() throws DataImportException {
     super.doBefore();
     columns = ModelReflectionUtils.getPersistableNonEntityFieldNames(this.getModel(), ignoredFields);
     fields = columns;
   }
 
   @Override
-  public void writeRecord(T record)  {
+  public void writeRecord(T record) throws DataImportException {
     
     FileWriter writer = this.getWriter();
     StringBuilder stringBuilder = new StringBuilder();

@@ -23,7 +23,6 @@ import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -53,7 +52,7 @@ public class ManifestImportExecutor {
 	private static final String PROPERTY_PREFIX = "centromere.import.";
 	private static final String MANIFEST_PROPERTY_PREFIX = PROPERTY_PREFIX + "manifest.";
 	
-	public void run(String filePath) {
+	public void run(String filePath) throws CommandLineRunnerException {
 		
 		// Get the manifest file
 		File file = null;
@@ -62,7 +61,7 @@ public class ManifestImportExecutor {
 			Assert.isTrue(file.isFile(), String.format("File cannot be found: %s", filePath));
 			Assert.isTrue(file.canRead(), String.format("File is not readable: %s", filePath));
 		} catch (Exception e){
-			throw new DataImportException(e);
+			throw new CommandLineRunnerException(e);
 		}
 		File directory = file.getParentFile();
 		Printer.print(String.format("Reading manifest file: %s", filePath), logger, Level.INFO);
@@ -75,7 +74,7 @@ public class ManifestImportExecutor {
 			manifest = objectMapper.readValue(file, ImportManifest.class);
 			Assert.notNull(manifest, "Could not parse manifest file.");
 		} catch (Exception e){
-			throw new DataImportException(e);
+			throw new CommandLineRunnerException(e);
 		}
 		
 		// Set environemntal properties from manifest options.

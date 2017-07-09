@@ -17,6 +17,7 @@
 package com.blueprint.centromere.core.commons.reader;
 
 import com.blueprint.centromere.core.commons.model.Subject;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.reader.AbstractRecordFileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -32,7 +33,7 @@ public class GenericSubjectReader extends AbstractRecordFileReader<Subject> {
   private String delimiter = "\t";
 
   @Override
-  public Subject readRecord() {
+  public Subject readRecord() throws DataImportException {
     try {
       String line  = this.getReader().readLine();
       while (line != null){
@@ -60,7 +61,7 @@ public class GenericSubjectReader extends AbstractRecordFileReader<Subject> {
    * Parses a line of text and returns a single model record.  Should return null if the line does
    * not contain a valid record.
    */
-  protected Subject getRecordFromLine(String line){
+  protected Subject getRecordFromLine(String line) throws DataImportException {
     String[] bits = line.split(delimiter);
     Subject subject = new Subject();
     subject.setName(bits[0].trim());

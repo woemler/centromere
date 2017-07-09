@@ -20,8 +20,9 @@ import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
-import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.InvalidDataFileException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.BufferedReader;
@@ -53,7 +54,7 @@ public abstract class AbstractRecordFileReader<T extends Model<?>>
 	 * Closes any open reader and opens the new target file.  Assigns local variables, if available.
 	 */
 	@Override
-	public void doBefore() {
+	public void doBefore() throws DataImportException {
 		
 	  this.close();
 
@@ -77,7 +78,7 @@ public abstract class AbstractRecordFileReader<T extends Model<?>>
 	 * Calls the close method on the reader.
 	 */
 	@Override
-	public void doAfter() {
+	public void doAfter() throws DataImportException {
 		this.close();
 	}
 
@@ -87,19 +88,19 @@ public abstract class AbstractRecordFileReader<T extends Model<?>>
 	 * 
 	 * @param inputFilePath
 	 */
-	protected void open(String inputFilePath) {
+	protected void open(String inputFilePath) throws DataImportException {
 		File file = new File(inputFilePath);
 		if (!file.canRead() || !file.isFile()){
 			try {
 				file = new File(ClassLoader.getSystemClassLoader().getResource(inputFilePath).getPath());
 			} catch (NullPointerException e){
-				throw new DataImportException(String.format("Cannot locate file: %s", inputFilePath), e);
+				throw new InvalidDataFileException(String.format("Cannot locate file: %s", inputFilePath), e);
 			}
 		}
 		try {
 			reader = new BufferedReader(new FileReader(file));
 		} catch (IOException e){
-			throw new DataImportException(String.format("Cannot read file: %s", inputFilePath), e);
+			throw new InvalidDataFileException(String.format("Cannot read file: %s", inputFilePath), e);
 		}
 	}
 

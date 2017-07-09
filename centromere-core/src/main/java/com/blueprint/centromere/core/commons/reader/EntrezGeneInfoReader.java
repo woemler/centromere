@@ -17,7 +17,7 @@
 package com.blueprint.centromere.core.commons.reader;
 
 import com.blueprint.centromere.core.commons.model.Gene;
-import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.reader.StandardRecordFileReader;
 import com.blueprint.centromere.core.model.ModelSupport;
 
@@ -29,7 +29,7 @@ public class EntrezGeneInfoReader extends StandardRecordFileReader<Gene>
 
 	private Class<Gene> model = Gene.class;
 
-	protected Gene getRecordFromLine(String line) {
+	protected Gene getRecordFromLine(String line) throws DataImportException {
 		String[] bits = line.split("\\t");
 		Gene gene;
 		try {

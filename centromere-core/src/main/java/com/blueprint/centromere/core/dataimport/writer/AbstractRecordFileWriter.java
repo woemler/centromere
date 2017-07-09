@@ -20,8 +20,9 @@ import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
-import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.InvalidDataFileException;
 import com.blueprint.centromere.core.model.Model;
 import java.io.File;
 import java.io.FileWriter;
@@ -55,23 +56,18 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
 	 * Opens a new output file for writing.
 	 */
 	@Override
-	public void doBefore()  {
-		
-	  try {
-      try {
-        afterPropertiesSet();
-        Assert.notNull(dataSet, "DataSet record is not set.");
-        Assert.notNull(dataSet.getId(), "DataSet record has not been persisted to the database.");
-        Assert.notNull(dataFile, "DataFile record is not set");
-        Assert.notNull(dataFile.getId(), "DataFile record has not been persisted to the database.");
-        Assert.notNull(dataFile.getFilePath(), "No DataFile file path has been set");
-        Assert.notNull(options, "Import options has not been set.");
-      } catch (Exception e){
-        throw new DataImportException(e);
-      }
-		} catch (IllegalArgumentException e){
-			throw new DataImportException(e);
-		}
+	public void doBefore() throws DataImportException {
+
+    try {
+      Assert.notNull(dataSet, "DataSet record is not set.");
+      Assert.notNull(dataSet.getId(), "DataSet record has not been persisted to the database.");
+      Assert.notNull(dataFile, "DataFile record is not set");
+      Assert.notNull(dataFile.getId(), "DataFile record has not been persisted to the database.");
+      Assert.notNull(dataFile.getFilePath(), "No DataFile file path has been set");
+      Assert.notNull(options, "Import options has not been set.");
+    } catch (Exception e){
+      throw new DataImportException(e);
+    }
 
     String filePath = getTempFilePath(dataFile.getFilePath());
     this.open(filePath);
@@ -82,7 +78,7 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
 	 * Closes the open file writer.
 	 */
 	@Override
-	public void doAfter()  {
+	public void doAfter() throws DataImportException  {
 		this.close();
 	}
 
@@ -91,13 +87,13 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
 	 * 
 	 * @param outputFilePath
 	 */
-	protected void open(String outputFilePath) {
+	protected void open(String outputFilePath) throws DataImportException {
 		outputFilePath = cleanFilePath(outputFilePath);
 		this.close();
 		try {
 			writer = new FileWriter(outputFilePath);
 		} catch (IOException e){
-			throw new DataImportException(String.format("Cannot open output file: %s", outputFilePath), e);
+			throw new InvalidDataFileException(String.format("Cannot open output file: %s", outputFilePath), e);
 		}
 	}
 
@@ -121,7 +117,7 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
    * @return
    */
   @Override
-  public String getTempFilePath(String inputFilePath)  {
+  public String getTempFilePath(String inputFilePath) throws DataImportException {
     File tempDir = new File(options.getTempFilePath());
     if (!tempDir.isDirectory() || !tempDir.canWrite()){
       throw new DataImportException(String.format("Unable to read or write to temp directory: %s",

@@ -22,7 +22,6 @@ import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataOperations;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import java.util.Arrays;
 import java.util.List;
@@ -47,14 +46,14 @@ public class DeleteCommandExecutor implements EnvironmentAware {
   private Repositories repositories;
   private Environment environment;
   
-  public void run(String category, List<String> toDelete){
+  public void run(String category, List<String> toDelete) throws CommandLineRunnerException{
     
     category = category.toLowerCase().replaceAll("-", "");
     if (!deleteable.contains(category)){
-      throw new DataImportException(String.format("The selected category is not supported for deletion:, %s", category));
+      throw new CommandLineRunnerException(String.format("The selected category is not supported for deletion:, %s", category));
     }
     if (toDelete.isEmpty()){
-      throw new DataImportException(String.format("No items selected for deletion for category: %s", category));
+      throw new CommandLineRunnerException(String.format("No items selected for deletion for category: %s", category));
     }
     
     switch (category){
@@ -120,12 +119,12 @@ public class DeleteCommandExecutor implements EnvironmentAware {
     
   }
   
-  private void deleteDataFile(DataFile dataFile){
+  private void deleteDataFile(DataFile dataFile) throws CommandLineRunnerException{
     Class<?> model = null;
     try {
       model = dataFile.getModelType();
     } catch (ClassNotFoundException e){
-      throw new DataImportException(e);
+      throw new CommandLineRunnerException(e);
     }
     ModelRepository repository = (ModelRepository) repositories.getRepositoryFor(model);
     if (repository instanceof DataOperations){

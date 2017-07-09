@@ -21,7 +21,6 @@ import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,11 +47,11 @@ public class ListCommandExecutor implements EnvironmentAware {
   private DataFileRepository dataFileRepository;
   private Environment environment;
 
-  public void run(String arg, boolean showDetails){
+  public void run(String arg, boolean showDetails) throws CommandLineRunnerException{
 
     arg = arg.trim().toLowerCase().replaceAll("-", "");
     if (!listable.contains(arg)){
-      throw new DataImportException("Unknown listable option: " + arg);
+      throw new CommandLineRunnerException("Unknown listable option: " + arg);
     }
 
     switch (arg){
@@ -134,7 +133,7 @@ public class ListCommandExecutor implements EnvironmentAware {
 
   }
 
-  public void run(String arg){
+  public void run(String arg) throws CommandLineRunnerException{
     run(arg, false);
   }
 

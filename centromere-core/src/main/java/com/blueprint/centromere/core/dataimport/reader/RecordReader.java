@@ -17,7 +17,7 @@
 package com.blueprint.centromere.core.dataimport.reader;
 
 import com.blueprint.centromere.core.dataimport.DataImportComponent;
-import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
 
@@ -33,6 +33,6 @@ public interface RecordReader<T extends Model<?>> extends DataImportComponent, M
 	 * 
 	 * @return a single {@link Model} record.
 	 */
-	T readRecord() ;
+	T readRecord() throws DataImportException;
 
 }

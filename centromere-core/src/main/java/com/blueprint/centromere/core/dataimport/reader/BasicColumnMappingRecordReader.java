@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.dataimport.reader;
 
-import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -49,7 +49,7 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	private ConversionService conversionService = new DefaultConversionService();
   
   @Override
-  public void doBefore()  {
+  public void doBefore() throws DataImportException {
     super.doBefore();
     headerFlag = true;
   }
@@ -60,7 +60,7 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
    * @return model record
    */
 	@Override 
-	public T readRecord()  {
+	public T readRecord() throws DataImportException {
 		try {
 			String line = this.getReader().readLine();
 			while (line != null){
@@ -78,7 +78,7 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 				line = this.getReader().readLine();
 			}
 		} catch (IOException e){
-			e.printStackTrace();
+			throw new DataImportException(e);
 		}
 		return null;
 	}
@@ -110,7 +110,7 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	 *
 	 * @param line header line from file
 	 */
-	private void parseHeader(String line)  {
+	protected void parseHeader(String line)  {
 		determineMappableModelFields();
 		String[] bits = line.split(delimiter);
 		for (int i = 0; i < bits.length; i++){
@@ -150,7 +150,7 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private T getRecordFromLine(String line) {
+	protected T getRecordFromLine(String line) throws DataImportException {
 		
 	  BeanWrapperImpl wrapper = new BeanWrapperImpl(this.getModel());
 		String[] bits = line.split(delimiter);
@@ -189,7 +189,7 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	 * @param type type to convert to
 	 * @return converted object
 	 */
-	private Object convertFieldValue(String s, Class<?> type)  {
+	private Object convertFieldValue(String s, Class<?> type) throws DataImportException {
 		if (type.equals(String.class)) return s;
 		if (conversionService.canConvert(String.class, type)){
 			return conversionService.convert(s, type);

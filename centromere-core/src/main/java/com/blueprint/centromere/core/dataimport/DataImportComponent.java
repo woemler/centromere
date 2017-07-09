@@ -16,6 +16,7 @@
 
 package com.blueprint.centromere.core.dataimport;
 
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -32,13 +33,13 @@ public interface DataImportComponent extends ImportOptionsAware, InitializingBea
 	 * To be executed before the main component method is first called.  Can be configured to handle 
 	 *   a variety of tasks using flexible input parameters.
 	 */
-	default void doBefore(){ }
+	default void doBefore() throws DataImportException { }
 
 	/**
 	 * To be executed after the main component method is called for the last time.  Can be configured 
 	 *   to handle a variety of tasks using flexible input parameters.
 	 */
-	default void doAfter() { }
+	default void doAfter() throws DataImportException { }
 
 	/**
 	 * Empty default implementation.  The purpose of extending {@link InitializingBean} is to trigger

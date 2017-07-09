@@ -46,15 +46,7 @@ public interface ImportOptions extends ApplicationOptions {
    * @return
    */
   default boolean isInvalidRecord(Object record)  {
-    if (record == null){
-      if (skipInvalidRecords()){
-        return true;
-      } else {
-        throw new DataImportException("Record object is null.");
-      }
-    } else {
-      return false;
-    }
+    return record == null;
   }
 
   /**
@@ -73,15 +65,7 @@ public interface ImportOptions extends ApplicationOptions {
    * @return
    */
   default boolean isInvalidSample(Sample sample)  {
-    if (sample == null || StringUtils.isEmpty(sample.getName()) || sample.getSubjectId() == null){
-      if (skipInvalidSamples()){
-        return true;
-      } else {
-        throw new DataImportException("Sample object is null.");
-      }
-    } else {
-      return false;
-    }
+    return sample == null || StringUtils.isEmpty(sample.getName()) || sample.getSubjectId() == null;
   }
 
   /**
@@ -100,16 +84,8 @@ public interface ImportOptions extends ApplicationOptions {
    * @return
    */
   default boolean isInvalidGene(Gene gene)  {
-    if (gene == null || StringUtils.isEmpty(gene.getPrimaryGeneSymbol())
-        || StringUtils.isEmpty(gene.getPrimaryReferenceId())){
-      if (skipInvalidGenes()){
-        return true;
-      } else {
-        throw new DataImportException("Gene object is null.");
-      }
-    } else {
-      return false;
-    }
+    return gene == null || StringUtils.isEmpty(gene.getPrimaryGeneSymbol())
+        || StringUtils.isEmpty(gene.getPrimaryReferenceId());
   }
 
   /**

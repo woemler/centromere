@@ -38,7 +38,7 @@ public class GeneExpressionTests extends AbstractTcgaTests {
   private final ClassPathResource exampleFile = new ClassPathResource("samples/sample_tcga_rna_seq_gene_expression.txt");
 
   @Override
-  public void setup() {
+  public void setup() throws Exception {
     super.setup();
     dataSetRepository.deleteAll();
     dataFileRepository.deleteAll();

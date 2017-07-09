@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 William Oemler, Blueprint Medicines
+ * Copyright 2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.dataimport;
+package com.blueprint.centromere.core.dataimport.exception;
+
+import org.springframework.boot.ExitCodeGenerator;
 
 /**
- * Generic exception thrown when a data import component has an unresolvable problem.
+ * Generic exception thrown when a data import component encounters a problem.
  * 
  * @author woemler
  */
-public class DataImportException extends RuntimeException {
+public class DataImportException extends Exception implements ExitCodeGenerator {
 
 	public DataImportException() {
 	}
@@ -42,4 +44,9 @@ public class DataImportException extends RuntimeException {
 			boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
+
+  @Override
+  public int getExitCode() {
+    return 1;
+  }
 }

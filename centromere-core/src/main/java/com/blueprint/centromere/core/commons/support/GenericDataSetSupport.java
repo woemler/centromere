@@ -62,12 +62,14 @@ public class GenericDataSetSupport implements DataSetSupport {
     Sample sample = new Sample();
     sample.setName(name);
     sample.setSubjectId(subject.getId());
-    sample.setHistology(getSampleTissueFromSubject(subject));
+    sample.setDataSetId(dataSet.getId());
+    sample.setHistology(getSampleHistologyFromSubject(subject));
     sample.setTissue(getSampleTissueFromSubject(subject));
     sample.setSampleType(getSampleTypeFromSubject(subject));
     setSampleAttributes(sample, subject);
     
     sample = sampleRepository.insert(sample);
+    logger.info(String.format("Created new Sample record: %s", sample.toString()));
     
     List<String> sampleIds = new ArrayList<>(subject.getSampleIds());
     sampleIds.add(sample.getId());

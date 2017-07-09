@@ -17,7 +17,7 @@
 package com.blueprint.centromere.core.dataimport.importer;
 
 import com.blueprint.centromere.core.dataimport.DataImportComponent;
-import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 
 /**
  * Data import component designed to take a temporary record file and import it directly into the 
@@ -32,5 +32,5 @@ public interface RecordImporter extends DataImportComponent {
 	 * 
 	 * @param filePath
 	 */
-	void importFile(String filePath);
+	void importFile(String filePath) throws DataImportException;
 }

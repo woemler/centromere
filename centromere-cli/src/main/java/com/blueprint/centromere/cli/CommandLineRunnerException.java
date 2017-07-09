@@ -16,12 +16,14 @@
 
 package com.blueprint.centromere.cli;
 
+import org.springframework.boot.ExitCodeGenerator;
+
 /**
  * Generic runtime exception for command line runner classes.
  * 
  * @author woemler
  */
-public class CommandLineRunnerException extends Exception {
+public class CommandLineRunnerException extends Exception implements ExitCodeGenerator {
 
 	public CommandLineRunnerException() {
 	}
@@ -42,4 +44,9 @@ public class CommandLineRunnerException extends Exception {
 			boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
+
+  @Override
+  public int getExitCode() {
+    return 1;
+  }
 }

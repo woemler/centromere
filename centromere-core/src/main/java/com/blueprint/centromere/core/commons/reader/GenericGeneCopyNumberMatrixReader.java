@@ -25,7 +25,10 @@ import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.DataSetSupport;
 import com.blueprint.centromere.core.commons.support.GenericDataSetSupport;
 import com.blueprint.centromere.core.commons.support.SampleAware;
-import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.InvalidGeneException;
+import com.blueprint.centromere.core.dataimport.exception.InvalidRecordException;
+import com.blueprint.centromere.core.dataimport.exception.InvalidSampleException;
 import com.blueprint.centromere.core.dataimport.reader.MultiRecordLineFileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,7 +67,7 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
    * an empty list should be returned.
    */
   @Override
-  protected List<GeneCopyNumber> getRecordsFromLine(String line) {
+  protected List<GeneCopyNumber> getRecordsFromLine(String line) throws DataImportException {
     
     String[] bits = line.trim().split(this.getDelimiter());
     List<GeneCopyNumber> records = new ArrayList<>();
@@ -79,7 +82,7 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
         logger.warn("Skipping unknown gene: %s %s", bits[0], bits[1]);
         return records;
       } else {
-        throw new DataImportException(String.format("Unknown gene: %s %s", bits[0], bits[1]));
+        throw new InvalidGeneException(String.format("Unknown gene: %s %s", bits[0], bits[1]));
       }
     }
     
@@ -101,7 +104,7 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
         if (this.getImportOptions().skipInvalidRecords()){
           continue;
         } else {
-          throw new DataImportException(String.format("Cannot parse floating point expression value " 
+          throw new InvalidRecordException(String.format("Cannot parse floating point expression value " 
               + "from column: %s", bits[i]));
         }
       }
@@ -116,7 +119,7 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
    * Extracts the column names from the header line in the file.
    */
   @Override
-  protected void parseHeader(String line) {
+  protected void parseHeader(String line) throws DataImportException {
     String[] bits = line.trim().split(this.getDelimiter());
     for (int i = 2; i < bits.length; i++){
       Optional<Sample> optional = support.findOrCreateSample(bits[i], this.getDataSet());
@@ -124,7 +127,7 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
         samples.put(i, optional.get());
       } else {
         if (!this.getImportOptions().skipInvalidSamples()){
-          throw new DataImportException(String.format("Unable to identify subject for sample: %s", bits[i]));
+          throw new InvalidSampleException(String.format("Unable to identify subject for sample: %s", bits[i]));
         }
       }
     }

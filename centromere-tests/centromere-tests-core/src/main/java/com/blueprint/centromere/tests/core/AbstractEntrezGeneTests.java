@@ -27,7 +27,7 @@ public abstract class AbstractEntrezGeneTests {
   @Autowired private Environment environment;
 
   @Before
-  public void setup(){
+  public void setup() throws Exception{
     dataFileRepository.deleteAll();
     dataSetRepository.deleteAll();
     geneRepository.deleteAll();

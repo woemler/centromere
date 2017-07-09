@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.dataimport.writer;
 
-import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -42,7 +42,7 @@ public class MongoImportTempFileWriter<T extends Model<?>> extends AbstractRecor
    *
    * @param record
    */
-  public void writeRecord(T record)  {
+  public void writeRecord(T record) throws DataImportException {
     FileWriter writer = this.getWriter();
     try {
       writer.write(convertEntityToJson(record));

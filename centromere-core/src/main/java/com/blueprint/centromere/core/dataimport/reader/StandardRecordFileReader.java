@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.dataimport.reader;
 
-import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import java.io.IOException;
 
@@ -36,7 +36,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 	 * {@link RecordReader#readRecord()}
 	 */
 	@Override
-	public T readRecord()  {
+	public T readRecord() throws DataImportException {
 		try {
 			String line = this.getReader().readLine();
 			while (line != null) {
@@ -53,7 +53,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 				line = this.getReader().readLine();
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new DataImportException(e);
 		}
 		return null;
 	}
@@ -69,7 +69,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 	 * @param line
 	 * @return
 	 */
-	abstract protected T getRecordFromLine(String line) ;
+	abstract protected T getRecordFromLine(String line) throws DataImportException ;
 
 	/**
 	 * Performs a test to see if the line should be skipped.

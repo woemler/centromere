@@ -33,7 +33,7 @@ public class AbstractTcgaTests extends AbstractEntrezGeneTests {
 
   @Override
   @Before
-  public void setup() {
+  public void setup() throws Exception {
     super.setup();
     subjectRepository.deleteAll();
     TcgaSubjectReader reader = new TcgaSubjectReader();

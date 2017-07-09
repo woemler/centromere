@@ -22,9 +22,9 @@ import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataOperations;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.dataimport.DataImportException;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.processor.RecordProcessor;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import com.google.common.hash.HashCode;
@@ -55,11 +55,12 @@ public class FileImportExecutor implements EnvironmentAware {
 	
 	private static final Logger logger = LoggerFactory.getLogger(FileImportExecutor.class);
 
-  public void run(String dataType, String filePath) {
+  public void run(String dataType, String filePath) throws CommandLineRunnerException {
     run(dataType, filePath, null, null);
   }
 	
-	public void run(String dataType, String filePath, DataSet dataSet, DataFile dataFile){
+	public void run(String dataType, String filePath, DataSet dataSet, DataFile dataFile) 
+      throws CommandLineRunnerException {
 
     ImportOptions importOptions = new ImportOptionsImpl(environment);
 		
@@ -68,7 +69,7 @@ public class FileImportExecutor implements EnvironmentAware {
 	    String message = String.format("Data type %s is not supported by a registered "
           + "record processor.", dataType);
 	    Printer.print(message, logger, Level.WARN);
-			throw new DataImportException(message);
+			throw new CommandLineRunnerException(message);
 		}
     RecordProcessor processor = processorRegistry.getByDataType(dataType);
     logger.info(String.format("Using record processor: %s", processor.getClass().getName()));
@@ -101,7 +102,7 @@ public class FileImportExecutor implements EnvironmentAware {
       HashCode hashCode = Files.hash(new File(filePath), Hashing.md5());
       dataFile.setChecksum(hashCode.toString());
     } catch (IOException e){
-      throw new DataImportException(e);
+      throw new CommandLineRunnerException(e);
     }
     
     Optional<DataFile> dfOptional = dataFileRepository.findByFilePath(filePath);
@@ -141,7 +142,7 @@ public class FileImportExecutor implements EnvironmentAware {
         try {
           r = (ModelRepository) repositories.getRepositoryFor(df.getModelType());
         } catch (ClassNotFoundException e){
-          throw new DataImportException(e);
+          throw new CommandLineRunnerException(e);
         }
         
         // If possible, delete the associated records for the file
@@ -173,13 +174,33 @@ public class FileImportExecutor implements EnvironmentAware {
     processor.setDataFile(dataFile);
 
     logger.info("Running processor doBefore method");
-		processor.doBefore();
+		try {
+      processor.doBefore();
+    } catch (DataImportException e){
+		  throw new CommandLineRunnerException(e);
+    }
 
-    logger.info("Processing file");
-		processor.run();
+		Exception exception = null;
+		try {
+      logger.info("Processing file");
+      processor.run();
+    } catch (Exception e){
+		  exception = e;
+    }
 
-    logger.info("Running processor doAfter method");
-		processor.doAfter();
+    try {
+      if (processor.isInFailedState()) {
+        logger.error("Processor execution failed.  Triggering 'doOnFailure' method.");
+        processor.doOnFailure();
+        if (exception != null)
+          throw new CommandLineRunnerException(exception);
+      } else {
+        logger.info("Running processor doAfter method");
+        processor.doAfter();
+      }
+    } catch (DataImportException e){
+      throw new CommandLineRunnerException(e);
+    }
     Printer.print("File processing complete.", logger, Level.INFO);
 	}
 

@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.dataimport.reader;
 
-import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -36,7 +36,7 @@ public abstract class ColumnRecordFileReader<T extends Model<?>> extends
   private String delimiter = "\\t";
 
   @Override
-  public void doBefore()  {
+  public void doBefore() throws DataImportException {
 
     super.doBefore();
     
@@ -65,30 +65,30 @@ public abstract class ColumnRecordFileReader<T extends Model<?>> extends
 
   }
 
-    protected abstract void setModelAttribute(T record, String attribute, String value);
+  protected abstract void setModelAttribute(T record, String attribute, String value);
 
-    @Override
-    public T readRecord()  {
-      if (records.size() == 0){
-        return null;
-      } else {
-        return records.remove(0);
-      }
+  @Override
+  public T readRecord() throws DataImportException {
+    if (records.size() == 0){
+      return null;
+    } else {
+      return records.remove(0);
     }
+  }
 
-    protected List<T> getRecords() {
-        return records;
-    }
+  protected List<T> getRecords() {
+      return records;
+  }
 
-    protected void setRecords(List<T> records) {
-        this.records = records;
-    }
+  protected void setRecords(List<T> records) {
+      this.records = records;
+  }
 
-    public String getDelimiter() {
-        return delimiter;
-    }
+  public String getDelimiter() {
+      return delimiter;
+  }
 
-    public void setDelimiter(String delimiter) {
-        this.delimiter = delimiter;
-    }
+  public void setDelimiter(String delimiter) {
+      this.delimiter = delimiter;
+  }
 }

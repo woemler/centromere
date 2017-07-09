@@ -20,7 +20,8 @@ import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.model.Subject;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.SampleAware;
-import com.blueprint.centromere.core.dataimport.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.InvalidSampleException;
 import com.blueprint.centromere.core.dataimport.reader.AbstractRecordFileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -44,7 +45,7 @@ public class GenericSampleReader extends AbstractRecordFileReader<Sample>
   }
 
   @Override
-  public Sample readRecord() {
+  public Sample readRecord() throws DataImportException {
     try {
       String line  = this.getReader().readLine();
       while (line != null){
@@ -72,7 +73,7 @@ public class GenericSampleReader extends AbstractRecordFileReader<Sample>
    * Parses a line of text and returns a single model record.  Should return null if the line does
    * not contain a valid record.
    */
-  protected Sample getRecordFromLine(String line){
+  protected Sample getRecordFromLine(String line) throws DataImportException {
     
     String[] bits = line.split(delimiter);
     
@@ -87,7 +88,7 @@ public class GenericSampleReader extends AbstractRecordFileReader<Sample>
       if (this.getImportOptions().skipInvalidSamples()){
         return null;
       } else {
-        throw new DataImportException(String.format("Unable to identify subject for sample with name: %s", bits[0]));
+        throw new InvalidSampleException(String.format("Unable to identify subject for sample with name: %s", bits[0]));
       }
     }
     

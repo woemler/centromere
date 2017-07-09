@@ -16,31 +16,30 @@
 
 package com.blueprint.centromere.core.commons.validator;
 
-import com.blueprint.centromere.core.commons.model.SegmentCopyNumber;
+import com.blueprint.centromere.core.commons.model.Mutation;
 import org.springframework.validation.Errors;
 
 /**
  * @author woemler
  */
-public class SegmentCopyNumberValidator extends DataValidator {
+public class MutationValidator extends DataValidator {
 
 	@Override 
 	public boolean supports(Class<?> aClass) {
-		return aClass.equals(SegmentCopyNumber.class);
+		return aClass.equals(Mutation.class);
 	}
 
 	@Override 
 	public void validate(Object o, Errors errors) {
-		SegmentCopyNumber data = (SegmentCopyNumber) o;
+		Mutation data = (Mutation) o;
     if (data.getDataFileId() == null) errors.reject("dataFileId", "dataFileId.empty");
     if (data.getDataSetId() == null) errors.reject("dataSetId", "dataSetId.empty");
     if (data.getSampleId() == null) errors.reject("sampleId", "sampleId.empty");
     if (data.getSubjectId() == null) errors.reject("subjectId", "subjectId.empty");
-		if (data.getValue() == null) errors.reject("value", "value.empty");
+		if (data.getVariantType() == null) errors.reject("variantType", "variantType.empty");
 		if (data.getChromosome() == null) errors.reject("chromosome", "chromosome.empty");
-		if (data.getSegmentStart() == null) errors.reject("segmentStart", "segmentStart.empty");
-		if (data.getSegmentStart() < 0) errors.reject("segmentStart", "segmentStart.invalidNumber");
-		if (data.getSegmentEnd() == null) errors.reject("segmentEnd", "segmentEnd.empty");
-		if (data.getSegmentEnd() < 0) errors.reject("segmentEnd", "segmentEnd.invalidNumber");
+		if (data.getDnaStartPosition() == null) errors.reject("dnaStartPosition", "dnaStartPosition.empty");
+		//if (data.getDnaStopPosition() == null) errors.reject("dnaStopPosition", "dnaStopPosition.empty");
+		if (data.getVariantClassification() == null) errors.reject("variantClassification", "variantClassification.empty");
 	}
 }

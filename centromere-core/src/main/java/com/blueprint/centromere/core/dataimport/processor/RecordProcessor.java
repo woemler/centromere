@@ -19,6 +19,7 @@ package com.blueprint.centromere.core.dataimport.processor;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.dataimport.DataImportComponent;
+import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.importer.RecordImporter;
 import com.blueprint.centromere.core.dataimport.reader.RecordReader;
 import com.blueprint.centromere.core.dataimport.writer.RecordWriter;
@@ -38,13 +39,13 @@ public interface RecordProcessor<T extends Model<?>>
 	/**
 	 * Executes the pipeline and processes the input through the individual components.
 	 */
-	void run();
+	void run() throws DataImportException;
 
   /**
    * Executes if the {@link #run()} method fails to execute properly, in place of the 
    * {@link #doAfter()} method.
    */
-	void doOnFailure();
+	void doOnFailure() throws DataImportException;
 
   /**
    * Indicates whether the processor component has failed its import execution, even if an 
