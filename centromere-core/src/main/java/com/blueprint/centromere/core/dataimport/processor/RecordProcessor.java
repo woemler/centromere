@@ -20,6 +20,7 @@ import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.dataimport.DataImportComponent;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
+import com.blueprint.centromere.core.dataimport.filter.Filter;
 import com.blueprint.centromere.core.dataimport.importer.RecordImporter;
 import com.blueprint.centromere.core.dataimport.reader.RecordReader;
 import com.blueprint.centromere.core.dataimport.writer.RecordWriter;
@@ -60,6 +61,8 @@ public interface RecordProcessor<T extends Model<?>>
 	RecordReader<T> getReader();
 	void setValidator(Validator validator);
 	Validator getValidator();
+	void setFilter(Filter<T> filter);
+	Filter<T> getFilter();
 	void setWriter(RecordWriter<T> writer);
 	RecordWriter<T> getWriter();
 	void setImporter(RecordImporter importer);

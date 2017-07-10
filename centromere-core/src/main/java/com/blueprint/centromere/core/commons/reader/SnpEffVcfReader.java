@@ -102,7 +102,7 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
       mutation.setDnaStartPosition(Integer.parseInt(bits[1].trim()));
       mutation.setReferenceAllele(bits[3].trim());
       mutation.setAlternateAllele(bits[4].trim());
-      if (!bits[2].trim().equals("")) {
+      if (!bits[2].trim().replaceAll("\\.", "").equals("")) {
         mutation.setExternalReferenes(Arrays.asList(bits[2].trim().split(";")));
       }
       
@@ -126,20 +126,9 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
       mutation.setProteinTranscript(null);
       
       mutation.setAlternateTranscripts(getAlternateTranscripts(info));
+      mutation.addAttributes(info);
       
       mutations.add(mutation);
-
-      // TODO: How to handle filtering?
-//      if (!info.containsKey("SNPEFF_GENE_NAME") || !info.containsKey("SNPEFF_AMINO_ACID_CHANGE") ||
-//          !info.containsKey("SNPEFF_EFFECT") || !info.containsKey("SNPEFF_FUNCTIONAL_CLASS")){
-//        return null;
-//      }
-//      if (info.containsKey("SNPEFF_GENE_BIOTYPE") && !info.get("SNPEFF_GENE_BIOTYPE").equals("protein_coding")){
-//        return null;
-//      }
-//      if (info.get("SNPEFF_FUNCTIONAL_CLASS").equals("NONE") || info.get("SNPEFF_FUNCTIONAL_CLASS").equals("SILENT")){
-//        return null;
-//      }
       
     }
     return mutations;
@@ -154,7 +143,7 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
       throws DataImportException {
     List<Mutation.VariantTranscript> transcripts = new ArrayList<>();
     for (String variant: info.getOrDefault("EFF", "").split(",")){
-      //if (variant.startsWith("NON_SYNONYMOUS_CODING")){
+      if (variant.startsWith("NON_SYNONYMOUS_CODING")){
         String[] bits = variant.replaceFirst("NON_SYNONYMOUS_CODING\\(", "").split("\\|");
         Mutation.VariantTranscript transcript = new Mutation.VariantTranscript();
         transcript.setTranscriptChange(bits[3].split("/")[0]);
@@ -163,7 +152,7 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
         Gene gene = getGene(bits[4]);
         if (gene != null) transcript.setGeneId(gene.getId());
         transcripts.add(transcript);
-      //}
+      }
     }
     return transcripts;
   }

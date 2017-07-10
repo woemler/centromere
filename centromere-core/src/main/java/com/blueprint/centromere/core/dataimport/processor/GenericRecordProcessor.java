@@ -28,7 +28,6 @@ import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
-import com.blueprint.centromere.core.dataimport.DataImportComponent;
 import com.blueprint.centromere.core.dataimport.DataTypeSupport;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
@@ -36,6 +35,7 @@ import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidDataFileException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidGeneException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidSampleException;
+import com.blueprint.centromere.core.dataimport.filter.Filter;
 import com.blueprint.centromere.core.dataimport.importer.RecordImporter;
 import com.blueprint.centromere.core.dataimport.reader.RecordReader;
 import com.blueprint.centromere.core.dataimport.writer.RecordWriter;
@@ -75,6 +75,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 	
 	private RecordReader<T> reader;
 	private Validator validator;
+	private Filter<T> filter;
 	private RecordWriter<T> writer;
 	private RecordImporter importer;
 	
@@ -139,6 +140,11 @@ public class GenericRecordProcessor<T extends Model<?>>
       importer.setImportOptions(options);
       if (importer instanceof DataSetAware) ((DataSetAware) importer).setDataSet(dataSet);
       if (importer instanceof DataFileAware) ((DataFileAware) importer).setDataFile(dataFile);
+    }
+    if (filter != null) {
+      filter.setImportOptions(options);
+      if (filter instanceof DataSetAware) ((DataSetAware) filter).setDataSet(dataSet);
+      if (filter instanceof DataFileAware) ((DataFileAware) filter).setDataFile(dataFile);
     }
 		
 		isConfigured = true;
@@ -233,8 +239,12 @@ public class GenericRecordProcessor<T extends Model<?>>
       try {
         reader.doBefore();
         writer.doBefore();
-        if (importer != null)
+        if (importer != null) {
           importer.doBefore();
+        }
+        if (filter != null){
+          filter.doBefore();
+        }
       } catch (InvalidSampleException e){
         if (options.skipInvalidSamples()) isInFailedState = true;
         else throw e;
@@ -251,11 +261,13 @@ public class GenericRecordProcessor<T extends Model<?>>
         return;
       }
     
+      //Process the records
       logger.info("Processing records.");
       T record = reader.readRecord();
 
       while (record != null) {
 
+        // Validate the record
         if (validator != null) {
           DataBinder dataBinder = new DataBinder(record);
           dataBinder.setValidator(validator);
@@ -272,8 +284,16 @@ public class GenericRecordProcessor<T extends Model<?>>
             }
           }
         }
-
-        writer.writeRecord(record);
+        
+        // Filter the record and write
+        if (filter != null){
+          if (!filter.isFilterable(record)){
+            writer.writeRecord(record);
+          }
+        } else {
+          writer.writeRecord(record);
+        }
+        
         record = reader.readRecord();
         count++;
 
@@ -288,6 +308,9 @@ public class GenericRecordProcessor<T extends Model<?>>
       try {
         writer.doAfter();
         reader.doAfter();
+        if (filter != null){
+          filter.doAfter();
+        }
         if (importer != null) {
           if (TempFileWriter.class.isAssignableFrom(writer.getClass())) {
             logger.info("Running RecordImporter file import");
@@ -322,18 +345,6 @@ public class GenericRecordProcessor<T extends Model<?>>
     }
 		
 	}
-	
-	public void executeDoBefore(DataImportComponent component) throws DataImportException {
-    try {
-      component.doBefore();
-    } catch (InvalidSampleException e){
-      if (!options.skipInvalidSamples()){
-        
-      }
-    } finally {
-      
-    }
-  }
 
 	public boolean isSupportedDataType(String dataType) {
 		return supportedDataTypes.contains(dataType);
@@ -413,7 +424,17 @@ public class GenericRecordProcessor<T extends Model<?>>
 		this.validator = validator;
 	}
 
-	public RecordWriter<T> getWriter() {
+  @Override
+  public Filter<T> getFilter() {
+    return filter;
+  }
+
+  @Override
+  public void setFilter(Filter<T> filter) {
+    this.filter = filter;
+  }
+
+  public RecordWriter<T> getWriter() {
 		return writer;
 	}
 
