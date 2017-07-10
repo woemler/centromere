@@ -54,6 +54,7 @@ public class AminoAcidConverter {
     map.put("trp", "W");
     map.put("tyr", "Y");
     map.put("val", "V");
+    map.put("ter", "X");
     shortToSingleLetterMap = Collections.unmodifiableMap(map);
     map = new HashMap<>();
     map.put("A", "Ala");
@@ -76,6 +77,7 @@ public class AminoAcidConverter {
     map.put("W", "Trp");
     map.put("Y", "Tyr");
     map.put("V", "Val");
+    map.put("X", "Ter");
     singleLetterToShortMap = Collections.unmodifiableMap(map);
   }
 

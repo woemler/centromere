@@ -36,6 +36,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 /**
@@ -45,6 +47,8 @@ import org.springframework.util.Assert;
  * @since 0.5.0
  */
 public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
+  
+  private static final Logger logger = LoggerFactory.getLogger(SnpEffVcfReader.class);
   
   private final GeneRepository geneRepository;
   private final SampleRepository sampleRepository;
@@ -117,12 +121,19 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
       mutation.setVariantClassification(info.getOrDefault("SNPEFF_FUNCTIONAL_CLASS", "n/a"));
       mutation.setVariantType(info.getOrDefault("SNPEFF_EFFECT", "n/a"));
       mutation.setCodonChange(info.getOrDefault("SNPEFF_CODON_CHANGE", null));
-      mutation.setNucleotideChange(info.containsKey("SNPEFF_AMINO_ACID_CHANGE") 
-          ? info.get("SNPEFF_AMINO_ACID_CHANGE").split("/")[1] : null);
+      
+      if (info.containsKey("SNPEFF_AMINO_ACID_CHANGE")){
+        for (String s: info.get("SNPEFF_AMINO_ACID_CHANGE").split("/")){
+          if (s.toLowerCase().startsWith("p.")){
+            mutation.setProteinChange(AminoAcidConverter.shortToSingleLetterMutation(s));
+          } else if (s.toLowerCase().startsWith("c.")){
+            mutation.setNucleotideChange(s);
+          }
+        }
+        
+      }
+      
       mutation.setNucleotideTranscript(info.getOrDefault("SNPEFF_TRANSCRIPT_ID", null));
-      mutation.setProteinChange(info.containsKey("SNPEFF_AMINO_ACID_CHANGE")
-          ? AminoAcidConverter.shortToSingleLetterMutation(
-              info.get("SNPEFF_AMINO_ACID_CHANGE").split("/")[0]) : null);
       mutation.setProteinTranscript(null);
       
       mutation.setAlternateTranscripts(getAlternateTranscripts(info));
