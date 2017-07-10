@@ -287,7 +287,9 @@ public class GenericRecordProcessor<T extends Model<?>>
         
         // Filter the record and write
         if (filter != null){
-          if (!filter.isFilterable(record)){
+          if (filter.isFilterable(record)){
+            logger.info(String.format("Filtering record: %s", record.toString()));
+          } else {
             writer.writeRecord(record);
           }
         } else {
