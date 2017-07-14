@@ -21,12 +21,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author woemler
  */
 public class AminoAcidConverter {
-
+  
+  private static final Logger logger = LoggerFactory.getLogger(AminoAcidConverter.class);
   private static final Map<String, String> shortToSingleLetterMap;
   private static final Map<String, String> singleLetterToShortMap;
   private static final Pattern SHORT_PATTERN = Pattern.compile("[A-Z][a-z]{2}");
@@ -94,7 +97,12 @@ public class AminoAcidConverter {
     m = m.replaceFirst("p.", "");
     Matcher matcher = SHORT_PATTERN.matcher(m);
     while (matcher.find()){
-      m = m.replaceAll(matcher.group(0), shortToSingleLetterMap.get(matcher.group(0).toLowerCase()));
+      String matched = matcher.group(0);
+      if (shortToSingleLetterMap.containsKey(matched.toLowerCase())){
+        m = m.replaceAll(matched, shortToSingleLetterMap.get(matched.toLowerCase()));  
+      } else {
+        logger.warn(String.format("Unable to identify amino acid symbol %s in variant: %s", matched, m));
+      }
     }
     return pFlag ? "p." + m : m;
   }

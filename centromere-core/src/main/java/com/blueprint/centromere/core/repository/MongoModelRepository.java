@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -106,7 +107,7 @@ public class MongoModelRepository<T extends Model<ID>, ID extends Serializable>
    */
   @Override
   public <S extends T> S update(S entity) {
-    if (exists(entity.getId())){
+    if (entity.getId() != null && exists(entity.getId())){
       mongoOperations.save(entity);
       return entity;
     } else {
@@ -155,7 +156,8 @@ public class MongoModelRepository<T extends Model<ID>, ID extends Serializable>
   private Criteria getQueryFromQueryCriteria(Iterable<QueryCriteria> queryCriterias){
     List<Criteria> criteriaList = new ArrayList<>();
     for (QueryCriteria queryCriteria: queryCriterias){
-      Criteria criteria = null;
+      Criteria criteria;
+      Pattern pattern;
       if (queryCriteria != null) {
         switch (queryCriteria.getEvaluation()) {
           case EQUALS:
@@ -209,10 +211,12 @@ public class MongoModelRepository<T extends Model<ID>, ID extends Serializable>
                 Criteria.where(queryCriteria.getKey()).gte(((List) queryCriteria.getValue()).get(1)));
             break;
           case LIKE:
-            criteria = new Criteria(queryCriteria.getKey()).regex((String) queryCriteria.getValue());
+            pattern = Pattern.compile((String) queryCriteria.getValue(), Pattern.CASE_INSENSITIVE);
+            criteria = new Criteria(queryCriteria.getKey()).regex(pattern);
             break;
           case NOT_LIKE:
-            criteria = new Criteria(queryCriteria.getKey()).not().regex((String) queryCriteria.getValue());
+            pattern = Pattern.compile((String) queryCriteria.getValue(), Pattern.CASE_INSENSITIVE);
+            criteria = new Criteria(queryCriteria.getKey()).not().regex(pattern);
             break;
           case STARTS_WITH:
             criteria = new Criteria(queryCriteria.getKey()).regex("^" + queryCriteria.getValue());

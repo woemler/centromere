@@ -16,7 +16,20 @@
 
 package com.blueprint.centromere.core.commons.model;
 
+import com.blueprint.centromere.core.commons.support.ManagedTerm;
 import com.blueprint.centromere.core.model.AbstractModel;
+import com.blueprint.centromere.core.model.Model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -25,52 +38,110 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * 
  * @author woemler
  */
+@CompoundIndexes({
+    @CompoundIndex(def = "{ 'model': 1, 'field': 1, 'term': 1 }", unique = true)
+})
 @Document
 public class Term extends AbstractModel {
 	
-	private String term;
-	private String source;
-	private String category;
-	private String subCategory;
-	private String referenceId;
+	@Indexed private String term;
+	@Indexed private String model;
+	@Indexed private String field;
+	private List<String> referenceIds;
 
-	public String getTerm() {
-		return term;
-	}
+  public String getTerm() {
+    return term;
+  }
 
-	public void setTerm(String term) {
-		this.term = term;
-	}
+  public void setTerm(String term) {
+    this.term = term;
+  }
+  
+  @JsonIgnore
+  public Class<?> getModelType() throws ClassNotFoundException {
+    return Class.forName(model);
+  }
 
-	public String getSource() {
-		return source;
-	}
+  public String getModel() {
+    return model;
+  }
 
-	public void setSource(String source) {
-		this.source = source;
-	}
+  public void setModel(Class<?> modelType){
+    this.model = modelType.getName();
+  }
 
-	public String getCategory() {
-		return category;
-	}
 
-	public void setCategory(String category) {
-		this.category = category;
-	}
+  public String getField() {
+    return field;
+  }
 
-	public String getSubCategory() {
-		return subCategory;
-	}
+  public void setField(String field) {
+    this.field = field;
+  }
 
-	public void setSubCategory(String subCategory) {
-		this.subCategory = subCategory;
-	}
+  public List<String> getReferenceIds() {
+    return referenceIds;
+  }
 
-	public String getReferenceId() {
-		return referenceId;
-	}
+  public void setReferenceIds(List<String> referenceIds) {
+    this.referenceIds = referenceIds;
+  }
+  
+  public void addReferenceId(String referenceId){
+    if (!referenceIds.contains(referenceId)) {
+      referenceIds.add(referenceId);
+    }
+  }
+  
+  public void addReferenceIds(Collection<String> referenceIds){
+    for (String ref: referenceIds){
+      this.addReferenceId(ref);
+    }
+  }
+  
+  public static <T extends Model<String>> List<Term> getModelTerms(T model) throws IllegalAccessException {
+    List<Term> terms = new ArrayList<>();
+    Class<?> current = model.getClass();
+    while (current.getSuperclass() != null){
+      for (Field field: current.getDeclaredFields()){
+        if (field.isAnnotationPresent(ManagedTerm.class)){
+          if (field.getType().isAssignableFrom(String.class)) {
+            field.setAccessible(true);
+            Term term = new Term();
+            term.setTerm((String) field.get(model));
+            term.setModel(model.getClass());
+            term.setField(field.getName());
+            term.setReferenceIds(Collections.singletonList(model.getId()));
+            terms.add(term);
+          } else if (Collection.class.isAssignableFrom(field.getType()) 
+              && field.getGenericType() instanceof ParameterizedType){
+            Type[] args = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
+            if (((Class) args[0]).isAssignableFrom(String.class)){
+              field.setAccessible(true);
+              for (String val: (Collection<String>) field.get(model)){
+                Term term = new Term();
+                term.setTerm(val);
+                term.setModel(model.getClass());
+                term.setField(field.getName());
+                term.setReferenceIds(Collections.singletonList(model.getId()));
+                terms.add(term);
+              }
+            }
+          }
+        }
+      }
+      current = current.getSuperclass();
+    }
+    return terms;
+  }
 
-	public void setReferenceId(String referenceId) {
-		this.referenceId = referenceId;
-	}
+  @Override
+  public String toString() {
+    return "Term{" +
+        "term='" + term + '\'' +
+        ", model='" + model + '\'' +
+        ", field='" + field + '\'' +
+        ", referenceIds=" + referenceIds +
+        '}';
+  }
 }

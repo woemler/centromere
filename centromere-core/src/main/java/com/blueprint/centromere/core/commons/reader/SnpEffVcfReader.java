@@ -125,7 +125,12 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
       if (info.containsKey("SNPEFF_AMINO_ACID_CHANGE")){
         for (String s: info.get("SNPEFF_AMINO_ACID_CHANGE").split("/")){
           if (s.toLowerCase().startsWith("p.")){
-            mutation.setProteinChange(AminoAcidConverter.shortToSingleLetterMutation(s));
+            try {
+              mutation.setProteinChange(AminoAcidConverter.shortToSingleLetterMutation(s));
+            } catch (Exception e){
+              logger.error(String.format("Error parsing amino acid variant: %s", s));
+              throw new DataImportException(e);
+            }
           } else if (s.toLowerCase().startsWith("c.")){
             mutation.setNucleotideChange(s);
           }

@@ -16,6 +16,7 @@
 
 package com.blueprint.centromere.core.commons.model;
 
+import com.blueprint.centromere.core.commons.support.ManagedTerm;
 import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Linked;
@@ -36,11 +37,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Subject extends AbstractModel implements Attributes {
 	
-	@Indexed(unique = true) private String name;
+	@Indexed(unique = true) @ManagedTerm private String name;
 	private String species;
 	private String gender;
 	@Ignored private String notes;
-	private List<String> aliases = new ArrayList<>();
+	@ManagedTerm @Indexed private List<String> aliases = new ArrayList<>();
 	private Map<String, String> attributes = new HashMap<>();
 	@Linked(model = Sample.class, rel = "samples") private List<String> sampleIds = new ArrayList<>();
 

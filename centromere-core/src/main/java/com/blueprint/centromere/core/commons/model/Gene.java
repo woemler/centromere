@@ -16,6 +16,7 @@
 
 package com.blueprint.centromere.core.commons.model;
 
+import com.blueprint.centromere.core.commons.support.ManagedTerm;
 import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Ignored;
 import java.util.ArrayList;
@@ -31,15 +32,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Gene extends AbstractModel implements Attributes {
 
-	@Indexed(unique = true) private String primaryReferenceId;
-	@Indexed private String primaryGeneSymbol;
+	@Indexed(unique = true) @ManagedTerm private String primaryReferenceId;
+	@Indexed @ManagedTerm private String primaryGeneSymbol;
 	private Integer taxId;
 	private String chromosome;
 	@Ignored private String chromosomeLocation;
 	private String geneType;
 	@Ignored private String description;
 	private String referenceSource;
-	@Indexed private List<String> aliases = new ArrayList<>();
+	@Indexed @ManagedTerm private List<String> aliases = new ArrayList<>();
 	private Map<String, String> attributes = new HashMap<>();
 	private Map<String, String> externalReferences = new HashMap<>();
 
