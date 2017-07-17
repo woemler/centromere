@@ -20,6 +20,7 @@ import com.blueprint.centromere.core.commons.support.ManagedTerm;
 import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -99,8 +100,9 @@ public class Term extends AbstractModel {
     }
   }
   
-  public static <T extends Model<String>> List<Term> getModelTerms(T model) throws IllegalAccessException {
+  public static <T extends Model<?>> List<Term> getModelTerms(T model) throws IllegalAccessException {
     List<Term> terms = new ArrayList<>();
+    if (!modelHasManagedTerms(model.getClass())) return terms;
     Class<?> current = model.getClass();
     while (current.getSuperclass() != null){
       for (Field field: current.getDeclaredFields()){
@@ -111,19 +113,20 @@ public class Term extends AbstractModel {
             term.setTerm((String) field.get(model));
             term.setModel(model.getClass());
             term.setField(field.getName());
-            term.setReferenceIds(Collections.singletonList(model.getId()));
+            term.setReferenceIds(Collections.singletonList(model.getId().toString()));
             terms.add(term);
           } else if (Collection.class.isAssignableFrom(field.getType()) 
               && field.getGenericType() instanceof ParameterizedType){
             Type[] args = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
-            if (((Class) args[0]).isAssignableFrom(String.class)){
+            //if (((Class) args[0]).isAssignableFrom(String.class)){
+            if (Serializable.class.isAssignableFrom((Class<?>) args[0])){
               field.setAccessible(true);
-              for (String val: (Collection<String>) field.get(model)){
+              for (Object val: (Collection<?>) field.get(model)){
                 Term term = new Term();
-                term.setTerm(val);
+                term.setTerm(val.toString());
                 term.setModel(model.getClass());
                 term.setField(field.getName());
-                term.setReferenceIds(Collections.singletonList(model.getId()));
+                term.setReferenceIds(Collections.singletonList(model.getId().toString()));
                 terms.add(term);
               }
             }
@@ -133,6 +136,19 @@ public class Term extends AbstractModel {
       current = current.getSuperclass();
     }
     return terms;
+  }
+  
+  public static boolean modelHasManagedTerms(Class<?> model){
+    Class<?> current = model;
+    while (current.getSuperclass() != null){
+      for (Field field: current.getDeclaredFields()){
+        if (field.isAnnotationPresent(ManagedTerm.class)){ 
+          return true;
+        }
+      }
+      current = current.getSuperclass();
+    }
+    return false;
   }
 
   @Override

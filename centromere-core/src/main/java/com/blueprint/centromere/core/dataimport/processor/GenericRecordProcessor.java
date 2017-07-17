@@ -28,6 +28,7 @@ import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
+import com.blueprint.centromere.core.dataimport.DataImportComponent;
 import com.blueprint.centromere.core.dataimport.DataTypeSupport;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
@@ -88,6 +89,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 	
 	private boolean isConfigured = false;
 	private boolean isInFailedState = false;
+	private Integer recordCount = 0;
 
 	/**
 	 * Empty default implementation.  The purpose of extending {@link org.springframework.beans.factory.InitializingBean}
@@ -223,7 +225,7 @@ public class GenericRecordProcessor<T extends Model<?>>
     
     try {
 
-      Integer count = 0;
+      recordCount = 0;
       if (!isConfigured)
         logger.warn(
             "Processor configuration method has not run!"); // TODO: Should this return or throw exception?
@@ -233,113 +235,24 @@ public class GenericRecordProcessor<T extends Model<?>>
         return;
       }
 
-      String inputFilePath = dataFile.getFilePath();
-
-      logger.info("Running doBefore method for processor components.");
-      try {
-        reader.doBefore();
-        writer.doBefore();
-        if (importer != null) {
-          importer.doBefore();
-        }
-        if (filter != null){
-          filter.doBefore();
-        }
-      } catch (InvalidSampleException e){
-        if (options.skipInvalidSamples()) isInFailedState = true;
-        else throw e;
-      } catch (InvalidDataFileException e){
-        if (options.skipInvalidFiles()) isInFailedState = true;
-        else throw e;
-      } catch (InvalidGeneException e){
-        if (options.skipInvalidGenes()) isInFailedState = true;
-        else throw e;
-      }
+      runComponentDoBefore();
 
       if (isInFailedState) {
         logger.warn("Record processor is in failed state and is aborting run.");
         return;
       }
     
-      //Process the records
-      logger.info("Processing records.");
-      T record = reader.readRecord();
-
-      while (record != null) {
-
-        // Validate the record
-        if (validator != null) {
-          DataBinder dataBinder = new DataBinder(record);
-          dataBinder.setValidator(validator);
-          dataBinder.validate();
-          BindingResult bindingResult = dataBinder.getBindingResult();
-          if (bindingResult.hasErrors()) {
-            logger.warn(String.format("Record failed validation: %s", record.toString()));
-            if (options.skipInvalidRecords()) {
-              record = reader.readRecord();
-              continue;
-            } else {
-              isInFailedState = true;
-              throw new DataImportException(bindingResult.toString());
-            }
-          }
-        }
-        
-        // Filter the record and write
-        if (filter != null){
-          if (filter.isFilterable(record)){
-            logger.info(String.format("Filtering record: %s", record.toString()));
-          } else {
-            writer.writeRecord(record);
-          }
-        } else {
-          writer.writeRecord(record);
-        }
-        
-        record = reader.readRecord();
-        count++;
-
-      }
+      processRecords();
 
       if (isInFailedState) {
         logger.warn("Record processor is in failed state and is aborting run.");
         return;
       }
 
-      logger.info("Running doAfter methods for processor components.");
-      try {
-        writer.doAfter();
-        reader.doAfter();
-        if (filter != null){
-          filter.doAfter();
-        }
-        if (importer != null) {
-          if (TempFileWriter.class.isAssignableFrom(writer.getClass())) {
-            logger.info("Running RecordImporter file import");
-            String tempFilePath = ((TempFileWriter) writer).getTempFilePath(inputFilePath);
-            importer.importFile(tempFilePath);
-            logger.info("Running RecordImporter doAfter method");
-            importer.doAfter();
-          } else {
-            logger
-                .warn(
-                    "RecordWriter instance does not implement TempFileWriter interface, cannot get"
-                        + " temp file path from component.");
-          }
-        }
-      } catch (InvalidSampleException e){
-        if (options.skipInvalidSamples()) isInFailedState = true;
-        else throw e;
-      } catch (InvalidDataFileException e){
-        if (options.skipInvalidFiles()) isInFailedState = true;
-        else throw e;
-      } catch (InvalidGeneException e){
-        if (options.skipInvalidGenes()) isInFailedState = true;
-        else throw e;
-      }
+      runComponentDoAfter();
 
       logger.info(
-          String.format("Successfully processed %d records from file: %s", count, inputFilePath));
+          String.format("Successfully processed %d records from file: %s", recordCount, dataFile.getFilePath()));
 
     } catch (Exception ex){
       isInFailedState = true;
@@ -348,10 +261,130 @@ public class GenericRecordProcessor<T extends Model<?>>
 		
 	}
 
+  /**
+   * Runs all of the {@link DataImportComponent#doBefore()} methods, and throws appropriate exceptions
+   *   if problems are encountered.
+   * 
+   * @throws DataImportException
+   */
+	protected void runComponentDoBefore() throws DataImportException {
+    logger.info("Running doBefore method for processor components.");
+    try {
+      reader.doBefore();
+      writer.doBefore();
+      if (importer != null) {
+        importer.doBefore();
+      }
+      if (filter != null){
+        filter.doBefore();
+      }
+    } catch (InvalidSampleException e){
+      if (options.skipInvalidSamples()) isInFailedState = true;
+      else throw e;
+    } catch (InvalidDataFileException e){
+      if (options.skipInvalidFiles()) isInFailedState = true;
+      else throw e;
+    } catch (InvalidGeneException e){
+      if (options.skipInvalidGenes()) isInFailedState = true;
+      else throw e;
+    }
+  }
+
+  /**
+   * Runs all of the {@link DataImportComponent#doAfter()} methods, and throws appropriate exceptions
+   *   if problems are encountered.
+   *
+   * @throws DataImportException
+   */
+  protected void runComponentDoAfter() throws DataImportException {
+    logger.info("Running doAfter methods for processor components.");
+    try {
+      writer.doAfter();
+      reader.doAfter();
+      if (filter != null){
+        filter.doAfter();
+      }
+      if (importer != null) {
+        if (TempFileWriter.class.isAssignableFrom(writer.getClass())) {
+          logger.info("Running RecordImporter file import");
+          String tempFilePath = ((TempFileWriter) writer).getTempFilePath(dataFile.getFilePath());
+          importer.importFile(tempFilePath);
+          logger.info("Running RecordImporter doAfter method");
+          importer.doAfter();
+        } else {
+          logger
+              .warn(
+                  "RecordWriter instance does not implement TempFileWriter interface, cannot get"
+                      + " temp file path from component.");
+        }
+      }
+    } catch (InvalidSampleException e){
+      if (options.skipInvalidSamples()) isInFailedState = true;
+      else throw e;
+    } catch (InvalidDataFileException e){
+      if (options.skipInvalidFiles()) isInFailedState = true;
+      else throw e;
+    } catch (InvalidGeneException e){
+      if (options.skipInvalidGenes()) isInFailedState = true;
+      else throw e;
+    }
+  }
+
+  /**
+   * Processes all of the incoming records.  Filters and validates records, if the appropriate
+   *   components are set.
+   * 
+   * @throws DataImportException
+   */
+  protected void processRecords() throws DataImportException {
+    logger.info("Processing records.");
+    T record = reader.readRecord();
+    while (record != null) {
+      if (validator != null) {
+        DataBinder dataBinder = new DataBinder(record);
+        dataBinder.setValidator(validator);
+        dataBinder.validate();
+        BindingResult bindingResult = dataBinder.getBindingResult();
+        if (bindingResult.hasErrors()) {
+          logger.warn(String.format("Record failed validation: %s", record.toString()));
+          if (options.skipInvalidRecords()) {
+            record = reader.readRecord();
+            continue;
+          } else {
+            isInFailedState = true;
+            throw new DataImportException(bindingResult.toString());
+          }
+        }
+      }
+      if (filter != null){
+        if (filter.isFilterable(record)){
+          logger.info(String.format("Filtering record: %s", record.toString()));
+        } else {
+          writer.writeRecord(record);
+        }
+      } else {
+        writer.writeRecord(record);
+      }
+      record = reader.readRecord();
+      recordCount++;
+    }
+  }
+
+  /**
+   * Tests whether the input dataType string value is processable by the component.
+   * 
+   * @param dataType
+   * @return
+   */
 	public boolean isSupportedDataType(String dataType) {
 		return supportedDataTypes.contains(dataType);
 	}
 
+  /**
+   * Sets the supported data type strings.
+   * 
+   * @param dataTypes
+   */
 	public void setSupportedDataTypes(Iterable<String> dataTypes) {
 		List<String> types = new ArrayList<>();
 		for (String type: dataTypes){
@@ -382,6 +415,10 @@ public class GenericRecordProcessor<T extends Model<?>>
   @Autowired
   public void setRegistry(ModelRepositoryRegistry registry) {
     this.registry = registry;
+  }
+  
+  protected ModelRepositoryRegistry getRegistry(){
+	  return registry;
   }
 
   public Class<T> getModel() {

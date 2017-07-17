@@ -1,6 +1,7 @@
 package com.blueprint.centromere.tests.core.test.commons;
 
 import com.blueprint.centromere.core.commons.model.Gene;
+import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.model.Term;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
@@ -66,6 +67,12 @@ public class TermTests extends AbstractRepositoryTests {
         Assert.isTrue("1".equals(term.getTerm()));
       }
     }
+  }
+  
+  @Test
+  public void termInspectionTest() throws Exception {
+    Assert.isTrue(Term.modelHasManagedTerms(Gene.class));
+    Assert.isTrue(!Term.modelHasManagedTerms(GeneExpression.class));
   }
   
   @Test
