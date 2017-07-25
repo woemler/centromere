@@ -24,6 +24,6 @@ import com.blueprint.centromere.core.commons.model.AffymetrixArrayData;
  */
 public interface AffymetrixArrayOperations<T extends AffymetrixArrayData> {
 
-  Iterable<T> findByProbesetId(String probesetId);
+  Iterable<T> findByProbeSetId(String probeSetId);
   
 }

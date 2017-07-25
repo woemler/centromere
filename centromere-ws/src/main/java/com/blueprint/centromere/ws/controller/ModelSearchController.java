@@ -31,6 +31,7 @@ import com.blueprint.centromere.core.repository.Evaluation;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.ws.config.ApiMediaTypes;
+import com.blueprint.centromere.ws.exception.InvalidParameterException;
 import com.blueprint.centromere.ws.exception.ResourceNotFoundException;
 import com.blueprint.centromere.ws.exception.RestError;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,6 +49,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
@@ -105,14 +108,14 @@ public class ModelSearchController {
       @ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
   })
   @RequestMapping(
-      value = "/{uri}/search/distinct",
+      value = "/{uri}/search/distinct/{field}",
       method = RequestMethod.GET,
       produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
           ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
           MediaType.TEXT_PLAIN_VALUE })
   public <T extends Model<ID>, ID extends Serializable> ResponseEntity<ResponseEnvelope<Object>> findDistinct(
-      @ApiParam(name = "field", value = "Model field name.") @RequestParam String field,
-      @PathVariable String uri,
+      /*@ApiParam(name = "field", value = "Model field name.")*/ @PathVariable("field") String field,
+      @PathVariable("uri") String uri,
       HttpServletRequest request)
   {
     
@@ -122,6 +125,12 @@ public class ModelSearchController {
     }
     
     Class<T> model = (Class<T>) registry.getModelByResource(uri);
+
+    BeanWrapper wrapper = new BeanWrapperImpl(model);
+    if (!wrapper.isReadableProperty(field)){
+      throw new InvalidParameterException(String.format("Requested field is not a valid model property: %s", field));
+    }
+    
     ModelRepository<T, ID> repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
     List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromFindDistinctRequest(model, request);
     Set<Object> distinct = repository.distinct(field, queryCriterias);

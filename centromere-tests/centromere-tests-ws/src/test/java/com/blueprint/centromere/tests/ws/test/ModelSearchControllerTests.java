@@ -69,14 +69,20 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findDistinct() throws Exception {
-    mockMvc.perform(get(BASE_URL + "/distinct?field=geneType"))
+    mockMvc.perform(get(BASE_URL + "/distinct/geneType"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)));
   }
 
   @Test
+  public void invalidFindDistinct() throws Exception {
+    mockMvc.perform(get(BASE_URL + "/distinct/badField"))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
   public void findDistinctFiltered() throws Exception {
-    mockMvc.perform(get(BASE_URL + "/distinct?field=primaryGeneSymbol&geneType=protein-coding"))
+    mockMvc.perform(get(BASE_URL + "/distinct/primaryGeneSymbol?geneType=protein-coding"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[2]", is("GeneD")));

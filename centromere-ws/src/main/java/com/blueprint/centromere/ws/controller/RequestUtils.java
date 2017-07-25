@@ -40,7 +40,7 @@ public class RequestUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(RequestUtils.class);
   private static final List<String> FIELD_FILTER_PARAMETERS = Arrays.asList("fields", "exclude");
-  private static final List<String> DISTINCT_PARAMETERS = Arrays.asList("field");
+  private static final List<String> DISTINCT_PARAMETERS = new ArrayList<>();
   private static final List<String> PAGINATION_PARAMETERS = Arrays.asList("page", "size", "sort");
 
   /**

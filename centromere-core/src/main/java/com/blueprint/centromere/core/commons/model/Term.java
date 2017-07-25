@@ -110,11 +110,14 @@ public class Term extends AbstractModel {
           if (field.getType().isAssignableFrom(String.class)) {
             field.setAccessible(true);
             Term term = new Term();
-            term.setTerm((String) field.get(model));
-            term.setModel(model.getClass());
-            term.setField(field.getName());
-            term.setReferenceIds(Collections.singletonList(model.getId().toString()));
-            terms.add(term);
+            String val = (String) field.get(model);
+            if (val != null && !val.trim().equals("")) {
+              term.setTerm(val);
+              term.setModel(model.getClass());
+              term.setField(field.getName());
+              term.setReferenceIds(Collections.singletonList(model.getId().toString()));
+              terms.add(term);
+            }
           } else if (Collection.class.isAssignableFrom(field.getType()) 
               && field.getGenericType() instanceof ParameterizedType){
             Type[] args = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
@@ -122,12 +125,14 @@ public class Term extends AbstractModel {
             if (Serializable.class.isAssignableFrom((Class<?>) args[0])){
               field.setAccessible(true);
               for (Object val: (Collection<?>) field.get(model)){
-                Term term = new Term();
-                term.setTerm(val.toString());
-                term.setModel(model.getClass());
-                term.setField(field.getName());
-                term.setReferenceIds(Collections.singletonList(model.getId().toString()));
-                terms.add(term);
+                if (val != null && !val.toString().trim().equals("")) {
+                  Term term = new Term();
+                  term.setTerm(val.toString());
+                  term.setModel(model.getClass());
+                  term.setField(field.getName());
+                  term.setReferenceIds(Collections.singletonList(model.getId().toString()));
+                  terms.add(term);
+                }
               }
             }
           }
