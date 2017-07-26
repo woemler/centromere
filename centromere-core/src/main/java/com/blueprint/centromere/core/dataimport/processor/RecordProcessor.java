@@ -19,6 +19,7 @@ package com.blueprint.centromere.core.dataimport.processor;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.dataimport.DataImportComponent;
+import com.blueprint.centromere.core.dataimport.Option;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.filter.Filter;
 import com.blueprint.centromere.core.dataimport.importer.RecordImporter;
@@ -26,6 +27,7 @@ import com.blueprint.centromere.core.dataimport.reader.RecordReader;
 import com.blueprint.centromere.core.dataimport.writer.RecordWriter;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
+import java.util.Collection;
 import org.springframework.validation.Validator;
 
 /**
@@ -55,6 +57,13 @@ public interface RecordProcessor<T extends Model<?>>
    * @return
    */
 	boolean isInFailedState();
+
+  /**
+   * Returns all of the {@link Option} annotations associated with the processor and its components.
+   * 
+   * @return
+   */
+	Collection<Option> getOptions();
 	
 	/* Getters and Setters */
 	void setReader(RecordReader<T> reader);

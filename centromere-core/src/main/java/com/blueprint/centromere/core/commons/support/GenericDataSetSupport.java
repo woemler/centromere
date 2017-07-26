@@ -16,18 +16,26 @@
 
 package com.blueprint.centromere.core.commons.support;
 
+import static com.blueprint.centromere.core.commons.support.GenericDataSetSupport.COPY_SUBJECT_ATTRIBUTES;
+
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.model.Subject;
 import com.blueprint.centromere.core.commons.model.Subject.Attributes;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
+import com.blueprint.centromere.core.dataimport.Option;
+import com.blueprint.centromere.core.dataimport.Options;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 /**
  * Default {@link DataSetSupport} implementation.  Handles generic sample creation and fetching,
@@ -35,19 +43,18 @@ import org.slf4j.LoggerFactory;
  * 
  * @author woemler
  */
-public class GenericDataSetSupport implements DataSetSupport {
+@Options({
+    @Option(value = COPY_SUBJECT_ATTRIBUTES, description = "Copy all Subject attributes to created samples.")    
+})
+@Component
+public class GenericDataSetSupport implements DataSetSupport, EnvironmentAware {
 
+  public static final String COPY_SUBJECT_ATTRIBUTES = "copy-subject-attributes";
   private static final Logger logger = LoggerFactory.getLogger(GenericDataSetSupport.class);
 
-  private final SubjectRepository subjectRepository;
-  private final SampleRepository sampleRepository;
-
-  public GenericDataSetSupport(
-      SubjectRepository subjectRepository,
-      SampleRepository sampleRepository) {
-    this.subjectRepository = subjectRepository;
-    this.sampleRepository = sampleRepository;
-  }
+  private SubjectRepository subjectRepository;
+  private SampleRepository sampleRepository;
+  private Environment environment;
 
   /**
    * Creates a new sample record, given only a name and an associated {@link DataSet} record.
@@ -75,8 +82,6 @@ public class GenericDataSetSupport implements DataSetSupport {
     sampleIds.add(sample.getId());
     subject.setSampleIds(sampleIds);
     subjectRepository.update(subject);
-
-    //TODO: Do we need to add sample Ids to data set record here?
     
     return sample;
   }
@@ -145,10 +150,15 @@ public class GenericDataSetSupport implements DataSetSupport {
   }
   
   private void setSampleAttributes(Sample sample, Subject subject){
-    for (Entry<String,String> entry: subject.getAttributes().entrySet()){
-      if (entry.getKey().startsWith(Attributes.SAMPLE_ATTRIBUTE_PREFIX)){
-        String key = entry.getKey().replace(Attributes.SAMPLE_ATTRIBUTE_PREFIX, "");
-        if (!sample.hasAttribute(key)) sample.addAttribute(key, entry.getValue());
+    if (environment.containsProperty(COPY_SUBJECT_ATTRIBUTES)){
+      sample.addAttributes(subject.getAttributes());  
+    } else {
+      for (Entry<String, String> entry : subject.getAttributes().entrySet()) {
+        if (entry.getKey().startsWith(Attributes.SAMPLE_ATTRIBUTE_PREFIX)) {
+          String key = entry.getKey().replace(Attributes.SAMPLE_ATTRIBUTE_PREFIX, "");
+          if (!sample.hasAttribute(key))
+            sample.addAttribute(key, entry.getValue());
+        }
       }
     }
   }
@@ -201,12 +211,32 @@ public class GenericDataSetSupport implements DataSetSupport {
     
   }
 
-  protected SubjectRepository getSubjectRepository() {
+  public SubjectRepository getSubjectRepository() {
     return subjectRepository;
   }
 
-  protected SampleRepository getSampleRepository() {
+  @Autowired
+  public void setSubjectRepository(
+      SubjectRepository subjectRepository) {
+    this.subjectRepository = subjectRepository;
+  }
+
+  public SampleRepository getSampleRepository() {
     return sampleRepository;
   }
 
+  @Autowired
+  public void setSampleRepository(
+      SampleRepository sampleRepository) {
+    this.sampleRepository = sampleRepository;
+  }
+
+  public Environment getEnvironment() {
+    return environment;
+  }
+
+  @Autowired
+  public void setEnvironment(Environment environment) {
+    this.environment = environment;
+  }
 }

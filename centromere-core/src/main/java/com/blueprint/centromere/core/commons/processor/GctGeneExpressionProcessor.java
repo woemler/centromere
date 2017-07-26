@@ -21,6 +21,7 @@ import com.blueprint.centromere.core.commons.reader.GctGeneExpressionFileReader;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
+import com.blueprint.centromere.core.commons.support.GenericDataSetSupport;
 import com.blueprint.centromere.core.commons.validator.GeneExpressionValidator;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.importer.MongoImportTempFileImporter;
@@ -38,16 +39,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class GctGeneExpressionProcessor extends GenericRecordProcessor<GeneExpression> {
 
+  @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   public GctGeneExpressionProcessor(
       GeneRepository geneRepository, 
       SampleRepository sampleRepository, 
       SubjectRepository subjectRepository,
       MongoTemplate mongoTemplate,
+      GenericDataSetSupport genericDataSetSupport,
       Environment environment
   ) {
     this.setModel(GeneExpression.class);
-    this.setReader(new GctGeneExpressionFileReader(geneRepository, sampleRepository, subjectRepository));
+    this.setReader(new GctGeneExpressionFileReader(geneRepository, genericDataSetSupport));
     this.setValidator(new GeneExpressionValidator());
     this.setWriter(new MongoImportTempFileWriter<>(GeneExpression.class, mongoTemplate));
     this.setImporter(new MongoImportTempFileImporter<>(GeneExpression.class, environment));

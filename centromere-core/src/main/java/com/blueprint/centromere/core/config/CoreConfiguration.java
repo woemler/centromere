@@ -48,7 +48,8 @@ public class CoreConfiguration {
 		@Configuration
 		@ComponentScan(basePackages = {
 				"com.blueprint.centromere.core.commons.reader",
-				"com.blueprint.centromere.core.commons.processor"
+				"com.blueprint.centromere.core.commons.processor",
+        "com.blueprint.centromere.core.commons.support"
 		})
 		public static class CommandLineComponentConfiguration { }
 

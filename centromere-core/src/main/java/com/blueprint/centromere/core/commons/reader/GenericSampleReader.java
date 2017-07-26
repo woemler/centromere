@@ -36,6 +36,7 @@ public class GenericSampleReader extends AbstractRecordFileReader<Sample>
     implements SampleAware{
   
   private final SubjectRepository subjectRepository;
+  
   private Map<String, Integer> headerMap = new HashMap<>();
   private String defaultEmptyValue = "n/a";
   private String delimiter = "\t";

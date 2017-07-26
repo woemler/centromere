@@ -20,12 +20,10 @@ import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetSupport;
-import com.blueprint.centromere.core.commons.support.GenericDataSetSupport;
 import com.blueprint.centromere.core.commons.support.SampleAware;
+import com.blueprint.centromere.core.dataimport.DataSetSupportAware;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidGeneException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidRecordException;
@@ -47,9 +45,10 @@ import org.slf4j.LoggerFactory;
  * @author woemler
  * @since 0.4.3
  */
+
 public class GctGeneExpressionFileReader
 		extends MultiRecordLineFileReader<GeneExpression>
-		implements ModelSupport<GeneExpression>, DataFileAware, SampleAware {
+		implements ModelSupport<GeneExpression>, DataFileAware, SampleAware, DataSetSupportAware {
 
 	private final GeneRepository geneRepository;
 	private final DataSetSupport dataSetSupport;
@@ -58,14 +57,6 @@ public class GctGeneExpressionFileReader
 	private Class<GeneExpression> model;
 	
 	private static final Logger logger = LoggerFactory.getLogger(GctGeneExpressionFileReader.class);
-
-  public GctGeneExpressionFileReader(
-      GeneRepository geneRepository,
-      SampleRepository sampleRepository,
-      SubjectRepository subjectRepository) {
-    this.geneRepository = geneRepository;
-    this.dataSetSupport = new GenericDataSetSupport(subjectRepository, sampleRepository);
-  }
 
   public GctGeneExpressionFileReader(
       GeneRepository geneRepository,
@@ -183,4 +174,8 @@ public class GctGeneExpressionFileReader
 		return new ArrayList<>(sampleMap.values());
 	}
 
+  @Override
+  public DataSetSupport getDataSetSupport() {
+    return dataSetSupport;
+  }
 }

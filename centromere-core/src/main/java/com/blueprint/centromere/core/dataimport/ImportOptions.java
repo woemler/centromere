@@ -29,6 +29,12 @@ import org.springframework.util.StringUtils;
  * @since 0.5.0
  */
 public interface ImportOptions extends ApplicationOptions {
+  
+  public static final String SKIP_INVALID_RECORDS = "skip-invalid-records";
+  public static final String SKIP_INVALID_SAMPLES = "skip-invalid-samples";
+  public static final String SKIP_INVALID_GENES = "skip-invalid-genes";
+  public static final String SKIP_INVALID_FILES = "skip-invalid-files";
+  public static final String OVERWRITE_EXISTING_FILES = "overwrite-existing-files";
 
   /**
    * Returns true if invalid records should be skipped, rather than raising an exception.

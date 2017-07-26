@@ -20,10 +20,10 @@ import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Mutation;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.CcleSupport;
+import com.blueprint.centromere.core.commons.support.DataSetSupport;
 import com.blueprint.centromere.core.commons.support.SampleAware;
+import com.blueprint.centromere.core.dataimport.DataSetSupportAware;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.reader.StandardRecordFileReader;
 import java.util.ArrayList;
@@ -36,9 +36,10 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author woemler
+ * @since 0.5.0
  */
 public class CcleMafReader extends StandardRecordFileReader<Mutation> 
-    implements SampleAware {
+    implements SampleAware, DataSetSupportAware {
 
   private static final Logger logger = LoggerFactory.getLogger(CcleMafReader.class);
 
@@ -53,12 +54,6 @@ public class CcleMafReader extends StandardRecordFileReader<Mutation>
   public CcleMafReader(GeneRepository geneRepository, CcleSupport ccleSupport) {
     this.ccleSupport = ccleSupport;
     this.geneRepository = geneRepository;
-  }
-  
-  public CcleMafReader(GeneRepository geneRepository, SubjectRepository subjectRepository,
-      SampleRepository sampleRepository){
-    this.geneRepository = geneRepository;
-    this.ccleSupport = new CcleSupport(subjectRepository, sampleRepository);
   }
 
   @Override
@@ -230,5 +225,10 @@ public class CcleMafReader extends StandardRecordFileReader<Mutation>
   @Override
   public List<Sample> getSamples() {
     return new ArrayList<>(sampleMap.values());
+  }
+
+  @Override
+  public DataSetSupport getDataSetSupport() {
+    return ccleSupport;
   }
 }

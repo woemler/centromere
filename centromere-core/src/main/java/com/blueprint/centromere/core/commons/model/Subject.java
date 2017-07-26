@@ -140,7 +140,7 @@ public class Subject extends AbstractModel implements Attributes {
 	
 	public static class Attributes {
 	  
-	  public static final String SAMPLE_ATTRIBUTE_PREFIX = "sample.";
+	  public static final String SAMPLE_ATTRIBUTE_PREFIX = "sample-";
 	  
 	  public static final String SAMPLE_HISTOLOGY = SAMPLE_ATTRIBUTE_PREFIX + "histology";
     public static final String SAMPLE_TISSUE = SAMPLE_ATTRIBUTE_PREFIX + "tissue";

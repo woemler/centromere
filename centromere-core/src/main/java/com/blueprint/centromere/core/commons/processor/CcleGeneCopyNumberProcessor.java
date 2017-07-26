@@ -40,17 +40,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class CcleGeneCopyNumberProcessor extends GenericRecordProcessor<GeneCopyNumber> {
 
+  @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   public CcleGeneCopyNumberProcessor(
       SampleRepository sampleRepository,
       SubjectRepository subjectRepository,
       GeneRepository geneRepository,
       MongoTemplate mongoTemplate,
+      CcleSupport ccleSupport,
       Environment environment
   ) {
-    GenericGeneCopyNumberMatrixReader reader = new GenericGeneCopyNumberMatrixReader(
-        new CcleSupport(subjectRepository, sampleRepository), geneRepository);
-    this.setReader(reader);
+    this.setReader(new GenericGeneCopyNumberMatrixReader(ccleSupport, geneRepository));
     this.setValidator(new GeneCopyNumberValidator());
     this.setWriter(new MongoImportTempFileWriter<>(GeneCopyNumber.class, mongoTemplate));
     this.setImporter(new MongoImportTempFileImporter<>(GeneCopyNumber.class, environment));

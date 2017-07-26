@@ -29,9 +29,12 @@ import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.dataimport.DataImportComponent;
+import com.blueprint.centromere.core.dataimport.DataSetSupportAware;
 import com.blueprint.centromere.core.dataimport.DataTypeSupport;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.ImportOptions;
+import com.blueprint.centromere.core.dataimport.Option;
+import com.blueprint.centromere.core.dataimport.Options;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidDataFileException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidGeneException;
@@ -45,7 +48,11 @@ import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +69,12 @@ import org.springframework.validation.Validator;
  * 
  * @author woemler
  */
+@Options({
+    @Option(value = ImportOptions.SKIP_INVALID_RECORDS, description = "Skips problematic records, rather than halting import."),
+    @Option(value = ImportOptions.SKIP_INVALID_SAMPLES, description = "Skips problematic samples, rather than halting import."),
+    @Option(value = ImportOptions.SKIP_INVALID_GENES, description = "Skips problematic genes, rather than halting import."),
+    @Option(value = ImportOptions.SKIP_INVALID_FILES, description = "Skips problematic files, rather than halting import.")
+})
 public class GenericRecordProcessor<T extends Model<?>> 
 		implements RecordProcessor<T>, DataTypeSupport, DataFileAware, DataSetAware {
 
@@ -393,7 +406,54 @@ public class GenericRecordProcessor<T extends Model<?>>
 		this.supportedDataTypes = types;
 	}
 
-	public List<String> getSupportedDataTypes() {
+  /**
+   * Returns all of the {@link Option} annotations associated with the processor and its components.
+   */
+  @Override
+  public Collection<Option> getOptions() {
+    
+    Set<Option> options = new HashSet<>();
+    
+    options.addAll(getOptionsFromClass(this.getClass()));
+    
+    if (reader != null){
+      options.addAll(getOptionsFromClass(reader.getClass()));
+      if (reader instanceof DataSetSupportAware) {
+        options.addAll(getOptionsFromClass(((DataSetSupportAware) reader).getDataSetSupport().getClass()));
+      }
+    }
+
+    if (writer != null){
+      options.addAll(getOptionsFromClass(writer.getClass()));
+      if (writer instanceof DataSetSupportAware) {
+        options.addAll(getOptionsFromClass(((DataSetSupportAware) writer).getDataSetSupport().getClass()));
+      }
+    }
+
+    if (importer != null){
+      options.addAll(getOptionsFromClass(importer.getClass()));
+      if (importer instanceof DataSetSupportAware) {
+        options.addAll(getOptionsFromClass(((DataSetSupportAware) importer).getDataSetSupport().getClass()));
+      }
+    }
+    
+    return options;
+    
+  }
+  
+  private Collection<Option> getOptionsFromClass(Class<?> type){
+    Set<Option> set = new HashSet<>();
+    if (type.isAnnotationPresent(Options.class)){
+      Options options = type.getAnnotation(Options.class);
+      Collections.addAll(set, options.value());
+    } 
+    if (type.isAnnotationPresent(Option.class)){
+      set.add(type.getAnnotation(Option.class));
+    }
+    return set;
+  }
+
+  public List<String> getSupportedDataTypes() {
 		return supportedDataTypes;
 	}
 

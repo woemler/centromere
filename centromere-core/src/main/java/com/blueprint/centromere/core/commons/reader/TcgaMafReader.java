@@ -21,10 +21,10 @@ import com.blueprint.centromere.core.commons.model.Mutation;
 import com.blueprint.centromere.core.commons.model.Mutation.VariantTranscript;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.commons.repository.SubjectRepository;
+import com.blueprint.centromere.core.commons.support.DataSetSupport;
 import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
+import com.blueprint.centromere.core.dataimport.DataSetSupportAware;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidGeneException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidSampleException;
@@ -43,7 +43,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author woemler
  */
-public class TcgaMafReader extends StandardRecordFileReader<Mutation> implements SampleAware {
+public class TcgaMafReader extends StandardRecordFileReader<Mutation> 
+    implements SampleAware, DataSetSupportAware {
 
   private static final Logger logger = LoggerFactory.getLogger(TcgaMafReader.class);
 
@@ -57,12 +58,6 @@ public class TcgaMafReader extends StandardRecordFileReader<Mutation> implements
 
   public TcgaMafReader(GeneRepository geneRepository, TcgaSupport tcgaSupport) {
     this.tcgaSupport = tcgaSupport;
-    this.geneRepository = geneRepository;
-  }
-
-  public TcgaMafReader(GeneRepository geneRepository, SubjectRepository subjectRepository, 
-      SampleRepository sampleRepository) {
-    this.tcgaSupport = new TcgaSupport(subjectRepository, sampleRepository);
     this.geneRepository = geneRepository;
   }
 
@@ -229,5 +224,10 @@ public class TcgaMafReader extends StandardRecordFileReader<Mutation> implements
   @Override
   public List<Sample> getSamples() {
     return new ArrayList<>(sampleMap.values());
+  }
+
+  @Override
+  public DataSetSupport getDataSetSupport() {
+    return tcgaSupport;
   }
 }

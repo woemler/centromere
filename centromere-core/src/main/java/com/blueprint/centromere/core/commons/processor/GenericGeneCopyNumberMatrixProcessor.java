@@ -21,6 +21,7 @@ import com.blueprint.centromere.core.commons.reader.GenericGeneCopyNumberMatrixR
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
+import com.blueprint.centromere.core.commons.support.GenericDataSetSupport;
 import com.blueprint.centromere.core.commons.validator.GeneCopyNumberValidator;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.importer.MongoImportTempFileImporter;
@@ -38,15 +39,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class GenericGeneCopyNumberMatrixProcessor extends GenericRecordProcessor<GeneCopyNumber> {
 
+  @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   public GenericGeneCopyNumberMatrixProcessor(
       SampleRepository sampleRepository,
       SubjectRepository subjectRepository,
       GeneRepository geneRepository,
       MongoTemplate mongoTemplate,
+      GenericDataSetSupport genericDataSetSupport,
       Environment environment
   ) {
-    this.setReader(new GenericGeneCopyNumberMatrixReader(subjectRepository, sampleRepository, geneRepository));
+    this.setReader(new GenericGeneCopyNumberMatrixReader(genericDataSetSupport, geneRepository));
     this.setValidator(new GeneCopyNumberValidator());
     this.setWriter(new MongoImportTempFileWriter<>(GeneCopyNumber.class, mongoTemplate));
     this.setImporter(new MongoImportTempFileImporter<>(GeneCopyNumber.class, environment));

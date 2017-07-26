@@ -21,10 +21,9 @@ import com.blueprint.centromere.core.commons.model.Mutation;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.AminoAcidConverter;
 import com.blueprint.centromere.core.commons.support.DataSetSupport;
-import com.blueprint.centromere.core.commons.support.GenericDataSetSupport;
+import com.blueprint.centromere.core.dataimport.DataSetSupportAware;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidDataFileException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidGeneException;
@@ -46,34 +45,25 @@ import org.springframework.util.Assert;
  * @author woemler
  * @since 0.5.0
  */
-public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
+public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> 
+    implements DataSetSupportAware {
   
   private static final Logger logger = LoggerFactory.getLogger(SnpEffVcfReader.class);
   
   private final GeneRepository geneRepository;
   private final SampleRepository sampleRepository;
-  private final DataSetSupport support;
+  private final DataSetSupport dataSetSupport;
   
   private boolean formatTestFlag = false;
 
   public SnpEffVcfReader(
       GeneRepository geneRepository,
       SampleRepository sampleRepository,
-      DataSetSupport support
+      DataSetSupport dataSetSupport
   ) {
     this.geneRepository = geneRepository;
     this.sampleRepository = sampleRepository;
-    this.support = support;
-  }
-  
-  public SnpEffVcfReader(
-      GeneRepository geneRepository,
-      SampleRepository sampleRepository,
-      SubjectRepository subjectRepository
-  ) {
-    this.sampleRepository = sampleRepository;
-    this.geneRepository = geneRepository;
-    this.support = new GenericDataSetSupport(subjectRepository, sampleRepository);
+    this.dataSetSupport = dataSetSupport;
   }
 
   /**
@@ -174,7 +164,7 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
   }
   
   protected Sample getSample(String name) throws InvalidSampleException {
-    return support.findOrCreateSample(name, this.getDataSet()).orElse(null);
+    return dataSetSupport.findOrCreateSample(name, this.getDataSet()).orElse(null);
   }
   
   protected Gene getGene(String identifier) throws InvalidGeneException {
@@ -234,7 +224,8 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
     return sampleRepository;
   }
 
-  public DataSetSupport getSupport() {
-    return support;
+  @Override
+  public DataSetSupport getDataSetSupport() {
+    return dataSetSupport;
   }
 }

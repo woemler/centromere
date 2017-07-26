@@ -38,7 +38,7 @@ This document outlines the best practices and guidelines for creating Oncoblocks
   - `DELETE` requests should be used to delete records.
   - `HEAD` requests should be used to retrieve response headers, mirroring `GET` requests.
   - `OPTIONS` requests should be used to retrieve metadata that describes the resource and its parameters.
-- Every endpoint should support at least GET, HEAD, and OPTIONS  methods.
+- Every endpoint should dataSetSupport at least GET, HEAD, and OPTIONS  methods.
 
 ### Querying
 
@@ -55,7 +55,7 @@ This document outlines the best practices and guidelines for creating Oncoblocks
 
 #### Field Filtering
 
-- All endpoints should support field filtering, allowing requests to specify which entity attributes will be returned.
+- All endpoints should dataSetSupport field filtering, allowing requests to specify which entity attributes will be returned.
 - Field filtering can be performed with either the `fields` query string parameter, which specifies the attributes to be returned, or with the `exclude` query string parameter, which specifies which attributes should NOT be returned:
 
 ```
@@ -68,7 +68,7 @@ GET /samples?exclude=sampleId,links
 
 #### Paging and Record Skipping
 
-- All endpoints should support record paging, allowing requests to retrieve records in batches.
+- All endpoints should dataSetSupport record paging, allowing requests to retrieve records in batches.
 - Paging should be performed using the query string parameters `limit` and `offset` or `page`.
   - `size` should specify the maximum number of records to be returned in the collection.
   - `offset` should specify the number of records to be skipped before the first record is returned.
@@ -83,7 +83,7 @@ GET /samples?exclude=sampleId,links
 
 #### Sorting
 
-- API endpoints should support sorting of data by one or more column names.
+- API endpoints should dataSetSupport sorting of data by one or more column names.
   - eg. `/samples?sort=name`
 - Records can be sorted in either ascending or descending order (defaults to ascending)
   - eg. `/samples?sort=tissue,desc`
@@ -118,7 +118,7 @@ All requests should return the appropriate HTTP status code.
 
 #### Hypermedia
 
-- All endpoints should support HATEOAS links, but link retrieval should not be mandatory.
+- All endpoints should dataSetSupport HATEOAS links, but link retrieval should not be mandatory.
 - Hypermedia links should be HAL formatted.
 - Hypermedia-enriched entities and collections should always include `self` links.
 - Links to related entities should be included where appropriate.
@@ -182,7 +182,7 @@ Accept can alter the returned representation.
 Reference: https://www.mnot.net/cache_docs/
 
 ## Compression
-All responses should support gzip.
+All responses should dataSetSupport gzip.
 
 ## Security
 - All API requests should be authenticated.
@@ -207,7 +207,7 @@ token = username:expiration:hash = woemler:12345678:retg876tr8g6weg7erg8werg6
 ```
 
 ## HTTP Rate Limiting
-All endpoints should support rate limiting.
+All endpoints should dataSetSupport rate limiting.
 
 - eg. Check the returned HTTP headers of any API request to see your current rate limit status:
 

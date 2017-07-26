@@ -20,10 +20,10 @@ import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.commons.repository.SubjectRepository;
+import com.blueprint.centromere.core.commons.support.DataSetSupport;
 import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
+import com.blueprint.centromere.core.dataimport.DataSetSupportAware;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidRecordException;
 import com.blueprint.centromere.core.dataimport.reader.MultiRecordLineFileReader;
@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TcgaRnaSeqGeneExpressionFileReader
 		extends MultiRecordLineFileReader<GeneExpression>
-		implements ModelSupport<GeneExpression>, SampleAware {
+		implements ModelSupport<GeneExpression>, SampleAware, DataSetSupportAware {
 
 	private static final Logger logger = LoggerFactory.getLogger(TcgaRnaSeqGeneExpressionFileReader.class);
 
@@ -56,11 +56,10 @@ public class TcgaRnaSeqGeneExpressionFileReader
 
 	public TcgaRnaSeqGeneExpressionFileReader(
       GeneRepository geneRepository,
-      SampleRepository sampleRepository,
-      SubjectRepository subjectRepository
+      TcgaSupport tcgaSupport
 	){
     this.geneRepository = geneRepository;
-    this.tcgaSupport = new TcgaSupport(subjectRepository, sampleRepository);
+    this.tcgaSupport = tcgaSupport;
 	}
 
 	@Override
@@ -165,5 +164,10 @@ public class TcgaRnaSeqGeneExpressionFileReader
   @Override
   public List<Sample> getSamples() {
     return new ArrayList<>(sampleMap.values());
+  }
+
+  @Override
+  public DataSetSupport getDataSetSupport() {
+    return tcgaSupport;
   }
 }

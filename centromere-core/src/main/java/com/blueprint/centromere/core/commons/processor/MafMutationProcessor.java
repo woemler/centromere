@@ -38,15 +38,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class MafMutationProcessor extends GenericRecordProcessor<Mutation> {
 
+    @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     public MafMutationProcessor(
         SampleRepository sampleRepository,
         SubjectRepository subjectRepository,
         GeneRepository geneRepository,
         MongoOperations mongoOperations,
+        TcgaSupport tcgaSupport,
         Environment environment
     ) {
-      this.setReader(new TcgaMafReader(geneRepository, new TcgaSupport(subjectRepository, sampleRepository)));
+      this.setReader(new TcgaMafReader(geneRepository, tcgaSupport));
       //this.setValidator(new()); // TODO: mutation validator
       this.setWriter(new MongoImportTempFileWriter<>(Mutation.class, mongoOperations));
       this.setImporter(new MongoImportTempFileImporter<>(Mutation.class, environment));

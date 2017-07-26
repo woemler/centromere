@@ -21,7 +21,7 @@ import com.blueprint.centromere.core.commons.reader.SnpEffVcfReader;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.MutationRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.commons.repository.SubjectRepository;
+import com.blueprint.centromere.core.commons.support.GenericDataSetSupport;
 import com.blueprint.centromere.core.commons.validator.MutationValidator;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
@@ -36,11 +36,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class SnpEffVcfProcessor extends GenericRecordProcessor<Mutation> {
 
+  @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
-  public SnpEffVcfProcessor(GeneRepository geneRepository, SampleRepository sampleRepository, 
-      SubjectRepository subjectRepository, MutationRepository mutationRepository) {
+  public SnpEffVcfProcessor(
+      GeneRepository geneRepository, 
+      SampleRepository sampleRepository, 
+      MutationRepository mutationRepository, 
+      GenericDataSetSupport genericDataSetSupport
+  ) {
     this.setModel(Mutation.class);
-    this.setReader(new SnpEffVcfReader(geneRepository, sampleRepository, subjectRepository));
+    this.setReader(new SnpEffVcfReader(geneRepository, sampleRepository, genericDataSetSupport));
     this.setValidator(new MutationValidator());
     this.setWriter(new RepositoryRecordWriter<>(mutationRepository));
   }

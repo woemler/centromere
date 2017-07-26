@@ -20,11 +20,9 @@ import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.GeneCopyNumber;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.DataSetSupport;
-import com.blueprint.centromere.core.commons.support.GenericDataSetSupport;
 import com.blueprint.centromere.core.commons.support.SampleAware;
+import com.blueprint.centromere.core.dataimport.DataSetSupportAware;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidGeneException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidRecordException;
@@ -42,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * @author woemler
  */
 public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader<GeneCopyNumber> 
-    implements SampleAware {
+    implements SampleAware, DataSetSupportAware {
   
   private static final Logger logger = LoggerFactory.getLogger(GenericGeneCopyNumberMatrixReader.class);
   
@@ -50,11 +48,6 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
   private final DataSetSupport support;
   private Map<Integer, Sample> samples = new HashMap<>();
 
-  public GenericGeneCopyNumberMatrixReader(SubjectRepository subjectRepository,
-      SampleRepository sampleRepository, GeneRepository geneRepository) {
-    this.geneRepository = geneRepository;
-    this.support = new GenericDataSetSupport(subjectRepository, sampleRepository);
-  }
 
   public GenericGeneCopyNumberMatrixReader(DataSetSupport dataSetSupport, 
       GeneRepository geneRepository) {
@@ -144,5 +137,10 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
   @Override
   public List<Sample> getSamples() {
     return new ArrayList<>(samples.values());
+  }
+
+  @Override
+  public DataSetSupport getDataSetSupport() {
+    return support;
   }
 }

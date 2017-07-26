@@ -167,7 +167,7 @@ public class Gene implements Model<String> {
 
 ### Repositories
 
-All Centromere repository classes implement the base `RepositoryOperations` interface, which defines all of the basic CRUD operations that all Centromere repositories should support.  This interface is based on Spring Data's `PagingAndSortingRepository`, but with some additional method definitions for dynamic query operations.  The database-specific implementations also include several methods specific to those data stores.  A MongoDB repository implementation for the above `Gene` model class might look like this:
+All Centromere repository classes implement the base `RepositoryOperations` interface, which defines all of the basic CRUD operations that all Centromere repositories should dataSetSupport.  This interface is based on Spring Data's `PagingAndSortingRepository`, but with some additional method definitions for dynamic query operations.  The database-specific implementations also include several methods specific to those data stores.  A MongoDB repository implementation for the above `Gene` model class might look like this:
 
 ```java
 @ModelRepository(Gene.class)
@@ -268,7 +268,7 @@ public class GeneInfoProcessor extends GenericRecordProcessor<Gene> {
 
 ### Web Service Controllers
 
-The web services controller layer handles HTTP requests and routes them to the appropriate repository implementation.  Web service controllers support standard CRUD operations via `GET`, `POST`, `PUT`, and `DELETE` methods. `HEAD` and `OPTIONS` methods are also supported for the purpose of exposing additional resource endpoint information.
+The web services controller layer handles HTTP requests and routes them to the appropriate repository implementation.  Web service controllers dataSetSupport standard CRUD operations via `GET`, `POST`, `PUT`, and `DELETE` methods. `HEAD` and `OPTIONS` methods are also supported for the purpose of exposing additional resource endpoint information.
 
 ```java
 @Controller
@@ -338,7 +338,7 @@ GET /genes?exclude=description,links
 
 #### Hypermedia
 
-For hypermedia support, use the `application/hal+json` or `application/hal+xml` media types to include embedded HAL-formatted links to related entities, allowing for easy resource discovery:
+For hypermedia dataSetSupport, use the `application/hal+json` or `application/hal+xml` media types to include embedded HAL-formatted links to related entities, allowing for easy resource discovery:
 
 ```
 Request:
