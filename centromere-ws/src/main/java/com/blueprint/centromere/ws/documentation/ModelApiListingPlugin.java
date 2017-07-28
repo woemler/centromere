@@ -1,12 +1,12 @@
 package com.blueprint.centromere.ws.documentation;
 
 import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.WebProperties;
 import com.blueprint.centromere.core.model.Model;
 import com.fasterxml.classmate.TypeResolver;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 import springfox.documentation.service.ApiDescription;
 import springfox.documentation.spi.DocumentationType;
@@ -21,7 +21,7 @@ import springfox.documentation.swagger.common.SwaggerPluginSupport;
 public class ModelApiListingPlugin implements ApiListingBuilderPlugin {
 
   @Autowired private ModelRepositoryRegistry registry;
-  @Autowired private Environment env;
+  @Autowired private WebProperties webProperties;
   @Autowired private TypeResolver typeResolver;
 
   @Override
@@ -32,10 +32,10 @@ public class ModelApiListingPlugin implements ApiListingBuilderPlugin {
 
   protected List<ApiDescription> getApiDescriptions(){
     Assert.notNull(registry, "ModelRegistry must not be null.");
-    Assert.notNull(env, "Environment must not be null.");
+    Assert.notNull(webProperties, "WebProperties must not be null.");
     List<ApiDescription> descriptions = new ArrayList<>();
     for (Class<? extends Model<?>> model: registry.getRegisteredModels()){
-      String path = env.getRequiredProperty("centromere.api.root-url") + "/" + registry.getModelUri(model);
+      String path = webProperties.getApi().getRootUrl() + "/" + registry.getModelUri(model);
       descriptions.addAll(SwaggerPluginUtil.getModelApiDescriptions(model, typeResolver, path));
     }
     return descriptions;

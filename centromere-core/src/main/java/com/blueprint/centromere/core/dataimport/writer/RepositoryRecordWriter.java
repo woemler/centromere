@@ -16,7 +16,6 @@
 
 package com.blueprint.centromere.core.dataimport.writer;
 
-import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.ModelRepository;
@@ -26,7 +25,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.util.Assert;
 
 /**
  * Simple implementation of {@link RecordWriter}, that writes all records directly to the database
@@ -43,7 +41,6 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
 	private final ModelRepository<T, ID> repository;
 	private Integer batchSize = 1;
 	private WriteMode writeMode = WriteMode.INSERT;
-	private ImportOptions options;
 	private List<T> records = new ArrayList<>();
 
   public RepositoryRecordWriter(ModelRepository<T, ID> repository) {
@@ -63,7 +60,6 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
 
   @Override
 	public void doBefore() throws DataImportException {
-    Assert.notNull(repository, "Repository must not be null");
 		records = new ArrayList<>();
 	}
 
@@ -105,16 +101,6 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
 	public void doAfter() throws DataImportException {
 			if (records.size() > 0) repository.save(records);
 	}
-
-  @Override
-  public ImportOptions getImportOptions() {
-    return options;
-  }
-
-  @Override
-  public void setImportOptions(ImportOptions options) {
-    this.options = options;
-  }
 
   public Integer getBatchSize() {
     return batchSize;

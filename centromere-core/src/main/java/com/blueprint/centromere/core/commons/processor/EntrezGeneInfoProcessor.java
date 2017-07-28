@@ -37,7 +37,9 @@ import org.springframework.stereotype.Component;
 public class EntrezGeneInfoProcessor extends GenericRecordProcessor<Gene> {
 
     @Autowired
-    public EntrezGeneInfoProcessor(GeneRepository geneRepository) {
+    public EntrezGeneInfoProcessor(
+        GeneRepository geneRepository
+    ) {
         this.setReader(new EntrezGeneInfoReader());
         this.setValidator(new GeneValidator());
         this.setWriter(new RepositoryRecordWriter<>(geneRepository));

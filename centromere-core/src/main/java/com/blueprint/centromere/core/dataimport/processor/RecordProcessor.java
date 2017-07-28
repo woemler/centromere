@@ -63,7 +63,7 @@ public interface RecordProcessor<T extends Model<?>>
    * 
    * @return
    */
-	Collection<Option> getOptions();
+	Collection<Option> getDataImportProperties();
 	
 	/* Getters and Setters */
 	void setReader(RecordReader<T> reader);

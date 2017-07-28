@@ -19,14 +19,13 @@ package com.blueprint.centromere.core.dataimport.reader;
 import com.blueprint.centromere.core.dataimport.DataImportComponent;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.model.ModelSupport;
 
 /**
  * Data impoer component class.  Reads from a data source and returns {@link Model} class instances.
  * 
  * @author woemler
  */
-public interface RecordReader<T extends Model<?>> extends DataImportComponent, ModelSupport<T> {
+public interface RecordReader<T extends Model<?>> extends DataImportComponent {
 
 	/**
 	 * Generates and returns a single {@link Model} entity from the input data source.

@@ -22,6 +22,7 @@ import org.springframework.core.env.Environment;
 /**
  * @author woemler
  */
+@Deprecated
 public class ApplicationOptionsImpl implements ApplicationOptions {
 
   private final Environment env;

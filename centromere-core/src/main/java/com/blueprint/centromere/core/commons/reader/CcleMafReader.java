@@ -21,9 +21,8 @@ import com.blueprint.centromere.core.commons.model.Mutation;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.support.CcleSupport;
-import com.blueprint.centromere.core.commons.support.DataSetSupport;
 import com.blueprint.centromere.core.commons.support.SampleAware;
-import com.blueprint.centromere.core.dataimport.DataSetSupportAware;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.reader.StandardRecordFileReader;
 import java.util.ArrayList;
@@ -33,27 +32,46 @@ import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 /**
  * @author woemler
  * @since 0.5.0
  */
 public class CcleMafReader extends StandardRecordFileReader<Mutation> 
-    implements SampleAware, DataSetSupportAware {
+    implements SampleAware {
 
   private static final Logger logger = LoggerFactory.getLogger(CcleMafReader.class);
 
   private final CcleSupport ccleSupport;
   private final GeneRepository geneRepository;
+  private final DataImportProperties dataImportProperties;
 
   private Map<String, Integer> columnMap = new HashMap<>();
   private Map<String, Sample> sampleMap = new HashMap<>();
   private String delimiter = "\t";
   private boolean headerFlag = true;
 
-  public CcleMafReader(GeneRepository geneRepository, CcleSupport ccleSupport) {
+  public CcleMafReader(CcleSupport ccleSupport,
+      GeneRepository geneRepository,
+      DataImportProperties dataImportProperties) {
     this.ccleSupport = ccleSupport;
     this.geneRepository = geneRepository;
+    this.dataImportProperties = dataImportProperties;
+  }
+
+  /**
+   * Closes any open reader and opens the new target file.  Assigns local variables, if available.
+   */
+  @Override
+  public void doBefore() throws DataImportException {
+    super.doBefore();
+    try {
+      Assert.notNull(ccleSupport, "CcleSupport is not set.");
+      Assert.notNull(geneRepository, "GeneRepository is not set.");
+    } catch (Exception e){
+      throw new DataImportException(e);
+    }
   }
 
   @Override
@@ -64,8 +82,8 @@ public class CcleMafReader extends StandardRecordFileReader<Mutation>
     mutation.setDataSetId(this.getDataSet().getId());
 
     Sample sample = getSampleFromLine(line);
-    if (this.getImportOptions().isInvalidSample(sample)) {
-      if (this.getImportOptions().skipInvalidSamples()) {
+    if (sample == null) {
+      if (dataImportProperties.isSkipInvalidSamples()) {
         logger.info("Skipping line due to invalid sample: " + line);
         return null;
       } else {
@@ -77,8 +95,8 @@ public class CcleMafReader extends StandardRecordFileReader<Mutation>
     }
 
     Gene gene = getGeneFromLine(line);
-    if (this.getImportOptions().isInvalidGene(gene)){
-      if (this.getImportOptions().skipInvalidGenes()) {
+    if (gene == null){
+      if (dataImportProperties.isSkipInvalidGenes()) {
         logger.info("Skipping line due to invalid gene: " + line);
         return null;
       } else {
@@ -218,17 +236,8 @@ public class CcleMafReader extends StandardRecordFileReader<Mutation>
   }
 
   @Override
-  public Class<Mutation> getModel() {
-    return Mutation.class;
-  }
-
-  @Override
   public List<Sample> getSamples() {
     return new ArrayList<>(sampleMap.values());
   }
 
-  @Override
-  public DataSetSupport getDataSetSupport() {
-    return ccleSupport;
-  }
 }

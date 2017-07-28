@@ -23,8 +23,7 @@ import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.dataimport.ImportOptions;
-import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -34,7 +33,6 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 
 /**
@@ -46,7 +44,7 @@ public class ManifestImportExecutor {
 	private FileImportExecutor fileImportExecutor;
 	private DataSetRepository dataSetRepository;
 	private DataFileRepository dataFileRepository;
-	private Environment environment;
+	private DataImportProperties dataImportProperties;
 	
 	private static final Logger logger = LoggerFactory.getLogger(ManifestImportExecutor.class);
 	private static final String PROPERTY_PREFIX = "centromere.import.";
@@ -79,14 +77,13 @@ public class ManifestImportExecutor {
 		
 		// Set environemntal properties from manifest options.
 		setEnvironmentProperties(manifest.getParameters());
-    ImportOptions importOptions = new ImportOptionsImpl(environment);
 		
 		// Get the data set
     DataSet dataSet;
     Optional<DataSet> dsOptional = dataSetRepository.findByShortName(manifest.getShortName());
     if (dsOptional.isPresent()){
       dataSet = dsOptional.get();
-      if (!importOptions.overwriteExistingDataSets()){
+      if (!dataImportProperties.isOverwriteExistingDataSets()){
         Printer.print(String.format("Skipping existing data set: %s", manifest.getShortName()), 
             logger, Level.WARN);
         return;
@@ -130,12 +127,11 @@ public class ManifestImportExecutor {
 			
 			// Update environment properties
 			setEnvironmentProperties(mf.getParameters());
-      importOptions = new ImportOptionsImpl(environment);
 			
       try {
         fileImportExecutor.run(mf.getType(), df.getAbsolutePath(), dataSet, dataFile);
       } catch (Exception e){
-        if (importOptions.skipInvalidFiles()){
+        if (dataImportProperties.isSkipInvalidFiles()){
           logger.warn(String.format("File processing failed, skipping file: %s", 
               df.getAbsolutePath()));
           logger.error(e.toString());
@@ -179,11 +175,11 @@ public class ManifestImportExecutor {
 	}
 
 	@Autowired
-	public void setEnvironment(Environment environment) {
-		this.environment = environment;
-	}
+  public void setDataImportProperties(DataImportProperties dataImportProperties) {
+    this.dataImportProperties = dataImportProperties;
+  }
 
-	@Autowired
+  @Autowired
   public void setDataSetRepository(DataSetRepository dataSetRepository) {
     this.dataSetRepository = dataSetRepository;
   }

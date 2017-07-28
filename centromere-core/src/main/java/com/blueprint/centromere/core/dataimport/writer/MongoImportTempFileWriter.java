@@ -16,6 +16,7 @@
 
 package com.blueprint.centromere.core.dataimport.writer;
 
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import com.mongodb.BasicDBObject;
@@ -32,8 +33,11 @@ public class MongoImportTempFileWriter<T extends Model<?>> extends AbstractRecor
 
   private final MongoOperations mongoOperations;
 
-  public MongoImportTempFileWriter(Class<T> model, MongoOperations mongoOperations) {
-    super(model);
+  public MongoImportTempFileWriter(
+      DataImportProperties dataImportProperties, 
+      MongoOperations mongoOperations
+  ) {
+    super(dataImportProperties);
     this.mongoOperations = mongoOperations;
   }
 

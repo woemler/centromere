@@ -17,20 +17,28 @@
 package com.blueprint.centromere.core.commons.reader;
 
 import com.blueprint.centromere.core.commons.model.Subject;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.reader.AbstractRecordFileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.beans.BeanUtils;
 
 /**
  * @author woemler
  */
 public class GenericSubjectReader extends AbstractRecordFileReader<Subject> {
   
+  private final DataImportProperties dataImportProperties;
+  
   private Map<String, Integer> headerMap = new HashMap<>();
   private String defaultEmptyValue = "n/a";
   private String delimiter = "\t";
+
+  public GenericSubjectReader(DataImportProperties dataImportProperties) {
+    this.dataImportProperties = dataImportProperties;
+  }
 
   @Override
   public Subject readRecord() throws DataImportException {
@@ -64,6 +72,7 @@ public class GenericSubjectReader extends AbstractRecordFileReader<Subject> {
   protected Subject getRecordFromLine(String line) throws DataImportException {
     String[] bits = line.split(delimiter);
     Subject subject = new Subject();
+    BeanUtils.copyProperties(dataImportProperties.getSubject(), subject);
     subject.setName(bits[0].trim());
     for (Map.Entry<String, Integer> entry : headerMap.entrySet()) {
       if ("tissue".equals(entry.getKey().toLowerCase())) {
@@ -86,20 +95,9 @@ public class GenericSubjectReader extends AbstractRecordFileReader<Subject> {
         subject.addAttribute(entry.getKey(), getColumnValue(entry.getKey(), bits));
       }
     }
-    subject = setDefaultFields(subject);
     return subject;
   }
   
-  private Subject setDefaultFields(Subject subject){
-    if (this.getImportOptions().getParameter("default-species").isPresent() && subject.getSpecies() == null){
-      subject.setSpecies(this.getImportOptions().getParameter("default-species").get());
-    }
-    if (this.getImportOptions().getParameter("default-gender").isPresent() && subject.getGender() == null){
-      subject.setGender(this.getImportOptions().getParameter("default-gender").get());
-    }
-    return subject;
-  }
-
   private String getColumnValue(String column, String[] bits){
     String val = null;
     if (headerMap.containsKey(column) && headerMap.get(column) < bits.length) {

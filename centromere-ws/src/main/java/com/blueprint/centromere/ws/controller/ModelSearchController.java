@@ -78,7 +78,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @since 0.5.0
  */
 @Controller
-@RequestMapping("${centromere.api.root-url}")
+@RequestMapping("${centromere.web.api.root-url}")
 @SuppressWarnings({"unchecked", "SpringJavaAutowiringInspection"})
 public class ModelSearchController {
 
@@ -87,7 +87,7 @@ public class ModelSearchController {
   @Autowired /*@Qualifier("defaultConversionService")*/ private ConversionService conversionService;
   @Autowired private ObjectMapper objectMapper;
 
-  @Value("${centromere.api.root-url}")
+  @Value("${centromere.web.api.root-url}")
   private String rootUrl;
 
   private static final Logger logger = LoggerFactory.getLogger(ModelSearchController.class);

@@ -28,6 +28,7 @@ import org.springframework.util.StringUtils;
  * @author woemler
  * @since 0.5.0
  */
+@Deprecated
 public interface ImportOptions extends ApplicationOptions {
   
   public static final String SKIP_INVALID_RECORDS = "skip-invalid-records";

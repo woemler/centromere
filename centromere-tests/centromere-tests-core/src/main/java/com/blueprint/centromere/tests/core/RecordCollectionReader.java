@@ -16,7 +16,6 @@
 
 package com.blueprint.centromere.tests.core;
 
-import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.dataimport.reader.RecordReader;
 import com.blueprint.centromere.core.model.Model;
 import java.util.ArrayList;
@@ -31,7 +30,6 @@ import java.util.List;
 public class RecordCollectionReader<T extends Model<?>> implements RecordReader<T> {
 	
 	private final List<T> records = new ArrayList<>();
-	private ImportOptions importOptions;
 	private Class<T> model;
 
   public RecordCollectionReader(List<T> records) {
@@ -43,22 +41,10 @@ public class RecordCollectionReader<T extends Model<?>> implements RecordReader<
 		return null;
 	}
 
-  @Override
-  public ImportOptions getImportOptions() {
-    return importOptions;
-  }
-
-  @Override
-  public void setImportOptions(ImportOptions importOptions) {
-    this.importOptions = importOptions;
-  }
-
-  @Override
 	public Class<T> getModel() {
 			return model;
 	}
 
-	@Override
 	public void setModel(Class<T> model) {
 			this.model = model;
 	}

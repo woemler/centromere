@@ -18,6 +18,7 @@ package com.blueprint.centromere.core.dataimport.reader;
 
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -36,18 +37,31 @@ import org.springframework.core.convert.support.DefaultConversionService;
  * @author woemler
  * @since 0.4.3
  */
-public class BasicColumnMappingRecordReader<T extends Model<?>> extends AbstractRecordFileReader<T> {
+public class BasicColumnMappingRecordReader<T extends Model<?>> extends AbstractRecordFileReader<T> 
+    implements ModelSupport<T> {
 
 	private static final Logger logger = LoggerFactory.getLogger(BasicColumnMappingRecordReader.class);
 	
+	private final Class<T> model;
+
+  private ConversionService conversionService = new DefaultConversionService();
 	private Map<String, Class<?>> fieldTypeMap = new HashMap<>(); // map of actual field name and types
 	private Map<String, String> fieldNameMap = new HashMap<>(); // map of aliases and actual field names
 	private Map<Integer, String> columnIndexMap = new HashMap<>(); // map of column indexes to mapped model field names
 	private Map<String, String> columnMappings = new HashMap<>();
 	private boolean headerFlag = true;
 	private String delimiter = "\\t";
-	private ConversionService conversionService = new DefaultConversionService();
-  
+
+  public BasicColumnMappingRecordReader(Class<T> model) {
+    this.model = model;
+  }
+
+  public BasicColumnMappingRecordReader(Class<T> model,
+      ConversionService conversionService) {
+    this.model = model;
+    this.conversionService = conversionService;
+  }
+
   @Override
   public void doBefore() throws DataImportException {
     super.doBefore();
@@ -92,7 +106,7 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	private void determineMappableModelFields()  {
 		fieldNameMap = new HashMap<>();
 		fieldTypeMap = new HashMap<>();
-		Class<?> current = this.getModel();
+		Class<?> current = model;
 		while (current.getSuperclass() != null){
 			for (Field field: current.getDeclaredFields()){
 				String fieldName = field.getName();
@@ -152,7 +166,7 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
 	@SuppressWarnings("unchecked")
 	protected T getRecordFromLine(String line) throws DataImportException {
 		
-	  BeanWrapperImpl wrapper = new BeanWrapperImpl(this.getModel());
+	  BeanWrapperImpl wrapper = new BeanWrapperImpl(model);
 		String[] bits = line.split(delimiter);
 		
 		for (int i = 0; i < bits.length; i++){
@@ -218,4 +232,12 @@ public class BasicColumnMappingRecordReader<T extends Model<?>> extends Abstract
   public void setColumnMappings(Map<String, String> columnMappings) {
     this.columnMappings = columnMappings;
   }
+
+  @Override
+  public Class<T> getModel() {
+    return model;
+  }
+
+  @Override
+  public void setModel(Class<T> model) {}
 }

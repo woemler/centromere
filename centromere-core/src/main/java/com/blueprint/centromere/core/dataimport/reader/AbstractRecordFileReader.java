@@ -20,11 +20,9 @@ import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
-import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidDataFileException;
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -40,15 +38,13 @@ import org.springframework.util.Assert;
  * @author woemler
  */
 public abstract class AbstractRecordFileReader<T extends Model<?>> 
-    implements RecordReader<T>, DataSetAware, DataFileAware, ModelSupport<T> {
+    implements RecordReader<T>, DataSetAware, DataFileAware {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractRecordFileReader.class);
-  
+
 	private BufferedReader reader;
 	private DataFile dataFile;
 	private DataSet dataSet;
-	private ImportOptions options;
-	private Class<T> model;
 
   /**
 	 * Closes any open reader and opens the new target file.  Assigns local variables, if available.
@@ -64,7 +60,6 @@ public abstract class AbstractRecordFileReader<T extends Model<?>>
       Assert.notNull(dataFile, "DataFile record is not set");
       Assert.notNull(dataFile.getId(), "DataFile record has not been persisted to the database.");
       Assert.notNull(dataFile.getFilePath(), "No DataFile file path has been set");
-      Assert.notNull(options, "Import options has not been set.");
     } catch (Exception e){
       throw new DataImportException(e);
     }
@@ -117,7 +112,7 @@ public abstract class AbstractRecordFileReader<T extends Model<?>>
 		}
 	}
 
-	protected BufferedReader getReader() {
+  protected BufferedReader getReader() {
 		return reader;
 	}
 
@@ -137,23 +132,4 @@ public abstract class AbstractRecordFileReader<T extends Model<?>>
     this.dataSet = dataSet;
   }
 
-  @Override
-  public ImportOptions getImportOptions() {
-    return options;
-  }
-
-  @Override
-  public void setImportOptions(ImportOptions importOptions) {
-    this.options = importOptions;
-  }
-
-  @Override
-	public Class<T> getModel() {
-			return model;
-	}
-
-	@Override
-	public void setModel(Class<T> model) {
-			this.model = model;
-	}
 }

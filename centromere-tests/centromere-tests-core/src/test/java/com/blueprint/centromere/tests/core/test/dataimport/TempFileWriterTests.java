@@ -10,7 +10,7 @@ import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.config.CoreConfiguration;
-import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.writer.DelimtedTextFileWriter;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
@@ -18,7 +18,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.env.Environment;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
@@ -38,14 +37,12 @@ public class TempFileWriterTests extends AbstractRepositoryTests {
   @Autowired private DataSetRepository dataSetRepository;
   @Autowired private GeneRepository geneRepository;
   @Autowired private GeneExpressionRepository geneExpressionRepository;
-  @Autowired private Environment environment;
   private boolean isConfigured = false;
   
   @Test
   public void delimitedTextWriterTest() throws Exception {
     DelimtedTextFileWriter<GeneExpression> writer = 
-        new DelimtedTextFileWriter<>(GeneExpression.class);
-    writer.setImportOptions(new ImportOptionsImpl(environment));
+        new DelimtedTextFileWriter<>(new DataImportProperties(), GeneExpression.class);
     String path = writer.getTempFilePath("/path/to/fake/file.txt");
     DataSet dataSet = new DataSet();
     dataSet.setShortName("test");

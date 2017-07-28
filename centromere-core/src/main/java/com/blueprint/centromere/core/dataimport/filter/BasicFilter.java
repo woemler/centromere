@@ -16,38 +16,21 @@
 
 package com.blueprint.centromere.core.dataimport.filter;
 
-import com.blueprint.centromere.core.dataimport.ImportOptions;
-import com.blueprint.centromere.core.dataimport.exception.DataImportException;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.model.Model;
-import org.springframework.util.Assert;
 
 /**
  * @author woemler
  */
 public abstract class BasicFilter<T extends Model<?>> implements Filter<T> {
 
-  private ImportOptions importOptions;
+  private final DataImportProperties dataImportProperties;
 
-  /**
-   * To be executed before the main component method is first called.  Can be configured to handle
-   * a variety of tasks using flexible input parameters.
-   */
-  @Override
-  public void doBefore() throws DataImportException {
-    try {
-      Assert.notNull(importOptions, "ImportOptions not set.");
-    } catch (Exception e){
-      throw new DataImportException(e);
-    }
+  public BasicFilter(DataImportProperties dataImportProperties) {
+    this.dataImportProperties = dataImportProperties;
   }
 
-  @Override
-  public ImportOptions getImportOptions() {
-    return importOptions;
-  }
-
-  @Override
-  public void setImportOptions(ImportOptions importOptions) {
-    this.importOptions = importOptions;
+  public DataImportProperties getDataImportProperties() {
+    return dataImportProperties;
   }
 }

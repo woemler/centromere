@@ -20,7 +20,7 @@ import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
-import com.blueprint.centromere.core.dataimport.ImportOptions;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidDataFileException;
 import com.blueprint.centromere.core.model.Model;
@@ -41,15 +41,15 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
 		implements RecordWriter<T>, TempFileWriter, DataSetAware, DataFileAware {
   
   private static final Logger logger = LoggerFactory.getLogger(AbstractRecordFileWriter.class);
-	
+
+  private final DataImportProperties dataImportProperties;
+  
 	private FileWriter writer;
-	private ImportOptions options;
 	private DataFile dataFile;
 	private DataSet dataSet;
-	private final Class<T> model;
 
-  public AbstractRecordFileWriter(Class<T> model) {
-    this.model = model;
+  public AbstractRecordFileWriter(DataImportProperties dataImportProperties) {
+    this.dataImportProperties = dataImportProperties;
   }
 
   /**
@@ -64,7 +64,6 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
       Assert.notNull(dataFile, "DataFile record is not set");
       Assert.notNull(dataFile.getId(), "DataFile record has not been persisted to the database.");
       Assert.notNull(dataFile.getFilePath(), "No DataFile file path has been set");
-      Assert.notNull(options, "Import options has not been set.");
     } catch (Exception e){
       throw new DataImportException(e);
     }
@@ -118,7 +117,12 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
    */
   @Override
   public String getTempFilePath(String inputFilePath) throws DataImportException {
-    File tempDir = new File(options.getTempFilePath());
+    File tempDir;
+    if (dataImportProperties.getTempDir() != null && !dataImportProperties.getTempDir().trim().equals("")) {
+      tempDir = new File(dataImportProperties.getTempDir());
+    } else {
+      tempDir = new File(System.getProperty("java.io.tmpdir"));
+    }
     if (!tempDir.isDirectory() || !tempDir.canWrite()){
       throw new DataImportException(String.format("Unable to read or write to temp directory: %s",
           tempDir.getAbsolutePath()));
@@ -148,24 +152,11 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
     this.dataSet = dataSet;
   }
 
-  public Class<T> getModel() {
-    return model;
-  }
-  
-  public void setModel(Class<T> model){}
-
-  @Override
-  public ImportOptions getImportOptions() {
-    return options;
-  }
-
-  @Override
-  public void setImportOptions(ImportOptions options) {
-    this.options = options;
-  }
-
   protected String cleanFilePath(String path){
 		return path.replaceAll("\\s+", "_");
 	}
 
+  public DataImportProperties getDataImportProperties() {
+    return dataImportProperties;
+  }
 }

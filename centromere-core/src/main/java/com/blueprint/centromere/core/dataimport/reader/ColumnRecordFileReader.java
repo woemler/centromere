@@ -18,6 +18,7 @@ package com.blueprint.centromere.core.dataimport.reader;
 
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.ModelSupport;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,11 +30,17 @@ import java.util.Map;
  *
  * @author woemler
  */
-public abstract class ColumnRecordFileReader<T extends Model<?>> extends
-    AbstractRecordFileReader<T> {
+public abstract class ColumnRecordFileReader<T extends Model<?>> 
+    extends AbstractRecordFileReader<T>
+    implements ModelSupport<T> {
 
   private List<T> records = new ArrayList<>();
   private String delimiter = "\\t";
+  private final Class<T> model;
+
+  public ColumnRecordFileReader(Class<T> model) {
+    this.model = model;
+  }
 
   @Override
   public void doBefore() throws DataImportException {
@@ -50,7 +57,7 @@ public abstract class ColumnRecordFileReader<T extends Model<?>> extends
         if (bits.length > 1){
           String field = bits[0];
           for (int i = 1; i < bits.length; i++){
-            T record = recordMap.containsKey(i) ? recordMap.get(i) : getModel().newInstance();
+            T record = recordMap.containsKey(i) ? recordMap.get(i) : model.newInstance();
             setModelAttribute(record, field, bits[i]);
             recordMap.put(i, record);
           }
@@ -91,4 +98,12 @@ public abstract class ColumnRecordFileReader<T extends Model<?>> extends
   public void setDelimiter(String delimiter) {
       this.delimiter = delimiter;
   }
+
+  @Override
+  public Class<T> getModel() {
+    return model;
+  }
+
+  @Override
+  public void setModel(Class<T> model) { }
 }

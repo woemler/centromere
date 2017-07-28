@@ -24,6 +24,7 @@ import com.blueprint.centromere.core.commons.model.Subject;
 import com.blueprint.centromere.core.commons.model.Subject.Attributes;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.Option;
 import com.blueprint.centromere.core.dataimport.Options;
 import java.util.ArrayList;
@@ -32,9 +33,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 /**
@@ -47,14 +47,14 @@ import org.springframework.stereotype.Component;
     @Option(value = COPY_SUBJECT_ATTRIBUTES, description = "Copy all Subject attributes to created samples.")    
 })
 @Component
-public class GenericDataSetSupport implements DataSetSupport, EnvironmentAware {
+public class GenericDataSetSupport implements DataSetSupport {
 
   public static final String COPY_SUBJECT_ATTRIBUTES = "copy-subject-attributes";
   private static final Logger logger = LoggerFactory.getLogger(GenericDataSetSupport.class);
 
   private SubjectRepository subjectRepository;
   private SampleRepository sampleRepository;
-  private Environment environment;
+  private DataImportProperties dataImportProperties;
 
   /**
    * Creates a new sample record, given only a name and an associated {@link DataSet} record.
@@ -67,6 +67,7 @@ public class GenericDataSetSupport implements DataSetSupport, EnvironmentAware {
   public Sample createSample(String name, Subject subject, DataSet dataSet) {
     
     Sample sample = new Sample();
+    BeanUtils.copyProperties(dataImportProperties.getSample(), sample);
     sample.setName(name);
     sample.setSubjectId(subject.getId());
     sample.setDataSetId(dataSet.getId());
@@ -104,7 +105,7 @@ public class GenericDataSetSupport implements DataSetSupport, EnvironmentAware {
    * @return
    */
   protected String getSampleTypeFromSubject(Subject subject){
-    if (subject.hasAttribute("sample.type")) return subject.getAttribute("sample.type");
+    if (subject.hasAttribute("sample-type")) return subject.getAttribute("sample-type");
     if (subject.hasAttribute("sampleType")) return subject.getAttribute("sampleType");
     return null;
   }
@@ -117,7 +118,7 @@ public class GenericDataSetSupport implements DataSetSupport, EnvironmentAware {
    * @return
    */
   protected String getSampleHistologyFromSubject(Subject subject){
-    if (subject.hasAttribute("sample.histology")) return subject.getAttribute("sample.histology");
+    if (subject.hasAttribute("sample-histology")) return subject.getAttribute("sample-histology");
     if (subject.hasAttribute("histology")) return subject.getAttribute("histology");
     return null;
   }
@@ -130,27 +131,18 @@ public class GenericDataSetSupport implements DataSetSupport, EnvironmentAware {
    * @return
    */
   protected String getSampleTissueFromSubject(Subject subject){
-    if (subject.hasAttribute("sample.tissue")) return subject.getAttribute("sample.tissue");
+    if (subject.hasAttribute("sample-tissue")) return subject.getAttribute("sample-tissue");
     if (subject.hasAttribute("tissue")) return subject.getAttribute("tissue");
-    if (subject.hasAttribute("sample.primarySite")) return subject.getAttribute("sample.primarySite");
+    if (subject.hasAttribute("sample-primarySite")) return subject.getAttribute("sample-primarySite");
     if (subject.hasAttribute("primarySite")) return subject.getAttribute("primarySite");
-    if (subject.hasAttribute("sample.primary_site")) return subject.getAttribute("sample.primary_site");
+    if (subject.hasAttribute("sample-primary_site")) return subject.getAttribute("sample-primary_site");
     if (subject.hasAttribute("primary_site")) return subject.getAttribute("primary_site");
     return null;
   }
   
-  private String getSampleAttribute(String key, Subject subject, DataSet dataSet){
-    if (subject.hasAttribute(key)){
-      return subject.getAttribute(key);
-    } else if (dataSet.hasParameter("default." + key)){
-      return dataSet.getParameter("default." + key);
-    } else {
-      return "n/a";
-    }
-  }
-  
   private void setSampleAttributes(Sample sample, Subject subject){
-    if (environment.containsProperty(COPY_SUBJECT_ATTRIBUTES)){
+    if (dataImportProperties.hasAttribute(COPY_SUBJECT_ATTRIBUTES) 
+        && Boolean.parseBoolean(dataImportProperties.getAttribute(COPY_SUBJECT_ATTRIBUTES))){
       sample.addAttributes(subject.getAttributes());  
     } else {
       for (Entry<String, String> entry : subject.getAttributes().entrySet()) {
@@ -231,12 +223,13 @@ public class GenericDataSetSupport implements DataSetSupport, EnvironmentAware {
     this.sampleRepository = sampleRepository;
   }
 
-  public Environment getEnvironment() {
-    return environment;
+  public DataImportProperties getDataImportProperties() {
+    return dataImportProperties;
   }
 
   @Autowired
-  public void setEnvironment(Environment environment) {
-    this.environment = environment;
+  public void setDataImportProperties(
+      DataImportProperties dataImportProperties) {
+    this.dataImportProperties = dataImportProperties;
   }
 }

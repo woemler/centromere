@@ -23,6 +23,7 @@ import org.springframework.core.env.Environment;
 /**
  * @author woemler
  */
+@Deprecated
 public class ImportOptionsImpl extends ApplicationOptionsImpl implements ImportOptions {
 
   private boolean skipInvalidRecords = false;

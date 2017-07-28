@@ -30,7 +30,7 @@ public class ModelResourceAssembler
   @SuppressWarnings("SpringJavaAutowiringInspection")
   private final ModelRepositoryRegistry registry;
 
-  @Value("${centromere.api.root-url}")
+  @Value("${centromere.web.api.root-url}")
   private String rootUrl;
 
   public ModelResourceAssembler(ModelRepositoryRegistry registry){

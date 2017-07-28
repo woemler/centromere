@@ -20,12 +20,9 @@ import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.reader.EntrezGeneInfoReader;
-import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -38,7 +35,6 @@ import org.springframework.util.Assert;
 @ContextConfiguration
 public class EntrezGeneTests {
 
-  @Autowired private Environment environment;
   private DataSet dataSet;
   private DataFile dataFile;
 
@@ -60,7 +56,6 @@ public class EntrezGeneTests {
 		EntrezGeneInfoReader reader = new EntrezGeneInfoReader();
 		reader.setDataSet(dataSet);
 		reader.setDataFile(dataFile);
-		reader.setImportOptions(new ImportOptionsImpl(environment));
 		Assert.isTrue(Gene.class.equals(reader.getModel()), String.format("Expected %s, got %s",
 				Gene.class.getName(), reader.getModel().getName()));
 		try {

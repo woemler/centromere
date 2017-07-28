@@ -18,6 +18,7 @@ package com.blueprint.centromere.ws.config;
 
 import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.config.WebProperties;
 import com.blueprint.centromere.ws.controller.ModelCrudController;
 import com.blueprint.centromere.ws.controller.ModelResourceAssembler;
 import com.blueprint.centromere.ws.controller.UserAuthenticationController;
@@ -31,10 +32,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.env.Environment;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.hateoas.config.EnableEntityLinks;
 import org.springframework.hateoas.config.EnableHypermediaSupport;
@@ -55,10 +53,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnableSpringDataWebSupport
 @EnableHypermediaSupport(type = { EnableHypermediaSupport.HypermediaType.HAL })
 @EnableEntityLinks
-@PropertySources({
-		@PropertySource({"classpath:centromere-defaults.properties"}),
-		@PropertySource(value = {"classpath:centromere.properties"},ignoreResourceNotFound = true)
-})
 @Import({
 		WebSecurityConfig.class,
 		SwaggerConfig.class
@@ -72,7 +66,7 @@ public class WebApplicationConfig extends WebMvcConfigurerAdapter {
 
   private static final Logger logger = LoggerFactory.getLogger(WebApplicationConfig.class);
 
-  @Autowired private Environment env;
+  @Autowired private WebProperties webProperties;
 
   @Bean
   public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer(){
@@ -158,18 +152,16 @@ public class WebApplicationConfig extends WebMvcConfigurerAdapter {
     } else {
       logger.info("[CENTROMERE] WebJar location already configured.");
     }
-    if ("true".equals(env.getRequiredProperty("centromere.web.enable-static-content").toLowerCase())){
+    if (webProperties.isEnableStaticContent()){
       if (!registry.hasMappingForPattern("/static/**")){
         registry.addResourceHandler("/static/**").addResourceLocations(
-            env.getRequiredProperty("centromere.web.static-content-location"));
-        if (env.getRequiredProperty("centromere.web.home-page") != null
-            && !"".equals(env.getRequiredProperty("centromere.web.home-page"))
-            && env.getRequiredProperty("centromere.web.home-page-location") != null
-            && !"".equals(env.getRequiredProperty("centromere.web.home-page"))){
-          registry.addResourceHandler(env.getRequiredProperty("centromere.web.home-page"))
-              .addResourceLocations(env.getRequiredProperty("centromere.web.home-page-location"));
+            webProperties.getStaticContentLocation());
+        if (webProperties.getHomePage() != null && !"".equals(webProperties.getHomePage())
+            && webProperties.getHomePageLocation() != null && !"".equals(webProperties.getHomePageLocation())){
+          registry.addResourceHandler(webProperties.getHomePage())
+              .addResourceLocations(webProperties.getHomePageLocation());
           logger.info(String.format("[CENTROMERE] Static home page configured at URL: /%s",
-              env.getRequiredProperty("centromere.web.home-page")));
+              webProperties.getHomePage()));
         } else {
           logger.warn("[CENTROMERE] Static home page location not properly configured.");
         }

@@ -22,6 +22,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
@@ -46,16 +47,23 @@ public class CoreConfiguration {
 		
     @Profile({ Profiles.CLI_PROFILE })
 		@Configuration
+    @Import({ DataImportProperties.class })
 		@ComponentScan(basePackages = {
 				"com.blueprint.centromere.core.commons.reader",
 				"com.blueprint.centromere.core.commons.processor",
         "com.blueprint.centromere.core.commons.support"
 		})
 		public static class CommandLineComponentConfiguration { }
+		
+		@Profile({ Profiles.WEB_PROFILE })
+    @Configuration
+    @Import({ WebProperties.class })
+    public static class WebComponentConfiguration { }
 
 	}
   
   @Configuration
+  @Import({ DatabaseProperties.class })
   public static class CommonConfiguration {
 
     @Bean

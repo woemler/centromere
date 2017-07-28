@@ -21,10 +21,9 @@ import com.blueprint.centromere.core.commons.model.Mutation;
 import com.blueprint.centromere.core.commons.model.Mutation.VariantTranscript;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.support.DataSetSupport;
 import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
-import com.blueprint.centromere.core.dataimport.DataSetSupportAware;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidGeneException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidSampleException;
@@ -43,22 +42,27 @@ import org.slf4j.LoggerFactory;
  *
  * @author woemler
  */
-public class TcgaMafReader extends StandardRecordFileReader<Mutation> 
-    implements SampleAware, DataSetSupportAware {
+public class TcgaMafReader extends StandardRecordFileReader<Mutation> implements SampleAware {
 
   private static final Logger logger = LoggerFactory.getLogger(TcgaMafReader.class);
 
   private final TcgaSupport tcgaSupport;
   private final GeneRepository geneRepository;
+  private final DataImportProperties dataImportProperties;
 
   private Map<String, Integer> columnMap = new HashMap<>();
   private Map<String, Sample> sampleMap = new HashMap<>();
   private String delimiter = "\t";
   private boolean headerFlag = true;
 
-  public TcgaMafReader(GeneRepository geneRepository, TcgaSupport tcgaSupport) {
+  public TcgaMafReader(
+      GeneRepository geneRepository, 
+      TcgaSupport tcgaSupport, 
+      DataImportProperties dataImportProperties
+  ) {
     this.tcgaSupport = tcgaSupport;
     this.geneRepository = geneRepository;
+    this.dataImportProperties = dataImportProperties;
   }
 
   @Override
@@ -69,8 +73,8 @@ public class TcgaMafReader extends StandardRecordFileReader<Mutation>
     mutation.setDataSetId(this.getDataSet().getId());
 
     Sample sample = getSampleFromLine(line);
-    if (this.getImportOptions().isInvalidSample(sample)) {
-      if (this.getImportOptions().skipInvalidSamples()) {
+    if (sample == null) {
+      if (dataImportProperties.isSkipInvalidSamples()) {
         logger.info("Skipping line due to invalid sample: " + line);
         return null;
       } else {
@@ -81,8 +85,8 @@ public class TcgaMafReader extends StandardRecordFileReader<Mutation>
     }
 
     Gene gene = getGeneFromLine(line);
-    if (this.getImportOptions().isInvalidGene(gene)){
-      if (this.getImportOptions().skipInvalidGenes()) {
+    if (gene == null){
+      if (dataImportProperties.isSkipInvalidGenes()) {
         logger.info("Skipping line due to invalid gene: " + line);
         return null;
       } else {
@@ -217,17 +221,8 @@ public class TcgaMafReader extends StandardRecordFileReader<Mutation>
   }
 
   @Override
-  public Class<Mutation> getModel() {
-    return Mutation.class;
-  }
-
-  @Override
   public List<Sample> getSamples() {
     return new ArrayList<>(sampleMap.values());
   }
 
-  @Override
-  public DataSetSupport getDataSetSupport() {
-    return tcgaSupport;
-  }
 }

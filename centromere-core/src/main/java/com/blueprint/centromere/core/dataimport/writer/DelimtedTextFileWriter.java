@@ -16,9 +16,11 @@
 
 package com.blueprint.centromere.core.dataimport.writer;
 
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelReflectionUtils;
+import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,8 +35,11 @@ import org.springframework.beans.BeanWrapperImpl;
  * @author woemler
  * @since 0.5.0
  */
-public class DelimtedTextFileWriter<T extends Model<?>> extends AbstractRecordFileWriter<T> {
+public class DelimtedTextFileWriter<T extends Model<?>> extends AbstractRecordFileWriter<T>
+    implements ModelSupport<T> {
 
+  private final Class<T> model;
+  
   private String delimiter = "\t";
   private String enclosedBy = "";
   private String escapedBy = "\\\\";
@@ -44,8 +49,9 @@ public class DelimtedTextFileWriter<T extends Model<?>> extends AbstractRecordFi
   private List<String> fields = new ArrayList<>();
   private boolean headerFlag = true;
 
-  public DelimtedTextFileWriter(Class<T> model) {
-    super(model);
+  public DelimtedTextFileWriter(DataImportProperties dataImportProperties, Class<T> model) {
+    super(dataImportProperties);
+    this.model = model;
   }
 
   @Override
@@ -162,4 +168,13 @@ public class DelimtedTextFileWriter<T extends Model<?>> extends AbstractRecordFi
     this.fields = fields;
   }
 
+  @Override
+  public Class<T> getModel() {
+    return model;
+  }
+
+  @Override
+  public void setModel(Class<T> model) {
+
+  }
 }

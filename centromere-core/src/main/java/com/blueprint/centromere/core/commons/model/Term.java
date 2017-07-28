@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -107,6 +108,7 @@ public class Term extends AbstractModel {
     while (current.getSuperclass() != null){
       for (Field field: current.getDeclaredFields()){
         if (field.isAnnotationPresent(ManagedTerm.class)){
+          ManagedTerm annotation = field.getAnnotation(ManagedTerm.class);
           if (field.getType().isAssignableFrom(String.class)) {
             field.setAccessible(true);
             Term term = new Term();
@@ -118,10 +120,30 @@ public class Term extends AbstractModel {
               term.setReferenceIds(Collections.singletonList(model.getId().toString()));
               terms.add(term);
             }
+          } else if (Map.class.isAssignableFrom(field.getType())
+              && field.getGenericType() instanceof ParameterizedType){
+            Type[] args = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
+            if (String.class.isAssignableFrom((Class<?>) args[0]) 
+                && Serializable.class.isAssignableFrom((Class<?>) args[1])){
+              field.setAccessible(true);
+              Map<String, Serializable> map = (Map<String, Serializable>) field.get(model);
+              for (String key: annotation.keys()){
+                if (map.containsKey(key)){
+                  String val = map.get(key).toString();
+                  if (val != null && !val.trim().equals("")){
+                    Term term = new Term();
+                    term.setTerm(val);
+                    term.setModel(model.getClass());
+                    term.setField(field.getName());
+                    term.setReferenceIds(Collections.singletonList(model.getId().toString()));
+                    terms.add(term);
+                  }
+                }
+              }
+            }
           } else if (Collection.class.isAssignableFrom(field.getType()) 
               && field.getGenericType() instanceof ParameterizedType){
             Type[] args = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
-            //if (((Class) args[0]).isAssignableFrom(String.class)){
             if (Serializable.class.isAssignableFrom((Class<?>) args[0])){
               field.setAccessible(true);
               for (Object val: (Collection<?>) field.get(model)){

@@ -77,7 +77,7 @@ public class CommandLineExecutorTests {
 	public void fileImportTest() throws Exception {
 		Assert.isTrue(geneRepository.count() == 0);
 		Resource file = new ClassPathResource("Homo_sapiens.gene_info");
-		String[] args = { "import", "file", "-f", file.getFile().getAbsolutePath(), "-t", "entrez_gene" };
+		String[] args = { "import", "file", "-f", file.getFile().getAbsolutePath(), "-t", "entrez_gene", "--centromere.import.dataset.short-name=test" };
 		executor.run(args);
 		Assert.isTrue(geneRepository.count() == 5, String.format("Expected 5 records, found %d", geneRepository.count()));
 	}

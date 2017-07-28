@@ -22,8 +22,7 @@ import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataOperations;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.dataimport.ImportOptions;
-import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.processor.RecordProcessor;
 import com.blueprint.centromere.core.repository.ModelRepository;
@@ -37,21 +36,19 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.Environment;
 import org.springframework.data.repository.support.Repositories;
 
 /**
  * @author woemler
  * @since 0.5.0
  */
-public class FileImportExecutor implements EnvironmentAware {
+public class FileImportExecutor {
 	
 	private ModelProcessorBeanRegistry processorRegistry;
 	private DataSetRepository dataSetRepository;
 	private DataFileRepository dataFileRepository;
-	private Environment environment;
 	private Repositories repositories;
+	private DataImportProperties dataImportProperties;
 	
 	private static final Logger logger = LoggerFactory.getLogger(FileImportExecutor.class);
 
@@ -62,9 +59,7 @@ public class FileImportExecutor implements EnvironmentAware {
 	public void run(String dataType, String filePath, DataSet dataSet, DataFile dataFile) 
       throws CommandLineRunnerException {
 
-    ImportOptions importOptions = new ImportOptionsImpl(environment);
-		
-	  // Check to make sure the target data type is supported
+    // Check to make sure the target data type is supported
 	  if (!processorRegistry.isSupportedDataType(dataType)){
 	    String message = String.format("Data type %s is not supported by a registered "
           + "record processor.", dataType);
@@ -77,7 +72,7 @@ public class FileImportExecutor implements EnvironmentAware {
 		
 	  // Get the data set object
     if (dataSet == null){
-      dataSet = getDataSetFromEnvironment();
+      dataSet = dataImportProperties.getDataSet();
     }
     Optional<DataSet> optional = dataSetRepository.findByShortName(dataSet.getShortName());
     if (!optional.isPresent()){
@@ -119,7 +114,7 @@ public class FileImportExecutor implements EnvironmentAware {
       DataFile df = dfOptional.get();
       
       // If file exists and skip-existing-files flag set, skip file and return
-      if (importOptions.skipExistingFiles()) {
+      if (dataImportProperties.isSkipExistingFiles()) {
         
         Printer.print(String.format("DataFile record already exists.  Skipping import: %s",
             df.getFilePath()), logger, Level.WARN);
@@ -127,7 +122,7 @@ public class FileImportExecutor implements EnvironmentAware {
         
       } 
       // If overwrite-existing-files flag is set, overwrite the file record and its data
-      else if (importOptions.overwriteExistingFiles()){
+      else if (dataImportProperties.isOverwriteExistingFiles()){
         
         // If the files have the same checksum, no need to overwrite
         if (df.getChecksum().equalsIgnoreCase(dataFile.getChecksum())){
@@ -169,7 +164,6 @@ public class FileImportExecutor implements EnvironmentAware {
     }
 
 		// Configure the processor
-    processor.setImportOptions(importOptions);
 		processor.setDataSet(dataSet);
     processor.setDataFile(dataFile);
 
@@ -204,66 +198,21 @@ public class FileImportExecutor implements EnvironmentAware {
     Printer.print("File processing complete.", logger, Level.INFO);
 	}
 
-  private DataSet getDataSetFromEnvironment() {
-    DataSet dataSet = new DataSet();
-    if (environment.containsProperty("dataSet.name")){
-      String name = environment.getRequiredProperty("dataSet.name");
-      dataSet.setDisplayName(name);
-      dataSet.setShortName(name.toLowerCase().replaceAll("[^a-z0-9\\s]]", "").replaceAll("\\s+", "-"));
-    }
-    if (environment.containsProperty("dataSet.displayName")){
-      dataSet.setDisplayName(environment.getRequiredProperty("dataSet.displayName"));
-    }
-    if (environment.containsProperty("dataSet.shortName")){
-      dataSet.setShortName(environment.getRequiredProperty("dataSet.shortName"));
-    }
-    if (environment.containsProperty("dataSet.source")){
-      dataSet.setSource(environment.getRequiredProperty("dataSet.source"));
-    }
-    if (environment.containsProperty("dataSet.version")){
-      dataSet.setVersion(environment.getRequiredProperty("dataSet.version"));
-    }
-    if (environment.containsProperty("dataSet.description")){
-      dataSet.setDescription(environment.getRequiredProperty("dataSet.description"));
-    }
-    
-    if (dataSet.getDisplayName() == null){
-      dataSet.setDisplayName(environment.getRequiredProperty("centromere.import.dataset.default-display-name"));
-    }
-    if (dataSet.getShortName() == null){
-      dataSet.setShortName(environment.getRequiredProperty("centromere.import.dataset.default-short-name"));
-    }
-    if (dataSet.getSource() == null){
-      dataSet.setSource(environment.getRequiredProperty("centromere.import.dataset.default-source"));
-    }
-    if (dataSet.getVersion() == null){
-      dataSet.setVersion(environment.getRequiredProperty("centromere.import.dataset.default-version"));
-    }
-    if (dataSet.getDescription() == null){
-      dataSet.setDescription(environment.getRequiredProperty("centromere.import.dataset.default-description"));
-    }
-    
-    return dataSet;
-  }
-
 	@Autowired
 	public void setProcessorRegistry(ModelProcessorBeanRegistry processorRegistry) {
 		this.processorRegistry = processorRegistry;
 	}
 
-  @Override
-  @Autowired
-  public void setEnvironment(Environment environment) {
-    this.environment = environment;
+	@Autowired
+  public void setDataImportProperties(DataImportProperties dataImportProperties) {
+    this.dataImportProperties = dataImportProperties;
   }
 
-  @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   public void setDataSetRepository(DataSetRepository dataSetRepository) {
     this.dataSetRepository = dataSetRepository;
   }
 
-  @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   public void setDataFileRepository(DataFileRepository dataFileRepository) {
     this.dataFileRepository = dataFileRepository;

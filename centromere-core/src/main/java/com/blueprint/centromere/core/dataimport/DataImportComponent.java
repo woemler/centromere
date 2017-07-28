@@ -27,7 +27,7 @@ import org.springframework.beans.factory.InitializingBean;
  * @author woemler
  * @since 0.4.1
  */
-public interface DataImportComponent extends ImportOptionsAware, InitializingBean {
+public interface DataImportComponent extends InitializingBean {
 
 	/**
 	 * To be executed before the main component method is first called.  Can be configured to handle 

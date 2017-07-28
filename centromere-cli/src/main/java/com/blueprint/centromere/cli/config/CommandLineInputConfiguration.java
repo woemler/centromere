@@ -27,18 +27,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
 import org.springframework.data.repository.support.Repositories;
 
 /**
  * @author woemler
  */
 @Configuration
-@PropertySources({
-		@PropertySource({"classpath:centromere-defaults.properties"}),
-		@PropertySource(value = {"classpath:centromere.properties"}, ignoreResourceNotFound = true)
-})
 @Profile({ Profiles.CLI_PROFILE })
 public class CommandLineInputConfiguration {
 	

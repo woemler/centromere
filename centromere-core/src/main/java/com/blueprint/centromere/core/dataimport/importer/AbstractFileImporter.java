@@ -16,10 +16,7 @@
 
 package com.blueprint.centromere.core.dataimport.importer;
 
-import com.blueprint.centromere.core.dataimport.ImportOptions;
-import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
-import org.springframework.util.Assert;
 
 /**
  * @author woemler
@@ -27,39 +24,4 @@ import org.springframework.util.Assert;
  */
 public abstract class AbstractFileImporter<T extends Model<?>> implements RecordImporter {
   
-  private final Class<T> model;
-  private ImportOptions options;
-
-  public AbstractFileImporter(Class<T> model) {
-    this.model = model;
-  }
-
-  /**
-   * To be executed before the main component method is first called.  Can be configured to handle
-   * a variety of tasks using flexible input parameters.
-   */
-  @Override
-  public void doBefore() throws DataImportException {
-    try {
-      Assert.notNull(model, "Model is not set.");
-      Assert.notNull(options, "ImportOptions is not set.");
-    } catch (Exception e){
-      throw new DataImportException(e);
-    }
-  }
-
-  @Override
-  public ImportOptions getImportOptions() {
-    return options;
-  }
-
-  @Override
-  public void setImportOptions(ImportOptions options) {
-    this.options = options;
-  }
-
-  public Class<T> getModel(){
-    return model;
-  }
-
 }

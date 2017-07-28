@@ -22,6 +22,7 @@ import com.blueprint.centromere.core.commons.support.DataSetSupport;
  * @author woemler
  * @since 0.5.0
  */
+@Deprecated
 public interface DataSetSupportAware {
   DataSetSupport getDataSetSupport();
 }

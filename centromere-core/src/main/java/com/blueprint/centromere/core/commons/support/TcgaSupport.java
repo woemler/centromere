@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -75,6 +76,7 @@ public class TcgaSupport extends GenericDataSetSupport {
     sampleName = sampleName.toLowerCase();
     
     Sample sample = new Sample();
+    BeanUtils.copyProperties(this.getDataImportProperties().getSample(), sample);
     sample.setName(sampleName);
     sample.setSubjectId(subject.getId());
     sample.setDataSetId(dataSet.getId());

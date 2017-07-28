@@ -20,12 +20,13 @@ import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.support.DataSetSupport;
 import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
-import com.blueprint.centromere.core.dataimport.DataSetSupportAware;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
+import com.blueprint.centromere.core.dataimport.exception.InvalidGeneException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidRecordException;
+import com.blueprint.centromere.core.dataimport.exception.InvalidSampleException;
 import com.blueprint.centromere.core.dataimport.reader.MultiRecordLineFileReader;
 import com.blueprint.centromere.core.model.ModelSupport;
 import java.util.ArrayList;
@@ -44,22 +45,26 @@ import org.slf4j.LoggerFactory;
  */
 public class TcgaRnaSeqGeneExpressionFileReader
 		extends MultiRecordLineFileReader<GeneExpression>
-		implements ModelSupport<GeneExpression>, SampleAware, DataSetSupportAware {
+		implements ModelSupport<GeneExpression>, SampleAware {
 
 	private static final Logger logger = LoggerFactory.getLogger(TcgaRnaSeqGeneExpressionFileReader.class);
 
 	private final GeneRepository geneRepository;
 	private final TcgaSupport tcgaSupport;
+	private final DataImportProperties dataImportProperties;
+	
 	private Map<String, Sample> sampleMap;
 	private Map<String, Gene> geneMap;
 	private Class<GeneExpression> model = GeneExpression.class;
 
 	public TcgaRnaSeqGeneExpressionFileReader(
       GeneRepository geneRepository,
-      TcgaSupport tcgaSupport
+      TcgaSupport tcgaSupport,
+      DataImportProperties dataImportProperties
 	){
     this.geneRepository = geneRepository;
     this.tcgaSupport = tcgaSupport;
+    this.dataImportProperties = dataImportProperties;
 	}
 
 	@Override
@@ -78,22 +83,30 @@ public class TcgaRnaSeqGeneExpressionFileReader
 		String[] bits = line.trim().split(this.getDelimiter());
 		if (bits.length > 1){
 			Gene gene = getGene(bits[0]);
-			if (this.getImportOptions().isInvalidGene(gene)){
-				logger.debug(String.format("Skipping line due to invalid gene: %s", line));
-        return new ArrayList<>();
+			if (gene == null){
+			  if (dataImportProperties.isSkipInvalidGenes()){
+          logger.warn(String.format("Skipping line due to invalid gene: %s", line));
+          return new ArrayList<>();
+        } else {
+			    throw new InvalidGeneException(String.format("Cannot identify gene in line: %s", line));
+        }
 			}
 			for (int i = 1; i < bits.length; i++){
 				GeneExpression record  = new GeneExpression();
 				Sample sample = getSample(i);
-				if (this.getImportOptions().isInvalidSample(sample)){
-          logger.debug(String.format("Skipping record due to invalid sample: %s",
-              this.getHeaders().get(i)));
-          continue;
+				if (sample == null){
+				  if (dataImportProperties.isSkipInvalidSamples()){
+            logger.debug(String.format("Skipping record due to invalid sample: %s",
+                this.getHeaders().get(i)));
+            continue;  
+          } else {
+				    throw new InvalidSampleException(String.format("Cannot identify sample in line: %s", line));
+          }
 				}
 				try {
 					record.setValue(Double.parseDouble(bits[i]));
 				} catch (NumberFormatException e){
-					if (this.getImportOptions().skipInvalidRecords()){
+					if (dataImportProperties.isSkipInvalidRecords()){
 						logger.warn(String.format("Invalid record, cannot parse value: %s", bits[i]));
 						continue;
 					} else {
@@ -166,8 +179,4 @@ public class TcgaRnaSeqGeneExpressionFileReader
     return new ArrayList<>(sampleMap.values());
   }
 
-  @Override
-  public DataSetSupport getDataSetSupport() {
-    return tcgaSupport;
-  }
 }

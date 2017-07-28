@@ -16,13 +16,13 @@
 
 package com.blueprint.centromere.ws.config;
 
+import com.blueprint.centromere.core.config.WebProperties;
 import com.blueprint.centromere.ws.security.AuthenticationTokenProcessingFilter;
 import com.blueprint.centromere.ws.security.BasicTokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -37,12 +37,11 @@ public abstract class TokenSecurityConfiguration extends WebSecurityConfigurerAd
 	@Autowired
 	private UserDetailsService userService;
 
-	@Autowired
-	private Environment env;
+	@Autowired private WebProperties webProperties;
 
 	@Bean
 	public BasicTokenUtils tokenUtils() {
-		BasicTokenUtils tokenUtils = new BasicTokenUtils(env.getRequiredProperty("centromere.security.token"));
+		BasicTokenUtils tokenUtils = new BasicTokenUtils(webProperties.getSecurity().getToken());
 		tokenUtils.setTokenLifespan(getTokenLifespan());
 		return tokenUtils;
 	}
@@ -55,15 +54,13 @@ public abstract class TokenSecurityConfiguration extends WebSecurityConfigurerAd
 	protected Long getTokenLifespan(){
 		long hour = 1000L * 60 * 60;
 		Long lifespan = hour * 24; // one day
-		try {
-			lifespan = hour * Long.parseLong(env.getRequiredProperty("centromere.security.token-lifespan-hours"));
-		} catch (NumberFormatException e){
-			try {
-				lifespan = hour * 24 * Long.parseLong(env.getRequiredProperty("centromere.security.token-lifespan-days"));
-			} catch (NumberFormatException ex){
-				logger.warn("[CENTROMERE] Token lifespan not properly configured.  Reverting to default configuration");
-			}
-		}
+		if (webProperties.getSecurity().getTokenLifespanHours() != null){
+			lifespan = hour * webProperties.getSecurity().getTokenLifespanHours();
+		} else if (webProperties.getSecurity().getTokenLifespanDays() != null) {
+      lifespan = hour * 24 * webProperties.getSecurity().getTokenLifespanDays();
+		} else {
+		  lifespan = hour;
+    }
 		return lifespan;
 	}
 	

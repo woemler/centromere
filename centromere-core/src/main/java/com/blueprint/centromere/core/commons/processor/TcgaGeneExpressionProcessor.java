@@ -21,12 +21,13 @@ import com.blueprint.centromere.core.commons.reader.TcgaRnaSeqGeneExpressionFile
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
 import com.blueprint.centromere.core.commons.validator.GeneExpressionValidator;
+import com.blueprint.centromere.core.config.DataImportProperties;
+import com.blueprint.centromere.core.config.DatabaseProperties;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.importer.MongoImportTempFileImporter;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.writer.MongoImportTempFileWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Component;
 
@@ -43,12 +44,13 @@ public class TcgaGeneExpressionProcessor extends GenericRecordProcessor<GeneExpr
         GeneRepository geneRepository,
         TcgaSupport tcgaSupport,
         MongoOperations mongoOperations,
-        Environment environment
+        DataImportProperties dataImportProperties,
+        DatabaseProperties databaseProperties
     ) {
-      this.setReader(new TcgaRnaSeqGeneExpressionFileReader(geneRepository, tcgaSupport));
+      this.setReader(new TcgaRnaSeqGeneExpressionFileReader(geneRepository, tcgaSupport, dataImportProperties));
       this.setValidator(new GeneExpressionValidator());
-      this.setWriter(new MongoImportTempFileWriter<>(GeneExpression.class, mongoOperations));
-      this.setImporter(new MongoImportTempFileImporter<>(GeneExpression.class, environment));
+      this.setWriter(new MongoImportTempFileWriter<>(dataImportProperties, mongoOperations));
+      this.setImporter(new MongoImportTempFileImporter<>(GeneExpression.class, databaseProperties));
       this.setModel(GeneExpression.class);
     }
 }

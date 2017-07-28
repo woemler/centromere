@@ -23,6 +23,7 @@ import com.blueprint.centromere.core.commons.repository.MutationRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.support.GenericDataSetSupport;
 import com.blueprint.centromere.core.commons.validator.MutationValidator;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter;
@@ -42,10 +43,11 @@ public class SnpEffVcfProcessor extends GenericRecordProcessor<Mutation> {
       GeneRepository geneRepository, 
       SampleRepository sampleRepository, 
       MutationRepository mutationRepository, 
-      GenericDataSetSupport genericDataSetSupport
+      GenericDataSetSupport genericDataSetSupport,
+      DataImportProperties dataImportProperties
   ) {
     this.setModel(Mutation.class);
-    this.setReader(new SnpEffVcfReader(geneRepository, sampleRepository, genericDataSetSupport));
+    this.setReader(new SnpEffVcfReader(geneRepository, sampleRepository, genericDataSetSupport, dataImportProperties));
     this.setValidator(new MutationValidator());
     this.setWriter(new RepositoryRecordWriter<>(mutationRepository));
   }

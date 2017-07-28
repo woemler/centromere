@@ -7,10 +7,8 @@ import com.blueprint.centromere.core.commons.reader.EntrezGeneInfoReader;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.Assert;
 
@@ -24,7 +22,6 @@ public abstract class AbstractEntrezGeneTests {
   @Autowired private GeneRepository geneRepository;
   @Autowired private DataSetRepository dataSetRepository;
   @Autowired private DataFileRepository dataFileRepository;
-  @Autowired private Environment environment;
 
   @Before
   public void setup() throws Exception{
@@ -42,7 +39,6 @@ public abstract class AbstractEntrezGeneTests {
     dataFileRepository.insert(dataFile);
     reader.setDataSet(dataSet);
     reader.setDataFile(dataFile);
-    reader.setImportOptions(new ImportOptionsImpl(environment));
     
     try {
       reader.doBefore();

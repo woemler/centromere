@@ -27,12 +27,12 @@ import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.commons.support.SampleAware;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.dataimport.DataImportComponent;
 import com.blueprint.centromere.core.dataimport.DataSetSupportAware;
 import com.blueprint.centromere.core.dataimport.DataTypeSupport;
 import com.blueprint.centromere.core.dataimport.DataTypes;
-import com.blueprint.centromere.core.dataimport.ImportOptions;
 import com.blueprint.centromere.core.dataimport.Option;
 import com.blueprint.centromere.core.dataimport.Options;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
@@ -69,12 +69,6 @@ import org.springframework.validation.Validator;
  * 
  * @author woemler
  */
-@Options({
-    @Option(value = ImportOptions.SKIP_INVALID_RECORDS, description = "Skips problematic records, rather than halting import."),
-    @Option(value = ImportOptions.SKIP_INVALID_SAMPLES, description = "Skips problematic samples, rather than halting import."),
-    @Option(value = ImportOptions.SKIP_INVALID_GENES, description = "Skips problematic genes, rather than halting import."),
-    @Option(value = ImportOptions.SKIP_INVALID_FILES, description = "Skips problematic files, rather than halting import.")
-})
 public class GenericRecordProcessor<T extends Model<?>> 
 		implements RecordProcessor<T>, DataTypeSupport, DataFileAware, DataSetAware {
 
@@ -84,6 +78,7 @@ public class GenericRecordProcessor<T extends Model<?>>
   private DataSetRepository dataSetRepository;
   private DataFileRepository dataFileRepository;
   private ModelRepositoryRegistry registry;
+  private DataImportProperties dataImportProperties;
   
 	private Class<T> model;
 	
@@ -95,8 +90,6 @@ public class GenericRecordProcessor<T extends Model<?>>
 	
 	private DataFile dataFile;
 	private DataSet dataSet;
-	
-	private ImportOptions options;
 	
 	private List<String> supportedDataTypes = new ArrayList<>();
 	
@@ -121,7 +114,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 
   /**
    * Performs configuration steps prior to each execution of {@link #run()}.  Assigns
-   *   options and metadata objects to the individual processing components that are expecting them.
+   *   dataImportProperties and metadata objects to the individual processing components that are expecting them.
    */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -135,29 +128,25 @@ public class GenericRecordProcessor<T extends Model<?>>
       Assert.notNull(dataFile, "DataFile record is not set");
       Assert.notNull(dataFile.getId(), "DataFile record has not been persisted to the database.");
       Assert.notNull(dataFile.getFilePath(), "No DataFile file path has been set");
-      Assert.notNull(options, "Import options has not been set.");
+      Assert.notNull(dataImportProperties, "Import DataImportProperties has not been set.");
     } catch (Exception e){
 	    throw new DataImportException(e);
     }
     
     // Passes along DataSet, DataFile, and ImportOptions to components
 		if (writer != null) {
-    	writer.setImportOptions(options);
     	if (writer instanceof DataSetAware) ((DataSetAware) writer).setDataSet(dataSet);
     	if (writer instanceof DataFileAware) ((DataFileAware) writer).setDataFile(dataFile);
 		}
 		if (reader != null) {
-      reader.setImportOptions(options);
       if (reader instanceof DataSetAware) ((DataSetAware) reader).setDataSet(dataSet);
       if (reader instanceof DataFileAware) ((DataFileAware) reader).setDataFile(dataFile);
     }
 		if (importer != null) {
-      importer.setImportOptions(options);
       if (importer instanceof DataSetAware) ((DataSetAware) importer).setDataSet(dataSet);
       if (importer instanceof DataFileAware) ((DataFileAware) importer).setDataFile(dataFile);
     }
     if (filter != null) {
-      filter.setImportOptions(options);
       if (filter instanceof DataSetAware) ((DataSetAware) filter).setDataSet(dataSet);
       if (filter instanceof DataFileAware) ((DataFileAware) filter).setDataFile(dataFile);
     }
@@ -292,13 +281,13 @@ public class GenericRecordProcessor<T extends Model<?>>
         filter.doBefore();
       }
     } catch (InvalidSampleException e){
-      if (options.skipInvalidSamples()) isInFailedState = true;
+      if (dataImportProperties.isSkipInvalidSamples()) isInFailedState = true;
       else throw e;
     } catch (InvalidDataFileException e){
-      if (options.skipInvalidFiles()) isInFailedState = true;
+      if (dataImportProperties.isSkipInvalidFiles()) isInFailedState = true;
       else throw e;
     } catch (InvalidGeneException e){
-      if (options.skipInvalidGenes()) isInFailedState = true;
+      if (dataImportProperties.isSkipInvalidGenes()) isInFailedState = true;
       else throw e;
     }
   }
@@ -332,13 +321,13 @@ public class GenericRecordProcessor<T extends Model<?>>
         }
       }
     } catch (InvalidSampleException e){
-      if (options.skipInvalidSamples()) isInFailedState = true;
+      if (dataImportProperties.isSkipInvalidSamples()) isInFailedState = true;
       else throw e;
     } catch (InvalidDataFileException e){
-      if (options.skipInvalidFiles()) isInFailedState = true;
+      if (dataImportProperties.isSkipInvalidFiles()) isInFailedState = true;
       else throw e;
     } catch (InvalidGeneException e){
-      if (options.skipInvalidGenes()) isInFailedState = true;
+      if (dataImportProperties.isSkipInvalidGenes()) isInFailedState = true;
       else throw e;
     }
   }
@@ -360,7 +349,7 @@ public class GenericRecordProcessor<T extends Model<?>>
         BindingResult bindingResult = dataBinder.getBindingResult();
         if (bindingResult.hasErrors()) {
           logger.warn(String.format("Record failed validation: %s", record.toString()));
-          if (options.skipInvalidRecords()) {
+          if (dataImportProperties.isSkipInvalidRecords()) {
             record = reader.readRecord();
             continue;
           } else {
@@ -410,7 +399,7 @@ public class GenericRecordProcessor<T extends Model<?>>
    * Returns all of the {@link Option} annotations associated with the processor and its components.
    */
   @Override
-  public Collection<Option> getOptions() {
+  public Collection<Option> getDataImportProperties() {
     
     Set<Option> options = new HashSet<>();
     
@@ -475,6 +464,11 @@ public class GenericRecordProcessor<T extends Model<?>>
   @Autowired
   public void setRegistry(ModelRepositoryRegistry registry) {
     this.registry = registry;
+  }
+
+  @Autowired
+  public void setDataImportProperties(DataImportProperties dataImportProperties) {
+    this.dataImportProperties = dataImportProperties;
   }
   
   protected ModelRepositoryRegistry getRegistry(){
@@ -548,16 +542,6 @@ public class GenericRecordProcessor<T extends Model<?>>
 	public void setImporter(RecordImporter importer) {
 		this.importer = importer;
 	}
-
-  @Override
-  public ImportOptions getImportOptions() {
-    return options;
-  }
-
-  @Override
-  public void setImportOptions(ImportOptions importOptions) {
-    options = importOptions;
-  }
 
   @Override
   public boolean isInFailedState() {

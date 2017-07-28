@@ -64,7 +64,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @author woemler
  */
 @Controller
-@RequestMapping("${centromere.api.root-url}")
+@RequestMapping("${centromere.web.api.root-url}")
 @SuppressWarnings({"unchecked", "SpringJavaAutowiringInspection"})
 public class ModelCrudController {
 
@@ -73,7 +73,7 @@ public class ModelCrudController {
   @Autowired /*@Qualifier("defaultConversionService")*/ private ConversionService conversionService;
   @Autowired private ObjectMapper objectMapper;
 
-  @Value("${centromere.api.root-url}")
+  @Value("${centromere.web.api.root-url}")
   private String rootUrl;
 
   private static final Logger logger = LoggerFactory.getLogger(ModelCrudController.class);

@@ -23,6 +23,7 @@ import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.support.AminoAcidConverter;
 import com.blueprint.centromere.core.commons.support.DataSetSupport;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.DataSetSupportAware;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidDataFileException;
@@ -53,17 +54,20 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation>
   private final GeneRepository geneRepository;
   private final SampleRepository sampleRepository;
   private final DataSetSupport dataSetSupport;
+  private final DataImportProperties dataImportProperties;
   
   private boolean formatTestFlag = false;
 
   public SnpEffVcfReader(
       GeneRepository geneRepository,
       SampleRepository sampleRepository,
-      DataSetSupport dataSetSupport
+      DataSetSupport dataSetSupport,
+      DataImportProperties dataImportProperties
   ) {
     this.geneRepository = geneRepository;
     this.sampleRepository = sampleRepository;
     this.dataSetSupport = dataSetSupport;
+    this.dataImportProperties = dataImportProperties;
   }
 
   /**
@@ -79,7 +83,7 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation>
       
       Sample sample = getSample(this.getHeaders().get(i));
       if (sample == null){
-        if (this.getImportOptions().skipInvalidSamples()){
+        if (dataImportProperties.isSkipInvalidSamples()){
           continue;
         } else {
           throw new InvalidSampleException(String.format("Unable to identify sample: %s", this.getHeaders().get(i)));

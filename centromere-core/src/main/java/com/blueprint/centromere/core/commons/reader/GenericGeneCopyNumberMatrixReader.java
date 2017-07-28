@@ -22,7 +22,7 @@ import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.support.DataSetSupport;
 import com.blueprint.centromere.core.commons.support.SampleAware;
-import com.blueprint.centromere.core.dataimport.DataSetSupportAware;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidGeneException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidRecordException;
@@ -40,19 +40,23 @@ import org.slf4j.LoggerFactory;
  * @author woemler
  */
 public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader<GeneCopyNumber> 
-    implements SampleAware, DataSetSupportAware {
+    implements SampleAware {
   
   private static final Logger logger = LoggerFactory.getLogger(GenericGeneCopyNumberMatrixReader.class);
   
   private final GeneRepository geneRepository;
   private final DataSetSupport support;
+  private final DataImportProperties dataImportProperties;
+  
   private Map<Integer, Sample> samples = new HashMap<>();
 
-
-  public GenericGeneCopyNumberMatrixReader(DataSetSupport dataSetSupport, 
-      GeneRepository geneRepository) {
+  public GenericGeneCopyNumberMatrixReader(
+      GeneRepository geneRepository,
+      DataSetSupport support,
+      DataImportProperties dataImportProperties) {
     this.geneRepository = geneRepository;
-    this.support = dataSetSupport;
+    this.support = support;
+    this.dataImportProperties = dataImportProperties;
   }
 
   /**
@@ -70,8 +74,8 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
     if (optional.isPresent()){
       gene = optional.get();
     } 
-    if (this.getImportOptions().isInvalidGene(gene)){
-      if (this.getImportOptions().skipInvalidGenes()){
+    if (gene == null){
+      if (dataImportProperties.isSkipInvalidGenes()){
         logger.warn("Skipping unknown gene: %s %s", bits[0], bits[1]);
         return records;
       } else {
@@ -94,7 +98,7 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
         Double val = Double.parseDouble(bits[i]);
         record.setValue(val);
       } catch (NumberFormatException e){
-        if (this.getImportOptions().skipInvalidRecords()){
+        if (dataImportProperties.isSkipInvalidRecords()){
           continue;
         } else {
           throw new InvalidRecordException(String.format("Cannot parse floating point expression value " 
@@ -119,7 +123,7 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
       if (optional.isPresent()){
         samples.put(i, optional.get());
       } else {
-        if (!this.getImportOptions().skipInvalidSamples()){
+        if (!dataImportProperties.isSkipInvalidSamples()){
           throw new InvalidSampleException(String.format("Unable to identify subject for sample: %s", bits[i]));
         }
       }
@@ -139,8 +143,4 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
     return new ArrayList<>(samples.values());
   }
 
-  @Override
-  public DataSetSupport getDataSetSupport() {
-    return support;
-  }
 }

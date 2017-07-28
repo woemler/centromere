@@ -17,13 +17,13 @@
 package com.blueprint.centromere.ws.config;
 
 import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.config.WebProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -61,12 +61,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Profile({ Profiles.NO_SECURITY })
     public static class OpenReadWriteTokenSecurityConfig extends TokenSecurityConfiguration {
         
-        @Autowired private Environment env;
+        @Autowired private WebProperties webProperties;
         
         @Override
         protected void configure(HttpSecurity http) throws Exception {
 
-            String secureUrl = env.getRequiredProperty("centromere.security.secure-url");
+            String secureUrl = webProperties.getSecurity().getSecureUrl();
             logger.info(String.format("Configuring web security with OPEN READ and OPEN WRITE for " 
                 + "API root %s", secureUrl));
 
@@ -130,12 +130,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Profile({Profiles.SECURE_READ_WRITE_PROFILE})
     public static class SecuredReadWriteTokenSecurityConfig extends TokenSecurityConfiguration {
 
-        @Autowired private Environment env;
+        @Autowired private WebProperties webProperties;
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
 
-            String secureUrl = env.getRequiredProperty("centromere.security.secure-url");
+            String secureUrl = webProperties.getSecurity().getSecureUrl();
             logger.info(String.format("Configuring web security with RESTRICTED READ and RESTRICTED " 
                 + "WRITE for API root: %s", secureUrl));
 

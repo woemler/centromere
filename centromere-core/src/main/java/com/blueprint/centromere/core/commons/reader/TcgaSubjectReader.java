@@ -27,7 +27,7 @@ import com.blueprint.centromere.core.dataimport.reader.ColumnRecordFileReader;
 public class TcgaSubjectReader extends ColumnRecordFileReader<Subject> {
 
   public TcgaSubjectReader() {
-    this.setModel(Subject.class);
+    super(Subject.class);
   }
 
   @Override

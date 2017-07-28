@@ -9,12 +9,10 @@ import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
-import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
 import java.io.File;
 import java.util.Date;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.Assert;
 
@@ -29,7 +27,6 @@ public class AbstractTcgaTests extends AbstractEntrezGeneTests {
   @Autowired private DataSetRepository dataSetRepository;
   @Autowired private SampleRepository sampleRepository;
   @Autowired private SubjectRepository subjectRepository;
-  @Autowired private Environment environment;
 
   @Override
   @Before
@@ -42,7 +39,6 @@ public class AbstractTcgaTests extends AbstractEntrezGeneTests {
       DataFile dataFile = getDataFile(dataSet, SUBJECTS_FILE.getFile());
       reader.setDataSet(dataSet);
       reader.setDataFile(dataFile);
-      reader.setImportOptions(new ImportOptionsImpl(environment));
       reader.doBefore();
       Subject subject = reader.readRecord();
       while (subject != null) {

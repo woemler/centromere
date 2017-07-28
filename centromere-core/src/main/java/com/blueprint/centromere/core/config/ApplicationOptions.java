@@ -21,6 +21,7 @@ import java.util.Optional;
 /**
  * @author woemler
  */
+@Deprecated
 public interface ApplicationOptions {
 
   /**

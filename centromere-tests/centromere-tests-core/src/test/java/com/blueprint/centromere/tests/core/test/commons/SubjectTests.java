@@ -20,7 +20,6 @@ import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Subject;
 import com.blueprint.centromere.core.commons.reader.TcgaSubjectReader;
-import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
@@ -55,7 +54,6 @@ public class SubjectTests {
 		TcgaSubjectReader reader = new TcgaSubjectReader();
 		reader.setDataSet(dataSet);
 		reader.setDataFile(dataFile);
-		reader.setImportOptions(new ImportOptionsImpl(environment));
 		Assert.isTrue(Subject.class.equals(reader.getModel()), String.format("Expected %s, got %s",
     Subject.class.getName(), reader.getModel().getName()));
     List<Subject> subjects = new ArrayList<>();

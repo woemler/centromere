@@ -21,6 +21,7 @@ import com.blueprint.centromere.core.commons.reader.GenericSampleReader;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.validator.SampleValidator;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter;
@@ -35,9 +36,13 @@ import org.springframework.stereotype.Component;
 public class GenericSampleProcessor extends GenericRecordProcessor<Sample> {
 
     @Autowired
-    public GenericSampleProcessor(SubjectRepository subjectRepository, SampleRepository sampleRepository) {
+    public GenericSampleProcessor(
+        SubjectRepository subjectRepository, 
+        SampleRepository sampleRepository,
+        DataImportProperties dataImportProperties
+    ) {
       this.setModel(Sample.class);
-      this.setReader(new GenericSampleReader(subjectRepository));
+      this.setReader(new GenericSampleReader(subjectRepository, dataImportProperties));
       this.setValidator(new SampleValidator());
       this.setWriter(new RepositoryRecordWriter<>(sampleRepository));
     }

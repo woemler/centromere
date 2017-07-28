@@ -16,16 +16,14 @@
 
 package com.blueprint.centromere.core.dataimport.importer;
 
-import com.blueprint.centromere.core.config.Properties;
-import com.blueprint.centromere.core.dataimport.ImportOptions;
-import com.blueprint.centromere.core.dataimport.ImportOptionsImpl;
+import com.blueprint.centromere.core.config.DatabaseProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.Assert;
 
@@ -33,33 +31,35 @@ import org.springframework.util.Assert;
  * @author woemler
  * @since 0.5.0
  */
-public class MongoImportTempFileImporter<T extends Model<?>> extends AbstractFileImporter<T> {
+public class MongoImportTempFileImporter<T extends Model<?>> extends AbstractFileImporter<T> 
+    implements ModelSupport<T> {
 
+  private final static Logger logger = LoggerFactory.getLogger(MongoImportTempFileImporter.class);
+  
+  private final Class<T> model;
+  private final DatabaseProperties databaseProperties;
+  
   private boolean stopOnError = true;
   private boolean upsertRecords = false;
   private boolean dropCollection = false;
-  private ImportOptions options;
-  private final Environment environment;
 
-  private final static Logger logger = LoggerFactory.getLogger(MongoImportTempFileImporter.class);
-
-  public MongoImportTempFileImporter(Class<T> model, Environment environment) {
-    super(model);
-    this.environment = environment;
-    this.options = new ImportOptionsImpl(environment);
+  public MongoImportTempFileImporter(Class<T> model,
+      DatabaseProperties databaseProperties) {
+    this.model = model;
+    this.databaseProperties = databaseProperties;
   }
 
   @Override
   public void doBefore() throws DataImportException {
     super.doBefore();
-    Assert.isTrue(environment.containsProperty(Properties.DB_HOST),
-        String.format("Environment property must not be null: %s", Properties.DB_HOST));
-    Assert.isTrue(environment.containsProperty(Properties.DB_NAME),
-        String.format("Environment property must not be null: %s", Properties.DB_NAME));
-    Assert.isTrue(environment.containsProperty(Properties.DB_USER),
-        String.format("Environment property must not be null: %s", Properties.DB_USER));
-    Assert.isTrue(environment.containsProperty(Properties.DB_PASSWORD),
-        String.format("Environment property must not be null: %s", Properties.DB_PASSWORD));
+    try {
+      Assert.notNull(databaseProperties.getHost(), "Database host not set.");
+      Assert.notNull(databaseProperties.getName(), "Database name not set.");
+      Assert.notNull(databaseProperties.getUser(), "Database username not set.");
+      Assert.notNull(databaseProperties.getPassword(), "Database password not set.");
+    } catch (Exception e){
+      throw new DataImportException(e);
+    }
   }
 
   /**
@@ -126,33 +126,32 @@ public class MongoImportTempFileImporter<T extends Model<?>> extends AbstractFil
     if (stopOnError) sb.append(" --stopOnError ");
     if (dropCollection) sb.append(" --drop ");
     if (upsertRecords) sb.append(" --upsert ");
-    if (environment.containsProperty(Properties.DB_USER)) {
-      sb.append(String.format(" --username %s ", environment.getRequiredProperty(Properties.DB_USER)));
+    if (databaseProperties.getUser() != null) {
+      sb.append(String.format(" --username %s ", databaseProperties.getUser()));
     }
-    if (environment.containsProperty(Properties.DB_PASSWORD)){
-      sb.append(String.format(" --password %s ", environment.getRequiredProperty(Properties.DB_PASSWORD)));
+    if (databaseProperties.getPassword() != null){
+      sb.append(String.format(" --password %s ", databaseProperties.getPassword()));
     }
-    if (environment.containsProperty(Properties.DB_HOST)) {
-      if (environment.getRequiredProperty(Properties.DB_HOST).contains(":")) {
-        sb.append(String.format(" --host %s ", environment.getRequiredProperty(Properties.DB_HOST)));
-      } else if (environment.containsProperty(Properties.DB_PORT)) {
-        sb.append(String.format(" --host %s:%s ", environment.getRequiredProperty(Properties.DB_HOST),
-            environment.getRequiredProperty(Properties.DB_PORT)));
+    if (databaseProperties.getHost() != null) {
+      if (databaseProperties.getHost().contains(":")) {
+        sb.append(String.format(" --host %s ", databaseProperties.getHost()));
+      } else if (databaseProperties.getPort() != null) {
+        sb.append(String.format(" --host %s:%s ", databaseProperties.getHost(), databaseProperties.getPort()));
       } else {
-        sb.append(String.format(" --host %s:27017 ", environment.getRequiredProperty(Properties.DB_HOST)));
+        sb.append(String.format(" --host %s:27017 ", databaseProperties.getHost()));
       }
     }
-    sb.append(String.format(" --db %s ", environment.getRequiredProperty(Properties.DB_NAME)));
+    sb.append(String.format(" --db %s ", databaseProperties.getName()));
     sb.append(String.format(" --collection %s ", getCollectionName()));
     sb.append(String.format(" --file %s ", filePath));
     return sb.toString();
   }
   
   private String getCollectionName(){
-    String name = this.getModel().getSimpleName();
+    String name = model.getSimpleName();
     name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
-    if (this.getModel().isAnnotationPresent(Document.class)){
-      Document document = this.getModel().getAnnotation(Document.class);
+    if (model.isAnnotationPresent(Document.class)){
+      Document document = model.getAnnotation(Document.class);
       if (!document.collection().equals("")) name = document.collection();
     }
     return name;
@@ -173,4 +172,15 @@ public class MongoImportTempFileImporter<T extends Model<?>> extends AbstractFil
     return this;
   }
 
+  public DatabaseProperties getDatabaseProperties() {
+    return databaseProperties;
+  }
+
+  @Override
+  public Class<T> getModel() {
+    return model;
+  }
+
+  @Override
+  public void setModel(Class<T> model) { }
 }
