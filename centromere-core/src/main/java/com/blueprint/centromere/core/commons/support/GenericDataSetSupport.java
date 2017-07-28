@@ -52,9 +52,19 @@ public class GenericDataSetSupport implements DataSetSupport {
   public static final String COPY_SUBJECT_ATTRIBUTES = "copy-subject-attributes";
   private static final Logger logger = LoggerFactory.getLogger(GenericDataSetSupport.class);
 
-  private SubjectRepository subjectRepository;
-  private SampleRepository sampleRepository;
-  private DataImportProperties dataImportProperties;
+  private final SubjectRepository subjectRepository;
+  private final SampleRepository sampleRepository;
+  private final DataImportProperties dataImportProperties;
+
+  @Autowired
+  public GenericDataSetSupport(
+      SubjectRepository subjectRepository,
+      SampleRepository sampleRepository,
+      DataImportProperties dataImportProperties) {
+    this.subjectRepository = subjectRepository;
+    this.sampleRepository = sampleRepository;
+    this.dataImportProperties = dataImportProperties;
+  }
 
   /**
    * Creates a new sample record, given only a name and an associated {@link DataSet} record.
@@ -183,7 +193,7 @@ public class GenericDataSetSupport implements DataSetSupport {
   public Optional<Sample> findOrCreateSample(String name, DataSet dataSet){
     Optional<Sample> optional = this.findSample(name, dataSet);
     if (optional.isPresent()) return optional;
-    Optional<Subject> subjectOptional = getSubjectRepository().findByName(name);
+    Optional<Subject> subjectOptional = subjectRepository.findByName(name);
     if (subjectOptional.isPresent()){
       Sample sample = createSample(name, subjectOptional.get(), dataSet);
       return Optional.of(sample);
@@ -207,29 +217,11 @@ public class GenericDataSetSupport implements DataSetSupport {
     return subjectRepository;
   }
 
-  @Autowired
-  public void setSubjectRepository(
-      SubjectRepository subjectRepository) {
-    this.subjectRepository = subjectRepository;
-  }
-
   public SampleRepository getSampleRepository() {
     return sampleRepository;
   }
 
-  @Autowired
-  public void setSampleRepository(
-      SampleRepository sampleRepository) {
-    this.sampleRepository = sampleRepository;
-  }
-
   public DataImportProperties getDataImportProperties() {
     return dataImportProperties;
-  }
-
-  @Autowired
-  public void setDataImportProperties(
-      DataImportProperties dataImportProperties) {
-    this.dataImportProperties = dataImportProperties;
   }
 }

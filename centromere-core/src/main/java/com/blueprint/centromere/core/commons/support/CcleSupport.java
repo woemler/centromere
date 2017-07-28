@@ -19,9 +19,13 @@ package com.blueprint.centromere.core.commons.support;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.model.Subject;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
+import com.blueprint.centromere.core.commons.repository.SubjectRepository;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,6 +36,14 @@ public class CcleSupport extends GenericDataSetSupport {
 
   private static final Logger logger = LoggerFactory.getLogger(CcleSupport.class);
   private static final String SAMPLE_TYPE = "cell line";
+
+  @Autowired
+  public CcleSupport(
+      SubjectRepository subjectRepository,
+      SampleRepository sampleRepository,
+      DataImportProperties dataImportProperties) {
+    super(subjectRepository, sampleRepository, dataImportProperties);
+  }
 
   /**
    * Creates a new sample record, given only a name and an associated {@link DataSet} record.

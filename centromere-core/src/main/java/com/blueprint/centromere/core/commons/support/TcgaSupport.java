@@ -19,12 +19,16 @@ package com.blueprint.centromere.core.commons.support;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.model.Subject;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
+import com.blueprint.centromere.core.commons.repository.SubjectRepository;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,7 +41,14 @@ public class TcgaSupport extends GenericDataSetSupport {
   private static final Logger logger = LoggerFactory.getLogger(TcgaSupport.class);
   private static final Pattern subjectNamePattern =
       Pattern.compile("(tcga-[a-zA-Z0-9]+-[a-zA-Z0-9]+)-.+", Pattern.CASE_INSENSITIVE);
-  
+
+  @Autowired
+  public TcgaSupport(
+      SubjectRepository subjectRepository,
+      SampleRepository sampleRepository,
+      DataImportProperties dataImportProperties) {
+    super(subjectRepository, sampleRepository, dataImportProperties);
+  }
 
   /**
    * {@link #createSample(String, Subject, DataSet)}

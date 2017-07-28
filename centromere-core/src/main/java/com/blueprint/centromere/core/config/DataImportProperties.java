@@ -31,7 +31,7 @@ import org.springframework.context.annotation.PropertySource;
  */
 @Configuration
 @PropertySource("classpath:database-defaults.properties")
-@ConfigurationProperties("centromere.db")
+@ConfigurationProperties("centromere.import")
 public class DataImportProperties {
 
   private boolean skipInvalidRecords;
@@ -169,5 +169,24 @@ public class DataImportProperties {
   public void setSample(Sample sample) {
     this.sample = sample;
   }
-  
+
+  @Override
+  public String toString() {
+    return "DataImportProperties{" +
+        "skipInvalidRecords=" + skipInvalidRecords +
+        ", skipInvalidGenes=" + skipInvalidGenes +
+        ", skipInvalidSamples=" + skipInvalidSamples +
+        ", skipInvalidFiles=" + skipInvalidFiles +
+        ", skipInvalidMetadata=" + skipInvalidMetadata +
+        ", skipExistingFiles=" + skipExistingFiles +
+        ", overwriteExistingFiles=" + overwriteExistingFiles +
+        ", overwriteExistingDataSets=" + overwriteExistingDataSets +
+        ", tempDir='" + tempDir + '\'' +
+        ", attributes=" + attributes +
+        ", dataSet=" + dataSet +
+        ", dataFile=" + dataFile +
+        ", subject=" + subject +
+        ", sample=" + sample +
+        '}';
+  }
 }
