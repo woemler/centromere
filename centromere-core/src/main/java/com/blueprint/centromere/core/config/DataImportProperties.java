@@ -30,7 +30,7 @@ import org.springframework.context.annotation.PropertySource;
  * @author woemler
  */
 @Configuration
-@PropertySource("classpath:database-defaults.properties")
+@PropertySource("classpath:data-import-defaults.properties")
 @ConfigurationProperties("centromere.import")
 public class DataImportProperties {
 
