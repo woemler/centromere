@@ -22,13 +22,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @author woemler
  */
 @Document
-//@CompoundIndexes({
-//    @CompoundIndex(def = "{'sampleId': 1, 'dataFileId': 1}"),
-//    @CompoundIndex(def = "{'geneId': 1, 'dataFileId': 1}")
-//})
 public class GeneCopyNumber extends Data {
 	
 	private Double value;
+	private Double lossOfHeterozygosity;
+	private Double ploidy;
 
 	public Double getValue() {
 		return value;
@@ -37,4 +35,20 @@ public class GeneCopyNumber extends Data {
 	public void setValue(Double value) {
 		this.value = value;
 	}
+
+  public Double getLossOfHeterozygosity() {
+    return lossOfHeterozygosity;
+  }
+
+  public void setLossOfHeterozygosity(Double lossOfHeterozygosity) {
+    this.lossOfHeterozygosity = lossOfHeterozygosity;
+  }
+
+  public Double getPloidy() {
+    return ploidy;
+  }
+
+  public void setPloidy(Double ploidy) {
+    this.ploidy = ploidy;
+  }
 }

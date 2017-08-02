@@ -19,9 +19,13 @@ package com.blueprint.centromere.tests.core;
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Gene;
+import com.blueprint.centromere.core.commons.model.GeneCopyNumber;
 import com.blueprint.centromere.core.commons.model.GeneExpression;
+import com.blueprint.centromere.core.commons.model.Mutation;
 import com.blueprint.centromere.core.commons.model.Sample;
+import com.blueprint.centromere.core.commons.model.SegmentCopyNumber;
 import com.blueprint.centromere.core.commons.model.Subject;
+import com.blueprint.centromere.core.commons.model.TranscriptExpression;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
@@ -164,43 +168,53 @@ public abstract class AbstractRepositoryTests {
     List<DataFile> dataFiles = new ArrayList<>();
 
     DataFile dataFileA = new DataFile();
+    dataFileA.setDataSetId(dataSetA.getId());
     dataFileA.setFilePath("/path/to/fileA");
     dataFileA.setDataType("GCT RNA-Seq gene expression");
     dataFileA.setDateCreated(new Date());
     dataFileA.setDateUpdated(new Date());
     dataFileA.setDataSetId(dataSetA.getId());
+    dataFileA.setModel(GeneExpression.class);
     dataFiles.add(dataFileA);
 
     DataFile dataFileB = new DataFile();
+    dataFileB.setDataSetId(dataSetA.getId());
     dataFileB.setFilePath("/path/to/fileB");
     dataFileB.setDataType("GCT RNA-Seq transcript expression");
     dataFileB.setDateCreated(new Date());
     dataFileB.setDateUpdated(new Date());
     dataFileB.setDataSetId(dataSetA.getId());
+    dataFileB.setModel(TranscriptExpression.class);
     dataFiles.add(dataFileB);
 
     DataFile dataFileC = new DataFile();
+    dataFileC.setDataSetId(dataSetA.getId());
     dataFileC.setFilePath("/path/to/fileC");
     dataFileC.setDataType("MAF mutations");
     dataFileC.setDateCreated(new Date());
     dataFileC.setDateUpdated(new Date());
     dataFileC.setDataSetId(dataSetA.getId());
+    dataFileC.setModel(Mutation.class);
     dataFiles.add(dataFileC);
 
     DataFile dataFileD = new DataFile();
+    dataFileD.setDataSetId(dataSetB.getId());
     dataFileD.setFilePath("/path/to/fileD");
     dataFileD.setDataType("Gene copy number");
     dataFileD.setDateCreated(new Date());
     dataFileD.setDateUpdated(new Date());
     dataFileD.setDataSetId(dataSetB.getId());
+    dataFileD.setModel(GeneCopyNumber.class);
     dataFiles.add(dataFileD);
 
     DataFile dataFileE = new DataFile();
+    dataFileE.setDataSetId(dataSetE.getId());
     dataFileE.setFilePath("/path/to/fileE");
     dataFileE.setDataType("Segment copy number");
     dataFileE.setDateCreated(new Date());
     dataFileE.setDateUpdated(new Date());
     dataFileE.setDataSetId(dataSetB.getId());
+    dataFileE.setModel(SegmentCopyNumber.class);
     dataFiles.add(dataFileE);
     
     dataFileRepository.insert(dataFiles);

@@ -165,7 +165,10 @@ public class CommandLineInputExecutor implements CommandLineRunner {
         
       }
       
-    } else if (LIST_COMMAND.equals(mainCommand)) {
+    } 
+    
+    // List command
+    else if (LIST_COMMAND.equals(mainCommand)) {
 
       String listable = "";
       if (listCommandArguments.getArgs() != null && !listCommandArguments.getArgs().isEmpty()) {
@@ -174,7 +177,10 @@ public class CommandLineInputExecutor implements CommandLineRunner {
       listCommandExecutor.run(listable, listCommandArguments.getShowDetails());
       code = 0;
 
-    } else if (DELETE_COMMAND.equals(mainCommand)){
+    } 
+    
+    // Delete command
+    else if (DELETE_COMMAND.equals(mainCommand)){
 
 		  String deleteable = "";
       List<String> toDelete = deleteCommandArguments.getArgs();

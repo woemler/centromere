@@ -22,6 +22,7 @@ import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataOperations;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import java.util.Arrays;
 import java.util.List;
@@ -43,6 +44,7 @@ public class DeleteCommandExecutor implements EnvironmentAware {
   
   private DataSetRepository dataSetRepository;
   private DataFileRepository dataFileRepository;
+  private SampleRepository sampleRepository;
   private Repositories repositories;
   private Environment environment;
   
@@ -102,11 +104,14 @@ public class DeleteCommandExecutor implements EnvironmentAware {
             continue;
           }
 
-          Printer.print(String.format("Deleting DataSet %s and all associated records",
+          Printer.print(String.format("Deleting DataSet %s and all associated records and samples",
               dataSet.getShortName()), logger, Level.INFO);
           for (String dataFileId: dataSet.getDataFileIds()){
             DataFile dataFile = dataFileRepository.findOne(dataFileId);
             deleteDataFile(dataFile);
+          }
+          for (String sampleId: dataSet.getSampleIds()){
+            sampleRepository.delete(sampleId);
           }
           
           dataSetRepository.delete(dataSet);
@@ -120,20 +125,31 @@ public class DeleteCommandExecutor implements EnvironmentAware {
   }
   
   private void deleteDataFile(DataFile dataFile) throws CommandLineRunnerException{
+    
     Class<?> model = null;
+    
     try {
       model = dataFile.getModelType();
     } catch (ClassNotFoundException e){
       throw new CommandLineRunnerException(e);
     }
+    
     ModelRepository repository = (ModelRepository) repositories.getRepositoryFor(model);
+    
     if (repository instanceof DataOperations){
+      
       DataOperations operations = (DataOperations) repository;
       operations.deleteByDataFileId(dataFile.getId());
+      DataSet dataSet = dataSetRepository.findOne(dataFile.getDataSetId());
+      List<String> dataFileIds = dataSet.getDataFileIds();
+      dataFileIds.remove(dataFile.getId());
+      dataSet.setDataFileIds(dataFileIds);
+      dataSetRepository.update(dataSet);
       dataFileRepository.delete(dataFile);
     } else {
       Printer.print("The selected data type does not support record deletion: DataFile", logger, Level.WARN);
     }
+    
   }
 
   @Override
@@ -152,6 +168,12 @@ public class DeleteCommandExecutor implements EnvironmentAware {
   public void setDataFileRepository(
       DataFileRepository dataFileRepository) {
     this.dataFileRepository = dataFileRepository;
+  }
+
+  @Autowired
+  public void setSampleRepository(
+      SampleRepository sampleRepository) {
+    this.sampleRepository = sampleRepository;
   }
 
   @Autowired

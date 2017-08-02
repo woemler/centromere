@@ -193,7 +193,7 @@ public class GenericDataSetSupport implements DataSetSupport {
   public Optional<Sample> findOrCreateSample(String name, DataSet dataSet){
     Optional<Sample> optional = this.findSample(name, dataSet);
     if (optional.isPresent()) return optional;
-    Optional<Subject> subjectOptional = subjectRepository.findByName(name);
+    Optional<Subject> subjectOptional = findSubject(name);
     if (subjectOptional.isPresent()){
       Sample sample = createSample(name, subjectOptional.get(), dataSet);
       return Optional.of(sample);
@@ -211,6 +211,10 @@ public class GenericDataSetSupport implements DataSetSupport {
     if (optional.isPresent()) return optional;
     return Optional.ofNullable(createSample(name, subject, dataSet));
     
+  }
+  
+  public Optional<Subject> findSubject(String name){
+    return subjectRepository.findByName(name);
   }
 
   public SubjectRepository getSubjectRepository() {
