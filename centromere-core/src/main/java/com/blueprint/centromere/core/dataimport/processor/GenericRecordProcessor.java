@@ -30,7 +30,6 @@ import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.dataimport.DataImportComponent;
-import com.blueprint.centromere.core.dataimport.DataSetSupportAware;
 import com.blueprint.centromere.core.dataimport.DataTypeSupport;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.Option;
@@ -399,35 +398,13 @@ public class GenericRecordProcessor<T extends Model<?>>
    * Returns all of the {@link Option} annotations associated with the processor and its components.
    */
   @Override
-  public Collection<Option> getDataImportProperties() {
-    
+  public Collection<Option> getDataImportOptions() {
     Set<Option> options = new HashSet<>();
-    
     options.addAll(getOptionsFromClass(this.getClass()));
-    
-    if (reader != null){
-      options.addAll(getOptionsFromClass(reader.getClass()));
-      if (reader instanceof DataSetSupportAware) {
-        options.addAll(getOptionsFromClass(((DataSetSupportAware) reader).getDataSetSupport().getClass()));
-      }
-    }
-
-    if (writer != null){
-      options.addAll(getOptionsFromClass(writer.getClass()));
-      if (writer instanceof DataSetSupportAware) {
-        options.addAll(getOptionsFromClass(((DataSetSupportAware) writer).getDataSetSupport().getClass()));
-      }
-    }
-
-    if (importer != null){
-      options.addAll(getOptionsFromClass(importer.getClass()));
-      if (importer instanceof DataSetSupportAware) {
-        options.addAll(getOptionsFromClass(((DataSetSupportAware) importer).getDataSetSupport().getClass()));
-      }
-    }
-    
+    if (reader != null) options.addAll(getOptionsFromClass(reader.getClass()));
+    if (writer != null) options.addAll(getOptionsFromClass(writer.getClass()));
+    if (importer != null) options.addAll(getOptionsFromClass(importer.getClass()));
     return options;
-    
   }
   
   private Collection<Option> getOptionsFromClass(Class<?> type){

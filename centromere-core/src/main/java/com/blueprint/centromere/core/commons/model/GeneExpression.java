@@ -22,20 +22,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @author woemler
  */
 @Document
-//@CompoundIndexes({
-//    @CompoundIndex(def = "{'sampleId': 1, 'dataFileId': 1}"),
-//    @CompoundIndex(def = "{'geneId': 1, 'dataFileId': 1}")
-//})
+@lombok.Data
 public class GeneExpression extends Data {
 	
 	private Double value;
-
-	public Double getValue() {
-		return value;
-	}
-
-	public void setValue(Double value) {
-		this.value = value;
-	}
 
 }

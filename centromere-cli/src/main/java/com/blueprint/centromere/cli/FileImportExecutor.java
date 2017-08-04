@@ -103,14 +103,17 @@ public class FileImportExecutor {
     
     Optional<DataFile> dfOptional = dataFileRepository.findByFilePath(filePath);
     
-    // Does a record with the file path exist already?
+    // DataFile record does not already exist
     if (!dfOptional.isPresent()){
       
       // If not, create a new record
       dataFile = dataFileRepository.insert(dataFile);
       Printer.print(String.format("Creating new DataFile record: %s", dataFile.toString()), logger, Level.INFO);
       
-    } else {
+    } 
+    
+    // DataFile record already exists
+    else {
       
       DataFile df = dfOptional.get();
       
@@ -122,11 +125,13 @@ public class FileImportExecutor {
         return;
         
       } 
-      // If overwrite-existing-files flag is set, overwrite the file record and its data
-      else if (dataImportProperties.isOverwriteExistingFiles()){
+      
+      // Overwrite the existing file
+      else {
         
-        // If the files have the same checksum, no need to overwrite
-        if (df.getChecksum().equalsIgnoreCase(dataFile.getChecksum())){
+        // If the files have the same checksum, and force-file-overwrite not set, skip file
+        if (df.getChecksum().equalsIgnoreCase(dataFile.getChecksum()) 
+            && !dataImportProperties.isForceFileOverwrite()){
           Printer.print(String.format("File is identical to original, overwrite will be skipped: %s", df.getFilePath()), logger, Level.INFO);
           return;
         }
@@ -155,13 +160,7 @@ public class FileImportExecutor {
         dataFile = dataFileRepository.insert(dataFile);
         
       } 
-      // Otherwise, use the existing file record and append to its existing records. 
-      else {
-        
-        dataFile = df;
-        Printer.print(String.format("Using existing DataFile record: %s", dataFile.toString()), logger, Level.INFO);
-        
-      }
+      
     }
 
 		// Configure the processor

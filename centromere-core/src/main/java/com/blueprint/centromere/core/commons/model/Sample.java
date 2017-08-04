@@ -22,6 +22,7 @@ import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Linked;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Data;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -33,6 +34,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @author woemler
  */
 @Document
+@Data
 public class Sample extends AbstractModel implements Attributes {
 
 	@Indexed @ManagedTerm private String name;
@@ -40,74 +42,9 @@ public class Sample extends AbstractModel implements Attributes {
 	@ManagedTerm private String tissue;
 	@ManagedTerm private String histology;
 	@Ignored private String notes;
-	private Map<String, String> attributes = new HashMap<>();
+	@ManagedTerm private Map<String, String> attributes = new HashMap<>();
 	@Indexed @Linked(model = Subject.class, rel = "subject") private String subjectId;
 	@Indexed @Linked(model = DataSet.class, rel = "dataSet") private String dataSetId;
-
-	public String getSubjectId() {
-		return subjectId;
-	}
-
-	public void setSubjectId(String subjectId) {
-		this.subjectId = subjectId;
-	}
-
-  public String getDataSetId() {
-    return dataSetId;
-  }
-
-  public void setDataSetId(String dataSetId) {
-    this.dataSetId = dataSetId;
-  }
-
-  @Override
-	public Map<String, String> getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes(Map<String, String> attributes) {
-		this.attributes = attributes;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getSampleType() {
-		return sampleType;
-	}
-
-	public void setSampleType(String sampleType) {
-		this.sampleType = sampleType;
-	}
-
-	public String getTissue() {
-		return tissue;
-	}
-
-	public void setTissue(String tissue) {
-		this.tissue = tissue;
-	}
-
-	public String getHistology() {
-		return histology;
-	}
-
-	public void setHistology(String histology) {
-		this.histology = histology;
-	}
-
-	public String getNotes() {
-		return notes;
-	}
-
-	public void setNotes(String notes) {
-		this.notes = notes;
-	}
 
 	@Override
 	public void addAttribute(String name, String value) {
@@ -126,20 +63,7 @@ public class Sample extends AbstractModel implements Attributes {
 
 	@Override
 	public String getAttribute(String name) {
-		return attributes.containsKey(name) ? attributes.get(name) : null;
+		return attributes.getOrDefault(name, null);
 	}
 
-	@Override
-	public String toString() {
-		return "Sample{" +
-				"name='" + name + '\'' +
-				", sampleType='" + sampleType + '\'' +
-				", tissue='" + tissue + '\'' +
-				", histology='" + histology + '\'' +
-				", notes='" + notes + '\'' +
-				", attributes=" + attributes +
-				", subjectId='" + subjectId + '\'' +
-        ", dataSetId='" + dataSetId + '\'' +
-				'}';
-	}
 }

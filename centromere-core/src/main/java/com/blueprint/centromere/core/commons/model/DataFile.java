@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Data;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -30,6 +31,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @author woemler
  */
 @Document
+@Data
 public class DataFile extends AbstractModel implements Attributes {
 	
 	@Indexed(unique = true) private String filePath;
@@ -40,69 +42,15 @@ public class DataFile extends AbstractModel implements Attributes {
 	@Ignored private Date dateUpdated;
 	@Indexed @Linked(model = DataSet.class, rel = "dataSet") private String dataSetId;
 	private Map<String, String> attributes = new HashMap<>();
-	
-	/* Getters and Setters */ 
-
-	public String getFilePath() {
-		return filePath;
-	}
-
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
-	}
-
-	public String getDataType() {
-		return dataType;
-	}
-
-	public void setDataType(String dataType) {
-		this.dataType = dataType;
-	}
 
 	@JsonIgnore
   public Class<?> getModelType() throws ClassNotFoundException {
     return Class.forName(model);
   }
 
-  public String getModel() {
-    return model;
-  }
-
   public void setModel(Class<?> modelType){
 	  this.model = modelType.getName();
   }
-
-  public String getChecksum() {
-    return checksum;
-  }
-
-  public void setChecksum(String checksum) {
-    this.checksum = checksum;
-  }
-
-  public Date getDateCreated() {
-		return dateCreated;
-	}
-
-	public void setDateCreated(Date dateCreated) {
-		this.dateCreated = dateCreated;
-	}
-
-	public Date getDateUpdated() {
-		return dateUpdated;
-	}
-
-	public void setDateUpdated(Date dateUpdated) {
-		this.dateUpdated = dateUpdated;
-	}
-
-	public String getDataSetId() {
-		return dataSetId;
-	}
-
-	public void setDataSetId(String dataSetId) {
-		this.dataSetId = dataSetId;
-	}
 
 	@Override
 	public Map<String, String> getAttributes() {
@@ -133,17 +81,4 @@ public class DataFile extends AbstractModel implements Attributes {
 		return attributes.getOrDefault(name, null);
 	}
 
-	@Override
-	public String toString() {
-		return "DataFile{" +
-				"filePath='" + filePath + '\'' +
-				", dataType='" + dataType + '\'' +
-        ", model='" + model + '\'' +
-        ", checksum='" + checksum + "'" +
-				", dateCreated=" + dateCreated +
-				", dateUpdated=" + dateUpdated +
-				", dataSetId='" + dataSetId + '\'' +
-				", attributes=" + attributes +
-				'}';
-	}
 }

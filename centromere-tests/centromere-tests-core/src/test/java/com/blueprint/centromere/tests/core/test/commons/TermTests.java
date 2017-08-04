@@ -10,7 +10,9 @@ import com.blueprint.centromere.core.commons.repository.TermRepository;
 import com.blueprint.centromere.core.config.CoreConfiguration;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -67,6 +69,30 @@ public class TermTests extends AbstractRepositoryTests {
         Assert.isTrue("1".equals(term.getTerm()));
       }
     }
+  }
+  
+  @Test
+  public void mapTermExtractiontest() throws Exception {
+    Sample sample = new Sample();
+    sample.setId("abc123");
+    sample.setName("SampleX");
+    sample.setHistology("Histology Y");
+    sample.setTissue("Tissue Z");
+    Map<String, String> attributes = new HashMap<>();
+    attributes.put("age", "70");
+    attributes.put("type", "patient");
+    sample.setAttributes(attributes);
+    sample.setSampleType("blood");
+    List<Term> terms = Term.getModelTerms(sample);
+    Assert.notNull(terms);
+    Assert.notEmpty(terms);
+    Map<String, Term> termMap = new HashMap<>();
+    for (Term term: terms){
+      termMap.put(term.getField(), term);
+    }
+    Assert.isTrue(termMap.containsKey("age"));
+    Assert.isTrue(termMap.containsKey("type"));
+    Assert.isTrue(!termMap.containsKey("sampleType"));
   }
   
   @Test

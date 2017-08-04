@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.Data;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -33,6 +34,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @author woemler
  */
 @Document
+@Data
 public class DataSet extends AbstractModel implements Attributes {
 	
 	private String displayName;
@@ -44,46 +46,6 @@ public class DataSet extends AbstractModel implements Attributes {
   @Linked(model = Sample.class, rel = "samples") private List<String> sampleIds = new ArrayList<>();
 	private Map<String, String> attributes = new HashMap<>();
 	@Ignored private Map<String, String> parameters = new HashMap<>();
-
-  public String getDisplayName() {
-    return displayName;
-  }
-
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
-  }
-
-  public String getShortName() {
-    return shortName;
-  }
-
-  public void setShortName(String shortName) {
-    this.shortName = shortName;
-  }
-
-  public String getSource() {
-		return source;
-	}
-
-	public void setSource(String source) {
-		this.source = source;
-	}
-
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
 
 	@Override
 	public Map<String, String> getAttributes() {
@@ -114,14 +76,6 @@ public class DataSet extends AbstractModel implements Attributes {
 		return attributes.containsKey(name) ? attributes.get(name) : null;
 	}
 
-  public Map<String, String> getParameters() {
-    return parameters;
-  }
-
-  public void setParameters(Map<String, String> parameters) {
-    this.parameters = parameters;
-  }
-
   public void addParameter(String name, String value) {
     parameters.put(name, value);
   }
@@ -138,22 +92,6 @@ public class DataSet extends AbstractModel implements Attributes {
     return parameters.containsKey(name) ? parameters.get(name) : null;
   }
 
-  public List<String> getDataFileIds() {
-    return dataFileIds;
-  }
-
-  public void setDataFileIds(List<String> dataFileIds) {
-    this.dataFileIds = dataFileIds;
-  }
-
-  public List<String> getSampleIds() {
-    return sampleIds;
-  }
-
-  public void setSampleIds(List<String> sampleIds) {
-    this.sampleIds = sampleIds;
-  }
-  
   public void addSampleId(String sampleId){
     if (!sampleIds.contains(sampleId)) sampleIds.add(sampleId);
   }
@@ -162,18 +100,4 @@ public class DataSet extends AbstractModel implements Attributes {
     if (!dataFileIds.contains(dataFileId)) dataFileIds.add(dataFileId);
   }
 
-  @Override
-  public String toString() {
-    return "DataSet{" +
-        "displayName='" + displayName + '\'' +
-        ", shortName='" + shortName + '\'' +
-        ", source='" + source + '\'' +
-        ", version='" + version + '\'' +
-        ", description='" + description + '\'' +
-        ", dataFileIds=" + dataFileIds +
-        ", sampleIds=" + sampleIds +
-        ", attributes=" + attributes +
-        ", parameters=" + parameters +
-        '}';
-  }
 }

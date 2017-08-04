@@ -27,6 +27,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
  * @author woemler
  * @since 0.4.3
  */
+@lombok.Data
 public abstract class Data extends AbstractModel {
 
 	@Indexed
@@ -49,43 +50,4 @@ public abstract class Data extends AbstractModel {
 	@Linked(model = Gene.class, rel = "gene")
 	private String geneId;
 
-	public String getSampleId() {
-		return sampleId;
-	}
-
-	public void setSampleId(String sampleId) {
-		this.sampleId = sampleId;
-	}
-
-  public String getSubjectId() {
-    return subjectId;
-  }
-
-  public void setSubjectId(String subjectId) {
-    this.subjectId = subjectId;
-  }
-
-  public String getDataFileId() {
-		return dataFileId;
-	}
-
-	public void setDataFileId(String dataFileId) {
-		this.dataFileId = dataFileId;
-	}
-
-	public String getGeneId() {
-		return geneId;
-	}
-
-	public void setGeneId(String geneId) {
-		this.geneId = geneId;
-	}
-
-  public String getDataSetId() {
-    return dataSetId;
-  }
-
-  public void setDataSetId(String dataSetId) {
-    this.dataSetId = dataSetId;
-  }
 }

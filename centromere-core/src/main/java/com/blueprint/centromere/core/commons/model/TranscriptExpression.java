@@ -22,28 +22,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @author woemler
  */
 @Document
-//@CompoundIndexes({
-//    @CompoundIndex(def = "{'sampleId': 1, 'dataFileId': 1}"),
-//    @CompoundIndex(def = "{'geneId': 1, 'dataFileId': 1}")
-//})
+@lombok.Data
 public class TranscriptExpression extends Data {
 	
 	private String transcriptAccession;
 	private Double value;
 
-	public String getTranscriptAccession() {
-		return transcriptAccession;
-	}
-
-	public void setTranscriptAccession(String transcriptAccession) {
-		this.transcriptAccession = transcriptAccession;
-	}
-
-	public Double getValue() {
-		return value;
-	}
-
-	public void setValue(Double value) {
-		this.value = value;
-	}
 }

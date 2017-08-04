@@ -22,6 +22,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @author woemler
  */
 @Document
+@lombok.Data
 public class SegmentCopyNumber extends Data {
 	
 	private String chromosome;
@@ -30,43 +31,4 @@ public class SegmentCopyNumber extends Data {
 	private Integer probeCount;
 	private Double value; 
 
-	public String getChromosome() {
-		return chromosome;
-	}
-
-	public void setChromosome(String chromosome) {
-		this.chromosome = chromosome;
-	}
-
-	public Long getSegmentStart() {
-		return segmentStart;
-	}
-
-	public void setSegmentStart(Long segmentStart) {
-		this.segmentStart = segmentStart;
-	}
-
-	public Long getSegmentEnd() {
-		return segmentEnd;
-	}
-
-	public void setSegmentEnd(Long segmentEnd) {
-		this.segmentEnd = segmentEnd;
-	}
-
-	public Integer getProbeCount() {
-		return probeCount;
-	}
-
-	public void setProbeCount(Integer probeCount) {
-		this.probeCount = probeCount;
-	}
-
-	public Double getValue() {
-		return value;
-	}
-
-	public void setValue(Double value) {
-		this.value = value;
-	}
 }

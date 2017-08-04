@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.Data;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -35,6 +36,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @author woemler
  */
 @Document
+@Data
 public class Subject extends AbstractModel implements Attributes {
 	
 	@Indexed(unique = true) @ManagedTerm private String name;
@@ -42,66 +44,15 @@ public class Subject extends AbstractModel implements Attributes {
 	private String gender;
 	@Ignored private String notes;
 	@ManagedTerm @Indexed private List<String> aliases = new ArrayList<>();
-	private Map<String, String> attributes = new HashMap<>();
+	@ManagedTerm private Map<String, String> attributes = new HashMap<>();
 	@Linked(model = Sample.class, rel = "samples") private List<String> sampleIds = new ArrayList<>();
 
-	public String getName() {
-		return name;
-	}
+  @Override
+  public Map<String, String> getAttributes() {
+    return attributes;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-  public String getSpecies() {
-		return species;
-	}
-
-	public void setSpecies(String species) {
-		this.species = species;
-	}
-
-	public String getGender() {
-		return gender;
-	}
-
-	public void setGender(String gender) {
-		this.gender = gender;
-	}
-
-	public String getNotes() {
-		return notes;
-	}
-
-	public void setNotes(String notes) {
-		this.notes = notes;
-	}
-
-	public List<String> getAliases() {
-		return aliases;
-	}
-
-	public void setAliases(List<String> aliases) {
-		this.aliases = aliases;
-	}
-
-	@Override public Map<String, String> getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes(Map<String, String> attributes) {
-		this.attributes = attributes;
-	}
-
-	public List<String> getSampleIds() {
-		return sampleIds;
-	}
-
-	public void setSampleIds(List<String> sampleIds) {
-		this.sampleIds = sampleIds;
-	}
-
-	@Override
+  @Override
 	public void addAttribute(String name, String value) {
 		attributes.put(name, value);
 	}
@@ -125,19 +76,7 @@ public class Subject extends AbstractModel implements Attributes {
 		if (!aliases.contains(alias)) this.aliases.add(alias);
 	}
 
-	@Override
-	public String toString() {
-		return "Subject{" +
-				"name='" + name + '\'' +
-        ", dataSetId='" + species + '\'' +
-				", gender='" + gender + '\'' +
-				", notes='" + notes + '\'' +
-				", aliases=" + aliases +
-				", attributes=" + attributes +
-				", sampleIds=" + sampleIds +
-				'}';
-	}
-	
+  	
 	public static class Attributes {
 	  
 	  public static final String SAMPLE_ATTRIBUTE_PREFIX = "sample-";

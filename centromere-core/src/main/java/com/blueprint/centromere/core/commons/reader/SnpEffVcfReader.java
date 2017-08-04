@@ -24,7 +24,6 @@ import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.support.AminoAcidConverter;
 import com.blueprint.centromere.core.commons.support.DataSetSupport;
 import com.blueprint.centromere.core.config.DataImportProperties;
-import com.blueprint.centromere.core.dataimport.DataSetSupportAware;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidDataFileException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidGeneException;
@@ -33,6 +32,7 @@ import com.blueprint.centromere.core.dataimport.reader.MultiRecordLineFileReader
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -46,8 +46,7 @@ import org.springframework.util.Assert;
  * @author woemler
  * @since 0.5.0
  */
-public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> 
-    implements DataSetSupportAware {
+public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
   
   private static final Logger logger = LoggerFactory.getLogger(SnpEffVcfReader.class);
   
@@ -101,7 +100,7 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation>
       mutation.setReferenceAllele(bits[3].trim());
       mutation.setAlternateAllele(bits[4].trim());
       if (!bits[2].trim().replaceAll("\\.", "").equals("")) {
-        mutation.setExternalReferenes(Arrays.asList(bits[2].trim().split(";")));
+        mutation.setExternalReferenes(new HashSet<>(Arrays.asList(bits[2].trim().split(";"))));
       }
       
       Map<String,String> info = parseInfo(bits[7].trim());
@@ -227,8 +226,7 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation>
   public SampleRepository getSampleRepository() {
     return sampleRepository;
   }
-
-  @Override
+  
   public DataSetSupport getDataSetSupport() {
     return dataSetSupport;
   }

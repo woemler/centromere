@@ -25,6 +25,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -102,13 +103,22 @@ public class Term extends AbstractModel {
   }
   
   public static <T extends Model<?>> List<Term> getModelTerms(T model) throws IllegalAccessException {
+    
     List<Term> terms = new ArrayList<>();
+    
     if (!modelHasManagedTerms(model.getClass())) return terms;
+    
     Class<?> current = model.getClass();
+    
     while (current.getSuperclass() != null){
+      
       for (Field field: current.getDeclaredFields()){
+        
         if (field.isAnnotationPresent(ManagedTerm.class)){
+          
           ManagedTerm annotation = field.getAnnotation(ManagedTerm.class);
+          
+          // String fields
           if (field.getType().isAssignableFrom(String.class)) {
             field.setAccessible(true);
             Term term = new Term();
@@ -120,28 +130,46 @@ public class Term extends AbstractModel {
               term.setReferenceIds(Collections.singletonList(model.getId().toString()));
               terms.add(term);
             }
-          } else if (Map.class.isAssignableFrom(field.getType())
+          } 
+          // Map fields
+          else if (Map.class.isAssignableFrom(field.getType())
               && field.getGenericType() instanceof ParameterizedType){
             Type[] args = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
             if (String.class.isAssignableFrom((Class<?>) args[0]) 
                 && Serializable.class.isAssignableFrom((Class<?>) args[1])){
               field.setAccessible(true);
               Map<String, Serializable> map = (Map<String, Serializable>) field.get(model);
-              for (String key: annotation.keys()){
-                if (map.containsKey(key)){
-                  String val = map.get(key).toString();
-                  if (val != null && !val.trim().equals("")){
+              if (Arrays.asList(annotation.keys()).isEmpty()){
+                for (Map.Entry<String, Serializable> entry: map.entrySet()){
+                  String val = entry.getValue().toString();
+                  if (val != null && !val.trim().equals("")) {
                     Term term = new Term();
                     term.setTerm(val);
                     term.setModel(model.getClass());
-                    term.setField(field.getName());
+                    term.setField(entry.getKey());
                     term.setReferenceIds(Collections.singletonList(model.getId().toString()));
                     terms.add(term);
                   }
                 }
+              } else {
+                for (String key : annotation.keys()) {
+                  if (map.containsKey(key)) {
+                    String val = map.get(key).toString();
+                    if (val != null && !val.trim().equals("")) {
+                      Term term = new Term();
+                      term.setTerm(val);
+                      term.setModel(model.getClass());
+                      term.setField(field.getName());
+                      term.setReferenceIds(Collections.singletonList(model.getId().toString()));
+                      terms.add(term);
+                    }
+                  }
+                }
               }
             }
-          } else if (Collection.class.isAssignableFrom(field.getType()) 
+          } 
+          // Collection fields
+          else if (Collection.class.isAssignableFrom(field.getType()) 
               && field.getGenericType() instanceof ParameterizedType){
             Type[] args = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
             if (Serializable.class.isAssignableFrom((Class<?>) args[0])){
@@ -158,11 +186,17 @@ public class Term extends AbstractModel {
               }
             }
           }
+          
         }
+        
       }
+      
       current = current.getSuperclass();
+      
     }
+    
     return terms;
+    
   }
   
   public static boolean modelHasManagedTerms(Class<?> model){

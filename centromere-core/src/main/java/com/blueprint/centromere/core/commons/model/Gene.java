@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.Data;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -30,6 +31,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @author woemler
  */
 @Document
+@Data
 public class Gene extends AbstractModel implements Attributes {
 
 	@Indexed(unique = true) @ManagedTerm private String primaryReferenceId;
@@ -44,101 +46,12 @@ public class Gene extends AbstractModel implements Attributes {
 	private Map<String, String> attributes = new HashMap<>();
 	private Map<String, String> externalReferences = new HashMap<>();
 
-	public String getPrimaryReferenceId() {
-		return primaryReferenceId;
-	}
-
-	public void setPrimaryReferenceId(String primaryReferenceId) {
-		this.primaryReferenceId = primaryReferenceId;
-	}
-
-	public String getReferenceSource() {
-		return referenceSource;
-	}
-
-	public void setReferenceSource(String referenceSource) {
-		this.referenceSource = referenceSource;
-	}
-
-	public String getPrimaryGeneSymbol() {
-		return primaryGeneSymbol;
-	}
-
-	public void setPrimaryGeneSymbol(String primaryGeneSymbol) {
-		this.primaryGeneSymbol = primaryGeneSymbol;
-	}
-
-	public Integer getTaxId() {
-		return taxId;
-	}
-
-	public void setTaxId(Integer taxId) {
-		this.taxId = taxId;
-	}
-
-	public String getChromosome() {
-		return chromosome;
-	}
-
-	public void setChromosome(String chromosome) {
-		this.chromosome = chromosome;
-	}
-
-	public String getChromosomeLocation() {
-		return chromosomeLocation;
-	}
-
-	public void setChromosomeLocation(String chromosomeLocation) {
-		this.chromosomeLocation = chromosomeLocation;
-	}
-
-	public String getGeneType() {
-		return geneType;
-	}
-
-	public void setGeneType(String geneType) {
-		this.geneType = geneType;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public Map<String, String> getExternalReferences(){
-		return externalReferences;
-	}
-
 	public void addExternalReference(String name, String value){
 		externalReferences.put(name, value);
 	}
 
 	public boolean hasExternalReference(String name){
 		return externalReferences.containsKey(name);
-	}
-
-	public List<String> getAliases() {
-		return aliases;
-	}
-
-	public void setAliases(List<String> aliases) {
-		this.aliases = aliases;
-	}
-
-	@Override
-	public Map<String, String> getAttributes() {
-		return attributes;
-	}
-
-	public void setAttributes(Map<String, String> attributes) {
-		this.attributes = attributes;
-	}
-
-	public void setExternalReferences(Map<String, String> externalReferences) {
-		this.externalReferences = externalReferences;
 	}
 
 	@Override
@@ -165,21 +78,4 @@ public class Gene extends AbstractModel implements Attributes {
 		if (!aliases.contains(alias)) this.aliases.add(alias);
 	}
 
-	@Override
-	public String toString() {
-		return "Gene{" +
-        "id='" + this.getId() + "\'" +
-				", primaryReferenceId='" + primaryReferenceId + '\'' +
-				", primaryGeneSymbol='" + primaryGeneSymbol + '\'' +
-				", taxId=" + taxId +
-				", chromosome='" + chromosome + '\'' +
-				", chromosomeLocation='" + chromosomeLocation + '\'' +
-				", geneType='" + geneType + '\'' +
-				", description='" + description + '\'' +
-				", referenceSource='" + referenceSource + '\'' +
-				", aliases=" + aliases +
-				", attributes=" + attributes +
-				", externalReferences=" + externalReferences +
-				'}';
-	}
 }

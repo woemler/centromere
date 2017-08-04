@@ -18,6 +18,7 @@ package com.blueprint.centromere.core.config;
 
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -28,6 +29,7 @@ import org.springframework.context.annotation.PropertySource;
 @Configuration
 @PropertySource("classpath:database-defaults.properties")
 @ConfigurationProperties("centromere.db")
+@Data
 public class DatabaseProperties {
   
   private String host;
@@ -36,54 +38,6 @@ public class DatabaseProperties {
   private String password;
   private Integer port;
   private Map<String, String> attributes = new HashMap<>();
-
-  public String getHost() {
-    return host;
-  }
-
-  public void setHost(String host) {
-    this.host = host;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getUser() {
-    return user;
-  }
-
-  public void setUser(String user) {
-    this.user = user;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public Integer getPort() {
-    return port;
-  }
-
-  public void setPort(Integer port) {
-    this.port = port;
-  }
-
-  public Map<String, String> getAttributes() {
-    return attributes;
-  }
-
-  public void setAttributes(Map<String, String> attributes) {
-    this.attributes = attributes;
-  }
 
   public boolean hasAttribute(String attribute){
     return this.attributes.containsKey(attribute);

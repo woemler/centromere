@@ -22,33 +22,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @author woemler
  */
 @Document
+@lombok.Data
 public class GeneCopyNumber extends Data {
 	
 	private Double value;
 	private Double lossOfHeterozygosity;
 	private Double ploidy;
 
-	public Double getValue() {
-		return value;
-	}
-
-	public void setValue(Double value) {
-		this.value = value;
-	}
-
-  public Double getLossOfHeterozygosity() {
-    return lossOfHeterozygosity;
-  }
-
-  public void setLossOfHeterozygosity(Double lossOfHeterozygosity) {
-    this.lossOfHeterozygosity = lossOfHeterozygosity;
-  }
-
-  public Double getPloidy() {
-    return ploidy;
-  }
-
-  public void setPloidy(Double ploidy) {
-    this.ploidy = ploidy;
-  }
 }

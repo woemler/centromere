@@ -19,25 +19,10 @@ package com.blueprint.centromere.core.commons.model;
 /**
  * @author woemler
  */
-
+@lombok.Data
 public abstract class AffymetrixArrayData extends Data {
 	
 	private String probeSetId;
 	private Double value;
-
-	public String getProbeSetId() {
-		return probeSetId;
-	}
-
-	public void setProbeSetId(String probeSetId) {
-		this.probeSetId = probeSetId;
-	}
-
-	public Double getValue() {
-		return value;
-	}
-
-	public void setValue(Double value) {
-		this.value = value;
-	}
+	
 }
