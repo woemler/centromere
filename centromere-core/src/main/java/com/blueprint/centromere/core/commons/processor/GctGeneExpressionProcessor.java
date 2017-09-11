@@ -18,17 +18,16 @@ package com.blueprint.centromere.core.commons.processor;
 
 import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.reader.GctGeneExpressionFileReader;
+import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.support.GenericDataSetSupport;
 import com.blueprint.centromere.core.commons.validator.GeneExpressionValidator;
 import com.blueprint.centromere.core.config.DataImportProperties;
-import com.blueprint.centromere.core.config.DatabaseProperties;
 import com.blueprint.centromere.core.dataimport.DataTypes;
-import com.blueprint.centromere.core.dataimport.importer.MongoImportTempFileImporter;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
-import com.blueprint.centromere.core.dataimport.writer.MongoImportTempFileWriter;
+import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter;
+import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter.WriteMode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,15 +41,15 @@ public class GctGeneExpressionProcessor extends GenericRecordProcessor<GeneExpre
   @Autowired
   public GctGeneExpressionProcessor(
       GeneRepository geneRepository, 
-      MongoTemplate mongoTemplate,
+      GeneExpressionRepository repository,
       GenericDataSetSupport genericDataSetSupport,
-      DataImportProperties dataImportProperties,
-      DatabaseProperties databaseProperties
+      DataImportProperties dataImportProperties
   ) {
     this.setModel(GeneExpression.class);
     this.setReader(new GctGeneExpressionFileReader(geneRepository, genericDataSetSupport, dataImportProperties));
     this.setValidator(new GeneExpressionValidator());
-    this.setWriter(new MongoImportTempFileWriter<>(dataImportProperties, mongoTemplate));
-    this.setImporter(new MongoImportTempFileImporter<>(GeneExpression.class, databaseProperties));
+    this.setWriter(new RepositoryRecordWriter<>(repository, WriteMode.INSERT, 200));
+//    this.setWriter(new MongoImportTempFileWriter<>(dataImportProperties, mongoTemplate));
+//    this.setImporter(new MongoImportTempFileImporter<>(GeneExpression.class, databaseProperties));
   }
 }

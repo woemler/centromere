@@ -19,15 +19,14 @@ package com.blueprint.centromere.core.commons.processor;
 import com.blueprint.centromere.core.commons.model.Mutation;
 import com.blueprint.centromere.core.commons.reader.TcgaMafReader;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
+import com.blueprint.centromere.core.commons.repository.MutationRepository;
 import com.blueprint.centromere.core.commons.support.TcgaSupport;
 import com.blueprint.centromere.core.config.DataImportProperties;
-import com.blueprint.centromere.core.config.DatabaseProperties;
 import com.blueprint.centromere.core.dataimport.DataTypes;
-import com.blueprint.centromere.core.dataimport.importer.MongoImportTempFileImporter;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
-import com.blueprint.centromere.core.dataimport.writer.MongoImportTempFileWriter;
+import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter;
+import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter.WriteMode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,15 +39,15 @@ public class MafMutationProcessor extends GenericRecordProcessor<Mutation> {
     @Autowired
     public MafMutationProcessor(
         GeneRepository geneRepository,
-        MongoOperations mongoOperations,
+        MutationRepository repository,
         TcgaSupport tcgaSupport,
-        DataImportProperties dataImportProperties,
-        DatabaseProperties databaseProperties
+        DataImportProperties dataImportProperties
     ) {
       this.setReader(new TcgaMafReader(geneRepository, tcgaSupport, dataImportProperties));
+      this.setWriter(new RepositoryRecordWriter<>(repository, WriteMode.INSERT, 200));
       //this.setValidator(new()); // TODO: mutation validator
-      this.setWriter(new MongoImportTempFileWriter<>(dataImportProperties, mongoOperations));
-      this.setImporter(new MongoImportTempFileImporter<>(Mutation.class, databaseProperties));
+//      this.setWriter(new MongoImportTempFileWriter<>(dataImportProperties, mongoOperations));
+//      this.setImporter(new MongoImportTempFileImporter<>(Mutation.class, databaseProperties));
       this.setModel(Mutation.class);
     }
 }

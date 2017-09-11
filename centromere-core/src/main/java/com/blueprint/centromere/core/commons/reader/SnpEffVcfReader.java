@@ -100,7 +100,7 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
       mutation.setReferenceAllele(bits[3].trim());
       mutation.setAlternateAllele(bits[4].trim());
       if (!bits[2].trim().replaceAll("\\.", "").equals("")) {
-        mutation.setExternalReferenes(new HashSet<>(Arrays.asList(bits[2].trim().split(";"))));
+        mutation.setExternalReferences(new HashSet<>(Arrays.asList(bits[2].trim().split(";"))));
       }
       
       Map<String,String> info = parseInfo(bits[7].trim());

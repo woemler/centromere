@@ -27,6 +27,7 @@ import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter;
+import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter.WriteMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -49,6 +50,6 @@ public class SnpEffVcfProcessor extends GenericRecordProcessor<Mutation> {
     this.setModel(Mutation.class);
     this.setReader(new SnpEffVcfReader(geneRepository, sampleRepository, genericDataSetSupport, dataImportProperties));
     this.setValidator(new MutationValidator());
-    this.setWriter(new RepositoryRecordWriter<>(mutationRepository));
+    this.setWriter(new RepositoryRecordWriter<>(mutationRepository, WriteMode.INSERT, 200));
   }
 }

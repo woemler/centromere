@@ -34,7 +34,7 @@ import java.util.List;
 public abstract class MultiRecordLineFileReader<T extends Model<?>> 
 		extends AbstractRecordFileReader<T> {
 	
-	private List<T> recordList;
+	private List<T> recordList = new ArrayList<>();
 	private List<String> headers;
 	private boolean headerFlag = true;
 	private String delimiter = "\\t";
@@ -62,7 +62,7 @@ public abstract class MultiRecordLineFileReader<T extends Model<?>>
 				String line = this.getReader().readLine();
 				while (line != null){
 					if (!isSkippableLine(line)) {
-						if (headerFlag){
+						if (isHeaderLine(line)){
 							parseHeader(line);
 							headerFlag = false;
 						} else {
@@ -87,6 +87,16 @@ public abstract class MultiRecordLineFileReader<T extends Model<?>>
 	protected void parseHeader(String line) throws DataImportException {
 		headers = Arrays.asList(line.trim().split(delimiter));
 	}
+
+  /**
+   * Tests whether the supplied line is a header.
+   * 
+   * @param line
+   * @return
+   */
+	protected boolean isHeaderLine(String line){
+	  return headerFlag;
+  }
 
 	/**
 	 * Extracts multiple records from a single line of the text file.  If no valid records are found, 

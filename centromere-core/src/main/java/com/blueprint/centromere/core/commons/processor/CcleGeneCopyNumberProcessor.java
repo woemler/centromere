@@ -18,17 +18,16 @@ package com.blueprint.centromere.core.commons.processor;
 
 import com.blueprint.centromere.core.commons.model.GeneCopyNumber;
 import com.blueprint.centromere.core.commons.reader.GenericGeneCopyNumberMatrixReader;
+import com.blueprint.centromere.core.commons.repository.GeneCopyNumberRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.support.CcleSupport;
 import com.blueprint.centromere.core.commons.validator.GeneCopyNumberValidator;
 import com.blueprint.centromere.core.config.DataImportProperties;
-import com.blueprint.centromere.core.config.DatabaseProperties;
 import com.blueprint.centromere.core.dataimport.DataTypes;
-import com.blueprint.centromere.core.dataimport.importer.MongoImportTempFileImporter;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
-import com.blueprint.centromere.core.dataimport.writer.MongoImportTempFileWriter;
+import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter;
+import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter.WriteMode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,15 +42,15 @@ public class CcleGeneCopyNumberProcessor extends GenericRecordProcessor<GeneCopy
   @Autowired
   public CcleGeneCopyNumberProcessor(
       GeneRepository geneRepository,
-      MongoTemplate mongoTemplate,
+      GeneCopyNumberRepository repository,
       CcleSupport ccleSupport,
-      DataImportProperties dataImportProperties,
-      DatabaseProperties databaseProperties
+      DataImportProperties dataImportProperties
   ) {
     this.setReader(new GenericGeneCopyNumberMatrixReader(geneRepository, ccleSupport, dataImportProperties));
     this.setValidator(new GeneCopyNumberValidator());
-    this.setWriter(new MongoImportTempFileWriter<>(dataImportProperties, mongoTemplate));
-    this.setImporter(new MongoImportTempFileImporter<>(GeneCopyNumber.class, databaseProperties));
+    this.setWriter(new RepositoryRecordWriter<>(repository, WriteMode.INSERT, 200));
+//    this.setWriter(new MongoImportTempFileWriter<>(dataImportProperties, mongoTemplate));
+//    this.setImporter(new MongoImportTempFileImporter<>(GeneCopyNumber.class, databaseProperties));
     this.setModel(GeneCopyNumber.class);
   }
   

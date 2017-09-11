@@ -128,7 +128,7 @@ public class CcleMafReader extends StandardRecordFileReader<Mutation>
     return mutation;
   }
 
-  private Gene getGeneFromLine(String line){
+  private Gene getGeneFromLine(String line) throws DataImportException {
     Gene gene = null;
     if (hasColumn("entrez_gene_id")){
       Optional<Gene> optional = geneRepository.findByPrimaryReferenceId(getColumnValue(line, "entrez_gene_id"));
@@ -146,7 +146,7 @@ public class CcleMafReader extends StandardRecordFileReader<Mutation>
     return optional.orElse(null);
   }
 
-  private Sample getSampleFromLine(String line){
+  private Sample getSampleFromLine(String line) throws DataImportException {
     String sampleName;
     if (hasColumn("tumor_sample_barcode")){
       sampleName = getColumnValue(line, "tumor_sample_barcode");
@@ -171,7 +171,7 @@ public class CcleMafReader extends StandardRecordFileReader<Mutation>
 
   }
 
-  private List<Mutation.VariantTranscript> parseAlternateTranscripts(String line){
+  private List<Mutation.VariantTranscript> parseAlternateTranscripts(String line) throws DataImportException{
     List<Mutation.VariantTranscript> transcripts = new ArrayList<>();
     String otherTranscripts = getColumnValue(line, "other_transcripts");
     if (otherTranscripts != null && !otherTranscripts.trim().equals("")) {
@@ -188,7 +188,7 @@ public class CcleMafReader extends StandardRecordFileReader<Mutation>
     return transcripts;
   }
 
-  private String parseReferenceGenome(String line){
+  private String parseReferenceGenome(String line) throws DataImportException {
     String ref = null;
     if (hasColumn("ncbi_build")){
       ref = "hg" + getColumnValue(line, "ncbi_build");
@@ -216,19 +216,6 @@ public class CcleMafReader extends StandardRecordFileReader<Mutation>
   @Override
   protected boolean isHeaderLine(String line) {
     return headerFlag;
-  }
-
-  private String getColumnValue(String line, String header) {
-    header = header.toLowerCase();
-    String value = null;
-    if (columnMap.containsKey(header)){
-      String[] bits = line.trim().split(delimiter);
-      Integer index = columnMap.get(header);
-      if (bits.length > index){
-        value = bits[index];
-      }
-    }
-    return value;
   }
 
   private boolean hasColumn(String column){

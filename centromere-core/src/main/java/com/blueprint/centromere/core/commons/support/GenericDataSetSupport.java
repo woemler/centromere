@@ -129,6 +129,7 @@ public class GenericDataSetSupport implements DataSetSupport {
    */
   protected String getSampleHistologyFromSubject(Subject subject){
     if (subject.hasAttribute("sample-histology")) return subject.getAttribute("sample-histology");
+    if (subject.hasAttribute("sampleHistology")) return subject.getAttribute("sampleHistology");
     if (subject.hasAttribute("histology")) return subject.getAttribute("histology");
     return null;
   }
@@ -142,8 +143,10 @@ public class GenericDataSetSupport implements DataSetSupport {
    */
   protected String getSampleTissueFromSubject(Subject subject){
     if (subject.hasAttribute("sample-tissue")) return subject.getAttribute("sample-tissue");
+    if (subject.hasAttribute("sampleTissue")) return subject.getAttribute("sampleTissue");
     if (subject.hasAttribute("tissue")) return subject.getAttribute("tissue");
     if (subject.hasAttribute("sample-primarySite")) return subject.getAttribute("sample-primarySite");
+    if (subject.hasAttribute("samplePrimarySite")) return subject.getAttribute("samplePrimarySite");
     if (subject.hasAttribute("primarySite")) return subject.getAttribute("primarySite");
     if (subject.hasAttribute("sample-primary_site")) return subject.getAttribute("sample-primary_site");
     if (subject.hasAttribute("primary_site")) return subject.getAttribute("primary_site");
@@ -214,7 +217,7 @@ public class GenericDataSetSupport implements DataSetSupport {
   }
   
   public Optional<Subject> findSubject(String name){
-    return subjectRepository.findByName(name);
+    return subjectRepository.bestGuess(name);
   }
 
   public SubjectRepository getSubjectRepository() {

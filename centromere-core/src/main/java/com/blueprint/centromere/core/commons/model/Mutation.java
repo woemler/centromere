@@ -38,7 +38,7 @@ public class Mutation extends Data implements Attributes {
 	private String strand;
 	@Indexed private String variantClassification;
 	@Indexed private String variantType;
-  private Set<String> externalReferenes = new HashSet<>();
+  private Set<String> externalReferences = new HashSet<>();
 	private String referenceAllele;
 	private String alternateAllele;
   private String codonChange;
@@ -50,7 +50,7 @@ public class Mutation extends Data implements Attributes {
 	private Map<String,String> attributes = new HashMap<>();
 
   public void addExternalReference(String reference){
-	  this.externalReferenes.add(reference);
+	  this.externalReferences.add(reference);
   }
   
   public void addAlternateTranscript(VariantTranscript transcript){

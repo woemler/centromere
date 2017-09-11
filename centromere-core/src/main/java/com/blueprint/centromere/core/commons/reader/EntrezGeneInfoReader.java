@@ -60,7 +60,12 @@ public class EntrezGeneInfoReader extends StandardRecordFileReader<Gene>
 		return line.trim().equals("") || line.startsWith("#");
 	}
 
-	@Override
+  @Override
+  protected boolean isHeaderLine(String line) {
+    return false;
+  }
+
+  @Override
 	public Class<Gene> getModel() {
 		return model;
 	}

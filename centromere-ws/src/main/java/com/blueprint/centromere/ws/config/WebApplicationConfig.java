@@ -109,7 +109,9 @@ public class WebApplicationConfig extends WebMvcConfigurerAdapter {
   public void configureContentNegotiation(ContentNegotiationConfigurer configurer){
     configurer
         //.favorPathExtension(false)
-        //.favorParameter(true)
+        .useJaf(false)
+        .ignoreAcceptHeader(false)
+        .favorParameter(false)
         .defaultContentType(MediaType.APPLICATION_JSON_UTF8);
   }
 
@@ -117,13 +119,6 @@ public class WebApplicationConfig extends WebMvcConfigurerAdapter {
   public CorsFilter corsFilter(){
     return new CorsFilter();
   }
-
-//  @Override
-//  public void addFormatters(FormatterRegistry registry) {
-//    registry.addConverter(new StringToAttributeConverter());
-//    registry.addConverter(new StringToSourcedAliasConverter());
-//    super.addFormatters(registry);
-//  }
 
   //TODO resolve this dependency
 //  @Bean

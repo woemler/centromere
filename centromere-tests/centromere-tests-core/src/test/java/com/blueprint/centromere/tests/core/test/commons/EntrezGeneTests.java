@@ -51,7 +51,7 @@ public class EntrezGeneTests {
 	
 	@Test
 	public void geneInfoReaderTest() throws Exception {
-		ClassPathResource resource = new ClassPathResource("Homo_sapiens.gene_info");
+		ClassPathResource resource = new ClassPathResource("samples/Homo_sapiens.gene_info");
 		dataFile.setFilePath(resource.getPath());
 		EntrezGeneInfoReader reader = new EntrezGeneInfoReader();
 		reader.setDataSet(dataSet);

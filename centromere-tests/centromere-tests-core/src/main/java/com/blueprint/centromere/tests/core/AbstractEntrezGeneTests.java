@@ -17,7 +17,8 @@ import org.springframework.util.Assert;
  */
 public abstract class AbstractEntrezGeneTests {
 
-  private static final ClassPathResource GENE_INFO_FILE = new ClassPathResource("Homo_sapiens.gene_info");
+  private static final ClassPathResource GENE_INFO_FILE = new ClassPathResource(
+      "samples/Homo_sapiens.gene_info");
 
   @Autowired private GeneRepository geneRepository;
   @Autowired private DataSetRepository dataSetRepository;

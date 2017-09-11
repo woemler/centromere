@@ -19,6 +19,10 @@ package com.blueprint.centromere.core.dataimport.reader;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
 
 /**
  * Standard text file reader that assumes that a single record is extractable from a single line.  
@@ -31,6 +35,10 @@ import java.io.IOException;
  */
 public abstract class StandardRecordFileReader<T extends Model<?>> 
 		extends AbstractRecordFileReader<T> {
+  
+  private Map<String, Integer> headerMap = new HashMap<>();
+  private String delimiter = "\t";
+  private ConversionService conversionService = new DefaultConversionService();
 
 	/**
 	 * {@link RecordReader#readRecord()}
@@ -58,8 +66,52 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 		return null;
 	}
 
+  /**
+   * 
+   * @param line
+   */
 	protected void parseHeader(String line){
+    headerMap = new HashMap<>();
+    String[] bits = line.split(delimiter);
+    for (int i = 0; i < bits.length; i++){
+      headerMap.put(bits[i], i);
+    }
+  }
 
+  /**
+   * 
+   * @param line
+   * @param header
+   * @param clazz
+   * @param <S>
+   * @return
+   * @throws DataImportException
+   */
+  protected <S> S getColumnValue(String line, String header, Class<S> clazz) throws DataImportException {
+	  if (!headerMap.containsKey(header)) {
+	    throw new DataImportException(String.format("Given header does not exist in this file: %s", header));
+    }
+	  String[] bits = line.split(this.getDelimiter());
+	  Integer index = headerMap.get(header);
+	  if (bits.length <= index){
+      throw new DataImportException(String.format("Header index is outside bounds of current line.  " 
+          + "Index = %d, line length = %d", index, bits.length));
+    }
+    if (!conversionService.canConvert(String.class, clazz)){
+	    throw new DataImportException(String.format("Cannot convert string value to %s", clazz.getName()));
+    }
+    return conversionService.convert(bits[index].trim(), clazz);
+  }
+
+  /**
+   * 
+   * @param line
+   * @param header
+   * @return
+   * @throws DataImportException
+   */
+  protected String getColumnValue(String line, String header) throws DataImportException {
+    return getColumnValue(line, header, String.class);
   }
 
 	/**
@@ -79,8 +131,35 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 	 */
 	abstract protected boolean isSkippableLine(String line);
 
-	protected boolean isHeaderLine(String line){
-		return false;
-	}
-	
+  /**
+   * Tests whether the supplied line is a header.
+   * 
+   * @param line
+   * @return
+   */
+	abstract protected boolean isHeaderLine(String line);
+
+  public String getDelimiter() {
+    return delimiter;
+  }
+
+  public void setDelimiter(String delimiter) {
+    this.delimiter = delimiter;
+  }
+
+  public ConversionService getConversionService() {
+    return conversionService;
+  }
+
+  public void setConversionService(ConversionService conversionService) {
+    this.conversionService = conversionService;
+  }
+
+  public Map<String, Integer> getHeaderMap() {
+    return headerMap;
+  }
+
+  public void setHeaderMap(Map<String, Integer> headerMap) {
+    this.headerMap = headerMap;
+  }
 }

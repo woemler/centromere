@@ -68,20 +68,20 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
     
     String[] bits = line.trim().split(this.getDelimiter());
     List<GeneCopyNumber> records = new ArrayList<>();
-
-    Gene gene = null;
-    Optional<Gene> optional = geneRepository.bestGuess(bits[0]);
-    if (optional.isPresent()){
-      gene = optional.get();
-    } 
-    if (gene == null){
-      if (dataImportProperties.isSkipInvalidGenes()){
-        logger.warn("Skipping unknown gene: %s %s", bits[0], bits[1]);
-        return records;
-      } else {
-        throw new InvalidGeneException(String.format("Unknown gene: %s %s", bits[0], bits[1]));
+    
+    Optional<Gene> optional = geneRepository.bestGuess(bits[0].replaceAll("['\"]", ""));
+    if (!optional.isPresent()) {
+      optional = geneRepository.bestGuess(bits[1].replaceAll("['\"]", ""));
+      if (!optional.isPresent()) {
+        if (dataImportProperties.isSkipInvalidGenes()) {
+          logger.warn(String.format("Skipping unknown gene: %s %s", bits[0], bits[1]));
+          return records;
+        } else {
+          throw new InvalidGeneException(String.format("Unknown gene: %s %s", bits[0], bits[1]));
+        }
       }
     }
+    Gene gene = optional.get();
     
     for (int i = 2; i < bits.length; i++){
       GeneCopyNumber record = new GeneCopyNumber();
@@ -95,7 +95,7 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
       record.setGeneId(gene.getId());
       record.setDataSetId(this.getDataSet().getId());
       try {
-        Double val = Double.parseDouble(bits[i]);
+        Double val = Double.parseDouble(bits[i].replaceAll("['\"]", ""));
         record.setValue(val);
       } catch (NumberFormatException e){
         if (dataImportProperties.isSkipInvalidRecords()){
@@ -119,7 +119,7 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
   protected void parseHeader(String line) throws DataImportException {
     String[] bits = line.trim().split(this.getDelimiter());
     for (int i = 2; i < bits.length; i++){
-      Optional<Sample> optional = support.findOrCreateSample(bits[i], this.getDataSet());
+      Optional<Sample> optional = support.findOrCreateSample(bits[i].replaceAll("['\"]", ""), this.getDataSet());
       if (optional.isPresent()){
         samples.put(i, optional.get());
       } else {

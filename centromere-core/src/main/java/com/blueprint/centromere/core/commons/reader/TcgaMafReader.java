@@ -111,13 +111,13 @@ public class TcgaMafReader extends StandardRecordFileReader<Mutation> implements
     mutation.setNucleotideTranscript(getColumnValue(line, "refseq_mrna_id"));
     mutation.setProteinTranscript(getColumnValue(line, "refseq_prot_id"));
     mutation.setAlternateTranscripts(parseAlternateTranscripts(line));
-    mutation.setExternalReferenes(null);
+    mutation.setExternalReferences(null);
     mutation.setAttributes(null);
     
     return mutation;
   }
 
-  private Gene getGeneFromLine(String line){
+  private Gene getGeneFromLine(String line) throws DataImportException {
     Gene gene = null;
     if (hasColumn("entrez_gene_id")){
       Optional<Gene> optional = geneRepository.findByPrimaryReferenceId(getColumnValue(line, "entrez_gene_id"));
@@ -130,12 +130,12 @@ public class TcgaMafReader extends StandardRecordFileReader<Mutation> implements
     return gene;
   }
   
-  private Gene getGene(String identifier){
+  private Gene getGene(String identifier) throws DataImportException {
     Optional<Gene> optional = geneRepository.bestGuess(identifier);
     return optional.orElse(null);
   }
 
-  private Sample getSampleFromLine(String line){
+  private Sample getSampleFromLine(String line) throws DataImportException {
     String sampleName;
     if (hasColumn("tumor_sample_barcode")){
       sampleName = getColumnValue(line, "tumor_sample_barcode");
@@ -156,7 +156,7 @@ public class TcgaMafReader extends StandardRecordFileReader<Mutation> implements
 
   }
   
-  private List<Mutation.VariantTranscript> parseAlternateTranscripts(String line){
+  private List<Mutation.VariantTranscript> parseAlternateTranscripts(String line) throws DataImportException {
     List<Mutation.VariantTranscript> transcripts = new ArrayList<>();
     String otherTranscripts = getColumnValue(line, "other_transcripts");
     if (otherTranscripts != null && !otherTranscripts.trim().equals("")) {
@@ -173,7 +173,7 @@ public class TcgaMafReader extends StandardRecordFileReader<Mutation> implements
     return transcripts;
   }
 
-  private String parseReferenceGenome(String line){
+  private String parseReferenceGenome(String line) throws DataImportException {
     String ref = null;
     if (hasColumn("ncbi_build")){
       ref = "hg" + getColumnValue(line, "ncbi_build");
@@ -203,18 +203,6 @@ public class TcgaMafReader extends StandardRecordFileReader<Mutation> implements
     return headerFlag;
   }
 
-  private String getColumnValue(String line, String header) {
-    header = header.toLowerCase();
-    String value = null;
-    if (columnMap.containsKey(header)){
-      String[] bits = line.trim().split(delimiter);
-      Integer index = columnMap.get(header);
-      if (bits.length > index){
-        value = bits[index];
-      }
-    }
-    return value;
-  }
 
   private boolean hasColumn(String column){
     return columnMap.containsKey(column);

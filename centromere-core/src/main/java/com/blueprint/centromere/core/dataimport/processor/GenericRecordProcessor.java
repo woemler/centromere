@@ -306,18 +306,7 @@ public class GenericRecordProcessor<T extends Model<?>>
         filter.doAfter();
       }
       if (importer != null) {
-        if (TempFileWriter.class.isAssignableFrom(writer.getClass())) {
-          logger.info("Running RecordImporter file import");
-          String tempFilePath = ((TempFileWriter) writer).getTempFilePath(dataFile.getFilePath());
-          importer.importFile(tempFilePath);
-          logger.info("Running RecordImporter doAfter method");
-          importer.doAfter();
-        } else {
-          logger
-              .warn(
-                  "RecordWriter instance does not implement TempFileWriter interface, cannot get"
-                      + " temp file path from component.");
-        }
+        importer.doAfter();
       }
     } catch (InvalidSampleException e){
       if (dataImportProperties.isSkipInvalidSamples()) isInFailedState = true;
@@ -368,6 +357,17 @@ public class GenericRecordProcessor<T extends Model<?>>
       }
       record = reader.readRecord();
       recordCount++;
+    }
+    if (importer != null) {
+      if (TempFileWriter.class.isAssignableFrom(writer.getClass())) {
+        logger.info("Running RecordImporter file import");
+        String tempFilePath = ((TempFileWriter) writer).getTempFilePath(dataFile.getFilePath());
+        importer.importFile(tempFilePath);
+      } else {
+        logger.warn(
+            "RecordWriter instance does not implement TempFileWriter interface, cannot get"
+                + " temp file path from component.");
+      }
     }
   }
 

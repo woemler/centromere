@@ -24,11 +24,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import org.springframework.data.repository.CrudRepository;
 
 /**
  * Simple implementation of {@link RecordWriter}, that writes all records directly to the database
- *   using a {@link CrudRepository} implementation.  Can be configured to write using an
+ *   using a {@link ModelRepository} instance.  Can be configured to write using an
  *   insert, update, or upsert (save) operation.
  * 
  * @author woemler

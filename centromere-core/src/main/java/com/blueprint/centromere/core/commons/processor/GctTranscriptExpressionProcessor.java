@@ -16,12 +16,12 @@
 
 package com.blueprint.centromere.core.commons.processor;
 
-import com.blueprint.centromere.core.commons.model.GeneCopyNumber;
-import com.blueprint.centromere.core.commons.reader.GenericGeneCopyNumberMatrixReader;
-import com.blueprint.centromere.core.commons.repository.GeneCopyNumberRepository;
+import com.blueprint.centromere.core.commons.model.TranscriptExpression;
+import com.blueprint.centromere.core.commons.reader.GctTranscriptExpressionFileReader;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
+import com.blueprint.centromere.core.commons.repository.TranscriptExpressionRepository;
 import com.blueprint.centromere.core.commons.support.GenericDataSetSupport;
-import com.blueprint.centromere.core.commons.validator.GeneCopyNumberValidator;
+import com.blueprint.centromere.core.commons.validator.TranscriptExpressionValidator;
 import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
@@ -33,24 +33,23 @@ import org.springframework.stereotype.Component;
 /**
  * @author woemler
  */
-@DataTypes(value = { "gene_copy_number" }, description = "Gene-normalized copy number values, in a sample-gene matrix format.")
+@DataTypes(value = { "gct_transcript_expression" }, description = "Transcript expression data from GCT files")
 @Component
-public class GenericGeneCopyNumberMatrixProcessor extends GenericRecordProcessor<GeneCopyNumber> {
+public class GctTranscriptExpressionProcessor extends GenericRecordProcessor<TranscriptExpression> {
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
-  public GenericGeneCopyNumberMatrixProcessor(
-      GeneRepository geneRepository,
-      GeneCopyNumberRepository repository,
+  public GctTranscriptExpressionProcessor(
+      GeneRepository geneRepository, 
+      TranscriptExpressionRepository repository,
       GenericDataSetSupport genericDataSetSupport,
       DataImportProperties dataImportProperties
   ) {
-    this.setReader(new GenericGeneCopyNumberMatrixReader(geneRepository, genericDataSetSupport, dataImportProperties));
-    this.setValidator(new GeneCopyNumberValidator());
+    this.setModel(TranscriptExpression.class);
+    this.setReader(new GctTranscriptExpressionFileReader(geneRepository, genericDataSetSupport, dataImportProperties));
+    this.setValidator(new TranscriptExpressionValidator());
     this.setWriter(new RepositoryRecordWriter<>(repository, WriteMode.INSERT, 200));
 //    this.setWriter(new MongoImportTempFileWriter<>(dataImportProperties, mongoTemplate));
-//    this.setImporter(new MongoImportTempFileImporter<>(GeneCopyNumber.class, databaseProperties));
-    this.setModel(GeneCopyNumber.class);
+//    this.setImporter(new MongoImportTempFileImporter<>(TranscriptExpression.class, databaseProperties));
   }
-  
 }
