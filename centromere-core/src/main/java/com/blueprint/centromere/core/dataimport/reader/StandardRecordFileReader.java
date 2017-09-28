@@ -19,7 +19,7 @@ package com.blueprint.centromere.core.dataimport.reader;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
@@ -36,7 +36,7 @@ import org.springframework.core.convert.support.DefaultConversionService;
 public abstract class StandardRecordFileReader<T extends Model<?>> 
 		extends AbstractRecordFileReader<T> {
   
-  private Map<String, Integer> headerMap = new HashMap<>();
+  private LinkedHashMap<String, Integer> headerMap = new LinkedHashMap<>();
   private String delimiter = "\t";
   private ConversionService conversionService = new DefaultConversionService();
 
@@ -71,7 +71,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
    * @param line
    */
 	protected void parseHeader(String line){
-    headerMap = new HashMap<>();
+    headerMap = new LinkedHashMap<>();
     String[] bits = line.split(delimiter);
     for (int i = 0; i < bits.length; i++){
       headerMap.put(bits[i], i);
@@ -159,7 +159,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
     return headerMap;
   }
 
-  public void setHeaderMap(Map<String, Integer> headerMap) {
+  public void setHeaderMap(LinkedHashMap<String, Integer> headerMap) {
     this.headerMap = headerMap;
   }
 }

@@ -327,37 +327,42 @@ public class GenericRecordProcessor<T extends Model<?>>
    * @throws DataImportException
    */
   protected void processRecords() throws DataImportException {
+    
     logger.info("Processing records.");
+    
     T record = reader.readRecord();
+    
+    // Process each record
     while (record != null) {
-      if (validator != null) {
-        DataBinder dataBinder = new DataBinder(record);
-        dataBinder.setValidator(validator);
-        dataBinder.validate();
-        BindingResult bindingResult = dataBinder.getBindingResult();
-        if (bindingResult.hasErrors()) {
-          logger.warn(String.format("Record failed validation: %s", record.toString()));
-          if (dataImportProperties.isSkipInvalidRecords()) {
-            record = reader.readRecord();
-            continue;
-          } else {
-            isInFailedState = true;
-            throw new DataImportException(bindingResult.toString());
+      
+      if (filter != null && filter.isFilterable(record)){
+        logger.info(String.format("Filtering record: %s", record.toString()));
+      } else {
+        if (validator != null) {
+          DataBinder dataBinder = new DataBinder(record);
+          dataBinder.setValidator(validator);
+          dataBinder.validate();
+          BindingResult bindingResult = dataBinder.getBindingResult();
+          if (bindingResult.hasErrors()) {
+            logger.warn(String.format("Record failed validation: %s", record.toString()));
+            if (dataImportProperties.isSkipInvalidRecords()) {
+              record = reader.readRecord();
+              continue;
+            } else {
+              isInFailedState = true;
+              throw new DataImportException(bindingResult.toString());
+            }
           }
         }
-      }
-      if (filter != null){
-        if (filter.isFilterable(record)){
-          logger.info(String.format("Filtering record: %s", record.toString()));
-        } else {
-          writer.writeRecord(record);
-        }
-      } else {
         writer.writeRecord(record);
       }
+      
       record = reader.readRecord();
       recordCount++;
+      
     }
+    
+    // Import records when done
     if (importer != null) {
       if (TempFileWriter.class.isAssignableFrom(writer.getClass())) {
         logger.info("Running RecordImporter file import");
@@ -369,6 +374,7 @@ public class GenericRecordProcessor<T extends Model<?>>
                 + " temp file path from component.");
       }
     }
+    
   }
 
   /**

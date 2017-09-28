@@ -50,6 +50,8 @@ import org.springframework.stereotype.Component;
 public class GenericDataSetSupport implements DataSetSupport {
 
   public static final String COPY_SUBJECT_ATTRIBUTES = "copy-subject-attributes";
+  public static final String COPY_SUBJECT_NAME = "copy-subject-name";
+  
   private static final Logger logger = LoggerFactory.getLogger(GenericDataSetSupport.class);
 
   private final SubjectRepository subjectRepository;
@@ -78,7 +80,12 @@ public class GenericDataSetSupport implements DataSetSupport {
     
     Sample sample = new Sample();
     BeanUtils.copyProperties(dataImportProperties.getSample(), sample);
-    sample.setName(name);
+    if (dataImportProperties.hasAttribute(COPY_SUBJECT_NAME)
+        && Boolean.parseBoolean(dataImportProperties.getAttribute(COPY_SUBJECT_NAME))){
+      sample.setName(subject.getName()); 
+    } else {
+      sample.setName(name);  
+    }
     sample.setSubjectId(subject.getId());
     sample.setDataSetId(dataSet.getId());
     sample.setHistology(getSampleHistologyFromSubject(subject));
