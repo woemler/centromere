@@ -16,12 +16,15 @@
 
 package com.blueprint.centromere.cli.config;
 
+import com.blueprint.centromere.cli.CentromereCommandLineInitializer;
 import com.blueprint.centromere.cli.CommandLineInputExecutor;
-import com.blueprint.centromere.cli.DeleteCommandExecutor;
-import com.blueprint.centromere.cli.FileImportExecutor;
-import com.blueprint.centromere.cli.ListCommandExecutor;
-import com.blueprint.centromere.cli.ManifestImportExecutor;
 import com.blueprint.centromere.cli.ModelProcessorBeanRegistry;
+import com.blueprint.centromere.cli.commands.CreateCommandExecutor;
+import com.blueprint.centromere.cli.commands.DeleteCommandExecutor;
+import com.blueprint.centromere.cli.commands.FileImportExecutor;
+import com.blueprint.centromere.cli.commands.ListCommandExecutor;
+import com.blueprint.centromere.cli.commands.ManifestImportExecutor;
+import com.blueprint.centromere.cli.commands.UpdateCommandExecutor;
 import com.blueprint.centromere.core.config.Profiles;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -39,11 +42,6 @@ public class CommandLineInputConfiguration {
 	@Bean
 	public ModelProcessorBeanRegistry modelProcessorBeanRegistry(){
 		return new ModelProcessorBeanRegistry();
-	}
-	
-	@Bean
-	public CommandLineInputExecutor commandLineInputExecutor(){
-		return new CommandLineInputExecutor();
 	}
 	
 	@Bean
@@ -67,8 +65,29 @@ public class CommandLineInputConfiguration {
   }
 
   @Bean
+  public CreateCommandExecutor createCommandExecutor(){
+    return new CreateCommandExecutor();
+  }
+  
+  @Bean
+  public UpdateCommandExecutor updateCommandExecutor(){
+    return new UpdateCommandExecutor();
+  }
+  
+  @Bean
   public Repositories repositories(ApplicationContext context){
     return new Repositories(context);
+  }
+  
+  @Configuration
+  @Profile({CentromereCommandLineInitializer.SINGLE_COMMAND_PROFILE})
+  public static class SingleCommandExecutionConfiguration {
+
+    @Bean
+    public CommandLineInputExecutor commandLineInputExecutor(){
+      return new CommandLineInputExecutor();
+    }
+    
   }
 
 }

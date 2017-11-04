@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.cli;
+package com.blueprint.centromere.cli.commands;
 
+import com.blueprint.centromere.cli.CommandLineRunnerException;
+import com.blueprint.centromere.cli.ModelProcessorBeanRegistry;
+import com.blueprint.centromere.cli.Printer;
 import com.blueprint.centromere.cli.Printer.Level;
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
@@ -47,7 +50,7 @@ public class ListCommandExecutor implements EnvironmentAware {
   private DataFileRepository dataFileRepository;
   private Environment environment;
 
-  public void run(String arg, boolean showDetails) throws CommandLineRunnerException{
+  public void run(String arg, boolean showDetails) throws CommandLineRunnerException {
 
     arg = arg.trim().toLowerCase().replaceAll("-", "");
     if (!listable.contains(arg)){

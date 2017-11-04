@@ -20,6 +20,7 @@ import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Linked;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,8 +97,20 @@ public class DataSet extends AbstractModel implements Attributes {
     if (!sampleIds.contains(sampleId)) sampleIds.add(sampleId);
   }
   
+  public void addSampleIds(Collection<String> sampleIds){
+    for (String sampleId: sampleIds){
+      addSampleId(sampleId);
+    }
+  }
+  
   public void addDataFileId(String dataFileId){
     if (!dataFileIds.contains(dataFileId)) dataFileIds.add(dataFileId);
+  }
+  
+  public void addDataFileIds(Collection<String> dataFileIds){
+    for (String dataFileId: dataFileIds){
+      addDataFileId(dataFileId);
+    }
   }
 
 }

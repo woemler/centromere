@@ -35,6 +35,7 @@ public class GenericSubjectReader extends AbstractRecordFileReader<Subject> {
   private Map<String, Integer> headerMap = new HashMap<>();
   private String defaultEmptyValue = "n/a";
   private String delimiter = "\t";
+  private String replacementCharacter = "_"; 
 
   public GenericSubjectReader(DataImportProperties dataImportProperties) {
     this.dataImportProperties = dataImportProperties;
@@ -92,7 +93,8 @@ public class GenericSubjectReader extends AbstractRecordFileReader<Subject> {
       } else if ("notes".equalsIgnoreCase(entry.getKey())){
         subject.setNotes(getColumnValue(entry.getKey(), bits));
       } else {
-        subject.addAttribute(entry.getKey(), getColumnValue(entry.getKey(), bits));
+        subject.addAttribute(entry.getKey().replaceAll("\\.", replacementCharacter), 
+            getColumnValue(entry.getKey(), bits)); // Maps cannot have periods in their keys
       }
     }
     return subject;
@@ -125,5 +127,12 @@ public class GenericSubjectReader extends AbstractRecordFileReader<Subject> {
   public void setDelimiter(String delimiter) {
     this.delimiter = delimiter;
   }
-  
+
+  public String getReplacementCharacter() {
+    return replacementCharacter;
+  }
+
+  public void setReplacementCharacter(String replacementCharacter) {
+    this.replacementCharacter = replacementCharacter;
+  }
 }

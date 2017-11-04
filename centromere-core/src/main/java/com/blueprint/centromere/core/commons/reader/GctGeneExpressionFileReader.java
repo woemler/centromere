@@ -16,150 +16,25 @@
 
 package com.blueprint.centromere.core.commons.reader;
 
-import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.GeneExpression;
-import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.support.DataSetSupport;
-import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.config.DataImportProperties;
-import com.blueprint.centromere.core.dataimport.exception.DataImportException;
-import com.blueprint.centromere.core.dataimport.exception.InvalidGeneException;
-import com.blueprint.centromere.core.dataimport.exception.InvalidRecordException;
-import com.blueprint.centromere.core.dataimport.exception.InvalidSampleException;
-import com.blueprint.centromere.core.dataimport.reader.MultiRecordLineFileReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Reads normalized gene expression data from GCT files
  *   (http://software.broadinstitute.org/cancer/software/genepattern/file-formats-guide#GCT).
  * 
  * @author woemler
- * @since 0.4.3
+ * @since 0.5.0
  */
-public class GctGeneExpressionFileReader extends MultiRecordLineFileReader<GeneExpression>
-		implements SampleAware {
-
-  private static final Logger logger = LoggerFactory.getLogger(GctGeneExpressionFileReader.class);
-  
-	private final GeneRepository geneRepository;
-	private final DataSetSupport dataSetSupport;
-	private final DataImportProperties dataImportProperties;
-	
-	private Map<String, Sample> sampleMap;
+public class GctGeneExpressionFileReader extends GctFileReader<GeneExpression>  {
 
   public GctGeneExpressionFileReader(
       GeneRepository geneRepository,
       DataSetSupport dataSetSupport,
       DataImportProperties dataImportProperties) {
-    this.geneRepository = geneRepository;
-    this.dataSetSupport = dataSetSupport;
-    this.dataImportProperties = dataImportProperties;
+    super(GeneExpression.class, geneRepository, dataSetSupport, dataImportProperties);
   }
-
-  @Override 
-	public void doBefore() throws DataImportException {
-    super.doBefore();
-    sampleMap = new HashMap<>();
-	}
-
-	@Override 
-	protected List<GeneExpression> getRecordsFromLine(String line) throws DataImportException {
-	  
-		List<GeneExpression> records = new ArrayList<>();
-		String[] bits = line.trim().split(this.getDelimiter());
-		
-		if (bits.length > 1){
-			
-		  Gene gene = getGene(line);
-			if (gene == null){
-				if (dataImportProperties.isSkipInvalidGenes()){
-					logger.warn(String.format("Skipping line due to invalid gene: %s", line));
-					return new ArrayList<>();
-				} else {
-					throw new InvalidGeneException(String.format("Invalid gene in line: %s", line));
-				}
-			}
-			
-			for (int i = 2; i < bits.length; i++){
-				
-			  GeneExpression record = new GeneExpression();
-			  
-				Sample sample = null;
-				if (sampleMap.containsKey(this.getHeaders().get(i))){
-					sample = sampleMap.get(this.getHeaders().get(i));
-				} else {
-					Optional<Sample> optional = dataSetSupport.findOrCreateSample(this.getHeaders().get(i), this.getDataSet());
-					if (optional.isPresent()){
-						sample = optional.get();
-						sampleMap.put(this.getHeaders().get(i), sample);
-					} 
-				}
-				if (sample == null){
-					if (dataImportProperties.isSkipInvalidSamples()){
-						logger.warn(String.format("Skipping record due to invalid sample: %s", 
-								this.getHeaders().get(i)));
-						continue;
-					} else {
-						throw new InvalidSampleException(String.format("Invalid sample: %s", this.getHeaders().get(i)));
-					}
-				}
-				
-				try {
-					record.setValue(Double.parseDouble(bits[i]));
-				} catch (NumberFormatException e){
-					if (dataImportProperties.isSkipInvalidRecords()){
-						logger.warn(String.format("Invalid record, cannot parse value: %s", bits[i]));
-						continue;
-					} else {
-						throw new InvalidRecordException(String.format("Cannot parse value: %s", bits[i]));
-					}
-				}
-				
-				record.setDataFileId(this.getDataFile().getId());
-				record.setDataSetId(getDataSet().getId());
-				record.setGeneId(gene.getId());
-				record.setSampleId(sample.getId());
-				record.setSubjectId(sample.getSubjectId());
-				records.add(record);
-				
-			}
-			
-		}
-		return records;
-	}
-
-	private Gene getGene(String line){
-		Gene gene = null;
-		String[] b = line.split(getDelimiter());
-		if (b.length > 1){
-			Optional<Gene> optional;
-			if (!b[0].trim().equals("")){
-				optional = geneRepository.bestGuess(b[0]);
-				if (optional.isPresent()) gene = optional.get();
-			}
-			if (gene == null){
-				optional = geneRepository.bestGuess(b[1]);
-				if (optional.isPresent()) gene = optional.get();
-			}
-		}
-		return gene;
-	}
-
-	@Override 
-	protected boolean isSkippableLine(String line) {
-		return line.startsWith("#") || line.trim().split(this.getDelimiter()).length < 3;
-	}
-
-	@Override 
-	public List<Sample> getSamples() {
-		return new ArrayList<>(sampleMap.values());
-	}
 
 }

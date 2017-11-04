@@ -23,8 +23,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document
 @lombok.Data
-public class TranscriptExpression extends SimpleData {
+public abstract class SimpleData extends Data {
 	
-	private String transcriptAccession;
+	private Double value;
 
 }

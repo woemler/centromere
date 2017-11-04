@@ -14,32 +14,35 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.cli.arguments;
+package com.blueprint.centromere.cli.parameters;
 
-import com.beust.jcommander.Parameter;
+import com.beust.jcommander.DynamicParameter;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
+ * Base JCommander command arguments.
+ * 
  * @author woemler
  * @since 0.5.0
  */
-public class ImportManifestCommandArguments {
-	
-	@Parameter(names = { "-f", "--file" }, required = true, description = "Input file path.  Required")
-	private String filePath;
+public abstract class GenericCommandParameters {
 
-	public String getFilePath() {
-		return filePath;
+  @DynamicParameter(names = "-D", description = "Dynamic key-value parameters. eg -Dname=Joe")
+	private Map<String, String> parameters = new HashMap<>();
+
+  public Map<String, String> getParameters() {
+		return parameters;
 	}
 
-	public void setFilePath(String filePath) {
-		this.filePath = filePath;
+	public void setParameters(Map<String, String> parameters) {
+		this.parameters = parameters;
 	}
 
 	@Override 
 	public String toString() {
-		return "ImportManifestCommandArguments{" +
-				"filePath='" + filePath + '\'' +
+		return "GenericCommandArguments{" +
+        "parameters=" + parameters +
 				'}';
 	}
-	
 }

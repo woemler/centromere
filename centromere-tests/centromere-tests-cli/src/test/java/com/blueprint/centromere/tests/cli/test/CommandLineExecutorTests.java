@@ -33,6 +33,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.io.ClassPathResource;
@@ -76,20 +77,20 @@ public class CommandLineExecutorTests {
 	@Test
 	public void fileImportTest() throws Exception {
 		Assert.isTrue(geneRepository.count() == 0);
-		Resource file = new ClassPathResource("Homo_sapiens.gene_info");
+		Resource file = new ClassPathResource("samples/Homo_sapiens.gene_info");
 		String[] args = { "import", "file", "-f", file.getFile().getAbsolutePath(), "-t", "entrez_gene", "--centromere.import.dataset.short-name=test" };
-		executor.run(args);
+		executor.run(new DefaultApplicationArguments(args));
 		Assert.isTrue(geneRepository.count() == 5, String.format("Expected 5 records, found %d", geneRepository.count()));
 	}
 
 	@Test
 	public void badDataTypeImportTest() throws Exception {
 		Assert.isTrue(geneRepository.count() == 0);
-		Resource file = new ClassPathResource("Homo_sapiens.gene_info");
+		Resource file = new ClassPathResource("samples/Homo_sapiens.gene_info");
 		String[] args = { "import", "file", "-f", file.getFile().getAbsolutePath(), "-t", "genes" };
 		Exception exception = null;
 		try {
-      executor.run(args);
+      executor.run(new DefaultApplicationArguments(args));
     } catch (Exception e){
 		  exception = e;
     }
@@ -103,7 +104,7 @@ public class CommandLineExecutorTests {
     String[] args = { "import", "file", "-f", "/path/to/bad/file", "-t", "genes" };
     Exception exception = null;
     try {
-      executor.run(args);
+      executor.run(new DefaultApplicationArguments(args));
     } catch (Exception e){
       exception = e;
     }
@@ -117,7 +118,7 @@ public class CommandLineExecutorTests {
     String[] args = { "import", "-f", "/path/to/bad/file", "-t", "genes" };
     Exception exception = null;
     try {
-      executor.run(args);
+      executor.run(new DefaultApplicationArguments(args));
     } catch (Exception e){
       exception = e;
     }
@@ -127,7 +128,7 @@ public class CommandLineExecutorTests {
   
   @Test
   public void fileOverwritingTest() throws Exception {
-    Resource file = new ClassPathResource("Homo_sapiens.gene_info");
+    Resource file = new ClassPathResource("samples/Homo_sapiens.gene_info");
     HashCode hash = Files.hash(file.getFile(), Hashing.md5());
     System.out.println(hash.toString());
   }

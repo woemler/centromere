@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.cli;
+package com.blueprint.centromere.cli.commands;
 
+import com.blueprint.centromere.cli.CommandLineRunnerException;
+import com.blueprint.centromere.cli.Printer;
 import com.blueprint.centromere.cli.Printer.Level;
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
@@ -48,7 +50,7 @@ public class DeleteCommandExecutor implements EnvironmentAware {
   private Repositories repositories;
   private Environment environment;
   
-  public void run(String category, List<String> toDelete) throws CommandLineRunnerException{
+  public void run(String category, List<String> toDelete) throws CommandLineRunnerException {
     
     category = category.toLowerCase().replaceAll("-", "");
     if (!deleteable.contains(category)){

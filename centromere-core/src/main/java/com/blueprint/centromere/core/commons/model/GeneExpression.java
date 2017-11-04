@@ -22,9 +22,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @author woemler
  */
 @Document
-@lombok.Data
-public class GeneExpression extends Data {
-	
-	private Double value;
+public class GeneExpression extends SimpleData {
 
 }

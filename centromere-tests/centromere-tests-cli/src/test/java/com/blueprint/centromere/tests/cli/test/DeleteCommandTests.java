@@ -17,6 +17,7 @@ import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
@@ -69,7 +70,7 @@ public class DeleteCommandTests extends AbstractRepositoryTests {
     String[] args = { "delete", "datafile", path};
     Exception exception = null;
     try {
-      executor.run(args);
+      executor.run(new DefaultApplicationArguments(args));
     } catch (Exception e){
       exception = e;
       e.printStackTrace();
@@ -111,7 +112,7 @@ public class DeleteCommandTests extends AbstractRepositoryTests {
     String[] args = { "delete", "dataset", dataSetName};
     Exception exception = null;
     try {
-      executor.run(args);
+      executor.run(new DefaultApplicationArguments(args));
     } catch (Exception e){
       exception = e;
       e.printStackTrace();

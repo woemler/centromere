@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.cli.arguments;
+package com.blueprint.centromere.cli.parameters;
+
+import com.beust.jcommander.Parameter;
+import lombok.Data;
 
 /**
  * @author woemler
  * @since 0.5.0
  */
-public class ImportCommandArguments extends GenericCommandArguments {
-
+@Data
+public class ImportManifestCommandParameters {
+	
+	@Parameter(names = { "-f", "--file" }, required = true, description = "Input file path.  Required")
+	private String filePath;
+	
 }

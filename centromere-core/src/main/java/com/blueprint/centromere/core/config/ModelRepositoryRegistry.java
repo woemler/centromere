@@ -88,6 +88,24 @@ public class ModelRepositoryRegistry {
   public boolean isRegisteredModel(Class<?> model){
     return repositoryTypeMap.containsKey(model);
   }
+  
+  public boolean isRegisteredModel(String name) {
+    for (Class<?> model: repositoryTypeMap.keySet()){
+      if (name.equalsIgnoreCase(model.getName())) return true;
+      else if (name.equalsIgnoreCase(model.getSimpleName())) return true;
+      else if (name.equalsIgnoreCase(model.getSimpleName().replace(".class", ""))) return true;
+    }
+    return false;
+  }
+  
+  public Class<? extends Model<?>> getRegisteredModel(String name){
+    for (Class<? extends Model<?>> model: repositoryTypeMap.keySet()){
+      if (name.equalsIgnoreCase(model.getName())) return model;
+      else if (name.equalsIgnoreCase(model.getSimpleName())) return model;
+      else if (name.equalsIgnoreCase(model.getSimpleName().replace(".class", ""))) return model;
+    }
+    return null;
+  }
 
   public ModelRepository getRepositoryByModel(Class<?> model){
     return repositoryTypeMap.containsKey(model) ? repositoryTypeMap.get(model) : null;
@@ -95,6 +113,10 @@ public class ModelRepositoryRegistry {
 
   public Collection<Class<? extends Model<?>>> getRegisteredModels(){
     return repositoryTypeMap.keySet();
+  }
+  
+  public Collection<String> getRegisteredResources(){
+    return typeNameMap.keySet();
   }
 
   public Collection<ModelRepository<?,?>> getModelRepositories(){

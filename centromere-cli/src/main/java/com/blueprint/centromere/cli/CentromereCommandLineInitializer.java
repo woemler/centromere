@@ -19,6 +19,7 @@ package com.blueprint.centromere.cli;
 import com.blueprint.centromere.cli.config.CommandLineInputConfiguration;
 import com.blueprint.centromere.core.config.AutoConfigureCentromere;
 import com.blueprint.centromere.core.config.Profiles;
+import com.google.common.collect.ObjectArrays;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,35 +28,66 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
 /**
+ * Base class for creating Spring Boot executables for command line interfaces with Centromere data
+ *   warehouses. Main application classes should extend this and be annotated with {@link AutoConfigureCentromere}.
+ * 
  * @author woemler
  */
 @SpringBootApplication
 public class CentromereCommandLineInitializer {
-	
+
+  public static final String SINGLE_EXECUTION_COMMAND = "-X";
+  public static final String SINGLE_COMMAND_PROFILE = "single_command";
+  
 	private static final Logger logger = LoggerFactory.getLogger(CentromereCommandLineInitializer.class);
 
+  /**
+   * Create and execute a {@link org.springframework.boot.SpringApplication} with the configured Centromere
+   *   components.
+   * 
+   * @param source
+   * @param args
+   */
   public static void run(Class<?> source, String[] args){
     SpringApplicationBuilder builder = new SpringApplicationBuilder(source);
     builder.child(CommandLineInputConfiguration.class);
     builder.bannerMode((Mode.LOG));
     builder.web(false);
-    builder.profiles(getActiveProfiles(source));
+    builder.profiles(getActiveProfiles(source, args));
     logger.info(String.format("Running Centromere with arguments: %s", args.toString()));
     System.out.println("Starting Centromere CLI...\n");
     builder.run(args);
   }
 
-  private static String[] getActiveProfiles(Class<?> source){
+  /**
+   * Inspects the command line arguments and the target source application class to determine if any
+   *   additional profiles should be activated.  
+   * 
+   * @param source
+   * @param args
+   * @return
+   */
+  private static String[] getActiveProfiles(Class<?> source, String[] args){
+    
     String[] profiles;
+    
     if (source.isAnnotationPresent(AutoConfigureCentromere.class)){
       AutoConfigureCentromere annotation = source.getAnnotation(AutoConfigureCentromere.class);
       profiles = annotation.useCustomSchema() ?
-          new String[] { Profiles.CLI_PROFILE, Profiles.SCHEMA_CUSTOM } : new String[] { Profiles.CLI_PROFILE};
+          new String[] { Profiles.CLI_PROFILE, Profiles.SCHEMA_CUSTOM } : new String[] { Profiles.CLI_PROFILE };
       logger.info(String.format("Running Centromere with profiles: %s", Arrays.asList(profiles)));
     } else {
       logger.info("Running Centromere with default profiles.");
       profiles = new String[]{};
     }
+    
+    if (Arrays.asList(args).contains(SINGLE_EXECUTION_COMMAND)) {
+      logger.info("Running in single-command mode.");
+      profiles = ObjectArrays.concat(profiles, SINGLE_COMMAND_PROFILE);
+    } else {
+      logger.info("Running in interactive shell mode.");
+    }
+    
     return profiles;
   }
 	

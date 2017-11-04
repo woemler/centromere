@@ -17,20 +17,30 @@
 package com.blueprint.centromere.cli;
 
 import com.beust.jcommander.JCommander;
-import com.beust.jcommander.MissingCommandException;
+import com.beust.jcommander.ParameterException;
 import com.blueprint.centromere.cli.Printer.Level;
-import com.blueprint.centromere.cli.arguments.DeleteCommandArguments;
-import com.blueprint.centromere.cli.arguments.ImportCommandArguments;
-import com.blueprint.centromere.cli.arguments.ImportFileCommandArguments;
-import com.blueprint.centromere.cli.arguments.ImportManifestCommandArguments;
-import com.blueprint.centromere.cli.arguments.ListCommandArguments;
+import com.blueprint.centromere.cli.commands.CreateCommandExecutor;
+import com.blueprint.centromere.cli.commands.DeleteCommandExecutor;
+import com.blueprint.centromere.cli.commands.FileImportExecutor;
+import com.blueprint.centromere.cli.commands.ListCommandExecutor;
+import com.blueprint.centromere.cli.commands.ManifestImportExecutor;
+import com.blueprint.centromere.cli.commands.UpdateCommandExecutor;
+import com.blueprint.centromere.cli.parameters.BaseParameters;
+import com.blueprint.centromere.cli.parameters.CreateCommandParameters;
+import com.blueprint.centromere.cli.parameters.DeleteCommandParameters;
+import com.blueprint.centromere.cli.parameters.ImportFileCommandParameters;
+import com.blueprint.centromere.cli.parameters.ImportManifestCommandParameters;
+import com.blueprint.centromere.cli.parameters.ListCommandParameters;
+import com.blueprint.centromere.cli.parameters.UpdateCommandParameters;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 
 /**
  * Primary command line input handler.  Parses input and execute the appropriate functions.
@@ -38,51 +48,55 @@ import org.springframework.boot.CommandLineRunner;
  * @author woemler
  * @since 0.5.0
  */
-public class CommandLineInputExecutor implements CommandLineRunner {
+public class CommandLineInputExecutor implements ApplicationRunner {
+
+  private static final Logger logger = LoggerFactory.getLogger(CommandLineInputExecutor.class);
+  
+  public static final String IMPORT_COMMAND = "import";
+  public static final String BATCH_COMMAND = "batch";
+  public static final String CREATE_COMMAND = "create";
+  public static final String LIST_COMMAND = "list";
+  public static final String UPDATE_COMMAND = "update";
+  public static final String DELETE_COMMAND = "delete";
 	
   private FileImportExecutor fileImportExecutor;
 	private ManifestImportExecutor manifestImportExecutor;
 	private ListCommandExecutor listCommandExecutor;
 	private DeleteCommandExecutor deleteCommandExecutor;
+	private CreateCommandExecutor createCommandExecutor;
+	private UpdateCommandExecutor updateCommandExecutor;
+	private DataImportProperties dataImportProperties;
 	
-	public static final String IMPORT_COMMAND = "import";
-	public static final String IMPORT_FILE_COMMAND = "file";
-	public static final String IMPORT_BATCH_COMMAND = "batch";
-
-	public static final String LIST_COMMAND = "list";
-	public static final String DELETE_COMMAND = "delete";
-
-	private static final Logger logger = LoggerFactory.getLogger(CommandLineInputExecutor.class);
+	private JCommander jc;
 
   /**
    * Accepts command line input and passes it to processing methods.  Throws an exception to halt
    *   the pipeline if an error is hit in a runner.
-   * 
+   *
    * @param args string arguments from command line
    * @throws Exception Exception any exception thrown by runners
    */
-	@Override 
-	public void run(String... args) throws Exception {
-		int code = 1;
-		Date start = new Date();
-		try {
-			code = processArguments(args);
-		} finally {
-			Date end = new Date();
-			String message;
-			if (code > 0){
-			  message = String.format("Command line execution exited with errors.  Elapsed time: %s",
+  @Override
+  public void run(ApplicationArguments args) throws Exception {
+    int code = 1;
+    Date start = new Date();
+    try {
+      code = processArguments(args.getSourceArgs());
+    } finally {
+      Date end = new Date();
+      String message;
+      if (code > 0){
+        message = String.format("Command line execution exited with errors.  Elapsed time: %s",
             formatInterval(end.getTime() - start.getTime()));
-				
-			} else {
-				message = String.format("Command line execution finished.  Elapsed time: %s", 
-						formatInterval(end.getTime() - start.getTime()));
-			}
-			logger.info(message);
-		}
-		
-	}
 
+      } else {
+        message = String.format("Command line execution finished.  Elapsed time: %s",
+            formatInterval(end.getTime() - start.getTime()));
+      }
+      logger.info(message);
+    }
+  }
+  
   /**
    * Processes the input arguments and executes the appropriate action.  Uses JCommander for argument
    *   parsing.
@@ -92,89 +106,99 @@ public class CommandLineInputExecutor implements CommandLineRunner {
    * @throws Exception any exception thrown by runners
    */
 	private int processArguments(String... args) throws Exception {
-		
-		JCommander jc = new JCommander();
-		jc.setAcceptUnknownOptions(true);
-		
-		ImportCommandArguments importCommandArguments = new ImportCommandArguments();
-		ImportFileCommandArguments importFileCommandArguments = new ImportFileCommandArguments();
-		ImportManifestCommandArguments importManifestCommandArguments = new ImportManifestCommandArguments();
-		
-		jc.addCommand(IMPORT_COMMAND, importCommandArguments);
-		
-		JCommander importJc = jc.getCommands().get(IMPORT_COMMAND);
-		importJc.addCommand(IMPORT_FILE_COMMAND, importFileCommandArguments);
-		importJc.addCommand(IMPORT_BATCH_COMMAND, importManifestCommandArguments);
 
-    ListCommandArguments listCommandArguments = new ListCommandArguments();
-    jc.addCommand(LIST_COMMAND, listCommandArguments);
-    JCommander listJc = jc.getCommands().get(LIST_COMMAND);
-
-    DeleteCommandArguments deleteCommandArguments = new DeleteCommandArguments();
-    jc.addCommand(DELETE_COMMAND, deleteCommandArguments);
-    JCommander deleteJc = jc.getCommands().get(DELETE_COMMAND);
+    BaseParameters baseParameters = new BaseParameters();
+    ImportFileCommandParameters importParameters = new ImportFileCommandParameters();
+    ImportManifestCommandParameters batchParameters = new ImportManifestCommandParameters();
+    CreateCommandParameters createParameters = new CreateCommandParameters();
+    UpdateCommandParameters updateParameters = new UpdateCommandParameters();
+    ListCommandParameters listParameters = new ListCommandParameters();
+    DeleteCommandParameters deleteParameters = new DeleteCommandParameters();
+	  
+	  jc = JCommander.newBuilder()
+        .acceptUnknownOptions(true)
+        .addObject(baseParameters)
+        .addCommand(IMPORT_COMMAND, importParameters)
+        .addCommand(BATCH_COMMAND, batchParameters)
+        .addCommand(CreateCommandParameters.COMMAND, createParameters)
+        .addCommand(UpdateCommandParameters.COMMAND, updateParameters)
+        .addCommand(LIST_COMMAND, listParameters)
+        .addCommand(DELETE_COMMAND, deleteParameters)
+        .build();
     
 		int code = 1;
 		
 		try {
 			jc.parse(args);
-		} catch (MissingCommandException e){
-      unknownCommand();
+		} catch (ParameterException e){
+      jc.usage();
 			return code;
 		}
 		
 		String mainCommand = jc.getParsedCommand();
 		
 		// File import
-		if (IMPORT_COMMAND.equals(mainCommand)) {
+		if (ImportFileCommandParameters.COMMAND.equals(mainCommand)) {
+
+      Printer.print(String.format("Running import file command with arguments: %s",
+          importParameters.toString()), logger, Level.INFO);
+      try {
+        fileImportExecutor.run(importParameters);
+      } catch (Exception e) {
+        throw new CommandLineRunnerException(e);
+      }
+      code = 0;
       
-		  String importCommand = importJc.getParsedCommand();
-      
-		  // Single file import
-		  if (IMPORT_FILE_COMMAND.equals(importCommand)) {
-        logger.info(String.format("Running import file command with arguments: %s %s",
-            importFileCommandArguments.toString(), importCommandArguments.toString()));
-        try {
-          fileImportExecutor.run(importFileCommandArguments.getDataType(),
-              importFileCommandArguments.getFilePath());
-        } catch (Exception e) {
-          throw new CommandLineRunnerException(e);
-        }
-        code = 0;
-      
-      // Manifest import
-		  } else if (IMPORT_BATCH_COMMAND.equals(importCommand)) {
+    // Manifest import
+    } else if (BATCH_COMMAND.equals(mainCommand)) {
 		    
-        logger.info(String.format("Running import batch command with arguments: %s %s",
-            importManifestCommandArguments.toString(), importCommandArguments.toString()));
+        Printer.print(String.format("Running import batch command with arguments: %s ",
+            batchParameters.toString()), logger, Level.INFO);
         try {
-          manifestImportExecutor.run(importManifestCommandArguments.getFilePath());
+          manifestImportExecutor.run(batchParameters.getFilePath());
         } catch (Exception e){
           throw new CommandLineRunnerException(e);
         }
         code = 0;
       
-		  } else {
-		    
-        Printer.print(String.format("Unknown import command: %s", importCommand), logger, Level.ERROR);
-        System.out.println("\nAvailable import commands: ");
-        System.out.println("\n    file: Imports a single file.");
-        importJc.usage(IMPORT_FILE_COMMAND);
-        System.out.println("\n    batch: Imports multiple files, defined using a manifest file.");
-        importJc.usage(IMPORT_BATCH_COMMAND);
-        
-      }
-      
     } 
+    
+    // CREATE command
+    else if (CreateCommandParameters.COMMAND.equals(mainCommand)){
+		  
+		  Printer.print(String.format("Creating new model record with arguments: %s", 
+          createParameters.toString()), logger, Level.INFO);
+		  try {
+		    createCommandExecutor.run(createParameters);
+      } catch (Exception e){
+		    throw new CommandLineRunnerException(e);
+      }
+      code = 0;
+		  
+    }
+
+    // UPDATE command
+    else if (UpdateCommandParameters.COMMAND.equals(mainCommand)){
+
+      Printer.print(String.format("Updating existing model record with arguments: %s",
+          updateParameters.toString()), logger, Level.INFO);
+      try {
+        updateCommandExecutor.run(updateParameters);
+      } catch (Exception e){
+        throw new CommandLineRunnerException(e);
+      }
+      code = 0;
+
+    }
     
     // List command
     else if (LIST_COMMAND.equals(mainCommand)) {
 
       String listable = "";
-      if (listCommandArguments.getArgs() != null && !listCommandArguments.getArgs().isEmpty()) {
-        listable = listCommandArguments.getArgs().get(0);
+      if (listParameters.getArgs() != null && !listParameters.getArgs().isEmpty()) {
+        listable = listParameters.getArgs().get(0);
       }
-      listCommandExecutor.run(listable, listCommandArguments.getShowDetails());
+      listCommandExecutor.run(listable, listParameters.getShowDetails());
       code = 0;
 
     } 
@@ -183,7 +207,7 @@ public class CommandLineInputExecutor implements CommandLineRunner {
     else if (DELETE_COMMAND.equals(mainCommand)){
 
 		  String deleteable = "";
-      List<String> toDelete = deleteCommandArguments.getArgs();
+      List<String> toDelete = deleteParameters.getArgs();
 		  if (toDelete != null && !toDelete.isEmpty()){
         deleteable = toDelete.remove(0);
 		    if (toDelete.size() > 0) {
@@ -194,26 +218,19 @@ public class CommandLineInputExecutor implements CommandLineRunner {
         }
 		    
       } else {
-		    deleteJc.usage();
+		    //deleteJc.usage();
       }
 		  
 		} else {
-			unknownCommand();
+			jc.usage();
+			//code = 1;
 		}
 		
 		return code;
 		
 	}
 	
-	private void unknownCommand(){
-    logger.error("Invalid command");
-    System.out.println("ERROR: Invalid command");
-    System.out.println("Available commands: import, list, delete");
-    System.out.println("    import: Imports one or more files into the data warehouse.");
-    System.out.println("    list:   List available data models, file processors, imported files, and other resources.");
-    System.out.println("    delete:   Remove data sets, data files, and their associated records from the warehouse.");
-  }
-
+	
 	/**
 	 * From http://stackoverflow.com/a/6710604/1458983
 	 * Converts a long-formatted timespan into a human-readable string that denotes the length of time 
@@ -247,5 +264,21 @@ public class CommandLineInputExecutor implements CommandLineRunner {
   @Autowired
   public void setDeleteCommandExecutor(DeleteCommandExecutor deleteCommandExecutor) {
     this.deleteCommandExecutor = deleteCommandExecutor;
+  }
+
+  @Autowired
+  public void setCreateCommandExecutor(CreateCommandExecutor createCommandExecutor) {
+    this.createCommandExecutor = createCommandExecutor;
+  }
+
+  @Autowired
+  public void setDataImportProperties(DataImportProperties dataImportProperties) { 
+	  this.dataImportProperties = dataImportProperties;
+  }
+
+  @Autowired
+  public void setUpdateCommandExecutor(
+      UpdateCommandExecutor updateCommandExecutor) {
+    this.updateCommandExecutor = updateCommandExecutor;
   }
 }

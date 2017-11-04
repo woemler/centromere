@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.cli;
+package com.blueprint.centromere.cli.commands;
 
+import com.blueprint.centromere.cli.CommandLineRunnerException;
+import com.blueprint.centromere.cli.Printer;
 import com.blueprint.centromere.cli.Printer.Level;
 import com.blueprint.centromere.cli.manifest.ImportManifest;
 import com.blueprint.centromere.cli.manifest.ManifestFile;
+import com.blueprint.centromere.cli.parameters.ImportFileCommandParameters;
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
@@ -128,8 +131,11 @@ public class ManifestImportExecutor {
 			// Update environment properties
 			setEnvironmentProperties(mf.getParameters());
 			
+			//TODO: Set data set and data file objects in args
+      ImportFileCommandParameters importFileCommandParameters = new ImportFileCommandParameters();
+			
       try {
-        fileImportExecutor.run(mf.getType(), df.getAbsolutePath(), dataSet, dataFile);
+        fileImportExecutor.run(importFileCommandParameters);
       } catch (Exception e){
         if (dataImportProperties.isSkipInvalidFiles()){
           logger.warn(String.format("File processing failed, skipping file: %s", 
