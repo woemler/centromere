@@ -19,7 +19,6 @@ package com.blueprint.centromere.core.config;
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Sample;
-import com.blueprint.centromere.core.commons.model.Subject;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Data;
@@ -49,7 +48,6 @@ public class DataImportProperties {
   
   private DataSet dataSet = new DataSet();
   private DataFile dataFile = new DataFile();
-  private Subject subject = new Subject();
   private Sample sample = new Sample();
   
   public boolean hasAttribute(String attribute){

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 the original author or authors
+ * Copyright 2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,26 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.cli.parameters;
+package com.blueprint.centromere.core.commons.model;
 
-import com.beust.jcommander.Parameter;
-import lombok.Data;
+import com.blueprint.centromere.core.model.Model;
+import org.springframework.data.annotation.Id;
 
 /**
  * @author woemler
- * @since 0.5.0
  */
-@Data
-public class ImportManifestCommandParameters {
+public abstract class AbstractMongoModel implements Model<String> {
 	
-	@Parameter(names = { "-f", "--file" }, required = true, description = "Input file path.  Required")
-	private String filePath;
-	
+	@Id private String id;
+
+	@Override 
+	public String getId() {
+		return id;
+	}
+
+	@Override
+	public void setId(String id) {
+		this.id = id;
+	}
+
 }

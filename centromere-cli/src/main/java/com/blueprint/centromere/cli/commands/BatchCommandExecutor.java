@@ -21,7 +21,7 @@ import com.blueprint.centromere.cli.Printer;
 import com.blueprint.centromere.cli.Printer.Level;
 import com.blueprint.centromere.cli.manifest.ImportManifest;
 import com.blueprint.centromere.cli.manifest.ManifestFile;
-import com.blueprint.centromere.cli.parameters.ImportFileCommandParameters;
+import com.blueprint.centromere.cli.parameters.ImportCommandParameters;
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
@@ -42,14 +42,14 @@ import org.springframework.util.Assert;
  * @author woemler
  * @since 0.5.0
  */
-public class ManifestImportExecutor {
+public class BatchCommandExecutor {
 	
-	private FileImportExecutor fileImportExecutor;
+	private ImportCommandExecutor importCommandExecutor;
 	private DataSetRepository dataSetRepository;
 	private DataFileRepository dataFileRepository;
 	private DataImportProperties dataImportProperties;
 	
-	private static final Logger logger = LoggerFactory.getLogger(ManifestImportExecutor.class);
+	private static final Logger logger = LoggerFactory.getLogger(BatchCommandExecutor.class);
 	private static final String PROPERTY_PREFIX = "centromere.import.";
 	private static final String MANIFEST_PROPERTY_PREFIX = PROPERTY_PREFIX + "manifest.";
 	
@@ -83,20 +83,20 @@ public class ManifestImportExecutor {
 		
 		// Get the data set
     DataSet dataSet;
-    Optional<DataSet> dsOptional = dataSetRepository.findByShortName(manifest.getShortName());
+    Optional<DataSet> dsOptional = dataSetRepository.findBySlug(manifest.getSlug());
     if (dsOptional.isPresent()){
       dataSet = dsOptional.get();
       if (!dataImportProperties.isOverwriteExistingDataSets()){
-        Printer.print(String.format("Skipping existing data set: %s", manifest.getShortName()), 
+        Printer.print(String.format("Skipping existing data set: %s", manifest.getSlug()), 
             logger, Level.WARN);
         return;
       }
     } else {
       dataSet = new DataSet();
-      dataSet.setShortName(manifest.getShortName());
+      dataSet.setSlug(manifest.getSlug());
     }
-    if (manifest.getDisplayName() != null && !"".equalsIgnoreCase(manifest.getDisplayName())) {
-      dataSet.setDisplayName(manifest.getDisplayName());
+    if (manifest.getName() != null && !"".equalsIgnoreCase(manifest.getName())) {
+      dataSet.setName(manifest.getName());
     }
     if (manifest.getDescription() != null && !"".equalsIgnoreCase(manifest.getDescription())) {
       dataSet.setDescription(manifest.getDescription());
@@ -132,10 +132,10 @@ public class ManifestImportExecutor {
 			setEnvironmentProperties(mf.getParameters());
 			
 			//TODO: Set data set and data file objects in args
-      ImportFileCommandParameters importFileCommandParameters = new ImportFileCommandParameters();
+      ImportCommandParameters importCommandParameters = new ImportCommandParameters();
 			
       try {
-        fileImportExecutor.run(importFileCommandParameters);
+        importCommandExecutor.run(importCommandParameters);
       } catch (Exception e){
         if (dataImportProperties.isSkipInvalidFiles()){
           logger.warn(String.format("File processing failed, skipping file: %s", 
@@ -176,8 +176,8 @@ public class ManifestImportExecutor {
 	}
 
 	@Autowired
-	public void setFileImportExecutor(FileImportExecutor fileImportExecutor) {
-		this.fileImportExecutor = fileImportExecutor;
+	public void setImportCommandExecutor(ImportCommandExecutor importCommandExecutor) {
+		this.importCommandExecutor = importCommandExecutor;
 	}
 
 	@Autowired

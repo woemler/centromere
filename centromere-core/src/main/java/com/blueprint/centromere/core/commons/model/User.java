@@ -16,7 +16,6 @@
 
 package com.blueprint.centromere.core.commons.model;
 
-import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Ignored;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +33,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author woemler
  */
 @Document
-public class User extends AbstractModel implements UserDetails {
+public class User extends AbstractMongoModel implements UserDetails {
 	
 	@Indexed(unique = true) private String username;
 	@Ignored private String password;

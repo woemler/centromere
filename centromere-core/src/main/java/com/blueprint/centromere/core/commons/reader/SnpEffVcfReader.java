@@ -22,7 +22,6 @@ import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.support.AminoAcidConverter;
-import com.blueprint.centromere.core.commons.support.DataSetSupport;
 import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidDataFileException;
@@ -52,7 +51,6 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
   
   private final GeneRepository geneRepository;
   private final SampleRepository sampleRepository;
-  private final DataSetSupport dataSetSupport;
   private final DataImportProperties dataImportProperties;
   
   private boolean formatTestFlag = false;
@@ -60,12 +58,10 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
   public SnpEffVcfReader(
       GeneRepository geneRepository,
       SampleRepository sampleRepository,
-      DataSetSupport dataSetSupport,
       DataImportProperties dataImportProperties
   ) {
     this.geneRepository = geneRepository;
     this.sampleRepository = sampleRepository;
-    this.dataSetSupport = dataSetSupport;
     this.dataImportProperties = dataImportProperties;
   }
 
@@ -80,18 +76,18 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
     String[] bits = line.split(this.getDelimiter());
     for (int i = 9; i < bits.length; i++){
       
-      Sample sample = getSample(this.getHeaders().get(i));
-      if (sample == null){
+      Optional<Sample> sampleOptional = sampleRepository.bestGuess(getHeaders().get(i));
+      if (!sampleOptional.isPresent()){
         if (dataImportProperties.isSkipInvalidSamples()){
           continue;
         } else {
           throw new InvalidSampleException(String.format("Unable to identify sample: %s", this.getHeaders().get(i)));
         }
       }
-      
+      Sample sample = sampleOptional.get();
+
       Mutation mutation = new Mutation();
       mutation.setSampleId(sample.getId());
-      mutation.setSubjectId(sample.getSubjectId());
       mutation.setDataSetId(this.getDataSet().getId());
       mutation.setDataFileId(this.getDataFile().getId());
       
@@ -166,10 +162,6 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
     return transcripts;
   }
   
-  protected Sample getSample(String name) throws InvalidSampleException {
-    return dataSetSupport.findOrCreateSample(name, this.getDataSet()).orElse(null);
-  }
-  
   protected Gene getGene(String identifier) throws InvalidGeneException {
     Optional<Gene> optional = geneRepository.bestGuess(identifier);
     return optional.orElse(null);
@@ -225,9 +217,5 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
 
   public SampleRepository getSampleRepository() {
     return sampleRepository;
-  }
-  
-  public DataSetSupport getDataSetSupport() {
-    return dataSetSupport;
   }
 }

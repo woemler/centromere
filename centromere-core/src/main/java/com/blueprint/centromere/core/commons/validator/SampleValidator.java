@@ -38,7 +38,5 @@ public class SampleValidator implements Validator {
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "sampleType", "sampleType.empty");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "tissue", "tissue.empty");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "histology", "histology.empty");
-		if (((Sample) o).getDataSetId() == null) errors.reject("dataSetId", "dataSetId.empty");
-		if (((Sample) o).getSubjectId() == null) errors.reject("subjectId", "subjectId.empty");
 	}
 }

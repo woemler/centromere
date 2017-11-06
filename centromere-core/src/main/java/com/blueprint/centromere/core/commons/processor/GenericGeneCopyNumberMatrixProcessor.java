@@ -20,7 +20,7 @@ import com.blueprint.centromere.core.commons.model.GeneCopyNumber;
 import com.blueprint.centromere.core.commons.reader.GenericGeneCopyNumberMatrixReader;
 import com.blueprint.centromere.core.commons.repository.GeneCopyNumberRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.support.GenericDataSetSupport;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.validator.GeneCopyNumberValidator;
 import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.DataTypes;
@@ -42,14 +42,12 @@ public class GenericGeneCopyNumberMatrixProcessor extends GenericRecordProcessor
   public GenericGeneCopyNumberMatrixProcessor(
       GeneRepository geneRepository,
       GeneCopyNumberRepository repository,
-      GenericDataSetSupport genericDataSetSupport,
+      SampleRepository sampleRepository,
       DataImportProperties dataImportProperties
   ) {
-    this.setReader(new GenericGeneCopyNumberMatrixReader(geneRepository, genericDataSetSupport, dataImportProperties));
+    this.setReader(new GenericGeneCopyNumberMatrixReader(geneRepository, sampleRepository, dataImportProperties));
     this.setValidator(new GeneCopyNumberValidator());
     this.setWriter(new RepositoryRecordWriter<>(repository, WriteMode.INSERT, 200));
-//    this.setWriter(new MongoImportTempFileWriter<>(dataImportProperties, mongoTemplate));
-//    this.setImporter(new MongoImportTempFileImporter<>(GeneCopyNumber.class, databaseProperties));
     this.setModel(GeneCopyNumber.class);
   }
   

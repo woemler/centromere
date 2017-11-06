@@ -27,12 +27,10 @@ import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Sample;
-import com.blueprint.centromere.core.commons.model.Subject;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.ws.WebTestInitializer;
@@ -60,7 +58,6 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
 
   @Autowired private GeneRepository geneRepository;
   @Autowired private SampleRepository sampleRepository;
-  @Autowired private SubjectRepository subjectRepository;
   @Autowired private DataSetRepository dataSetRepository;
   @Autowired private DataFileRepository dataFileRepository;
   @Autowired private MockMvc mockMvc;
@@ -118,25 +115,13 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
   @Test
   public void findDataBySampleMetadata() throws Exception {
 
-    Sample sample = sampleRepository.findByName("SampleA").get(0);
+    Sample sample = sampleRepository.findByName("SampleA").get();
 
     mockMvc.perform(get(DATA_URL + "/sample?name=SampleA"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[0]", hasKey("sampleId")))
         .andExpect(jsonPath("$[0].sampleId", is(sample.getId())));
-  }
-
-  @Test
-  public void findDataBySubjectMetadata() throws Exception {
-
-    Subject subject = subjectRepository.findByName("SubjectA").get();
-
-    mockMvc.perform(get(DATA_URL + "/subject?name=SubjectA"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(6)))
-        .andExpect(jsonPath("$[0]", hasKey("subjectId")))
-        .andExpect(jsonPath("$[0].subjectId", is(subject.getId())));
   }
 
   @Test
@@ -154,9 +139,9 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
   @Test
   public void findDataByDataSetMetadata() throws Exception {
 
-    DataSet dataSet = dataSetRepository.findByShortName("DataSetA").get();
+    DataSet dataSet = dataSetRepository.findBySlug("DataSetA").get();
 
-    mockMvc.perform(get(DATA_URL + "/dataset?shortName=DataSetA"))
+    mockMvc.perform(get(DATA_URL + "/dataset?slug=DataSetA"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(6)))
         .andExpect(jsonPath("$[0]", hasKey("dataSetId")))

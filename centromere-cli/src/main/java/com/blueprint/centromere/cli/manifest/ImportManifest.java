@@ -18,20 +18,22 @@ package com.blueprint.centromere.cli.manifest;
 
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.github.slugify.Slugify;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import lombok.Data;
 
 /**
  * @author woemler
  * @since 0.5.0
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Data
 public class ImportManifest {
     
   private String name;
-  private String shortName;
-  private String displayName;
+  private String slug;
   private String source;
   private String version;
   private String description;
@@ -39,105 +41,20 @@ public class ImportManifest {
   private LinkedHashMap<String, String> attributes = new LinkedHashMap<>();
   private List<ManifestFile> files = new ArrayList<>();
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getShortName() {
-    return shortName;
-  }
-
-  public void setShortName(String shortName) {
-    this.shortName = shortName;
-  }
-
-  public String getDisplayName() {
-    return displayName;
-  }
-
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
-  }
-
-  public String getSource() {
-    return source;
-  }
-
-  public void setSource(String source) {
-    this.source = source;
-  }
-
-  public String getVersion() {
-    return version;
-  }
-
-  public void setVersion(String version) {
-    this.version = version;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public LinkedHashMap<String, String> getParameters() {
-    return parameters;
-  }
-
-  public void setParameters(LinkedHashMap<String, String> parameters) {
-    this.parameters = parameters;
-  }
-
-  public LinkedHashMap<String, String> getAttributes() {
-    return attributes;
-  }
-
-  public void setAttributes(LinkedHashMap<String, String> attributes) {
-    this.attributes = attributes;
-  }
-
-  public List<ManifestFile> getFiles() {
-    return files;
-  }
-
-  public void setFiles(List<ManifestFile> files) {
-    this.files = files;
-  }
-  
   public DataSet createDataSet(){
     DataSet dataSet = new DataSet();
-    if (name != null){
-      dataSet.setDisplayName(name);
-      dataSet.setShortName(name.toLowerCase().replaceAll("[^a-z0-9\\s]]", "").replaceAll("\\s+", "-"));
+    dataSet.setName(name);
+    if (slug != null) {
+      dataSet.setSlug(slug);
+    } else {
+      dataSet.setSlug(new Slugify().slugify(name));
     }
-    if (displayName != null) dataSet.setDisplayName(displayName);
-    if (shortName != null) dataSet.setShortName(shortName);
     dataSet.setDescription(description);
     dataSet.setSource(source);
     dataSet.setVersion(version);
     dataSet.setAttributes(attributes);
+    dataSet.setParameters(parameters);
     return dataSet;
   }
 
-  @Override
-  public String toString() {
-    return "ImportManifest{" +
-        "name='" + name + '\'' +
-        ", shortName='" + shortName + '\'' +
-        ", displayName='" + displayName + '\'' +
-        ", source='" + source + '\'' +
-        ", version='" + version + '\'' +
-        ", description='" + description + '\'' +
-        ", parameters=" + parameters +
-        ", attributes=" + attributes +
-        ", files=" + files +
-        '}';
-  }
 }

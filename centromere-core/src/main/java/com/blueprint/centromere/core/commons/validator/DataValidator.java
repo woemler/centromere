@@ -32,7 +32,6 @@ public abstract class DataValidator implements Validator {
     if (data.getDataSetId() == null) errors.reject("dataSetId", "dataSetId.empty");
 		if (data.getGeneId() == null) errors.reject("geneId", "geneId.empty");
 		if (data.getSampleId() == null) errors.reject("sampleId", "sampleId.empty");
-    if (data.getSubjectId() == null) errors.reject("subjectId", "subjectId.empty");
 	}
 	
 }

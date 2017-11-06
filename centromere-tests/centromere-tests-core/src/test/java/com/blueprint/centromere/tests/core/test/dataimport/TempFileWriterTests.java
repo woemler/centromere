@@ -8,7 +8,6 @@ import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.config.CoreConfiguration;
 import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.writer.DelimtedTextFileWriter;
@@ -32,7 +31,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class TempFileWriterTests extends AbstractRepositoryTests {
 
   @Autowired private SampleRepository sampleRepository;
-  @Autowired private SubjectRepository subjectRepository;
   @Autowired private DataFileRepository dataFileRepository;
   @Autowired private DataSetRepository dataSetRepository;
   @Autowired private GeneRepository geneRepository;
@@ -45,8 +43,8 @@ public class TempFileWriterTests extends AbstractRepositoryTests {
         new DelimtedTextFileWriter<>(new DataImportProperties(), GeneExpression.class);
     String path = writer.getTempFilePath("/path/to/fake/file.txt");
     DataSet dataSet = new DataSet();
-    dataSet.setShortName("test");
-    dataSet.setDisplayName("Test");
+    dataSet.setSlug("test");
+    dataSet.setName("Test");
     dataSet.setId("test");
     DataFile dataFile = new DataFile();
     dataFile.setFilePath(path);

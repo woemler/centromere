@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.commons.reader;
 
-import com.blueprint.centromere.core.commons.model.Subject;
+import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.dataimport.reader.ColumnRecordFileReader;
 
 /**
@@ -24,14 +24,14 @@ import com.blueprint.centromere.core.dataimport.reader.ColumnRecordFileReader;
  * 
  * @author woemler
  */
-public class TcgaSubjectReader extends ColumnRecordFileReader<Subject> {
+public class TcgaSampleReader extends ColumnRecordFileReader<Sample> {
 
-  public TcgaSubjectReader() {
-    super(Subject.class);
+  public TcgaSampleReader() {
+    super(Sample.class);
   }
 
   @Override
-  protected void setModelAttribute(Subject record, String attribute, String value) {
+  protected void setModelAttribute(Sample record, String attribute, String value) {
     if (attribute.equalsIgnoreCase("hybridization ref")){
       record.setName(value.toLowerCase());
     } else if (attribute.equalsIgnoreCase("gender")){

@@ -20,7 +20,7 @@ import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.reader.GctGeneExpressionFileReader;
 import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.support.GenericDataSetSupport;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.validator.GeneExpressionValidator;
 import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.DataTypes;
@@ -42,11 +42,11 @@ public class GctGeneExpressionProcessor extends GenericRecordProcessor<GeneExpre
   public GctGeneExpressionProcessor(
       GeneRepository geneRepository, 
       GeneExpressionRepository repository,
-      GenericDataSetSupport genericDataSetSupport,
+      SampleRepository sampleRepository,
       DataImportProperties dataImportProperties
   ) {
     this.setModel(GeneExpression.class);
-    this.setReader(new GctGeneExpressionFileReader(geneRepository, genericDataSetSupport, dataImportProperties));
+    this.setReader(new GctGeneExpressionFileReader(geneRepository, sampleRepository, dataImportProperties));
     this.setValidator(new GeneExpressionValidator());
     this.setWriter(new RepositoryRecordWriter<>(repository, WriteMode.INSERT, 200));
 //    this.setWriter(new MongoImportTempFileWriter<>(dataImportProperties, mongoTemplate));

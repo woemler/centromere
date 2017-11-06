@@ -21,7 +21,7 @@ import com.blueprint.centromere.cli.CommandLineRunnerException;
 import com.blueprint.centromere.cli.ModelProcessorBeanRegistry;
 import com.blueprint.centromere.cli.Printer;
 import com.blueprint.centromere.cli.Printer.Level;
-import com.blueprint.centromere.cli.parameters.ImportFileCommandParameters;
+import com.blueprint.centromere.cli.parameters.ImportCommandParameters;
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
@@ -51,7 +51,7 @@ import org.springframework.data.repository.support.Repositories;
  * @author woemler
  * @since 0.5.0
  */
-public class FileImportExecutor {
+public class ImportCommandExecutor {
 	
 	private ModelProcessorBeanRegistry processorRegistry;
 	private DataSetRepository dataSetRepository;
@@ -59,9 +59,9 @@ public class FileImportExecutor {
 	private Repositories repositories;
 	private DataImportProperties dataImportProperties;
 	
-	private static final Logger logger = LoggerFactory.getLogger(FileImportExecutor.class);
+	private static final Logger logger = LoggerFactory.getLogger(ImportCommandExecutor.class);
 	
-	public void run(ImportFileCommandParameters parameters) throws CommandLineRunnerException {
+	public void run(ImportCommandParameters parameters) throws CommandLineRunnerException {
 	  
 	  // If help flag is active, show info and exit.
 	  if (parameters.isHelp()){
@@ -71,6 +71,7 @@ public class FileImportExecutor {
 	  
 	  String dataType = parameters.getDataType();
 	  String filePath = parameters.getFilePath();
+	  String dataSetKey = parameters.getDataSetKey();
 	  updateDataImportProperties(parameters);
 
     // Check to make sure the target data type is supported and get the processor
@@ -82,30 +83,17 @@ public class FileImportExecutor {
     logger.info(String.format("Using record processor: %s", processor.getClass().getName()));
 		Printer.print(String.format("Running file import: data-type=%s  file=%s", dataType, filePath), logger, Level.INFO);
 		
-	  // If data set ID is specified, get the record
-    DataSet dataSet = null;
-    if (parameters.getDataSetKey() != null){
-      Optional<DataSet> dataSetOptional = Optional.ofNullable(dataSetRepository.findOne(parameters.getDataSetKey()));
-      if (!dataSetOptional.isPresent()){
-        dataSetOptional = dataSetRepository.findByShortName(parameters.getDataSetKey());
-      }
-      if (!dataSetOptional.isPresent()){
-        throw new CommandLineRunnerException(String.format("Unable to identify data set using key: %s", 
-            parameters.getDataSetKey()));
-      }
-      dataSet = dataSetOptional.get();
-      Printer.print(String.format("Using DataSet record: %s", dataSet.toString()), logger, Level.INFO);
+	  // Get the data set
+    Optional<DataSet> dataSetOptional = Optional.ofNullable(dataSetRepository.findOne(dataSetKey));
+    if (!dataSetOptional.isPresent()){
+      dataSetOptional = dataSetRepository.findBySlug(dataSetKey);
     }
-    
-    // If data set is not set, use the default
-    if (dataSet == null){
-      dataSet = dataImportProperties.getDataSet();
-      Optional<DataSet> dataSetOptional = dataSetRepository.findByShortName(dataSet.getShortName());
-      if (!dataSetOptional.isPresent()){
-        Printer.print(String.format("Registering new data set: %s", dataSet.toString()), logger, Level.INFO);
-        dataSet = dataSetRepository.insert(dataSet);
-      }
+    if (!dataSetOptional.isPresent()){
+      throw new CommandLineRunnerException(String.format("Unable to identify data set using key: %s",
+          parameters.getDataSetKey()));
     }
+    DataSet dataSet = dataSetOptional.get();
+    Printer.print(String.format("Using DataSet record: %s", dataSet.toString()), logger, Level.INFO);
 
     // Get the data file record
     DataFile dataFile;
@@ -243,7 +231,7 @@ public class FileImportExecutor {
    */
 	private void showHelp() {
     JCommander.newBuilder()
-        .addCommand(ImportFileCommandParameters.COMMAND, new ImportFileCommandParameters())
+        .addCommand(ImportCommandParameters.COMMAND, new ImportCommandParameters())
         .build()
         .usage();
     System.out.println("\nAvailable data types:");
@@ -255,12 +243,12 @@ public class FileImportExecutor {
     System.out.println("\nAvailable data sets:");
     System.out.println("    ShortName  ID");
     System.out.println("    ----  -----------");
-    for (DataSet dataSet: dataSetRepository.findAll(new Sort(Direction.ASC, "shortName"))){
-      System.out.println(String.format("    %s: %s", dataSet.getShortName(), dataSet.getId()));
+    for (DataSet dataSet: dataSetRepository.findAll(new Sort(Direction.ASC, "slug"))){
+      System.out.println(String.format("    %s: %s", dataSet.getSlug(), dataSet.getId()));
     }
   }
 	
-  private void updateDataImportProperties(ImportFileCommandParameters parameters){
+  private void updateDataImportProperties(ImportCommandParameters parameters){
 	  if (parameters.isSkipInvalidFiles()) dataImportProperties.setSkipInvalidFiles(true);
     if (parameters.isSkipInvalidGenes()) dataImportProperties.setSkipInvalidGenes(true);
     if (parameters.isSkipInvalidRecords()) dataImportProperties.setSkipInvalidRecords(true);

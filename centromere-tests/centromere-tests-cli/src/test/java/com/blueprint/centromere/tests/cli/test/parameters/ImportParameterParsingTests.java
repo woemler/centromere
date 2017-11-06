@@ -2,7 +2,7 @@ package com.blueprint.centromere.tests.cli.test.parameters;
 
 import com.beust.jcommander.JCommander;
 import com.blueprint.centromere.cli.parameters.BaseParameters;
-import com.blueprint.centromere.cli.parameters.ImportFileCommandParameters;
+import com.blueprint.centromere.cli.parameters.ImportCommandParameters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.core.io.ClassPathResource;
@@ -23,12 +23,12 @@ public class ImportParameterParsingTests {
   @Test
   public void fileImportParameterTest() throws Exception {
     
-    ImportFileCommandParameters parameters = new ImportFileCommandParameters();
+    ImportCommandParameters parameters = new ImportCommandParameters();
     BaseParameters baseParameters = new BaseParameters();
     Exception exception = null;
     JCommander jc = null;
     String[] args = { "import", "-f", exampleFile.getFile().getAbsolutePath(), "-t", "gene_info", 
-        "--skip-invalid-genes", "-o", "-X", "--spring.profiles.active=test" };
+        "-d", "1234", "--skip-invalid-genes", "-o", "-X", "--spring.profiles.active=test" };
     
     try {
       jc = JCommander.newBuilder()
@@ -62,7 +62,7 @@ public class ImportParameterParsingTests {
   @Test
   public void fileImportMissingCommandTest() throws Exception {
 
-    ImportFileCommandParameters parameters = new ImportFileCommandParameters();
+    ImportCommandParameters parameters = new ImportCommandParameters();
     BaseParameters baseParameters = new BaseParameters();
     Exception exception = null;
     JCommander jc = null;
@@ -99,7 +99,7 @@ public class ImportParameterParsingTests {
   @Test
   public void fileImportInvalidCommandTest() throws Exception {
 
-    ImportFileCommandParameters parameters = new ImportFileCommandParameters();
+    ImportCommandParameters parameters = new ImportCommandParameters();
     BaseParameters baseParameters = new BaseParameters();
     Exception exception = null;
     JCommander jc = null;
@@ -136,7 +136,7 @@ public class ImportParameterParsingTests {
   @Test
   public void fileImportMetadataArgTest() throws Exception {
 
-    ImportFileCommandParameters parameters = new ImportFileCommandParameters();
+    ImportCommandParameters parameters = new ImportCommandParameters();
     BaseParameters baseParameters = new BaseParameters();
     Exception exception = null;
     JCommander jc = null;

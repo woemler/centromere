@@ -18,8 +18,8 @@ package com.blueprint.centromere.tests.core.test.commons;
 
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.model.Subject;
-import com.blueprint.centromere.core.commons.reader.TcgaSubjectReader;
+import com.blueprint.centromere.core.commons.model.Sample;
+import com.blueprint.centromere.core.commons.reader.TcgaSampleReader;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
@@ -36,7 +36,7 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class SubjectTests {
+public class SampleTests {
 
   @Autowired private Environment environment;
 
@@ -44,37 +44,37 @@ public class SubjectTests {
 	public void tcgaSubjectReaderTest() throws Exception {
     ClassPathResource resource = new ClassPathResource("samples/tcga_sample_subjects.txt");
 	  DataSet dataSet = new DataSet();
-		dataSet.setShortName("test");
-		dataSet.setDisplayName("Test");
+		dataSet.setSlug("test");
+		dataSet.setName("Test");
 		dataSet.setId("test");
 		DataFile dataFile = new DataFile();
 		dataFile.setFilePath(resource.getPath());
 		dataFile.setDataSetId(dataSet.getId());
 		dataFile.setId("test");
-		TcgaSubjectReader reader = new TcgaSubjectReader();
+		TcgaSampleReader reader = new TcgaSampleReader();
 		reader.setDataSet(dataSet);
 		reader.setDataFile(dataFile);
-		Assert.isTrue(Subject.class.equals(reader.getModel()), String.format("Expected %s, got %s",
-    Subject.class.getName(), reader.getModel().getName()));
-    List<Subject> subjects = new ArrayList<>();
+		Assert.isTrue(Sample.class.equals(reader.getModel()), String.format("Expected %s, got %s",
+    Sample.class.getName(), reader.getModel().getName()));
+    List<Sample> samples = new ArrayList<>();
 		try {
 			reader.doBefore();
-			Subject subject = reader.readRecord();
-      while (subject != null){
-          subjects.add(subject);
-          subject = reader.readRecord();
+			Sample sample = reader.readRecord();
+      while (sample != null){
+          samples.add(sample);
+          sample = reader.readRecord();
       }
 		} finally {
 			reader.doAfter();
 		}
-		Assert.notEmpty(subjects);
-    System.out.println(subjects.toString());
-    Assert.isTrue(subjects.size() == 5);
-    Subject subject = subjects.get(0);
+		Assert.notEmpty(samples);
+    System.out.println(samples.toString());
+    Assert.isTrue(samples.size() == 5);
+    Sample subject = samples.get(0);
     Assert.notNull(subject);
     Assert.isTrue("tcga-2y-a9gv".equals(subject.getName()));
     Assert.isTrue("liver".equals(subject.getAttribute("tumor_tissue_site")));
-    subject = subjects.get(4);
+    subject = samples.get(4);
     Assert.notNull(subject);
     Assert.isTrue("tcga-bc-a110".equals(subject.getName()));
     Assert.isTrue("black or african american".equals(subject.getAttribute("race")));

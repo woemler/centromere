@@ -47,10 +47,10 @@ public class CreateCommandTests extends AbstractRepositoryTests {
   @Test
   public void createDataSetTest(){
 
-    Optional<DataSet> optional = dataSetRepository.findByShortName("test");
+    Optional<DataSet> optional = dataSetRepository.findBySlug("test");
     Assert.isTrue(!optional.isPresent(), "DataSet must not exist already.");
     
-    String json = "{\"shortName\": \"test\", \"displayName\": \"This is a test\", \"source\": \"internal\"}";
+    String json = "{\"slug\": \"test\", \"name\": \"This is a test\", \"source\": \"internal\"}";
     CreateCommandParameters parameters = new CreateCommandParameters();
     parameters.setModel("dataset");
     parameters.setData(json);
@@ -63,11 +63,11 @@ public class CreateCommandTests extends AbstractRepositoryTests {
     }
     Assert.isTrue(exception == null, "Exception must be null");
 
-    optional = dataSetRepository.findByShortName("test");
+    optional = dataSetRepository.findBySlug("test");
     Assert.isTrue(optional.isPresent());
     DataSet dataSet = optional.get();
-    Assert.isTrue("test".equals(dataSet.getShortName()));
-    Assert.isTrue("This is a test".equals(dataSet.getDisplayName()));
+    Assert.isTrue("test".equals(dataSet.getSlug()));
+    Assert.isTrue("This is a test".equals(dataSet.getName()));
     Assert.isTrue("internal".equals(dataSet.getSource()));
     Assert.isTrue(dataSet.getDescription() == null);
     
@@ -76,10 +76,10 @@ public class CreateCommandTests extends AbstractRepositoryTests {
   @Test
   public void duplicateDataSetTest(){
 
-    Optional<DataSet> optional = dataSetRepository.findByShortName("DataSetA");
+    Optional<DataSet> optional = dataSetRepository.findBySlug("DataSetA");
     Assert.isTrue(optional.isPresent(), "DataSet must exist already.");
 
-    String json = "{\"shortName\": \"DataSetA\", \"displayName\": \"This is a test\", \"source\": \"internal\"}";
+    String json = "{\"slug\": \"DataSetA\", \"name\": \"This is a test\", \"source\": \"internal\"}";
     CreateCommandParameters parameters = new CreateCommandParameters();
     parameters.setModel("dataset");
     parameters.setData(json);
@@ -94,17 +94,17 @@ public class CreateCommandTests extends AbstractRepositoryTests {
     Assert.isTrue(exception instanceof CommandLineRunnerException, "Expected CommandLineRunnerException, but was " 
         + exception.getClass().getSimpleName());
 
-    optional = dataSetRepository.findByShortName("DataSetA");
+    optional = dataSetRepository.findBySlug("DataSetA");
     Assert.isTrue(optional.isPresent());
     DataSet dataSet = optional.get();
-    Assert.isTrue("DataSetA".equals(dataSet.getShortName()));
+    Assert.isTrue("DataSetA".equals(dataSet.getSlug()));
     
   }
 
   @Test
   public void invalidModelTest(){
 
-    String json = "{\"shortName\": \"test\", \"displayName\": \"This is a test\", \"source\": \"internal\"}";
+    String json = "{\"slug\": \"test\", \"name\": \"This is a test\", \"source\": \"internal\"}";
     CreateCommandParameters parameters = new CreateCommandParameters();
     parameters.setModel("invalid");
     parameters.setData(json);
@@ -124,7 +124,7 @@ public class CreateCommandTests extends AbstractRepositoryTests {
   @Test
   public void badJsonTest(){
 
-    String json = "{\"shortName\" \"test\", \"displayName\" \"This is a test\", \"source\" \"internal\"}";
+    String json = "{\"slug\" \"test\", \"name\" \"This is a test\", \"source\" \"internal\"}";
     CreateCommandParameters parameters = new CreateCommandParameters();
     parameters.setModel("dataset");
     parameters.setData(json);
@@ -144,7 +144,7 @@ public class CreateCommandTests extends AbstractRepositoryTests {
   @Test
   public void invalidAttributeTest(){
 
-    String json = "{\"shortName\" \"test\", \"displayName\" \"This is a test\", \"invalid\" \"internal\"}";
+    String json = "{\"slug\" \"test\", \"name\" \"This is a test\", \"invalid\" \"internal\"}";
     CreateCommandParameters parameters = new CreateCommandParameters();
     parameters.setModel("dataset");
     parameters.setData(json);

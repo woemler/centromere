@@ -1,6 +1,6 @@
 <manifest>
-    <displayName>Test Manifest</displayName>
-    <shortName>test</shortName>
+    <name>Test Manifest</name>
+    <slug>test</slug>
     <description>This is a test</description>
     <source>internal</source>
     <version>1.0</version>

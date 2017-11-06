@@ -90,9 +90,11 @@ public class TermTests extends AbstractRepositoryTests {
     for (Term term: terms){
       termMap.put(term.getField(), term);
     }
+    System.out.println(termMap.toString());
     Assert.isTrue(termMap.containsKey("age"));
     Assert.isTrue(termMap.containsKey("type"));
-    Assert.isTrue(!termMap.containsKey("sampleType"));
+    Assert.isTrue(termMap.containsKey("sampleType"));
+    Assert.isTrue(!termMap.containsKey("gender"));
   }
   
   @Test

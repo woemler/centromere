@@ -1,6 +1,6 @@
 {
-  "displayName": "Test Manifest",
-  "shortName": "test",
+  "name": "Test Manifest",
+  "slug": "test",
   "description": "This is a test",
   "source": "internal",
   "version": "1.0",

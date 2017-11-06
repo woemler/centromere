@@ -26,7 +26,7 @@ import lombok.Data;
  */
 @Data
 @Parameters(commandDescription = "")
-public class ImportFileCommandParameters {
+public class ImportCommandParameters {
   
   public static final String COMMAND = "import";
 	
@@ -36,14 +36,14 @@ public class ImportFileCommandParameters {
 	@Parameter(names = { "-t", "--type" }, required = true, 
       description = "Data type label for the target file.  Required.")
 	private String dataType;
+
+  @Parameter(names = { "-d", "--data-set" }, required = true, description = "Identifier used to identify " 
+      + "the associated data set.  If not specified, the file will not be associated with any data set.")
+  private String dataSetKey;
 	
 	@Parameter(names = { "-o", "--overwrite" }, description = "If the target file already exists in the " 
       + "data warehouse, its records will be wiped and the file re-imported.")
   private boolean overwrite = false;
-
-  @Parameter(names = { "-d", "--data-set" }, description = "Identifier used to identify the associated data set.  " 
-      + "If not specified, the file will not be associated with any data set.")
-  private String dataSetKey;
 
   @Parameter(names = { "-s", "--sample" }, description = "Identifier used to associate all contained " 
       + "file data with a single sample.  Useful if the file contains no sample identifiers, or if the " 

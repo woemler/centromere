@@ -19,8 +19,8 @@ package com.blueprint.centromere.core.commons.processor;
 import com.blueprint.centromere.core.commons.model.TranscriptExpression;
 import com.blueprint.centromere.core.commons.reader.GctTranscriptExpressionFileReader;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.repository.TranscriptExpressionRepository;
-import com.blueprint.centromere.core.commons.support.GenericDataSetSupport;
 import com.blueprint.centromere.core.commons.validator.TranscriptExpressionValidator;
 import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.DataTypes;
@@ -42,14 +42,12 @@ public class GctTranscriptExpressionProcessor extends GenericRecordProcessor<Tra
   public GctTranscriptExpressionProcessor(
       GeneRepository geneRepository, 
       TranscriptExpressionRepository repository,
-      GenericDataSetSupport genericDataSetSupport,
+      SampleRepository sampleRepository,
       DataImportProperties dataImportProperties
   ) {
     this.setModel(TranscriptExpression.class);
-    this.setReader(new GctTranscriptExpressionFileReader(geneRepository, genericDataSetSupport, dataImportProperties));
+    this.setReader(new GctTranscriptExpressionFileReader(geneRepository, sampleRepository, dataImportProperties));
     this.setValidator(new TranscriptExpressionValidator());
     this.setWriter(new RepositoryRecordWriter<>(repository, WriteMode.INSERT, 200));
-//    this.setWriter(new MongoImportTempFileWriter<>(dataImportProperties, mongoTemplate));
-//    this.setImporter(new MongoImportTempFileImporter<>(TranscriptExpression.class, databaseProperties));
   }
 }

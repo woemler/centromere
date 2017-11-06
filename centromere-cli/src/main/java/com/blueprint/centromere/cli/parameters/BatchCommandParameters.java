@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.model;
+package com.blueprint.centromere.cli.parameters;
 
-import org.springframework.data.annotation.Id;
+import com.beust.jcommander.Parameter;
+import lombok.Data;
 
 /**
  * @author woemler
+ * @since 0.5.0
  */
-public abstract class AbstractModel implements Model<String> {
+@Data
+public class BatchCommandParameters {
 	
-	@Id private String id;
-
-	@Override 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
+	@Parameter(names = { "-f", "--file" }, required = true, description = "Input file path.  Required")
+	private String filePath;
+	
 }

@@ -27,12 +27,10 @@ import java.util.List;
 public interface DataOperations<T extends Model<?>> {
 	List<T> findByDataFileId(String dataFileId);
 	List<T> findBySampleId(String sampleId);
-	List<T> findBySubjectId(String subjectId);
 	List<T> findByGeneId(String geneId);
 	List<T> findByDataSetId(String dataSetId);
 	void deleteByDataFileId(String dataFileId);
   void deleteBySampleId(String sampleId);
-  void deleteBySubjectId(String subjectId);
   void deleteByGeneId(String geneId);
   void deleteByDataSetId(String dataSetId);
 }

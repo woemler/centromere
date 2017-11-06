@@ -19,11 +19,11 @@ package com.blueprint.centromere.cli.config;
 import com.blueprint.centromere.cli.CentromereCommandLineInitializer;
 import com.blueprint.centromere.cli.CommandLineInputExecutor;
 import com.blueprint.centromere.cli.ModelProcessorBeanRegistry;
+import com.blueprint.centromere.cli.commands.BatchCommandExecutor;
 import com.blueprint.centromere.cli.commands.CreateCommandExecutor;
 import com.blueprint.centromere.cli.commands.DeleteCommandExecutor;
-import com.blueprint.centromere.cli.commands.FileImportExecutor;
+import com.blueprint.centromere.cli.commands.ImportCommandExecutor;
 import com.blueprint.centromere.cli.commands.ListCommandExecutor;
-import com.blueprint.centromere.cli.commands.ManifestImportExecutor;
 import com.blueprint.centromere.cli.commands.UpdateCommandExecutor;
 import com.blueprint.centromere.core.config.Profiles;
 import org.springframework.context.ApplicationContext;
@@ -45,13 +45,13 @@ public class CommandLineInputConfiguration {
 	}
 	
 	@Bean
-	public FileImportExecutor fileImportExecutor(){
-		return new FileImportExecutor();
+	public ImportCommandExecutor fileImportExecutor(){
+		return new ImportCommandExecutor();
 	}
 	
 	@Bean
-	public ManifestImportExecutor manifestImportExecutor(){
-		return new ManifestImportExecutor();
+	public BatchCommandExecutor manifestImportExecutor(){
+		return new BatchCommandExecutor();
 	}
 	
 	@Bean

@@ -18,12 +18,11 @@ package com.blueprint.centromere.tests.core.test.repository;
 
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Gene;
-import com.blueprint.centromere.core.commons.model.Subject;
+import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.config.CoreConfiguration;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
@@ -48,7 +47,6 @@ public class CommonsModelRepositoryTests extends AbstractRepositoryTests {
 
   @Autowired private GeneRepository geneRepository;
   @Autowired private SampleRepository sampleRepository;
-  @Autowired private SubjectRepository subjectRepository;
   @Autowired private DataSetRepository dataSetRepository;
   @Autowired private DataFileRepository dataFileRepository;
   
@@ -71,14 +69,14 @@ public class CommonsModelRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findUniqueDataSetTest(){
 
-    Optional<DataSet> optional = dataSetRepository.findByShortName("DataSetA");
+    Optional<DataSet> optional = dataSetRepository.findBySlug("DataSetA");
     Assert.notNull(optional, "Optional must not be null");
     Assert.isTrue(optional.isPresent(), "Object must be present");
     DataSet dataSet = optional.get();
     Assert.notNull(dataSet, "Object must not be null");
-    Assert.isTrue("DataSetA".equals(dataSet.getShortName()), "Primary ID must be 'DataSetA'");
+    Assert.isTrue("DataSetA".equals(dataSet.getSlug()), "Primary ID must be 'DataSetA'");
 
-    optional = dataSetRepository.findByShortName("DataSetZ");
+    optional = dataSetRepository.findBySlug("DataSetZ");
     Assert.notNull(optional, "Optional must not be null");
     Assert.isTrue(!optional.isPresent(), "Object must not be present");
 
@@ -87,14 +85,14 @@ public class CommonsModelRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findUniqueSubjectTest(){
 
-    Optional<Subject> optional = subjectRepository.findByName("SubjectA");
+    Optional<Sample> optional = sampleRepository.findByName("SampleA");
     Assert.notNull(optional, "Optional must not be null");
     Assert.isTrue(optional.isPresent(), "Object must be present");
-    Subject subject = optional.get();
-    Assert.notNull(subject, "Object must not be null");
-    Assert.isTrue("SubjectA".equals(subject.getName()), "Primary ID must be 'SubjectA'");
+    Sample sample = optional.get();
+    Assert.notNull(sample, "Object must not be null");
+    Assert.isTrue("SampleA".equals(sample.getName()), "Primary ID must be 'SampleA'");
 
-    optional = subjectRepository.findByName("SubjectZ");
+    optional = sampleRepository.findByName("SampleZ");
     Assert.notNull(optional, "Optional must not be null");
     Assert.isTrue(!optional.isPresent(), "Object must not be present");
 

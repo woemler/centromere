@@ -23,7 +23,6 @@ import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Sample;
-import com.blueprint.centromere.core.commons.model.Subject;
 import com.blueprint.centromere.core.commons.repository.MetadataOperations;
 import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.model.Model;
@@ -285,9 +284,6 @@ public class ModelSearchController {
     if ("sample".equals(meta.toLowerCase())){
       metaModel = Sample.class;
       metaField = "sampleId";
-    } else if ("subject".equals(meta.toLowerCase())){
-      metaModel = Subject.class;
-      metaField = "subjectId";
     } else if ("gene".equals(meta.toLowerCase())){
       metaModel = Gene.class;
       metaField = "geneId";

@@ -35,7 +35,6 @@ public class MutationValidator extends DataValidator {
     if (data.getDataFileId() == null) errors.reject("dataFileId", "dataFileId.empty");
     if (data.getDataSetId() == null) errors.reject("dataSetId", "dataSetId.empty");
     if (data.getSampleId() == null) errors.reject("sampleId", "sampleId.empty");
-    if (data.getSubjectId() == null) errors.reject("subjectId", "subjectId.empty");
 		if (data.getVariantType() == null) errors.reject("variantType", "variantType.empty");
 		if (data.getChromosome() == null) errors.reject("chromosome", "chromosome.empty");
 		if (data.getDnaStartPosition() == null) errors.reject("dnaStartPosition", "dnaStartPosition.empty");

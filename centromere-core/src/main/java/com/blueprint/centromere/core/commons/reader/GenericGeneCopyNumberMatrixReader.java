@@ -20,7 +20,7 @@ import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.GeneCopyNumber;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.support.DataSetSupport;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
@@ -45,17 +45,17 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
   private static final Logger logger = LoggerFactory.getLogger(GenericGeneCopyNumberMatrixReader.class);
   
   private final GeneRepository geneRepository;
-  private final DataSetSupport support;
+  private final SampleRepository sampleRepository;
   private final DataImportProperties dataImportProperties;
   
   private Map<Integer, Sample> samples = new HashMap<>();
 
   public GenericGeneCopyNumberMatrixReader(
       GeneRepository geneRepository,
-      DataSetSupport support,
+      SampleRepository sampleRepository,
       DataImportProperties dataImportProperties) {
     this.geneRepository = geneRepository;
-    this.support = support;
+    this.sampleRepository = sampleRepository;
     this.dataImportProperties = dataImportProperties;
   }
 
@@ -87,7 +87,6 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
       GeneCopyNumber record = new GeneCopyNumber();
       if (samples.containsKey(i)){
         record.setSampleId(samples.get(i).getId());
-        record.setSubjectId(samples.get(i).getSubjectId());
       } else {
         continue;
       }
@@ -119,7 +118,7 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
   protected void parseHeader(String line) throws DataImportException {
     String[] bits = line.trim().split(this.getDelimiter());
     for (int i = 2; i < bits.length; i++){
-      Optional<Sample> optional = support.findOrCreateSample(bits[i].replaceAll("['\"]", ""), this.getDataSet());
+      Optional<Sample> optional = sampleRepository.bestGuess(bits[i].replaceAll("['\"]", ""));
       if (optional.isPresent()){
         samples.put(i, optional.get());
       } else {

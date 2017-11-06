@@ -17,7 +17,6 @@
 package com.blueprint.centromere.core.commons.model;
 
 import com.blueprint.centromere.core.commons.support.ManagedTerm;
-import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
@@ -45,7 +44,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
     @CompoundIndex(def = "{ 'model': 1, 'field': 1, 'term': 1 }", unique = true)
 })
 @Document
-public class Term extends AbstractModel {
+public class Term extends AbstractMongoModel {
 	
 	@Indexed private String term;
 	@Indexed private String model;

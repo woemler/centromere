@@ -35,7 +35,6 @@ public class SegmentCopyNumberValidator extends DataValidator {
     if (data.getDataFileId() == null) errors.reject("dataFileId", "dataFileId.empty");
     if (data.getDataSetId() == null) errors.reject("dataSetId", "dataSetId.empty");
     if (data.getSampleId() == null) errors.reject("sampleId", "sampleId.empty");
-    if (data.getSubjectId() == null) errors.reject("subjectId", "subjectId.empty");
 		if (data.getValue() == null) errors.reject("value", "value.empty");
 		if (data.getChromosome() == null) errors.reject("chromosome", "chromosome.empty");
 		if (data.getSegmentStart() == null) errors.reject("segmentStart", "segmentStart.empty");

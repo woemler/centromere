@@ -3,12 +3,11 @@ package com.blueprint.centromere.tests.core;
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.GeneExpression;
-import com.blueprint.centromere.core.commons.model.Subject;
-import com.blueprint.centromere.core.commons.reader.TcgaSubjectReader;
+import com.blueprint.centromere.core.commons.model.Sample;
+import com.blueprint.centromere.core.commons.reader.TcgaSampleReader;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import java.io.File;
 import java.util.Date;
 import org.junit.Before;
@@ -26,37 +25,36 @@ public class AbstractTcgaTests extends AbstractEntrezGeneTests {
   @Autowired private DataFileRepository dataFileRepository;
   @Autowired private DataSetRepository dataSetRepository;
   @Autowired private SampleRepository sampleRepository;
-  @Autowired private SubjectRepository subjectRepository;
 
   @Override
   @Before
   public void setup() throws Exception {
     super.setup();
-    subjectRepository.deleteAll();
-    TcgaSubjectReader reader = new TcgaSubjectReader();
+    sampleRepository.deleteAll();
+    TcgaSampleReader reader = new TcgaSampleReader();
     try {
       DataSet dataSet = getDataSet();
       DataFile dataFile = getDataFile(dataSet, SUBJECTS_FILE.getFile());
       reader.setDataSet(dataSet);
       reader.setDataFile(dataFile);
       reader.doBefore();
-      Subject subject = reader.readRecord();
-      while (subject != null) {
-        subjectRepository.insert(subject);
-        subject = reader.readRecord();
+      Sample sample = reader.readRecord();
+      while (sample != null) {
+        sampleRepository.insert(sample);
+        sample = reader.readRecord();
       }
     } catch (Exception e){
       e.printStackTrace();
     } finally {
       reader.doAfter();
     }
-    Assert.isTrue(subjectRepository.count() > 0);
+    Assert.isTrue(sampleRepository.count() > 0);
   }
 
   protected DataSet getDataSet(){
     DataSet dataSet = new DataSet();
-    dataSet.setShortName("TCGA-Test");
-    dataSet.setDisplayName("TCGA Test Data Set");
+    dataSet.setSlug("TCGA-Test");
+    dataSet.setName("TCGA Test Data Set");
     dataSet.setSource("TCGA");
     dataSet.setVersion("1.0");
     dataSet = dataSetRepository.insert(dataSet);
@@ -85,9 +83,5 @@ public class AbstractTcgaTests extends AbstractEntrezGeneTests {
 
   public SampleRepository getSampleRepository() {
     return sampleRepository;
-  }
-
-  public SubjectRepository getSubjectRepository() {
-    return subjectRepository;
   }
 }

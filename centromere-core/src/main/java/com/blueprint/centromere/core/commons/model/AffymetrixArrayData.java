@@ -20,9 +20,8 @@ package com.blueprint.centromere.core.commons.model;
  * @author woemler
  */
 @lombok.Data
-public abstract class AffymetrixArrayData extends Data {
+public abstract class AffymetrixArrayData extends SimpleData {
 	
 	private String probeSetId;
-	private Double value;
 	
 }

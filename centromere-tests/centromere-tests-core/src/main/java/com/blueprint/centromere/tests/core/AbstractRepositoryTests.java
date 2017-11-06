@@ -24,14 +24,12 @@ import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.model.Mutation;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.model.SegmentCopyNumber;
-import com.blueprint.centromere.core.commons.model.Subject;
 import com.blueprint.centromere.core.commons.model.TranscriptExpression;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -47,7 +45,6 @@ public abstract class AbstractRepositoryTests {
   @Autowired private GeneRepository geneRepository;
   @Autowired private DataSetRepository dataSetRepository;
   @Autowired private DataFileRepository dataFileRepository;
-  @Autowired private SubjectRepository subjectRepository;
   @Autowired private SampleRepository sampleRepository;
   @Autowired private GeneExpressionRepository geneExpressionRepository;
 
@@ -57,7 +54,6 @@ public abstract class AbstractRepositoryTests {
     geneRepository.deleteAll();
     dataSetRepository.deleteAll();
     dataFileRepository.deleteAll();
-    subjectRepository.deleteAll();
     sampleRepository.deleteAll();
     geneExpressionRepository.deleteAll();
     
@@ -127,35 +123,40 @@ public abstract class AbstractRepositoryTests {
     List<DataSet> dataSets = new ArrayList<>();
 
     DataSet dataSetA = new DataSet();
-    dataSetA.setShortName("DataSetA");
+    dataSetA.setSlug("DataSetA");
+    dataSetA.setName("DataSetA");
     dataSetA.setSource("Internal");
     dataSetA.setVersion("1.0");
     dataSetA.setDescription("This is an example data set.");
     dataSets.add(dataSetA);
 
     DataSet dataSetB = new DataSet();
-    dataSetB.setShortName("DataSetB");
+    dataSetB.setSlug("DataSetB");
+    dataSetA.setName("DataSetB");
     dataSetB.setSource("External");
     dataSetB.setVersion("1.0");
     dataSetB.setDescription("This is an example data set.");
     dataSets.add(dataSetB);
 
     DataSet dataSetC = new DataSet();
-    dataSetC.setShortName("DataSetC");
+    dataSetC.setSlug("DataSetC");
+    dataSetC.setName("DataSetC");
     dataSetC.setSource("Internal");
     dataSetC.setVersion("2.0");
     dataSetC.setDescription("This is an example data set.");
     dataSets.add(dataSetC);
 
     DataSet dataSetD = new DataSet();
-    dataSetD.setShortName("DataSetD");
+    dataSetD.setSlug("DataSetD");
+    dataSetD.setName("DataSetD");
     dataSetD.setSource("External");
     dataSetD.setVersion("1.0");
     dataSetD.setDescription("This is an example data set.");
     dataSets.add(dataSetD);
 
     DataSet dataSetE = new DataSet();
-    dataSetE.setShortName("DataSetE");
+    dataSetE.setSlug("DataSetE");
+    dataSetE.setName("DataSetE");
     dataSetE.setSource("Internal");
     dataSetE.setVersion("1.0");
     dataSetE.setDescription("This is an example data set.");
@@ -224,57 +225,6 @@ public abstract class AbstractRepositoryTests {
     dataSetRepository.update(dataSetA);
     dataSetRepository.update(dataSetB);
     
-    // Subjects
-
-    List<Subject> subjects = new ArrayList<>();
-
-    Subject subjectA = new Subject();
-    subjectA.setName("SubjectA");
-    subjectA.setSpecies("Human");
-    subjectA.setGender("M");
-    subjectA.setNotes("This is an example subject");
-    subjectA.addAlias("subject_a");
-    subjectA.addAttribute("tag", "tagA");
-    subjects.add(subjectA);
-
-    Subject subjectB = new Subject();
-    subjectB.setName("SubjectB");
-    subjectB.setSpecies("Human");
-    subjectB.setGender("F");
-    subjectB.setNotes("This is an example subject");
-    subjectB.addAlias("subject_b");
-    subjectB.addAttribute("tag", "tagA");
-    subjects.add(subjectB);
-
-    Subject subjectC = new Subject();
-    subjectC.setName("SubjectC");
-    subjectC.setSpecies("Mouse");
-    subjectC.setGender("M");
-    subjectC.setNotes("This is an example subject");
-    subjectC.addAlias("subject_c");
-    subjectC.addAttribute("tag", "tagB");
-    subjects.add(subjectC);
-
-    Subject subjectD = new Subject();
-    subjectD.setName("SubjectD");
-    subjectD.setSpecies("Human");
-    subjectD.setGender("U");
-    subjectD.setNotes("This is an example subject");
-    subjectD.addAlias("subject_d");
-    subjectD.addAttribute("tag", "tagB");
-    subjects.add(subjectD);
-
-    Subject subjectE = new Subject();
-    subjectE.setName("SubjectE");
-    subjectE.setSpecies("Mouse");
-    subjectE.setGender("F");
-    subjectE.setNotes("This is an example subject");
-    subjectE.addAlias("subject_e");
-    subjectE.addAttribute("tag", "tagA");
-    subjects.add(subjectE);
-    
-    subjectRepository.insert(subjects);
-    
     // Samples
 
     List<Sample> samples = new ArrayList<>();
@@ -286,8 +236,8 @@ public abstract class AbstractRepositoryTests {
     sampleA.setSampleType("cell line");
     sampleA.setNotes("This is an example sample.");
     sampleA.addAttribute("tag", "tagA");
-    sampleA.setSubjectId(subjectA.getId());
-    sampleA.setDataSetId(dataSetA.getId());
+    sampleA.setSpecies("H sapiens");
+    sampleA.setGender("M");
     samples.add(sampleA);
 
     Sample sampleB = new Sample();
@@ -297,8 +247,8 @@ public abstract class AbstractRepositoryTests {
     sampleB.setSampleType("cell line");
     sampleB.setNotes("This is an example sample.");
     sampleB.addAttribute("tag", "tagB");
-    sampleB.setSubjectId(subjectA.getId());
-    sampleB.setDataSetId(dataSetA.getId());
+    sampleB.setSpecies("H sapiens");
+    sampleB.setGender("F");
     samples.add(sampleB);
 
     Sample sampleC = new Sample();
@@ -308,8 +258,8 @@ public abstract class AbstractRepositoryTests {
     sampleC.setSampleType("PDX");
     sampleC.setNotes("This is an example sample.");
     sampleC.addAttribute("tag", "tagA");
-    sampleC.setSubjectId(subjectA.getId());
-    sampleC.setDataSetId(dataSetA.getId());
+    sampleC.setSpecies("H sapiens");
+    sampleC.setGender("F");
     samples.add(sampleC);
 
     Sample sampleD = new Sample();
@@ -319,8 +269,8 @@ public abstract class AbstractRepositoryTests {
     sampleD.setSampleType("cell line");
     sampleD.setNotes("This is an example sample.");
     sampleD.addAttribute("tag", "tagA");
-    sampleD.setSubjectId(subjectB.getId());
-    sampleD.setDataSetId(dataSetA.getId());
+    sampleD.setSpecies("H sapiens");
+    sampleD.setGender("U");
     samples.add(sampleD);
 
     Sample sampleE = new Sample();
@@ -330,16 +280,11 @@ public abstract class AbstractRepositoryTests {
     sampleE.setSampleType("PDX");
     sampleE.setNotes("This is an example sample.");
     sampleE.addAttribute("tag", "tagB");
-    sampleE.setSubjectId(subjectB.getId());
-    sampleE.setDataSetId(dataSetA.getId());
+    sampleE.setSpecies("H sapiens");
+    sampleE.setGender("M");
     samples.add(sampleE);
     
     sampleRepository.insert(samples);
-    
-    subjectA.setSampleIds(Arrays.asList(sampleA.getId(), sampleB.getId(), sampleC.getId()));
-    subjectB.setSampleIds(Arrays.asList(sampleD.getId(), sampleE.getId()));
-    subjectRepository.update(subjectA);
-    subjectRepository.update(subjectB);
     
     List<String> sampleIds = new ArrayList<>();
     for (Sample sample: samples){
@@ -355,7 +300,6 @@ public abstract class AbstractRepositoryTests {
 
     GeneExpression geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleA.getId());
-    geneExpression.setSubjectId(sampleA.getSubjectId());
     geneExpression.setGeneId(geneA.getId());
     geneExpression.setDataFileId(dataFileA.getId());
     geneExpression.setDataSetId(dataFileA.getDataSetId());
@@ -364,7 +308,6 @@ public abstract class AbstractRepositoryTests {
 
     geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleA.getId());
-    geneExpression.setSubjectId(sampleA.getSubjectId());
     geneExpression.setGeneId(geneB.getId());
     geneExpression.setDataFileId(dataFileA.getId());
     geneExpression.setDataSetId(dataFileA.getDataSetId());
@@ -373,7 +316,6 @@ public abstract class AbstractRepositoryTests {
 
     geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleA.getId());
-    geneExpression.setSubjectId(sampleA.getSubjectId());
     geneExpression.setGeneId(geneC.getId());
     geneExpression.setDataFileId(dataFileA.getId());
     geneExpression.setDataSetId(dataFileA.getDataSetId());
@@ -382,7 +324,6 @@ public abstract class AbstractRepositoryTests {
 
     geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleB.getId());
-    geneExpression.setSubjectId(sampleB.getSubjectId());
     geneExpression.setGeneId(geneA.getId());
     geneExpression.setDataFileId(dataFileA.getId());
     geneExpression.setDataSetId(dataFileA.getDataSetId());
@@ -391,7 +332,6 @@ public abstract class AbstractRepositoryTests {
 
     geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleB.getId());
-    geneExpression.setSubjectId(sampleB.getSubjectId());
     geneExpression.setGeneId(geneB.getId());
     geneExpression.setDataFileId(dataFileA.getId());
     geneExpression.setDataSetId(dataFileA.getDataSetId());
@@ -400,7 +340,6 @@ public abstract class AbstractRepositoryTests {
 
     geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleB.getId());
-    geneExpression.setSubjectId(sampleB.getSubjectId());
     geneExpression.setGeneId(geneC.getId());
     geneExpression.setDataFileId(dataFileA.getId());
     geneExpression.setDataSetId(dataFileA.getDataSetId());

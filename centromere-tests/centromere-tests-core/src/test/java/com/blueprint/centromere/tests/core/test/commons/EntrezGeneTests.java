@@ -41,8 +41,8 @@ public class EntrezGeneTests {
   @Before
   public void setup(){
     dataSet = new DataSet();
-    dataSet.setShortName("test");
-    dataSet.setDisplayName("Test");
+    dataSet.setSlug("test");
+    dataSet.setName("Test");
     dataSet.setId("test");
     dataFile = new DataFile();
     dataFile.setId("test");

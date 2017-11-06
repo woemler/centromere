@@ -1,8 +1,8 @@
 package com.blueprint.centromere.tests.cli.test.commands;
 
 import com.blueprint.centromere.cli.CentromereCommandLineInitializer;
-import com.blueprint.centromere.cli.commands.FileImportExecutor;
-import com.blueprint.centromere.cli.parameters.ImportFileCommandParameters;
+import com.blueprint.centromere.cli.commands.ImportCommandExecutor;
+import com.blueprint.centromere.cli.parameters.ImportCommandParameters;
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Gene;
@@ -42,7 +42,7 @@ public class ImportCommandTests extends AbstractRepositoryTests {
   public static final Resource geneInfoFile = new ClassPathResource("samples/Homo_sapiens.gene_info");
   public static final Resource gctGeneExpressionFile = new ClassPathResource("samples/gene_expression.gct");
 
-  @Autowired private FileImportExecutor executor;
+  @Autowired private ImportCommandExecutor executor;
   @Autowired private DataSetRepository dataSetRepository;
   @Autowired private DataFileRepository dataFileRepository;
   @Autowired private SampleRepository sampleRepository;
@@ -52,7 +52,7 @@ public class ImportCommandTests extends AbstractRepositoryTests {
   
   @Test
   public void helpTest(){
-    ImportFileCommandParameters parameters = new ImportFileCommandParameters();
+    ImportCommandParameters parameters = new ImportCommandParameters();
     parameters.setHelp(true);
     Exception exception = null;
     try {
@@ -70,13 +70,13 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     
     geneRepository.deleteAll();
     Assert.isTrue(geneRepository.count() == 0);
-    long dsCount = dataSetRepository.count();
     long dfCount = dataFileRepository.count();
     Assert.isTrue(!dataFileRepository.findByFilePath(geneInfoFile.getFile().getAbsolutePath()).isPresent());
     
-    ImportFileCommandParameters parameters = new ImportFileCommandParameters();
+    ImportCommandParameters parameters = new ImportCommandParameters();
     parameters.setDataType("entrez_gene");
     parameters.setFilePath(geneInfoFile.getFile().getAbsolutePath());
+    parameters.setDataSetKey("DataSetA");
     Exception exception = null;
     
     try {
@@ -88,13 +88,7 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     
     Assert.isTrue(exception == null, "Exception should be null");
     Assert.isTrue(geneRepository.count() > 0, "GeneRepository should not be empty");
-    Assert.isTrue(dataSetRepository.count() == dsCount+1, "DataSet record count should have iterated by one");
     Assert.isTrue(dataFileRepository.count() == dfCount+1, "DaatFile record count should have iterated by one");
-    
-    Optional<DataSet> dataSetOptional = dataSetRepository.findByShortName(dataImportProperties.getDataSet().getShortName());
-    Assert.isTrue(dataSetOptional.isPresent());
-    DataSet dataSet = dataSetOptional.get();
-    Assert.isTrue(dataImportProperties.getDataSet().getDisplayName().equals(dataSet.getDisplayName()));
 
     Optional<DataFile> dataFileOptional = dataFileRepository.findByFilePath(geneInfoFile.getFile().getAbsolutePath());
     Assert.isTrue(dataFileOptional.isPresent());
@@ -102,7 +96,12 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     Assert.isTrue(geneInfoFile.getFile().getAbsolutePath().equals(dataFile.getFilePath()));
     Assert.isTrue(Gene.class.equals(dataFile.getModelType()));
     Assert.isTrue("entrez_gene".equals(dataFile.getDataType()));
-    Assert.isTrue(dataSet.getId().equals(dataFile.getDataSetId()));
+
+    Optional<DataSet> dataSetOptional = dataSetRepository.findById(dataFile.getDataSetId());
+    Assert.isTrue(dataSetOptional.isPresent());
+    DataSet dataSet = dataSetOptional.get();
+    Assert.isTrue("DataSetA".equals(dataSet.getSlug()));
+    Assert.isTrue(dataSet.getDataFileIds().contains(dataFile.getId()));
     
   }
   
@@ -114,8 +113,8 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     Assert.isTrue(geneExpressionRepository.count() == 0);
     
     DataSet dataSet = new DataSet();
-    dataSet.setShortName("example");
-    dataSet.setDisplayName("Example data set");
+    dataSet.setSlug("example");
+    dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
     for (Sample sample: sampleRepository.findAll()){
       sampleIds.add(sample.getId());
@@ -123,9 +122,9 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     dataSet.setSampleIds(sampleIds);
     dataSetRepository.insert(dataSet);
     Assert.notNull(dataSet.getId());
-    Assert.isTrue(dataSetRepository.findByShortName("example").isPresent());
+    Assert.isTrue(dataSetRepository.findBySlug("example").isPresent());
 
-    ImportFileCommandParameters parameters = new ImportFileCommandParameters();
+    ImportCommandParameters parameters = new ImportCommandParameters();
     parameters.setDataType("gct_gene_expression");
     parameters.setFilePath(gctGeneExpressionFile.getFile().getAbsolutePath());
     parameters.setDataSetKey("example");

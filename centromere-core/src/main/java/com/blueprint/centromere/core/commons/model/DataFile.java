@@ -16,7 +16,6 @@
 
 package com.blueprint.centromere.core.commons.model;
 
-import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Linked;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -32,15 +31,28 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document
 @Data
-public class DataFile extends AbstractModel implements Attributes {
+public class DataFile extends AbstractMongoModel implements Attributes {
 	
-	@Indexed(unique = true) private String filePath;
+	@Indexed(unique = true) 
+  private String filePath;
+  
 	private String dataType;
+	
 	private String model;
-	@Ignored private String checksum;
-	@Ignored private Date dateCreated;
-	@Ignored private Date dateUpdated;
-	@Indexed @Linked(model = DataSet.class, rel = "dataSet") private String dataSetId;
+	
+	@Ignored 
+  private String checksum;
+	
+	@Ignored 
+  private Date dateCreated;
+	
+	@Ignored 
+  private Date dateUpdated;
+	
+	@Indexed 
+  @Linked(model = DataSet.class, rel = "dataSet") 
+  private String dataSetId;
+	
 	private Map<String, String> attributes = new HashMap<>();
 
 	@JsonIgnore

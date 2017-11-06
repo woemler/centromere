@@ -20,7 +20,7 @@ import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.reader.TcgaRnaSeqGeneExpressionFileReader;
 import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.support.TcgaSupport;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.validator.GeneExpressionValidator;
 import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.DataTypes;
@@ -41,15 +41,13 @@ public class TcgaGeneExpressionProcessor extends GenericRecordProcessor<GeneExpr
     @Autowired
     public TcgaGeneExpressionProcessor(
         GeneRepository geneRepository,
-        TcgaSupport tcgaSupport,
+        SampleRepository sampleRepository,
         DataImportProperties dataImportProperties,
         GeneExpressionRepository repository
     ) {
-      this.setReader(new TcgaRnaSeqGeneExpressionFileReader(geneRepository, tcgaSupport, dataImportProperties));
+      this.setReader(new TcgaRnaSeqGeneExpressionFileReader(geneRepository, sampleRepository, dataImportProperties));
       this.setValidator(new GeneExpressionValidator());
       this.setWriter(new RepositoryRecordWriter<>(repository, WriteMode.INSERT, 200));
-//      this.setWriter(new MongoImportTempFileWriter<>(dataImportProperties, mongoOperations));
-//      this.setImporter(new MongoImportTempFileImporter<>(GeneExpression.class, databaseProperties));
       this.setModel(GeneExpression.class);
     }
 }

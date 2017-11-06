@@ -18,7 +18,7 @@ package com.blueprint.centromere.core.commons.reader;
 
 import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.support.DataSetSupport;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.config.DataImportProperties;
 
 /**
@@ -32,9 +32,9 @@ public class GctGeneExpressionFileReader extends GctFileReader<GeneExpression>  
 
   public GctGeneExpressionFileReader(
       GeneRepository geneRepository,
-      DataSetSupport dataSetSupport,
+      SampleRepository sampleRepository,
       DataImportProperties dataImportProperties) {
-    super(GeneExpression.class, geneRepository, dataSetSupport, dataImportProperties);
+    super(GeneExpression.class, geneRepository, sampleRepository, dataImportProperties);
   }
 
 }

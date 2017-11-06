@@ -39,7 +39,7 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CommandLineTestInitializer.class)
-@ActiveProfiles({Profiles.CLI_PROFILE})
+@ActiveProfiles({Profiles.CLI_PROFILE, CommandLineTestInitializer.SINGLE_COMMAND_PROFILE})
 @FixMethodOrder
 public class ManifestParsingTests {
 	
@@ -52,8 +52,8 @@ public class ManifestParsingTests {
 		System.out.println(manifest.toString());
         Assert.notNull(manifest.getAttributes());
         Assert.notEmpty(manifest.getAttributes());
-		Assert.isTrue("Test Manifest".equals(manifest.getDisplayName()));
-		Assert.isTrue("test".equals(manifest.getShortName()));
+		Assert.isTrue("Test Manifest".equals(manifest.getName()));
+		Assert.isTrue("test".equals(manifest.getSlug()));
 		Assert.isTrue("This is a test".equals(manifest.getDescription()));
 		Assert.isTrue("internal".equals(manifest.getSource()));
 		Assert.isTrue("1.0".equals(manifest.getVersion()));

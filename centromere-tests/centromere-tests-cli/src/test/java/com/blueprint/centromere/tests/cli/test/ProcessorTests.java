@@ -17,7 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CommandLineTestInitializer.class, webEnvironment = WebEnvironment.NONE)
-@ActiveProfiles({ Profiles.CLI_PROFILE })
+@ActiveProfiles({ Profiles.CLI_PROFILE, CommandLineTestInitializer.SINGLE_COMMAND_PROFILE })
 public class ProcessorTests {
   
   @Autowired private EntrezGeneInfoProcessor entrezGeneInfoProcessor;

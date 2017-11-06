@@ -17,7 +17,6 @@
 package com.blueprint.centromere.core.commons.model;
 
 import com.blueprint.centromere.core.commons.support.ManagedTerm;
-import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Ignored;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +31,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document
 @Data
-public class Gene extends AbstractModel implements Attributes {
+public class Gene extends AbstractMongoModel implements Attributes {
 
 	@Indexed(unique = true) @ManagedTerm private String primaryReferenceId;
 	@Indexed @ManagedTerm private String primaryGeneSymbol;

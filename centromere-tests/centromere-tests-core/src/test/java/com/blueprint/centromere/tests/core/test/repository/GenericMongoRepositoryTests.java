@@ -67,8 +67,9 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
     List<Gene> genes = (List<Gene>) geneRepository.findAll();
 
-    Gene gene = geneRepository.findOne(genes.get(0).getId());
-    Assert.notNull(gene);
+    Optional<Gene> optional = geneRepository.findById(genes.get(0).getId());
+    Assert.isTrue(optional.isPresent());
+    Gene gene = optional.get();
     Assert.isTrue(gene.getPrimaryReferenceId().equals("1"));
     Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
     Assert.notNull(gene.getAliases());

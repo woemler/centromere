@@ -20,7 +20,7 @@ import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.model.TranscriptExpression;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.support.DataSetSupport;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 
@@ -35,9 +35,9 @@ public class GctTranscriptExpressionFileReader extends GctFileReader<TranscriptE
 
   public GctTranscriptExpressionFileReader(
       GeneRepository geneRepository,
-      DataSetSupport dataSetSupport,
+      SampleRepository sampleRepository,
       DataImportProperties dataImportProperties) {
-    super(TranscriptExpression.class, geneRepository, dataSetSupport, dataImportProperties);
+    super(TranscriptExpression.class, geneRepository, sampleRepository, dataImportProperties);
   }
 
   @Override

@@ -20,50 +20,20 @@ import com.blueprint.centromere.core.commons.model.DataFile;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import lombok.Data;
 
 /**
  * @author woemler
  * @since 0.5.0
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Data
 public class ManifestFile {
 
   private String path;
   private String type;
   private LinkedHashMap<String, String> parameters = new LinkedHashMap<>();
   private LinkedHashMap<String, String> attributes = new LinkedHashMap<>();
-
-  public String getPath() {
-      return path;
-  }
-
-  public void setPath(String path) {
-      this.path = path;
-  }
-
-  public String getType() {
-      return type;
-  }
-
-  public void setType(String type) {
-      this.type = type;
-  }
-
-  public LinkedHashMap<String, String> getParameters() {
-    return parameters;
-  }
-
-  public void setParameters(LinkedHashMap<String, String> parameters) {
-    this.parameters = parameters;
-  }
-
-  public LinkedHashMap<String, String> getAttributes() {
-      return attributes;
-  }
-
-  public void setAttributes(LinkedHashMap<String, String> attributes) {
-      this.attributes = attributes;
-  }
   
   public DataFile createDataFile(){
     DataFile dataFile = new DataFile();
@@ -75,12 +45,4 @@ public class ManifestFile {
     return dataFile;
   }
 
-  @Override 
-  public String toString() {
-    return "ManifestFile{" +
-      "path='" + path + '\'' +
-      ", type='" + type + '\'' +
-      ", attributes=" + attributes +
-      '}';
-  }
 }

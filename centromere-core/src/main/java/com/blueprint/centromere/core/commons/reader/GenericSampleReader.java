@@ -17,18 +17,14 @@
 package com.blueprint.centromere.core.commons.reader;
 
 import com.blueprint.centromere.core.commons.model.Sample;
-import com.blueprint.centromere.core.commons.model.Subject;
-import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
-import com.blueprint.centromere.core.dataimport.exception.InvalidSampleException;
 import com.blueprint.centromere.core.dataimport.reader.AbstractRecordFileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.springframework.beans.BeanUtils;
 
 /**
@@ -37,17 +33,13 @@ import org.springframework.beans.BeanUtils;
 public class GenericSampleReader extends AbstractRecordFileReader<Sample> 
     implements SampleAware{
   
-  private final SubjectRepository subjectRepository;
   private final DataImportProperties dataImportProperties;
   
   private Map<String, Integer> headerMap = new HashMap<>();
   private String defaultEmptyValue = "n/a";
   private String delimiter = "\t";
 
-  public GenericSampleReader(
-      SubjectRepository subjectRepository, 
-      DataImportProperties dataImportProperties) {
-    this.subjectRepository = subjectRepository;
+  public GenericSampleReader(DataImportProperties dataImportProperties) {
     this.dataImportProperties = dataImportProperties;
   }
 
@@ -87,31 +79,21 @@ public class GenericSampleReader extends AbstractRecordFileReader<Sample>
     Sample sample = new Sample();
     BeanUtils.copyProperties(dataImportProperties.getSample(), sample);
     sample.setName(bits[0].trim());
-    sample.setDataSetId(this.getDataSet().getId());
 
-    Optional<Subject> optional = subjectRepository.findByName(bits[0]);
-    if (optional.isPresent()){
-      sample.setSubjectId(optional.get().getId());
-    } else {
-      if (dataImportProperties.isSkipInvalidSamples()){
-        return null;
-      } else {
-        throw new InvalidSampleException(String.format("Unable to identify subject for sample with name: %s", bits[0]));
-      }
-    }
-    
     for (Map.Entry<String, Integer> entry : headerMap.entrySet()) {
-      if (entry.getKey().equalsIgnoreCase("tissue") 
-          || entry.getKey().replaceAll("[_.-]+", "").equalsIgnoreCase("primarysite")) {
+      if (entry.getKey().equalsIgnoreCase("tissue")) {
         sample.setTissue(getColumnValue(entry.getKey(), bits));
-      } else if (entry.getKey().equalsIgnoreCase("histology")
-          || entry.getKey().replaceAll("[_.-]+", "").equalsIgnoreCase("cancertype")) {
+      } else if (entry.getKey().equalsIgnoreCase("histology")) {
         sample.setHistology(getColumnValue(entry.getKey(), bits));
       } else if (entry.getKey().equalsIgnoreCase("type")
           || entry.getKey().replaceAll("[_.-]+", "").equalsIgnoreCase("sampletype")) {
         sample.setSampleType(getColumnValue(entry.getKey(), bits));
       } else if (entry.getKey().equalsIgnoreCase("notes")) {
         sample.setNotes(getColumnValue(entry.getKey(), bits));
+      } else if (entry.getKey().equalsIgnoreCase("gender")) {
+        sample.setGender(getColumnValue(entry.getKey(), bits));
+      } else if (entry.getKey().equalsIgnoreCase("species")) {
+        sample.setSpecies(getColumnValue(entry.getKey(), bits));
       } else {
         sample.addAttribute(entry.getKey(), getColumnValue(entry.getKey(), bits));
       }

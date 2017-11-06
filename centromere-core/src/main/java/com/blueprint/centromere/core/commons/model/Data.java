@@ -16,27 +16,22 @@
 
 package com.blueprint.centromere.core.commons.model;
 
-import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Linked;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 /**
  * Base class for modeling processed genomic data.  Assumes that each record has an associated 
- *   {@link DataFile}, {@link Sample}, and {@link Gene}.
+ *   {@link DataFile}, {@link DataSet}, {@link Sample}, and {@link Gene}.  
  * 
  * @author woemler
  * @since 0.4.3
  */
 @lombok.Data
-public abstract class Data extends AbstractModel {
+public abstract class Data extends AbstractMongoModel {
 
 	@Indexed
 	@Linked(model = Sample.class, rel = "sample")
 	private String sampleId;
-
-  @Indexed
-  @Linked(model = Subject.class, rel = "subject")
-  private String subjectId;
 
 	@Indexed
 	@Linked(model = DataFile.class, rel = "dataFile")
@@ -49,5 +44,5 @@ public abstract class Data extends AbstractModel {
 	@Indexed
 	@Linked(model = Gene.class, rel = "gene")
 	private String geneId;
-
+  
 }

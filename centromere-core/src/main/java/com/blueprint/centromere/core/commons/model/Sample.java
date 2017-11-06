@@ -17,34 +17,51 @@
 package com.blueprint.centromere.core.commons.model;
 
 import com.blueprint.centromere.core.commons.support.ManagedTerm;
-import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Ignored;
-import com.blueprint.centromere.core.model.Linked;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.Data;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * Model for representing a single biological sample taken from a {@link Subject} for experimentation.
- *   It is presumed that a single sample can be used in one or more assays and be a part of one or
- *   more {@link DataSet} instances.
+ * Model for representing biological samples in analyses.  It is presumed that a single sample can 
+ *   be used in one or more analyses and be a part of one or more {@link DataSet} instances.
  * 
  * @author woemler
  */
 @Document
 @Data
-public class Sample extends AbstractModel implements Attributes {
+public class Sample extends AbstractMongoModel implements Attributes {
 
-	@Indexed @ManagedTerm private String name;
+	@Indexed(unique = true) 
+  @ManagedTerm 
+  private String name;
+	
+	@ManagedTerm
 	private String sampleType;
-	@ManagedTerm private String tissue;
-	@ManagedTerm private String histology;
-	@Ignored private String notes;
-	@ManagedTerm private Map<String, String> attributes = new HashMap<>();
-	@Indexed @Linked(model = Subject.class, rel = "subject") private String subjectId;
-	@Indexed @Linked(model = DataSet.class, rel = "dataSet") private String dataSetId;
+	
+	@ManagedTerm
+  private String species;
+	
+  private String gender;
+	
+	@ManagedTerm 
+  private String tissue;
+	
+	@ManagedTerm 
+  private String histology;
+	
+	@Ignored 
+  private String notes;
+	
+	@ManagedTerm 
+  private Map<String, String> attributes = new HashMap<>();
+	
+	@Indexed
+  private List<String> aliases = new ArrayList<>();
 
 	@Override
 	public void addAttribute(String name, String value) {

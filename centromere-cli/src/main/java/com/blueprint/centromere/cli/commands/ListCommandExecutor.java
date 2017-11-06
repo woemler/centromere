@@ -97,7 +97,7 @@ public class ListCommandExecutor implements EnvironmentAware {
         
         List<String> dataSets = new ArrayList<>();
         for (DataSet dataSet: dataSetRepository.findAll()){
-          dataSets.add(showDetails ? dataSet.toString() : dataSet.getDisplayName());
+          dataSets.add(showDetails ? dataSet.toString() : dataSet.getName());
         }
         if (!dataSets.isEmpty()){
           Collections.sort(dataSets);

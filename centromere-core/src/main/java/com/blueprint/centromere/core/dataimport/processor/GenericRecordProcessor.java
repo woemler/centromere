@@ -19,11 +19,9 @@ package com.blueprint.centromere.core.dataimport.processor;
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Sample;
-import com.blueprint.centromere.core.commons.model.Subject;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataOperations;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.commons.support.SampleAware;
@@ -73,7 +71,6 @@ public class GenericRecordProcessor<T extends Model<?>>
 
   private static final Logger logger = LoggerFactory.getLogger(GenericRecordProcessor.class);
 
-  private SubjectRepository subjectRepository;
   private DataSetRepository dataSetRepository;
   private DataFileRepository dataFileRepository;
   private ModelRepositoryRegistry registry;
@@ -164,24 +161,17 @@ public class GenericRecordProcessor<T extends Model<?>>
     // If DataFile contained Sample records, associate them with the proper Subject and DataSet record
     if (reader instanceof SampleAware) {
       List<Sample> samples = ((SampleAware) reader).getSamples();
+      List<String> sampleIds = dataSet.getSampleIds();
       for (Sample sample : samples) {
-        Subject subject = subjectRepository.findOne(sample.getSubjectId());
-        List<String> sampleIds = subject.getSampleIds();
         if (!sampleIds.contains(sample.getId())) {
           sampleIds.add(sample.getId());
-          subject.setSampleIds(new ArrayList<>(sampleIds));
-          subjectRepository.update(subject);
-        }
-        sampleIds = dataSet.getSampleIds();
-        if (!sampleIds.contains(sample.getId())) {
-          sampleIds.add(sample.getId());
-          dataSet.setSampleIds(new ArrayList<>(sampleIds));
-          dataSetRepository.update(dataSet);
         }
       }
+      dataSet.setSampleIds(new ArrayList<>(sampleIds));
+      dataSetRepository.update(dataSet);
     }
     
-    // Associate the DataFile with the appopriate DataSet record
+    // Associate the DataFile with the appropriate DataSet record
     List<String> dataFileIds = dataSet.getDataFileIds();
     if (!dataFileIds.contains(dataFile.getId())) {
       dataFileIds.add(dataFile.getId());
@@ -428,11 +418,6 @@ public class GenericRecordProcessor<T extends Model<?>>
   public List<String> getSupportedDataTypes() {
 		return supportedDataTypes;
 	}
-
-  @Autowired
-  public void setSubjectRepository(SubjectRepository subjectRepository) {
-    this.subjectRepository = subjectRepository;
-  }
 
   @Autowired
   public void setDataSetRepository(DataSetRepository dataSetRepository) {

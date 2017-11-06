@@ -19,17 +19,17 @@ package com.blueprint.centromere.cli;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import com.blueprint.centromere.cli.Printer.Level;
+import com.blueprint.centromere.cli.commands.BatchCommandExecutor;
 import com.blueprint.centromere.cli.commands.CreateCommandExecutor;
 import com.blueprint.centromere.cli.commands.DeleteCommandExecutor;
-import com.blueprint.centromere.cli.commands.FileImportExecutor;
+import com.blueprint.centromere.cli.commands.ImportCommandExecutor;
 import com.blueprint.centromere.cli.commands.ListCommandExecutor;
-import com.blueprint.centromere.cli.commands.ManifestImportExecutor;
 import com.blueprint.centromere.cli.commands.UpdateCommandExecutor;
 import com.blueprint.centromere.cli.parameters.BaseParameters;
+import com.blueprint.centromere.cli.parameters.BatchCommandParameters;
 import com.blueprint.centromere.cli.parameters.CreateCommandParameters;
 import com.blueprint.centromere.cli.parameters.DeleteCommandParameters;
-import com.blueprint.centromere.cli.parameters.ImportFileCommandParameters;
-import com.blueprint.centromere.cli.parameters.ImportManifestCommandParameters;
+import com.blueprint.centromere.cli.parameters.ImportCommandParameters;
 import com.blueprint.centromere.cli.parameters.ListCommandParameters;
 import com.blueprint.centromere.cli.parameters.UpdateCommandParameters;
 import com.blueprint.centromere.core.config.DataImportProperties;
@@ -59,8 +59,8 @@ public class CommandLineInputExecutor implements ApplicationRunner {
   public static final String UPDATE_COMMAND = "update";
   public static final String DELETE_COMMAND = "delete";
 	
-  private FileImportExecutor fileImportExecutor;
-	private ManifestImportExecutor manifestImportExecutor;
+  private ImportCommandExecutor importCommandExecutor;
+	private BatchCommandExecutor batchCommandExecutor;
 	private ListCommandExecutor listCommandExecutor;
 	private DeleteCommandExecutor deleteCommandExecutor;
 	private CreateCommandExecutor createCommandExecutor;
@@ -108,8 +108,8 @@ public class CommandLineInputExecutor implements ApplicationRunner {
 	private int processArguments(String... args) throws Exception {
 
     BaseParameters baseParameters = new BaseParameters();
-    ImportFileCommandParameters importParameters = new ImportFileCommandParameters();
-    ImportManifestCommandParameters batchParameters = new ImportManifestCommandParameters();
+    ImportCommandParameters importParameters = new ImportCommandParameters();
+    BatchCommandParameters batchParameters = new BatchCommandParameters();
     CreateCommandParameters createParameters = new CreateCommandParameters();
     UpdateCommandParameters updateParameters = new UpdateCommandParameters();
     ListCommandParameters listParameters = new ListCommandParameters();
@@ -138,12 +138,12 @@ public class CommandLineInputExecutor implements ApplicationRunner {
 		String mainCommand = jc.getParsedCommand();
 		
 		// File import
-		if (ImportFileCommandParameters.COMMAND.equals(mainCommand)) {
+		if (ImportCommandParameters.COMMAND.equals(mainCommand)) {
 
       Printer.print(String.format("Running import file command with arguments: %s",
           importParameters.toString()), logger, Level.INFO);
       try {
-        fileImportExecutor.run(importParameters);
+        importCommandExecutor.run(importParameters);
       } catch (Exception e) {
         throw new CommandLineRunnerException(e);
       }
@@ -155,7 +155,7 @@ public class CommandLineInputExecutor implements ApplicationRunner {
         Printer.print(String.format("Running import batch command with arguments: %s ",
             batchParameters.toString()), logger, Level.INFO);
         try {
-          manifestImportExecutor.run(batchParameters.getFilePath());
+          batchCommandExecutor.run(batchParameters.getFilePath());
         } catch (Exception e){
           throw new CommandLineRunnerException(e);
         }
@@ -247,13 +247,13 @@ public class CommandLineInputExecutor implements ApplicationRunner {
 	}
 
 	@Autowired
-	public void setFileImportExecutor(FileImportExecutor fileImportExecutor) {
-		this.fileImportExecutor = fileImportExecutor;
+	public void setImportCommandExecutor(ImportCommandExecutor importCommandExecutor) {
+		this.importCommandExecutor = importCommandExecutor;
 	}
 
 	@Autowired
-  public void setManifestImportExecutor(ManifestImportExecutor manifestImportExecutor) {
-    this.manifestImportExecutor = manifestImportExecutor;
+  public void setBatchCommandExecutor(BatchCommandExecutor batchCommandExecutor) {
+    this.batchCommandExecutor = batchCommandExecutor;
   }
 
   @Autowired

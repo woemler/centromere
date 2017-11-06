@@ -19,7 +19,7 @@ package com.blueprint.centromere.core.commons.reader;
 import com.blueprint.centromere.core.commons.model.AffymetrixArrayData;
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Sample;
-import com.blueprint.centromere.core.commons.support.DataSetSupport;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
@@ -43,7 +43,7 @@ public abstract class AffymetrixMicroarrayGeneExpressionReader<T extends Affymet
   
   private static final Logger logger = LoggerFactory.getLogger(AffymetrixMicroarrayGeneExpressionReader.class);
   
-  private final DataSetSupport dataSetSupport;
+  private final SampleRepository sampleRepository;
   private final DataImportProperties dataImportProperties;
   private final Class<T> model;
   
@@ -51,9 +51,9 @@ public abstract class AffymetrixMicroarrayGeneExpressionReader<T extends Affymet
   private List<String> headers = new ArrayList<>();
 
   public AffymetrixMicroarrayGeneExpressionReader(
-      DataSetSupport dataSetSupport,
+      SampleRepository sampleRepository,
       DataImportProperties dataImportProperties, Class<T> model) {
-    this.dataSetSupport = dataSetSupport;
+    this.sampleRepository = sampleRepository;
     this.dataImportProperties = dataImportProperties;
     this.model = model;
   }
@@ -97,7 +97,6 @@ public abstract class AffymetrixMicroarrayGeneExpressionReader<T extends Affymet
               record.setDataFileId(this.getDataFile().getId());
               record.setGeneId(gene.getId());
               record.setSampleId(sample.getId());
-              record.setSubjectId(sample.getSubjectId());
               record.setProbeSetId(accession);
               record.setValue(Double.parseDouble(bits[i].trim()));
               dtoList.add(record);
@@ -135,7 +134,7 @@ public abstract class AffymetrixMicroarrayGeneExpressionReader<T extends Affymet
     for (int i = 2; i < headers.size(); i++){
       String header = headers.get(i);
       if (!header.equals("empty")) {
-        Optional<Sample> optional = dataSetSupport.findOrCreateSample(header, this.getDataSet());
+        Optional<Sample> optional = sampleRepository.bestGuess(header);
         if (!optional.isPresent()) {
           if (!dataImportProperties.isSkipInvalidSamples()){
             throw new InvalidSampleException(String.format("Unknown sample: %s", header));

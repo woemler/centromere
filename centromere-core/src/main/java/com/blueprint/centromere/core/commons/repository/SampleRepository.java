@@ -33,19 +33,19 @@ public interface SampleRepository extends
 		MetadataOperations<Sample>,
 		AttributeOperations<Sample> {
 
-  Optional<Sample> findByNameAndSubjectId(String name, String subjectId);
-  Optional<Sample> findByNameAndDataSetId(String name, String dataSetId);
-	List<Sample> findByName(@Param("name") String name);
+	Optional<Sample> findByName(@Param("name") String name);
+	List<Sample> findByAliases(@Param("alias") String alias);
 	List<Sample> findBySampleType(@Param("type") String sampleType);
 	List<Sample> findByTissue(@Param("tissue") String tissue);
 	List<Sample> findByHistology(@Param("histology") String histology);
-	List<Sample> findBySubjectId(@Param("subjectId") String subjectId);
-  List<Sample> findByDataSetId(@Param("dataSetId") String dataSetId);
+	List<Sample> findBySpecies(@Param("species") String species);
 	
 	@Override
 	default List<Sample> guess(@Param("keyword") String keyword){
 		List<Sample> samples = new ArrayList<>();
-		samples.addAll(findByName(keyword));
+		Optional<Sample> optional = this.findByName(keyword);
+		if (optional.isPresent()) samples.add(optional.get());
+		samples.addAll(this.findByAliases(keyword));
 		samples.addAll(findByTissue(keyword));
 		samples.addAll(findByHistology(keyword));
 		samples.addAll(findBySampleType(keyword));
@@ -54,15 +54,10 @@ public interface SampleRepository extends
 
   @Override
   default Optional<Sample> bestGuess(String keyword){
-    List<Sample> samples = findByName(keyword);
-    if (!samples.isEmpty()) return Optional.of(samples.get(0));
-    samples = findByTissue(keyword);
-    if (!samples.isEmpty()) return Optional.of(samples.get(0));
-    samples = findByHistology(keyword);
-    if (!samples.isEmpty()) return Optional.of(samples.get(0));
-    samples = findBySampleType(keyword);
-    if (!samples.isEmpty()) return Optional.of(samples.get(0));
-    return Optional.empty();
+    Optional<Sample> optional = findByName(keyword);
+    if (optional.isPresent()) return optional;
+    List<Sample> samples = this.findByAliases(keyword);
+    return samples.isEmpty() ? Optional.empty() : Optional.of(samples.get(0));
   }
 	
 }

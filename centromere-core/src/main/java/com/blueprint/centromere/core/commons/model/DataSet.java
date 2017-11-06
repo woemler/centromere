@@ -16,7 +16,6 @@
 
 package com.blueprint.centromere.core.commons.model;
 
-import com.blueprint.centromere.core.model.AbstractModel;
 import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Linked;
 import java.util.ArrayList;
@@ -36,17 +35,32 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document
 @Data
-public class DataSet extends AbstractModel implements Attributes {
+public class DataSet extends AbstractMongoModel implements Attributes {
 	
-	private String displayName;
-	@Indexed(unique = true) private String shortName;
-	@Indexed private String source;
-	@Ignored private String version;
-	@Ignored private String description;
-	@Linked(model = DataFile.class, rel = "dataFiles") private List<String> dataFileIds = new ArrayList<>();
-  @Linked(model = Sample.class, rel = "samples") private List<String> sampleIds = new ArrayList<>();
-	private Map<String, String> attributes = new HashMap<>();
-	@Ignored private Map<String, String> parameters = new HashMap<>();
+	private String name;
+	
+	@Indexed(unique = true) 
+  private String slug;
+	
+	@Indexed 
+  private String source;
+	
+	@Ignored 
+  private String version;
+	
+	@Ignored 
+  private String description;
+	
+	@Linked(model = DataFile.class, rel = "dataFiles") 
+  private List<String> dataFileIds = new ArrayList<>();
+  
+	@Linked(model = Sample.class, rel = "samples") 
+  private List<String> sampleIds = new ArrayList<>();
+	
+  private Map<String, String> attributes = new HashMap<>();
+	
+  @Ignored 
+  private Map<String, String> parameters = new HashMap<>();
 
 	@Override
 	public Map<String, String> getAttributes() {

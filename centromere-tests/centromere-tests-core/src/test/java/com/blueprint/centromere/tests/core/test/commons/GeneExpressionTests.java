@@ -5,7 +5,6 @@ import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.commons.repository.SubjectRepository;
 import com.blueprint.centromere.core.config.CoreConfiguration;
 import com.blueprint.centromere.tests.core.AbstractTcgaTests;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
@@ -31,7 +30,6 @@ public class GeneExpressionTests extends AbstractTcgaTests {
   @Autowired(required = false) private GeneExpressionRepository geneExpressionRepository;
   @Autowired private GeneRepository geneRepository;
   @Autowired private SampleRepository sampleRepository;
-  @Autowired private SubjectRepository subjectRepository;
   @Autowired private DataSetRepository dataSetRepository;
   @Autowired private DataFileRepository dataFileRepository;
 

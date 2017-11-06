@@ -93,7 +93,7 @@ public class DeleteCommandExecutor implements EnvironmentAware {
         for (String item: toDelete){
 
           DataSet dataSet = null;
-          Optional<DataSet> optional = dataSetRepository.findByShortName(item);
+          Optional<DataSet> optional = dataSetRepository.findBySlug(item);
           if (optional.isPresent()){
             dataSet = optional.get();
           } else {
@@ -107,7 +107,7 @@ public class DeleteCommandExecutor implements EnvironmentAware {
           }
 
           Printer.print(String.format("Deleting DataSet %s and all associated records and samples",
-              dataSet.getShortName()), logger, Level.INFO);
+              dataSet.getSlug()), logger, Level.INFO);
           for (String dataFileId: dataSet.getDataFileIds()){
             DataFile dataFile = dataFileRepository.findOne(dataFileId);
             deleteDataFile(dataFile);

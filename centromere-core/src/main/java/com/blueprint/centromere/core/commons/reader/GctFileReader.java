@@ -20,7 +20,7 @@ import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.model.SimpleData;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.support.DataSetSupport;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
@@ -50,7 +50,7 @@ public abstract class GctFileReader<T extends SimpleData> extends MultiRecordLin
   
   private final Class<T> model;
 	private final GeneRepository geneRepository;
-	private final DataSetSupport dataSetSupport;
+	private final SampleRepository sampleRepository;
 	private final DataImportProperties dataImportProperties;
 	
 	private Map<String, Sample> sampleMap;
@@ -61,11 +61,11 @@ public abstract class GctFileReader<T extends SimpleData> extends MultiRecordLin
   public GctFileReader(
       Class<T> model,
       GeneRepository geneRepository,
-      DataSetSupport dataSetSupport,
+      SampleRepository sampleRepository,
       DataImportProperties dataImportProperties) {
     this.model = model;
     this.geneRepository = geneRepository;
-    this.dataSetSupport = dataSetSupport;
+    this.sampleRepository = sampleRepository;
     this.dataImportProperties = dataImportProperties;
   }
 
@@ -138,7 +138,6 @@ public abstract class GctFileReader<T extends SimpleData> extends MultiRecordLin
 				record.setDataSetId(getDataSet().getId());
 				record.setGeneId(gene.getId());
 				record.setSampleId(sample.getId());
-				record.setSubjectId(sample.getSubjectId());
 				
 				record = getRecordValue(record, sample, gene, line, i);
 				
@@ -189,7 +188,7 @@ public abstract class GctFileReader<T extends SimpleData> extends MultiRecordLin
     if (sampleMap.containsKey(this.getHeaders().get(i))){
       sample = sampleMap.get(this.getHeaders().get(i));
     } else {
-      Optional<Sample> optional = dataSetSupport.findOrCreateSample(this.getHeaders().get(i), this.getDataSet());
+      Optional<Sample> optional = sampleRepository.bestGuess(this.getHeaders().get(i));
       if (optional.isPresent()){
         sample = optional.get();
         sampleMap.put(this.getHeaders().get(i), sample);

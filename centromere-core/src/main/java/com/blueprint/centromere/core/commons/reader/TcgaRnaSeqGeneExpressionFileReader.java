@@ -20,8 +20,8 @@ import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
+import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.commons.support.SampleAware;
-import com.blueprint.centromere.core.commons.support.TcgaSupport;
 import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidGeneException;
@@ -50,7 +50,7 @@ public class TcgaRnaSeqGeneExpressionFileReader
 	private static final Logger logger = LoggerFactory.getLogger(TcgaRnaSeqGeneExpressionFileReader.class);
 
 	private final GeneRepository geneRepository;
-	private final TcgaSupport tcgaSupport;
+	private final SampleRepository sampleRepository;
 	private final DataImportProperties dataImportProperties;
 	
 	private Map<String, Sample> sampleMap;
@@ -59,11 +59,11 @@ public class TcgaRnaSeqGeneExpressionFileReader
 
 	public TcgaRnaSeqGeneExpressionFileReader(
       GeneRepository geneRepository,
-      TcgaSupport tcgaSupport,
+      SampleRepository sampleRepository,
       DataImportProperties dataImportProperties
 	){
     this.geneRepository = geneRepository;
-    this.tcgaSupport = tcgaSupport;
+    this.sampleRepository = sampleRepository;
     this.dataImportProperties = dataImportProperties;
 	}
 
@@ -117,7 +117,6 @@ public class TcgaRnaSeqGeneExpressionFileReader
 				record.setDataSetId(getDataSet().getId());
 				record.setGeneId(gene.getId());
 				record.setSampleId(sample.getId());
-				record.setSubjectId(sample.getSubjectId());
 				records.add(record);
 			}
 			
@@ -136,8 +135,9 @@ public class TcgaRnaSeqGeneExpressionFileReader
 		if (sampleMap.containsKey(sampleName)){
 			sample = sampleMap.get(sampleName);
 		} else {
-			Optional<Sample> optional = tcgaSupport.findSample(sampleName, this.getDataSet());
-			sample = optional.isPresent() ? optional.get() : tcgaSupport.createSample(sampleName, this.getDataSet());
+		  sample = null; //TODO
+//			Optional<Sample> optional = tcgaSupport.findSample(sampleName, this.getDataSet());
+//			sample = optional.isPresent() ? optional.get() : tcgaSupport.createSample(sampleName, this.getDataSet());
 			sampleMap.put(this.getHeaders().get(index), sample);
 		}
 		return sample;
