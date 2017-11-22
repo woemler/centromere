@@ -67,6 +67,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 	}
 
   /**
+   * Extracts the column names from the header line of the file.
    * 
    * @param line
    */
@@ -80,6 +81,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 
   /**
    * 
+   * 
    * @param line
    * @param header
    * @param clazz
@@ -88,17 +90,29 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
    * @throws DataImportException
    */
   protected <S> S getColumnValue(String line, String header, Class<S> clazz) throws DataImportException {
-	  if (!headerMap.containsKey(header)) {
-	    throw new DataImportException(String.format("Given header does not exist in this file: %s", header));
-    }
-	  String[] bits = line.split(this.getDelimiter());
-	  Integer index = headerMap.get(header);
-	  if (bits.length <= index){
-      throw new DataImportException(String.format("Header index is outside bounds of current line.  " 
+	  return getColumnValue(line, header, clazz, false);
+  }
+
+  /**
+   *
+   * @param line
+   * @param header
+   * @param clazz
+   * @param caseSensitive
+   * @param <S>
+   * @return
+   * @throws DataImportException
+   */
+  protected <S> S getColumnValue(String line, String header, Class<S> clazz, boolean caseSensitive) throws DataImportException {
+    Integer index = getColumnIndex(header, caseSensitive);
+    if (index == -1) throw new DataImportException(String.format("Given header does not exist in this file: %s", header));
+    String[] bits = line.split(this.getDelimiter());
+    if (bits.length <= index){
+      throw new DataImportException(String.format("Header index is outside bounds of current line.  "
           + "Index = %d, line length = %d", index, bits.length));
     }
     if (!conversionService.canConvert(String.class, clazz)){
-	    throw new DataImportException(String.format("Cannot convert string value to %s", clazz.getName()));
+      throw new DataImportException(String.format("Cannot convert string value to %s", clazz.getName()));
     }
     return conversionService.convert(bits[index].trim(), clazz);
   }
@@ -112,6 +126,67 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
    */
   protected String getColumnValue(String line, String header) throws DataImportException {
     return getColumnValue(line, header, String.class);
+  }
+
+  /**
+   * Given a column header name, will return the index position of the column, or null if the column 
+   *   is not present.
+   * 
+   * @param header
+   * @return
+   */
+  protected Integer getColumnIndex(String header){
+    for (Map.Entry<String, Integer> entry: headerMap.entrySet()){
+      if (header.toLowerCase().equals(entry.getKey().toLowerCase())) return entry.getValue();
+    }
+    return -1;
+  }
+
+  /**
+   * Given a column header name, will return the index position of the column, or null if the column 
+   *   is not present.
+   *
+   * @param header
+   * @return
+   */
+  protected Integer getColumnIndex(String header, boolean caseSensitive){
+    if (caseSensitive) return headerMap.getOrDefault(header, -1);
+    else return getColumnIndex(header);
+  }
+
+  /**
+   * Given an index, corresponding to a column position, returns the header name for the column, or 
+   *   null if not present.
+   * 
+   * @param index
+   * @return
+   */
+  protected String getColumnHeader(Integer index){
+    for (Map.Entry<String, Integer> entry: headerMap.entrySet()){
+      if (index.equals(entry.getValue())) return entry.getKey();
+    }
+    return null;
+  }
+
+  /**
+   * Tests to see whether a column exists in the file.
+   * 
+   * @param header
+   * @param caseSensitive
+   * @return
+   */
+  protected boolean hasColumn(String header, boolean caseSensitive) {
+    return getColumnIndex(header, caseSensitive) > -1;
+  }
+
+  /**
+   * Tests to see whether a column exists in the file.  Ignores header case.
+   * 
+   * @param header
+   * @return
+   */
+  protected boolean hasColumn(String header){
+    return hasColumn(header, false);
   }
 
 	/**
@@ -155,7 +230,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
     this.conversionService = conversionService;
   }
 
-  public Map<String, Integer> getHeaderMap() {
+  public LinkedHashMap<String, Integer> getHeaderMap() {
     return headerMap;
   }
 

@@ -116,6 +116,8 @@ public class GenericRecordProcessor<T extends Model<?>>
 	@Override
 	public void doBefore() throws DataImportException {
 	  
+	  isInFailedState = false;
+	  
 	  // Checks that DataSet, DataFile, and ImportOptions are set
 	  try {
       afterPropertiesSet();
@@ -125,7 +127,10 @@ public class GenericRecordProcessor<T extends Model<?>>
       Assert.notNull(dataFile.getId(), "DataFile record has not been persisted to the database.");
       Assert.notNull(dataFile.getFilePath(), "No DataFile file path has been set");
       Assert.notNull(dataImportProperties, "Import DataImportProperties has not been set.");
+      Assert.notNull(dataSetRepository, "DataSetRepository must not be null.");
+      Assert.notNull(dataFileRepository, "DataFileRepository must not be null.");
     } catch (Exception e){
+	    isInFailedState = true;
 	    throw new DataImportException(e);
     }
     
@@ -324,6 +329,8 @@ public class GenericRecordProcessor<T extends Model<?>>
     
     // Process each record
     while (record != null) {
+
+      recordCount++;
       
       if (filter != null && filter.isFilterable(record)){
         logger.info(String.format("Filtering record: %s", record.toString()));
@@ -348,7 +355,6 @@ public class GenericRecordProcessor<T extends Model<?>>
       }
       
       record = reader.readRecord();
-      recordCount++;
       
     }
     

@@ -26,7 +26,7 @@ import java.util.Map;
 
 /**
  * Reads plain text files and maps a single column to a single record, to be emitted when the file's
- *   line reading is exhausted.  Assumes that the the first column represents filed identifiers.
+ *   line reading is exhausted.  Assumes that the the first column represents field identifiers.
  *
  * @author woemler
  */

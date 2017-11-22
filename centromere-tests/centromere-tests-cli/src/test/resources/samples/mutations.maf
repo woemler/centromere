@@ -1,0 +1,11 @@
+Hugo_Symbol	Entrez_Gene_Id	Center	NCBI_Build	Chromosome	Start_position	End_position	Strand	Variant_Classification	Variant_Type	Reference_Allele	Tumor_Seq_Allele1	Tumor_Seq_Allele2	dbSNP_RS	dbSNP_Val_Status	Tumor_Sample_Barcode	Matched_Norm_Sample_Barcode	Match_Norm_Seq_Allele1	Match_Norm_Seq_Allele2	Tumor_Validation_Allele1	Tumor_Validation_Allele2	Match_Norm_Validation_Allele1	Match_Norm_Validation_Allele2	Verification_Status	Validation_Status	Mutation_Status	Sequencing_Phase	Sequence_Source	Validation_Method
+GeneA	1	hgsc.bcm.edu;broad.mit.edu;ucsc.edu;bcgsc.ca	37	X	140994602	140994602	+	Missense_Mutation	SNP	A	A	T			SampleB	SampleB	A	A	.	.	.	.	Unknown	Untested	Somatic	.	WXS	none
+GeneA	1	hgsc.bcm.edu	37	17	80012466	80012466	+	Missense_Mutation	SNP	C	C	T	rs139982509		SampleD	SampleD	C	C	.	.	.	.	Unknown	Untested	Somatic	.	WXS	none
+GeneB	2	hgsc.bcm.edu;bcgsc.ca	37	22	21153979	21153979	+	Silent	SNP	G	G	A			SampleA	SampleA	G	G	.	.	.	.	Unknown	Untested	Somatic	.	WXS	none
+GeneC	3	hgsc.bcm.edu	37	6	170597856	170597856	+	Nonsense_Mutation	SNP	C	C	A			SampleE	SampleE	C	C	.	.	.	.	Unknown	Untested	Somatic	.	WXS	none
+GeneC	3	hgsc.bcm.edu	37	2	11735403	11735403	+	Nonsense_Mutation	SNP	G	G	T			SampleX	SampleX	G	G	.	.	.	.	Unknown	Untested	Somatic	.	WXS	none
+GeneC	3	hgsc.bcm.edu	37	7	116199003	116199003	+	Missense_Mutation	SNP	G	G	T			SampleA	SampleA	G	G	.	.	.	.	Unknown	Untested	Somatic	.	WXS	none
+GeneD	4	hgsc.bcm.edu	37	20	45192078	45192078	+	Missense_Mutation	SNP	G	G	T			SampleB	SampleB	G	G	.	.	.	.	Unknown	Untested	Somatic	.	WXS	none
+GeneD	4	hgsc.bcm.edu;broad.mit.edu;ucsc.edu;bcgsc.ca	37	22	38323501	38323501	+	Missense_Mutation	SNP	G	G	C			SampleC	SampleC	G	G	.	.	.	.	Unknown	Untested	Somatic	.	WXS	none
+GeneE	5	hgsc.bcm.edu;broad.mit.edu	37	19	22157034	22157034	+	Nonsense_Mutation	SNP	G	G	A			SampleD	SampleD	G	G	.	.	.	.	Unknown	Untested	Somatic	.	WXS	none
+GeneX	99	hgsc.bcm.edu;broad.mit.edu;ucsc.edu;bcgsc.ca	37	12	6471245	6471245	+	Missense_Mutation	SNP	G	G	T			SampleE	SampleE	G	G	.	.	.	.	Unknown	Untested	Somatic	.	WXS	none

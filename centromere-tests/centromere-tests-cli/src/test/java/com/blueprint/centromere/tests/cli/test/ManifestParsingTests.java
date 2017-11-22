@@ -74,7 +74,7 @@ public class ManifestParsingTests {
 	@Test
 	public void yamlParsingTest() throws Exception {
 		ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-		ClassPathResource resource = new ClassPathResource("samples/example_manifest.yml");
+		ClassPathResource resource = new ClassPathResource("manifests/example_manifest.yml");
 		File file = resource.getFile();
 		ImportManifest manifest = objectMapper.readValue(file, ImportManifest.class);
 		testManifestObject(manifest);
@@ -83,7 +83,7 @@ public class ManifestParsingTests {
 	@Test
 	public void jsonParsingTest() throws Exception {
 		ObjectMapper objectMapper = new ObjectMapper();
-		ClassPathResource resource = new ClassPathResource("samples/example_manifest.json");
+		ClassPathResource resource = new ClassPathResource("manifests/example_manifest.json");
 		File file = resource.getFile();
 		ImportManifest manifest = objectMapper.readValue(file, ImportManifest.class);
 		testManifestObject(manifest);
@@ -92,7 +92,7 @@ public class ManifestParsingTests {
 	@Test
 	public void xmlParsingTest() throws Exception {
 		ObjectMapper objectMapper = new XmlMapper();
-		ClassPathResource resource = new ClassPathResource("samples/example_manifest.xml");
+		ClassPathResource resource = new ClassPathResource("manifests/example_manifest.xml");
 		File file = resource.getFile();
 		ImportManifest manifest = objectMapper.readValue(file, ImportManifest.class);
 		testManifestObject(manifest);

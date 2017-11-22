@@ -38,6 +38,8 @@ public class MutationValidator extends DataValidator {
 		if (data.getVariantType() == null) errors.reject("variantType", "variantType.empty");
 		if (data.getChromosome() == null) errors.reject("chromosome", "chromosome.empty");
 		if (data.getDnaStartPosition() == null) errors.reject("dnaStartPosition", "dnaStartPosition.empty");
+    if (data.getReferenceAllele() == null) errors.reject("referenceAllele", "referenceAllele.empty");
+    if (data.getAlternateAllele() == null) errors.reject("alternateAllele", "alternateAllele.empty");
 		//if (data.getDnaStopPosition() == null) errors.reject("dnaStopPosition", "dnaStopPosition.empty");
 		if (data.getVariantClassification() == null) errors.reject("variantClassification", "variantClassification.empty");
 	}

@@ -1,17 +1,27 @@
 package com.blueprint.centromere.tests.core.test.commons;
 
+import com.blueprint.centromere.core.commons.model.DataFile;
+import com.blueprint.centromere.core.commons.model.DataSet;
+import com.blueprint.centromere.core.commons.model.GeneExpression;
+import com.blueprint.centromere.core.commons.model.Sample;
+import com.blueprint.centromere.core.commons.reader.GctGeneExpressionFileReader;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.config.CoreConfiguration;
-import com.blueprint.centromere.tests.core.AbstractTcgaTests;
+import com.blueprint.centromere.core.config.DataImportProperties;
+import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
@@ -25,7 +35,9 @@ import org.springframework.util.Assert;
     CoreConfiguration.CommonConfiguration.class,
     CoreConfiguration.DefaultModelConfiguration.class
 })
-public class GeneExpressionTests extends AbstractTcgaTests {
+public class GeneExpressionTests extends AbstractRepositoryTests {
+
+  private static final Resource gctGeneExpressionFile = new ClassPathResource("samples/gene_expression.gct");
 
   @Autowired(required = false) private GeneExpressionRepository geneExpressionRepository;
   @Autowired private GeneRepository geneRepository;
@@ -33,8 +45,7 @@ public class GeneExpressionTests extends AbstractTcgaTests {
   @Autowired private DataSetRepository dataSetRepository;
   @Autowired private DataFileRepository dataFileRepository;
 
-  private final ClassPathResource exampleFile = new ClassPathResource("samples/sample_tcga_rna_seq_gene_expression.txt");
-
+  @Before
   @Override
   public void setup() throws Exception {
     super.setup();
@@ -49,24 +60,52 @@ public class GeneExpressionTests extends AbstractTcgaTests {
   }
 
   @Test
-  public void tcgaGeneExpressionFileReaderTest() throws Exception {
-//
-//    DataSet dataSet = getDataSet();
-//    DataFile dataFile = getDataFile(dataSet, exampleFile.getFile());
-//    reader.doBefore(exampleFile.getFile(), dataFile, dataSet);
-//    List<GeneExpression> records = new ArrayList<>();
-//    GeneExpression record = reader.readRecord();
-//    while (record != null){
-//      records.add(record);
-//      record = reader.readRecord();
-//    }
-//    reader.doAfter();
-//    Assert.notNull(records, "List must not be null");
-//    Assert.notEmpty(records, "List must not be empty");
-//    Assert.isTrue(records.size() == 5,
-//        String.format("Expected 5 records, found ", records.size()));
+  public void gctExpressionReaderTest() throws Exception {
+
+    geneExpressionRepository.deleteAll();
+    Assert.isTrue(geneExpressionRepository.count() == 0);
+
+    DataSet dataSet = new DataSet();
+    dataSet.setSlug("example");
+    dataSet.setName("Example data set");
+    List<String> sampleIds = new ArrayList<>();
+    for (Sample sample: sampleRepository.findAll()){
+      sampleIds.add(sample.getId());
+    }
+    dataSet.setSampleIds(sampleIds);
+    dataSetRepository.insert(dataSet);
+    Assert.notNull(dataSet.getId());
+    Assert.isTrue(dataSetRepository.findBySlug("example").isPresent());
+    
+    DataFile dataFile = new DataFile();
+    dataFile.setFilePath(gctGeneExpressionFile.getFile().getAbsolutePath());
+    dataFile.setModel(GeneExpression.class);
+    dataFile.setDataSetId(dataSet.getId());
+    dataFile.setDataType("gct_expression");
+    dataFileRepository.insert(dataFile);
+
+    DataImportProperties dataImportProperties = new DataImportProperties();
+    dataImportProperties.setSkipInvalidGenes(true);
+    dataImportProperties.setSkipInvalidSamples(true);
+
+    GctGeneExpressionFileReader reader = 
+        new GctGeneExpressionFileReader(geneRepository, sampleRepository, dataImportProperties);
+    reader.setDataSet(dataSet);
+    reader.setDataFile(dataFile);
+    reader.doBefore();
+    
+    List<GeneExpression> expressionList = new ArrayList<>();
+    
+    GeneExpression geneExpression = reader.readRecord();
+    while (geneExpression != null){
+      expressionList.add(geneExpression);
+      geneExpression = reader.readRecord();
+    }
+    
+    reader.doAfter();
+
+    Assert.notEmpty(expressionList);
+
   }
-
-
 
 }

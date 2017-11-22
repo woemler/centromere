@@ -25,7 +25,7 @@ import lombok.Data;
  * @since 0.5.0
  */
 @Data
-@Parameters(commandDescription = "")
+@Parameters(commandDescription = "Imports a single file into the data warehouse.")
 public class ImportCommandParameters {
   
   public static final String COMMAND = "import";

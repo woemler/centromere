@@ -1,8 +1,8 @@
-package com.blueprint.centromere.tests.cli.test.commands;
+package com.blueprint.centromere.tests.cli.test.executor;
 
 import com.blueprint.centromere.cli.CentromereCommandLineInitializer;
+import com.blueprint.centromere.cli.CommandLineInputExecutor;
 import com.blueprint.centromere.cli.CommandLineRunnerException;
-import com.blueprint.centromere.cli.commands.ImportCommandExecutor;
 import com.blueprint.centromere.cli.parameters.ImportCommandParameters;
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
@@ -24,9 +24,13 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.io.ClassPathResource;
@@ -41,13 +45,14 @@ import org.springframework.util.Assert;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CommandLineTestInitializer.class, webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles({ Profiles.CLI_PROFILE, CentromereCommandLineInitializer.SINGLE_COMMAND_PROFILE })
-public class ImportCommandTests extends AbstractRepositoryTests {
+@FixMethodOrder
+public class ImportArgExecutionTests extends AbstractRepositoryTests {
   
   private static final Resource geneInfoFile = new ClassPathResource("samples/Homo_sapiens.gene_info");
   private static final Resource gctGeneExpressionFile = new ClassPathResource("samples/gene_expression.gct");
   private static final Resource mafFile = new ClassPathResource("samples/mutations.maf");
 
-  @Autowired private ImportCommandExecutor executor;
+  @Autowired private CommandLineInputExecutor executor;
   @Autowired private DataSetRepository dataSetRepository;
   @Autowired private DataFileRepository dataFileRepository;
   @Autowired private SampleRepository sampleRepository;
@@ -55,13 +60,20 @@ public class ImportCommandTests extends AbstractRepositoryTests {
   @Autowired private GeneExpressionRepository geneExpressionRepository;
   @Autowired private MutationRepository mutationRepository;
   
+  @Before
+  @Override
+  public void setup() throws Exception {
+    super.setup();
+    mutationRepository.deleteAll();
+  }
+  
   @Test
   public void helpTest(){
-    ImportCommandParameters parameters = new ImportCommandParameters();
-    parameters.setHelp(true);
+    String[] args = { "-h" };
+    ApplicationArguments arguments = new DefaultApplicationArguments(args);
     Exception exception = null;
     try {
-      executor.run(parameters);
+      executor.run(arguments);
     } catch (Exception e){
       e.printStackTrace();
       exception = e;
@@ -78,14 +90,13 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     long dfCount = dataFileRepository.count();
     Assert.isTrue(!dataFileRepository.findByFilePath(geneInfoFile.getFile().getAbsolutePath()).isPresent());
     
-    ImportCommandParameters parameters = new ImportCommandParameters();
-    parameters.setDataType("entrez_gene");
-    parameters.setFilePath(geneInfoFile.getFile().getAbsolutePath());
-    parameters.setDataSetKey("DataSetA");
+    String[] args = { "import", "-t", "entrez_gene", "-f", geneInfoFile.getFile().getAbsolutePath(), 
+        "-d", "DataSetA", "--skip-invalid-samples", "--skip-invalid-genes" };
+    ApplicationArguments arguments = new DefaultApplicationArguments(args);
     Exception exception = null;
     
     try {
-      executor.run(parameters);
+      executor.run(arguments);
     } catch (Exception e){
       e.printStackTrace();
       exception = e;
@@ -135,10 +146,14 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     parameters.setDataSetKey("example");
     parameters.setSkipInvalidGenes(true);
     parameters.setSkipInvalidSamples(true);
+
+    String[] args = { "import", "-t", "gct_gene_expression", "-f", gctGeneExpressionFile.getFile().getAbsolutePath(),
+        "-d", "example", "--skip-invalid-samples", "--skip-invalid-genes" };
+    ApplicationArguments arguments = new DefaultApplicationArguments(args);
     Exception exception = null;
 
     try {
-      executor.run(parameters);
+      executor.run(arguments);
     } catch (Exception e){
       e.printStackTrace();
       exception = e;
@@ -169,9 +184,6 @@ public class ImportCommandTests extends AbstractRepositoryTests {
   @Test
   public void mafMutationImportTest() throws Exception {
 
-    mutationRepository.deleteAll();
-    Assert.isTrue(mutationRepository.count() == 0);
-
     DataSet dataSet = new DataSet();
     dataSet.setSlug("example");
     dataSet.setName("Example data set");
@@ -183,17 +195,16 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     dataSetRepository.insert(dataSet);
     Assert.notNull(dataSet.getId());
     Assert.isTrue(dataSetRepository.findBySlug("example").isPresent());
+    
+    Assert.isTrue(!dataFileRepository.findByFilePath(mafFile.getFile().getAbsolutePath()).isPresent());
 
-    ImportCommandParameters parameters = new ImportCommandParameters();
-    parameters.setDataType("maf_mutation");
-    parameters.setFilePath(mafFile.getFile().getAbsolutePath());
-    parameters.setDataSetKey("example");
-    parameters.setSkipInvalidGenes(true);
-    parameters.setSkipInvalidSamples(true);
+    String[] args = { "import", "-t", "maf_mutation", "-f", mafFile.getFile().getAbsolutePath(),
+        "-d", "example", "--skip-invalid-samples", "--skip-invalid-genes" };
+    ApplicationArguments arguments = new DefaultApplicationArguments(args);
     Exception exception = null;
 
     try {
-      executor.run(parameters);
+      executor.run(arguments);
     } catch (Exception e){
       e.printStackTrace();
       exception = e;
@@ -261,9 +272,6 @@ public class ImportCommandTests extends AbstractRepositoryTests {
   @Test
   public void invalidSampleTest() throws Exception {
 
-    mutationRepository.deleteAll();
-    Assert.isTrue(mutationRepository.count() == 0);
-
     DataSet dataSet = new DataSet();
     dataSet.setSlug("example");
     dataSet.setName("Example data set");
@@ -276,15 +284,13 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     Assert.notNull(dataSet.getId());
     Assert.isTrue(dataSetRepository.findBySlug("example").isPresent());
 
-    ImportCommandParameters parameters = new ImportCommandParameters();
-    parameters.setDataType("maf_mutation");
-    parameters.setFilePath(mafFile.getFile().getAbsolutePath());
-    parameters.setDataSetKey("example");
-    parameters.setSkipInvalidGenes(true);
+    String[] args = { "import", "-t", "maf_mutation", "-f", mafFile.getFile().getAbsolutePath(),
+        "-d", "example", "--skip-invalid-genes" };
+    ApplicationArguments arguments = new DefaultApplicationArguments(args);
     Exception exception = null;
 
     try {
-      executor.run(parameters);
+      executor.run(arguments);
     } catch (Exception e){
       e.printStackTrace();
       exception = e;
@@ -293,7 +299,7 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     Assert.notNull(exception, "Exception should not be null");
     Assert.isTrue(exception instanceof CommandLineRunnerException, "Expected CommandLineRunnerException, was " 
         + exception.getClass().getSimpleName());
-    Assert.isTrue(exception.getCause() instanceof InvalidSampleException);
+    Assert.isTrue(exception.getCause().getCause() instanceof InvalidSampleException);
 
     Optional<DataFile> dataFileOptional = dataFileRepository
         .findByFilePath(mafFile.getFile().getAbsolutePath());
@@ -325,16 +331,13 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     Assert.notNull(dataSet.getId());
     Assert.isTrue(dataSetRepository.findBySlug("example").isPresent());
 
-    ImportCommandParameters parameters = new ImportCommandParameters();
-    parameters.setDataType("maf_mutation");
-    parameters.setFilePath("/path/to/no/file");
-    parameters.setDataSetKey("example");
-    parameters.setSkipInvalidGenes(true);
-    parameters.setSkipInvalidSamples(true);
+    String[] args = { "import", "-t", "maf_mutation", "-f", "/path/to/no/file",
+        "-d", "example", "--skip-invalid-samples", "--skip-invalid-genes" };
+    ApplicationArguments arguments = new DefaultApplicationArguments(args);
     Exception exception = null;
 
     try {
-      executor.run(parameters);
+      executor.run(arguments);
     } catch (Exception e){
       e.printStackTrace();
       exception = e;
@@ -343,7 +346,7 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     Assert.notNull(exception, "Exception should not be null");
     Assert.isTrue(exception instanceof CommandLineRunnerException, "Expected CommandLineRunnerException, was "
         + exception.getClass().getSimpleName());
-    Assert.isTrue(exception.getCause() instanceof FileNotFoundException);
+    Assert.isTrue(exception.getCause().getCause() instanceof FileNotFoundException);
 
     Optional<DataFile> dataFileOptional = dataFileRepository
         .findByFilePath(mafFile.getFile().getAbsolutePath());
@@ -357,9 +360,6 @@ public class ImportCommandTests extends AbstractRepositoryTests {
   @Test
   public void invalidDataTypeTest() throws Exception {
 
-    mutationRepository.deleteAll();
-    Assert.isTrue(mutationRepository.count() == 0);
-
     DataSet dataSet = new DataSet();
     dataSet.setSlug("example");
     dataSet.setName("Example data set");
@@ -372,16 +372,13 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     Assert.notNull(dataSet.getId());
     Assert.isTrue(dataSetRepository.findBySlug("example").isPresent());
 
-    ImportCommandParameters parameters = new ImportCommandParameters();
-    parameters.setDataType("bad_type");
-    parameters.setFilePath(mafFile.getFile().getAbsolutePath());
-    parameters.setDataSetKey("example");
-    parameters.setSkipInvalidGenes(true);
-    parameters.setSkipInvalidSamples(true);
+    String[] args = { "import", "-t", "bad_type", "-f", mafFile.getFile().getAbsolutePath(),
+        "-d", "example", "--skip-invalid-samples", "--skip-invalid-genes" };
+    ApplicationArguments arguments = new DefaultApplicationArguments(args);
     Exception exception = null;
 
     try {
-      executor.run(parameters);
+      executor.run(arguments);
     } catch (Exception e){
       e.printStackTrace();
       exception = e;
@@ -403,19 +400,21 @@ public class ImportCommandTests extends AbstractRepositoryTests {
   @Test
   public void invalidDataSetTest() throws Exception {
 
-    mutationRepository.deleteAll();
-    Assert.isTrue(mutationRepository.count() == 0);
-
     ImportCommandParameters parameters = new ImportCommandParameters();
     parameters.setDataType("maf_mutation");
     parameters.setFilePath(mafFile.getFile().getAbsolutePath());
     parameters.setDataSetKey("bad-data-set");
     parameters.setSkipInvalidGenes(true);
     parameters.setSkipInvalidSamples(true);
+
+
+    String[] args = { "import", "-t", "maf_mutation", "-f", mafFile.getFile().getAbsolutePath(),
+        "-d", "bad-data-set", "--skip-invalid-samples", "--skip-invalid-genes" };
+    ApplicationArguments arguments = new DefaultApplicationArguments(args);
     Exception exception = null;
 
     try {
-      executor.run(parameters);
+      executor.run(arguments);
     } catch (Exception e){
       e.printStackTrace();
       exception = e;

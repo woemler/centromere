@@ -249,10 +249,10 @@ public class ImportCommandExecutor {
   }
 	
   private void updateDataImportProperties(ImportCommandParameters parameters){
-	  if (parameters.isSkipInvalidFiles()) dataImportProperties.setSkipInvalidFiles(true);
-    if (parameters.isSkipInvalidGenes()) dataImportProperties.setSkipInvalidGenes(true);
-    if (parameters.isSkipInvalidRecords()) dataImportProperties.setSkipInvalidRecords(true);
-    if (parameters.isSkipInvalidSamples()) dataImportProperties.setSkipInvalidSamples(true);
+	  dataImportProperties.setSkipInvalidFiles(parameters.isSkipInvalidFiles());
+    dataImportProperties.setSkipInvalidGenes(parameters.isSkipInvalidGenes());
+    dataImportProperties.setSkipInvalidRecords(parameters.isSkipInvalidRecords());
+    dataImportProperties.setSkipInvalidSamples(parameters.isSkipInvalidSamples());
   }
 
 	@Autowired
