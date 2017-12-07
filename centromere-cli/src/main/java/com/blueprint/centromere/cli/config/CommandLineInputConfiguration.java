@@ -26,6 +26,8 @@ import com.blueprint.centromere.cli.commands.ImportCommandExecutor;
 import com.blueprint.centromere.cli.commands.ListCommandExecutor;
 import com.blueprint.centromere.cli.commands.UpdateCommandExecutor;
 import com.blueprint.centromere.core.config.Profiles;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,6 +40,12 @@ import org.springframework.data.repository.support.Repositories;
 @Configuration
 @Profile({ Profiles.CLI_PROFILE })
 public class CommandLineInputConfiguration {
+  
+  @Bean
+  @ConditionalOnMissingBean
+  public ObjectMapper objectMapper(){
+    return new ObjectMapper();
+  }
 	
 	@Bean
 	public ModelProcessorBeanRegistry modelProcessorBeanRegistry(){
