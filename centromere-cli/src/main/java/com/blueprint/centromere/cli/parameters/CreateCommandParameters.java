@@ -13,6 +13,7 @@ import lombok.Data;
 public class CreateCommandParameters extends GenericCommandParameters {
   
   public static final String COMMAND = "create";
+  public static final String HELP = "Create and insert new records into the data warehouse.";
 
   @Parameter(names = { "-m", "--model" }, required = true, 
       description = "Model of data to be created.")

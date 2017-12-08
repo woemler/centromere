@@ -29,6 +29,7 @@ import lombok.Data;
 public class ImportCommandParameters {
   
   public static final String COMMAND = "import";
+  public static final String HELP = "Imports a single file into the data warehouse.";
 	
 	@Parameter(names = { "-f", "--file" }, required = true, description = "Input file path.  Required")
 	private String filePath;

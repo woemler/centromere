@@ -1,8 +1,8 @@
 package com.blueprint.centromere.tests.cli.test.executor;
 
 import com.blueprint.centromere.cli.CentromereCommandLineInitializer;
-import com.blueprint.centromere.cli.CommandLineInputExecutor;
 import com.blueprint.centromere.cli.CommandLineRunnerException;
+import com.blueprint.centromere.cli.JCommanderInputExecutor;
 import com.blueprint.centromere.cli.parameters.ImportCommandParameters;
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
@@ -52,7 +52,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
   private static final Resource gctGeneExpressionFile = new ClassPathResource("samples/gene_expression.gct");
   private static final Resource mafFile = new ClassPathResource("samples/mutations.maf");
 
-  @Autowired private CommandLineInputExecutor executor;
+  @Autowired private JCommanderInputExecutor executor;
   @Autowired private DataSetRepository dataSetRepository;
   @Autowired private DataFileRepository dataFileRepository;
   @Autowired private SampleRepository sampleRepository;

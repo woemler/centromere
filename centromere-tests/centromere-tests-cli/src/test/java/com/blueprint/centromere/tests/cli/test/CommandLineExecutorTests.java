@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.tests.cli.test;
 
-import com.blueprint.centromere.cli.CommandLineInputExecutor;
+import com.blueprint.centromere.cli.JCommanderInputExecutor;
 import com.blueprint.centromere.cli.ModelProcessorBeanRegistry;
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Sample;
@@ -46,7 +46,7 @@ import org.springframework.util.Assert;
 public class CommandLineExecutorTests {
 	
 	@Autowired private ModelProcessorBeanRegistry registry;
-	@Autowired private CommandLineInputExecutor executor;
+	@Autowired private JCommanderInputExecutor executor;
 	@Autowired private GeneRepository geneRepository;
 	@Autowired private GeneExpressionRepository geneExpressionRepository;
 	@Autowired private DataFileRepository dataFileRepository;

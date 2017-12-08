@@ -48,16 +48,9 @@ import org.springframework.boot.ApplicationRunner;
  * @author woemler
  * @since 0.5.0
  */
-public class CommandLineInputExecutor implements ApplicationRunner {
+public class JCommanderInputExecutor implements ApplicationRunner {
 
-  private static final Logger logger = LoggerFactory.getLogger(CommandLineInputExecutor.class);
-  
-  public static final String IMPORT_COMMAND = "import";
-  public static final String BATCH_COMMAND = "batch";
-  public static final String CREATE_COMMAND = "create";
-  public static final String LIST_COMMAND = "list";
-  public static final String UPDATE_COMMAND = "update";
-  public static final String DELETE_COMMAND = "delete";
+  private static final Logger logger = LoggerFactory.getLogger(JCommanderInputExecutor.class);
 	
   private ImportCommandExecutor importCommandExecutor;
 	private BatchCommandExecutor batchCommandExecutor;
@@ -118,12 +111,12 @@ public class CommandLineInputExecutor implements ApplicationRunner {
 	  jc = JCommander.newBuilder()
         .acceptUnknownOptions(true)
         .addObject(baseParameters)
-        .addCommand(IMPORT_COMMAND, importParameters)
-        .addCommand(BATCH_COMMAND, batchParameters)
+        .addCommand(ImportCommandParameters.COMMAND, importParameters)
+        .addCommand(BatchCommandParameters.COMMAND, batchParameters)
         .addCommand(CreateCommandParameters.COMMAND, createParameters)
         .addCommand(UpdateCommandParameters.COMMAND, updateParameters)
-        .addCommand(LIST_COMMAND, listParameters)
-        .addCommand(DELETE_COMMAND, deleteParameters)
+        .addCommand(ListCommandParameters.COMMAND, listParameters)
+        .addCommand(DeleteCommandParameters.COMMAND, deleteParameters)
         .build();
     
 		int code = 1;
@@ -150,7 +143,7 @@ public class CommandLineInputExecutor implements ApplicationRunner {
       code = 0;
       
     // Manifest import
-    } else if (BATCH_COMMAND.equals(mainCommand)) {
+    } else if (BatchCommandParameters.COMMAND.equals(mainCommand)) {
 		    
         Printer.print(String.format("Running import batch command with arguments: %s ",
             batchParameters.toString()), logger, Level.INFO);
@@ -192,19 +185,19 @@ public class CommandLineInputExecutor implements ApplicationRunner {
     }
     
     // List command
-    else if (LIST_COMMAND.equals(mainCommand)) {
+    else if (ListCommandParameters.COMMAND.equals(mainCommand)) {
 
       String listable = "";
       if (listParameters.getArgs() != null && !listParameters.getArgs().isEmpty()) {
         listable = listParameters.getArgs().get(0);
       }
-      listCommandExecutor.run(listable, listParameters.getShowDetails());
+      listCommandExecutor.run(listable, listParameters.isShowDetails());
       code = 0;
 
     } 
     
     // Delete command
-    else if (DELETE_COMMAND.equals(mainCommand)){
+    else if (DeleteCommandParameters.COMMAND.equals(mainCommand)){
 
 		  String deleteable = "";
       List<String> toDelete = deleteParameters.getArgs();

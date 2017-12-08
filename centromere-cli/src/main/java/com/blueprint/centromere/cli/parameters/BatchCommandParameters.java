@@ -17,6 +17,7 @@
 package com.blueprint.centromere.cli.parameters;
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import lombok.Data;
 
 /**
@@ -24,7 +25,11 @@ import lombok.Data;
  * @since 0.5.0
  */
 @Data
+@Parameters(commandDescription = "Imports multiple files into the warehouse using a manifest file.")
 public class BatchCommandParameters {
+  
+  public static final String COMMAND = "batch";
+  public static final String HELP = "Imports multiple files into the warehouse using a manifest file.";
 	
 	@Parameter(names = { "-f", "--file" }, required = true, description = "Input file path.  Required")
 	private String filePath;

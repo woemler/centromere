@@ -54,7 +54,7 @@ public class CentromereCommandLineInitializer {
     builder.bannerMode((Mode.LOG));
     builder.web(false);
     builder.profiles(getActiveProfiles(source, args));
-    logger.info(String.format("Running Centromere with arguments: %s", args.toString()));
+    logger.info(String.format("Running Centromere with arguments: %s", Arrays.asList(args).toString()));
     System.out.println("Starting Centromere CLI...\n");
     builder.run(args);
   }

@@ -14,6 +14,8 @@ import lombok.Data;
 public class UpdateCommandParameters extends GenericCommandParameters {
   
   public static final String COMMAND = "update";
+  public static final String HELP = "Updates existing data warehouse records, replacing existing model "
+      + "attributes with those supplied by user input.";
 
   @Parameter(names = { "-m", "--model" }, required = true, 
       description = "Model of data to be created.")

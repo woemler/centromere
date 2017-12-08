@@ -1,6 +1,6 @@
 package com.blueprint.centromere.tests.cli.test.commands;
 
-import com.blueprint.centromere.cli.CommandLineInputExecutor;
+import com.blueprint.centromere.cli.JCommanderInputExecutor;
 import com.blueprint.centromere.cli.ModelProcessorBeanRegistry;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
@@ -27,7 +27,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class DeleteCommandTests extends AbstractRepositoryTests {
 
   @Autowired private ModelProcessorBeanRegistry registry;
-  @Autowired private CommandLineInputExecutor executor;
+  @Autowired private JCommanderInputExecutor executor;
   @Autowired private GeneRepository geneRepository;
   @Autowired private GeneExpressionRepository geneExpressionRepository;
   @Autowired private DataFileRepository dataFileRepository;
