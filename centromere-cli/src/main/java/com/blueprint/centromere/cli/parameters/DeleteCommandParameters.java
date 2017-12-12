@@ -12,7 +12,7 @@ import lombok.Data;
  */
 @Data
 @Parameters(commandDescription = "Deletes one or more records from the data warehouse.")
-public class DeleteCommandParameters extends GenericCommandParameters {
+public class DeleteCommandParameters {
   
   public static final String COMMAND = "delete";
   public static final String HELP = "Deletes one or more records from the data warehouse.";

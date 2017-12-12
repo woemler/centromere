@@ -9,6 +9,8 @@ import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.tests.cli.CommandLineTestInitializer;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,12 +47,12 @@ public class CreateCommandTests extends AbstractRepositoryTests {
   }
 
   @Test
-  public void createDataSetTest(){
+  public void createDataSetJsonTest(){
 
-    Optional<DataSet> optional = dataSetRepository.findBySlug("test");
+    Optional<DataSet> optional = dataSetRepository.findByDataSetId("test");
     Assert.isTrue(!optional.isPresent(), "DataSet must not exist already.");
     
-    String json = "{\"slug\": \"test\", \"name\": \"This is a test\", \"source\": \"internal\"}";
+    String json = "{\"dataSetId\": \"test\", \"name\": \"This is a test\", \"source\": \"internal\"}";
     CreateCommandParameters parameters = new CreateCommandParameters();
     parameters.setModel("dataset");
     parameters.setData(json);
@@ -63,10 +65,10 @@ public class CreateCommandTests extends AbstractRepositoryTests {
     }
     Assert.isTrue(exception == null, "Exception must be null");
 
-    optional = dataSetRepository.findBySlug("test");
+    optional = dataSetRepository.findByDataSetId("test");
     Assert.isTrue(optional.isPresent());
     DataSet dataSet = optional.get();
-    Assert.isTrue("test".equals(dataSet.getSlug()));
+    Assert.isTrue("test".equals(dataSet.getDataSetId()));
     Assert.isTrue("This is a test".equals(dataSet.getName()));
     Assert.isTrue("internal".equals(dataSet.getSource()));
     Assert.isTrue(dataSet.getDescription() == null);
@@ -74,12 +76,44 @@ public class CreateCommandTests extends AbstractRepositoryTests {
   }
 
   @Test
+  public void createDataSetDynamicTest(){
+
+    Optional<DataSet> optional = dataSetRepository.findByDataSetId("test");
+    Assert.isTrue(!optional.isPresent(), "DataSet must not exist already.");
+
+    Map<String, String> fields = new HashMap<>();
+    fields.put("dataSetId", "test");
+    fields.put("name", "This is a test");
+    fields.put("source", "internal");
+    CreateCommandParameters parameters = new CreateCommandParameters();
+    parameters.setModel("dataset");
+    parameters.setFields(fields);
+    Exception exception = null;
+    try {
+      executor.run(parameters);
+    } catch (Exception e){
+      e.printStackTrace();
+      exception = e;
+    }
+    Assert.isTrue(exception == null, "Exception must be null");
+
+    optional = dataSetRepository.findByDataSetId("test");
+    Assert.isTrue(optional.isPresent());
+    DataSet dataSet = optional.get();
+    Assert.isTrue("test".equals(dataSet.getDataSetId()));
+    Assert.isTrue("This is a test".equals(dataSet.getName()));
+    Assert.isTrue("internal".equals(dataSet.getSource()));
+    Assert.isTrue(dataSet.getDescription() == null);
+
+  }
+
+  @Test
   public void duplicateDataSetTest(){
 
-    Optional<DataSet> optional = dataSetRepository.findBySlug("DataSetA");
+    Optional<DataSet> optional = dataSetRepository.findByDataSetId("DataSetA");
     Assert.isTrue(optional.isPresent(), "DataSet must exist already.");
 
-    String json = "{\"slug\": \"DataSetA\", \"name\": \"This is a test\", \"source\": \"internal\"}";
+    String json = "{\"dataSetId\": \"DataSetA\", \"sampleId\": \"This is a test\", \"source\": \"internal\"}";
     CreateCommandParameters parameters = new CreateCommandParameters();
     parameters.setModel("dataset");
     parameters.setData(json);
@@ -94,17 +128,17 @@ public class CreateCommandTests extends AbstractRepositoryTests {
     Assert.isTrue(exception instanceof CommandLineRunnerException, "Expected CommandLineRunnerException, but was " 
         + exception.getClass().getSimpleName());
 
-    optional = dataSetRepository.findBySlug("DataSetA");
+    optional = dataSetRepository.findByDataSetId("DataSetA");
     Assert.isTrue(optional.isPresent());
     DataSet dataSet = optional.get();
-    Assert.isTrue("DataSetA".equals(dataSet.getSlug()));
+    Assert.isTrue("DataSetA".equals(dataSet.getDataSetId()));
     
   }
 
   @Test
   public void invalidModelTest(){
 
-    String json = "{\"slug\": \"test\", \"name\": \"This is a test\", \"source\": \"internal\"}";
+    String json = "{\"dataSetId\": \"test\", \"sampleId\": \"This is a test\", \"source\": \"internal\"}";
     CreateCommandParameters parameters = new CreateCommandParameters();
     parameters.setModel("invalid");
     parameters.setData(json);
@@ -124,7 +158,7 @@ public class CreateCommandTests extends AbstractRepositoryTests {
   @Test
   public void badJsonTest(){
 
-    String json = "{\"slug\" \"test\", \"name\" \"This is a test\", \"source\" \"internal\"}";
+    String json = "{\"dataSetId\" \"test\", \"sampleId\" \"This is a test\", \"source\" \"internal\"}";
     CreateCommandParameters parameters = new CreateCommandParameters();
     parameters.setModel("dataset");
     parameters.setData(json);
@@ -144,7 +178,7 @@ public class CreateCommandTests extends AbstractRepositoryTests {
   @Test
   public void invalidAttributeTest(){
 
-    String json = "{\"slug\" \"test\", \"name\" \"This is a test\", \"invalid\" \"internal\"}";
+    String json = "{\"dataSetId\" \"test\", \"sampleId\" \"This is a test\", \"invalid\" \"internal\"}";
     CreateCommandParameters parameters = new CreateCommandParameters();
     parameters.setModel("dataset");
     parameters.setData(json);

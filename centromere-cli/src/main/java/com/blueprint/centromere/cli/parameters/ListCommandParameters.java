@@ -12,7 +12,7 @@ import lombok.Data;
  */
 @Data
 @Parameters(commandDescription = "Lists out available records or properties of the data warehouse.")
-public class ListCommandParameters extends GenericCommandParameters {
+public class ListCommandParameters {
   
   public static final String COMMAND = "list";
   public static final String HELP = "Lists out available records or properties of the data warehouse.";

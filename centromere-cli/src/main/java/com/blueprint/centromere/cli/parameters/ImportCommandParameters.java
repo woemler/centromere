@@ -40,7 +40,7 @@ public class ImportCommandParameters {
 
   @Parameter(names = { "-d", "--data-set" }, required = true, description = "Identifier used to identify " 
       + "the associated data set.  If not specified, the file will not be associated with any data set.")
-  private String dataSetKey;
+  private String dataSetId;
 	
 	@Parameter(names = { "-o", "--overwrite" }, description = "If the target file already exists in the " 
       + "data warehouse, its records will be wiped and the file re-imported.")
@@ -49,7 +49,7 @@ public class ImportCommandParameters {
   @Parameter(names = { "-s", "--sample" }, description = "Identifier used to associate all contained " 
       + "file data with a single sample.  Useful if the file contains no sample identifiers, or if the " 
       + "sample identifier is included in the file name.")
-  private String sampleKey;
+  private String sampleId;
 	
 	@Parameter(names = { "--skip-invalid-records" }, 
       description = "Invalid data records will be skipped, rather than triggering exceptions.")

@@ -56,6 +56,8 @@ public class CentromereCommandLineInitializer {
     builder.profiles(getActiveProfiles(source, args));
     logger.info(String.format("Running Centromere with arguments: %s", Arrays.asList(args).toString()));
     System.out.println("Starting Centromere CLI...\n");
+    //String[] disabledCommands = {"--spring.shell.command.script.enabled=false"};
+    //builder.run(StringUtils.concatenateStringArrays(args, disabledCommands));
     builder.run(args);
   }
 
