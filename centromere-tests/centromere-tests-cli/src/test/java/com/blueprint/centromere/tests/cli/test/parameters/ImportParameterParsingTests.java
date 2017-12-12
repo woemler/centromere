@@ -164,10 +164,10 @@ public class ImportParameterParsingTests {
     Assert.isTrue(exampleFile.getFile().getAbsolutePath().equals(parameters.getFilePath()), "File path does not match");
     Assert.notNull(parameters.getDataType(), "Data type must not be null");
     Assert.isTrue("gene_info".equals(parameters.getDataType()), "Data type should be 'gene_info'");
-    Assert.notNull(parameters.getDataSetKey(), "DataSet must not be null");
-    Assert.isTrue("test-data-set".equals(parameters.getDataSetKey()), "value should be 'test-data-set'");
-    Assert.notNull(parameters.getSampleKey(), "Sample key must not be null");
-    Assert.isTrue("123".equals(parameters.getSampleKey()), "Sample kye should be '123'");
+    Assert.notNull(parameters.getDataSetId(), "DataSet must not be null");
+    Assert.isTrue("test-data-set".equals(parameters.getDataSetId()), "value should be 'test-data-set'");
+    Assert.notNull(parameters.getSampleId(), "Sample key must not be null");
+    Assert.isTrue("123".equals(parameters.getSampleId()), "Sample kye should be '123'");
 
   }
   

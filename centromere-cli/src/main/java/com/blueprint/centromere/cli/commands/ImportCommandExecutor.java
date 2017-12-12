@@ -71,7 +71,7 @@ public class ImportCommandExecutor {
 	  
 	  String dataType = parameters.getDataType();
 	  String filePath = parameters.getFilePath();
-	  String dataSetKey = parameters.getDataSetKey();
+	  String dataSetId = parameters.getDataSetId();
 	  updateDataImportProperties(parameters);
 
     // Check to make sure the target data type is supported and get the processor
@@ -84,13 +84,13 @@ public class ImportCommandExecutor {
 		Printer.print(String.format("Running file import: data-type=%s  file=%s", dataType, filePath), logger, Level.INFO);
 		
 	  // Get the data set
-    Optional<DataSet> dataSetOptional = Optional.ofNullable(dataSetRepository.findOne(dataSetKey));
+    Optional<DataSet> dataSetOptional = Optional.ofNullable(dataSetRepository.findOne(dataSetId));
     if (!dataSetOptional.isPresent()){
-      dataSetOptional = dataSetRepository.findBySlug(dataSetKey);
+      dataSetOptional = dataSetRepository.findByDataSetId(dataSetId);
     }
     if (!dataSetOptional.isPresent()){
       throw new CommandLineRunnerException(String.format("Unable to identify data set using key: %s",
-          parameters.getDataSetKey()));
+          parameters.getDataSetId()));
     }
     DataSet dataSet = dataSetOptional.get();
     Printer.print(String.format("Using DataSet record: %s", dataSet.toString()), logger, Level.INFO);
@@ -148,6 +148,13 @@ public class ImportCommandExecutor {
         // Update the existing record
         dataFile.setDateCreated(dataFile.getDateCreated());
         //dataFileRepository.delete(dataFile);
+        
+        try {
+          dataFile.generateFileId();
+        } catch (Exception e){
+          throw new CommandLineRunnerException(e);
+        }
+
         Printer.print(String.format("Updating existing data file record: %s", dataFile.toString()),
             logger, Level.INFO);
         dataFile = dataFileRepository.update(dataFile);
@@ -169,6 +176,11 @@ public class ImportCommandExecutor {
         HashCode hashCode = Files.hash(new File(filePath), Hashing.md5());
         dataFile.setChecksum(hashCode.toString());
       } catch (IOException e){
+        throw new CommandLineRunnerException(e);
+      }
+      try {
+        dataFile.generateFileId();
+      } catch (Exception e){
         throw new CommandLineRunnerException(e);
       }
 
@@ -243,8 +255,8 @@ public class ImportCommandExecutor {
     System.out.println("\nAvailable data sets:");
     System.out.println("    ShortName  ID");
     System.out.println("    ----  -----------");
-    for (DataSet dataSet: dataSetRepository.findAll(new Sort(Direction.ASC, "slug"))){
-      System.out.println(String.format("    %s: %s", dataSet.getSlug(), dataSet.getId()));
+    for (DataSet dataSet: dataSetRepository.findAll(new Sort(Direction.ASC, "dataSetId"))){
+      System.out.println(String.format("    %s: %s", dataSet.getDataSetId(), dataSet.getId()));
     }
   }
 	

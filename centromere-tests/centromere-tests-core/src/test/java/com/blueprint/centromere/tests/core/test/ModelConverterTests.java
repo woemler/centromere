@@ -37,18 +37,18 @@ public class ModelConverterTests {
 	
 	@Test
 	public void jsonConverterTest() throws Exception {
-		String json = "{\"primaryReferenceId\": 1, \"primaryGeneSymbol\": \"ABC\", \"taxId\": 9606}";
+		String json = "{\"geneId\": 1, \"primaryGeneSymbol\": \"ABC\", \"taxId\": 9606}";
 		JsonModelConverter converter = new JsonModelConverter(Gene.class);
 		Gene gene = (Gene) converter.convert(json);
 		Assert.notNull(gene);
-		Assert.isTrue("1".equals(gene.getPrimaryReferenceId()));
+		Assert.isTrue("1".equals(gene.getGeneId()));
 		Assert.isTrue("ABC".equals(gene.getPrimaryGeneSymbol()));
 		Assert.isNull(gene.getChromosome());
 	}
 	
 	@Test
 	public void badJsonConversiontest() throws Exception {
-		String json = "{\"primaryReferenceId\": 1, \"primaryGeneSymbol\": \"ABC\", \"badField\": 0}";
+		String json = "{\"geneId\": 1, \"primaryGeneSymbol\": \"ABC\", \"badField\": 0}";
 		JsonModelConverter converter = new JsonModelConverter(new ObjectMapper(), Gene.class);
 		Gene gene = (Gene) converter.convert(json);
 		Assert.isNull(gene);
@@ -57,13 +57,13 @@ public class ModelConverterTests {
 	@Test
 	public void mapConversionTest() throws Exception {
 		Map<String, String> map = new HashMap<>();
-		map.put("primaryReferenceId", "1");
+		map.put("geneId", "1");
 		map.put("primaryGeneSymbol", "ABC");
 		map.put("taxId", "9606");
 		KeyValueMapModelConverter converter = new KeyValueMapModelConverter(Gene.class);
 		Gene gene = (Gene) converter.convert(map);
 		Assert.notNull(gene);
-		Assert.isTrue("1".equals(gene.getPrimaryReferenceId()));
+		Assert.isTrue("1".equals(gene.getGeneId()));
 		Assert.isTrue("ABC".equals(gene.getPrimaryGeneSymbol()));
 		Assert.isNull(gene.getChromosome());
 	}
@@ -71,7 +71,7 @@ public class ModelConverterTests {
 	@Test
 	public void badMapConversionTest() throws Exception {
 		Map<String, String> map = new HashMap<>();
-		map.put("primaryReferenceId", "1");
+		map.put("geneId", "1");
 		map.put("primaryGeneSymbol", "ABC");
 		map.put("badField", "0");
 		KeyValueMapModelConverter converter = new KeyValueMapModelConverter(new ObjectMapper(), Gene.class);

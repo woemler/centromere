@@ -83,17 +83,17 @@ public class BatchCommandExecutor {
 		
 		// Get the data set
     DataSet dataSet;
-    Optional<DataSet> dsOptional = dataSetRepository.findBySlug(manifest.getSlug());
+    Optional<DataSet> dsOptional = dataSetRepository.findByDataSetId(manifest.getDataSetId());
     if (dsOptional.isPresent()){
       dataSet = dsOptional.get();
       if (!dataImportProperties.isOverwriteExistingDataSets()){
-        Printer.print(String.format("Skipping existing data set: %s", manifest.getSlug()), 
+        Printer.print(String.format("Skipping existing data set: %s", manifest.getDataSetId()), 
             logger, Level.WARN);
         return;
       }
     } else {
       dataSet = new DataSet();
-      dataSet.setSlug(manifest.getSlug());
+      dataSet.setDataSetId(manifest.getDataSetId());
     }
     if (manifest.getName() != null && !"".equalsIgnoreCase(manifest.getName())) {
       dataSet.setName(manifest.getName());

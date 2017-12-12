@@ -70,7 +70,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     Optional<Gene> optional = geneRepository.findById(genes.get(0).getId());
     Assert.isTrue(optional.isPresent());
     Gene gene = optional.get();
-    Assert.isTrue(gene.getPrimaryReferenceId().equals("1"));
+    Assert.isTrue(gene.getGeneId().equals("1"));
     Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
     Assert.notNull(gene.getAliases());
     Assert.notEmpty(gene.getAliases());
@@ -89,7 +89,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
     Gene gene = genes.get(0);
     Assert.notNull(gene);
-    Assert.isTrue(gene.getPrimaryReferenceId().equals("1"));
+    Assert.isTrue(gene.getGeneId().equals("1"));
     Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
     Assert.notNull(gene.getAliases());
     Assert.notEmpty(gene.getAliases());
@@ -123,7 +123,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
     Gene gene = genes.get(0);
     Assert.notNull(gene);
-    Assert.isTrue(gene.getPrimaryReferenceId().equals("2"));
+    Assert.isTrue(gene.getGeneId().equals("2"));
     Assert.isTrue("GeneB".equals(gene.getPrimaryGeneSymbol()));
 
   }
@@ -142,7 +142,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
     Gene gene = genes.get(0);
     Assert.notNull(gene);
-    Assert.isTrue(gene.getPrimaryReferenceId().equals("2"));
+    Assert.isTrue(gene.getGeneId().equals("2"));
     Assert.isTrue("GeneB".equals(gene.getPrimaryGeneSymbol()));
 
   }
@@ -159,7 +159,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
     Gene gene = genes.get(0);
     Assert.notNull(gene);
-    Assert.isTrue(gene.getPrimaryReferenceId().equals("2"));
+    Assert.isTrue(gene.getGeneId().equals("2"));
     Assert.isTrue("GeneB".equals(gene.getPrimaryGeneSymbol()));
     Assert.isTrue("DEF".equals(gene.getAliases().get(0)));
 
@@ -177,7 +177,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
     Gene gene = genes.get(0);
     Assert.notNull(gene);
-    Assert.isTrue(gene.getPrimaryReferenceId().equals("1"));
+    Assert.isTrue(gene.getGeneId().equals("1"));
     Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
     Assert.isTrue(gene.getAttributes().size() == 1);
     Assert.isTrue(gene.getAttributes().containsKey("isKinase"));
@@ -187,23 +187,23 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
   @Test
   public void findSortedTest(){
-    Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "primaryReferenceId"));
+    Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "geneId"));
     List<Gene> genes = (List<Gene>) geneRepository.findAll(sort);
     Assert.notNull(genes);
     Assert.notEmpty(genes);
     Assert.isTrue(genes.size() == 5);
-    Assert.isTrue(genes.get(0).getPrimaryReferenceId().equals("5"));
+    Assert.isTrue(genes.get(0).getGeneId().equals("5"));
   }
 
   @Test
   public void findAndSortTest(){
     QueryCriteria criteria = new QueryCriteria("geneType", "protein-coding");
-    Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "primaryReferenceId"));
+    Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "geneId"));
     List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singletonList(criteria), sort);
     Assert.notNull(genes);
     Assert.notEmpty(genes);
     Assert.isTrue(genes.size() == 3);
-    Assert.isTrue(genes.get(0).getPrimaryReferenceId().equals("4"));
+    Assert.isTrue(genes.get(0).getGeneId().equals("4"));
   }
 
   @Test
@@ -222,7 +222,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
     Gene gene = genes.get(0);
     Assert.notNull(gene);
-    Assert.isTrue(gene.getPrimaryReferenceId().equals("3"));
+    Assert.isTrue(gene.getGeneId().equals("3"));
 
   }
 
@@ -244,7 +244,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
     Gene gene = genes.get(0);
     Assert.notNull(gene);
-    Assert.isTrue(gene.getPrimaryReferenceId().equals("4"));
+    Assert.isTrue(gene.getGeneId().equals("4"));
 
   }
   
@@ -435,16 +435,16 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void insertTest(){
     Gene gene = new Gene();
-    gene.setPrimaryReferenceId("100");
+    gene.setGeneId("100");
     gene.setPrimaryGeneSymbol("TEST");
     gene.setTaxId(9606);
     gene.setChromosome("1");
     gene.setGeneType("protein-coding");
     geneRepository.save(gene);
 
-    Gene created = geneRepository.findByPrimaryReferenceId("100").get();
+    Gene created = geneRepository.findByGeneId("100").get();
     Assert.notNull(created);
-    Assert.isTrue(created.getPrimaryReferenceId().equals("100"));
+    Assert.isTrue(created.getGeneId().equals("100"));
     Assert.isTrue("TEST".equals(created.getPrimaryGeneSymbol()));
 
     geneRepository.delete(created);
@@ -455,26 +455,26 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   public void insertMultipleTest(){
     List<Gene> genes = new ArrayList<>();
     Gene gene1 = new Gene();
-    gene1.setPrimaryReferenceId("100");
+    gene1.setGeneId("100");
     gene1.setPrimaryGeneSymbol("TEST");
     gene1.setTaxId(9606);
     gene1.setChromosome("1");
     gene1.setGeneType("protein-coding");
     genes.add(gene1);
     Gene gene2 = new Gene();
-    gene2.setPrimaryReferenceId("101");
+    gene2.setGeneId("101");
     gene2.setPrimaryGeneSymbol("TEST2");
     gene2.setTaxId(9606);
     gene2.setChromosome("12");
     gene2.setGeneType("pseudo");
     genes.add(gene2);
     geneRepository.save(genes);
-    Optional<Gene> optional = geneRepository.findByPrimaryReferenceId("100");
+    Optional<Gene> optional = geneRepository.findByGeneId("100");
     Assert.notNull(optional);
     Assert.isTrue(optional.isPresent());
     Gene gene = optional.get();
     Assert.notNull(gene);
-    optional = geneRepository.findByPrimaryReferenceId("101");
+    optional = geneRepository.findByGeneId("101");
     Assert.notNull(genes);
     Assert.isTrue(optional.isPresent());
     gene = genes.get(0);
@@ -486,7 +486,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   public void updateTest(){
 
     Gene gene = new Gene();
-    gene.setPrimaryReferenceId("100");
+    gene.setGeneId("100");
     gene.setPrimaryGeneSymbol("TEST");
     gene.setTaxId(9606);
     gene.setChromosome("1");
@@ -497,7 +497,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     gene.setGeneType("pseudogene");
     geneRepository.save(gene);
 
-    Optional<Gene> optional = geneRepository.findByPrimaryReferenceId("100");
+    Optional<Gene> optional = geneRepository.findByGeneId("100");
     Assert.notNull(optional);
     Assert.isTrue(optional.isPresent());
     Gene updated = optional.get();
@@ -511,14 +511,14 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   public void updateMultipleTest(){
     List<Gene> genes = new ArrayList<>();
     Gene gene1 = new Gene();
-    gene1.setPrimaryReferenceId("100");
+    gene1.setGeneId("100");
     gene1.setPrimaryGeneSymbol("TEST");
     gene1.setTaxId(9606);
     gene1.setChromosome("1");
     gene1.setGeneType("protein-coding");
     genes.add(gene1);
     Gene gene2 = new Gene();
-    gene2.setPrimaryReferenceId("101");
+    gene2.setGeneId("101");
     gene2.setPrimaryGeneSymbol("TEST2");
     gene2.setTaxId(9606);
     gene2.setChromosome("12");
@@ -534,13 +534,13 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     genes.add(gene2);
     geneRepository.save(genes);
 
-    Optional<Gene> optional = geneRepository.findByPrimaryReferenceId("100");
+    Optional<Gene> optional = geneRepository.findByGeneId("100");
     Assert.notNull(optional);
     Assert.isTrue(optional.isPresent());
     Gene gene = optional.get();
     Assert.notNull(gene);
     Assert.isTrue("TEST".equals(gene.getGeneType()));
-    optional = geneRepository.findByPrimaryReferenceId("101");
+    optional = geneRepository.findByGeneId("101");
     Assert.notNull(optional);
     Assert.isTrue(optional.isPresent());
     gene = optional.get();
@@ -552,22 +552,22 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   public void deleteTest(){
 
     Gene gene = new Gene();
-    gene.setPrimaryReferenceId("100");
+    gene.setGeneId("100");
     gene.setPrimaryGeneSymbol("TEST");
     gene.setTaxId(9606);
     gene.setChromosome("1");
     gene.setGeneType("protein-coding");
     geneRepository.save(gene);
 
-    Optional<Gene> optional = geneRepository.findByPrimaryReferenceId("100");
+    Optional<Gene> optional = geneRepository.findByGeneId("100");
     Assert.notNull(optional);
     Assert.isTrue(optional.isPresent());
     Gene created = optional.get();
     Assert.notNull(created);
-    Assert.isTrue(created.getPrimaryReferenceId().equals("100"));
+    Assert.isTrue(created.getGeneId().equals("100"));
 
     geneRepository.delete(created);
-    optional = geneRepository.findByPrimaryReferenceId("100");
+    optional = geneRepository.findByGeneId("100");
     Assert.notNull(optional);
     Assert.isTrue(!optional.isPresent());
 
@@ -601,14 +601,14 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     Assert.notEmpty(genes);
 
     Gene gene = genes.get(0);
-    Assert.isTrue(gene.getPrimaryReferenceId().equals("1"));
+    Assert.isTrue(gene.getGeneId().equals("1"));
 
     genes = geneRepository.guess("MNO");
     Assert.notNull(genes);
     Assert.notEmpty(genes);
 
     gene = genes.get(0);
-    Assert.isTrue(gene.getPrimaryReferenceId().equals("5"));
+    Assert.isTrue(gene.getGeneId().equals("5"));
 
     genes = geneRepository.guess("XYZ");
     Assert.isTrue(genes.size() == 0);

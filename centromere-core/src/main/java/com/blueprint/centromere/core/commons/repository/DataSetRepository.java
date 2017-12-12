@@ -28,8 +28,8 @@ import org.springframework.data.mongodb.repository.Query;
  */
 @ModelResource("datasets")
 public interface DataSetRepository extends ModelRepository<DataSet, String> {
-	Optional<DataSet> findBySlug(String shortName); 
-	List<DataSet> findByName(String name);
+	Optional<DataSet> findByDataSetId(String dataSetId); 
+	Optional<DataSet> findByName(String name);
 	List<DataSet> findBySource(String source);
 	@Query("{ 'sampleIds': ?0 }")  List<DataSet> findBySampleId(String sampleId);
   @Query("{ 'dataFileIds': ?0 }")  List<DataSet> findByDataFileId(String dataFileId);

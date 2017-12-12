@@ -53,7 +53,7 @@ public class AbstractTcgaTests extends AbstractEntrezGeneTests {
 
   protected DataSet getDataSet(){
     DataSet dataSet = new DataSet();
-    dataSet.setSlug("TCGA-Test");
+    dataSet.setDataSetId("TCGA-Test");
     dataSet.setName("TCGA Test Data Set");
     dataSet.setSource("TCGA");
     dataSet.setVersion("1.0");

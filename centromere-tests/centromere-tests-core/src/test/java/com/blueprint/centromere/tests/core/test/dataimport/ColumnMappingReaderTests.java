@@ -98,7 +98,7 @@ public class ColumnMappingReaderTests {
 		}
 		wrapper.setPropertyValue("primaryGeneSymbol", value);
 
-		type = wrapper.getPropertyType("primaryReferenceId");
+		type = wrapper.getPropertyType("geneId");
 		value = entrezGeneId;
 		if (!type.equals(String.class)){
 			if (conversionService.canConvert(type, String.class)){
@@ -107,7 +107,7 @@ public class ColumnMappingReaderTests {
 				System.out.println(String.format("Cannot convert %s to String", type.getName()));
 			}
 		}
-		wrapper.setPropertyValue("primaryReferenceId", value);
+		wrapper.setPropertyValue("geneId", value);
 
 		type = wrapper.getPropertyType("taxId");
 		value = taxId;
@@ -146,8 +146,8 @@ public class ColumnMappingReaderTests {
 		Assert.notNull(gene);
 		Assert.notNull(gene.getPrimaryGeneSymbol());
 		Assert.isTrue("TEST".equals(gene.getPrimaryGeneSymbol()));
-		Assert.notNull(gene.getPrimaryReferenceId());
-		Assert.isTrue(gene.getPrimaryReferenceId() == "7");
+		Assert.notNull(gene.getGeneId());
+		Assert.isTrue(gene.getGeneId() == "7");
 		Assert.notNull(gene.getTaxId());
 		Assert.isTrue(gene.getTaxId() == 9606);
 		Assert.notNull(gene.getAliases());

@@ -29,7 +29,7 @@ public class UpdateParameterParsingTests {
     Exception exception = null;
     JCommander jc = null;
     String[] args = {UpdateCommandParameters.COMMAND, "-i", "123", "-m", "dataset", "-r", "--data", 
-        "{\"slug\": \"test\", \"source\": \"internal\", \"name\": \"This is a test\"}" };
+        "{\"dataSetId\": \"test\", \"source\": \"internal\", \"name\": \"This is a test\"}" };
     
     try {
       jc = JCommander.newBuilder()
@@ -68,10 +68,10 @@ public class UpdateParameterParsingTests {
 
     Assert.isTrue(exception == null, "No exception should be thrown");
     Assert.notNull(dataSet, "DataSet should not be null.");
-    Assert.notNull(dataSet.getSlug(), "ShortName should not be null");
+    Assert.notNull(dataSet.getDataSetId(), "ShortName should not be null");
     Assert.notNull(dataSet.getName(), "Displayname should not be null");
     Assert.notNull(dataSet.getSource(), "Source should not be null");
-    Assert.isTrue("test".equals(dataSet.getSlug()), "ShortName should be 'test'");
+    Assert.isTrue("test".equals(dataSet.getDataSetId()), "ShortName should be 'test'");
     Assert.isTrue("This is a test".equals(dataSet.getName()), "DisplayName should be 'test'");
     Assert.isTrue("internal".equals(dataSet.getSource()), "source should be 'test'");
     
@@ -85,7 +85,7 @@ public class UpdateParameterParsingTests {
     Exception exception = null;
     JCommander jc = null;
     String[] args = {UpdateCommandParameters.COMMAND, "-m", "dataset", "-r", "--data",
-        "{\"slug\": \"test\", \"source\": \"internal\", \"name\": \"This is a test\"}" };
+        "{\"dataSetId\": \"test\", \"source\": \"internal\", \"name\": \"This is a test\"}" };
 
     try {
       jc = JCommander.newBuilder()

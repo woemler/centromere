@@ -43,7 +43,7 @@ public class TempFileWriterTests extends AbstractRepositoryTests {
         new DelimtedTextFileWriter<>(new DataImportProperties(), GeneExpression.class);
     String path = writer.getTempFilePath("/path/to/fake/file.txt");
     DataSet dataSet = new DataSet();
-    dataSet.setSlug("test");
+    dataSet.setDataSetId("test");
     dataSet.setName("Test");
     dataSet.setId("test");
     DataFile dataFile = new DataFile();

@@ -33,7 +33,7 @@ import lombok.Data;
 public class ImportManifest {
     
   private String name;
-  private String slug;
+  private String dataSetId;
   private String source;
   private String version;
   private String description;
@@ -44,10 +44,10 @@ public class ImportManifest {
   public DataSet createDataSet(){
     DataSet dataSet = new DataSet();
     dataSet.setName(name);
-    if (slug != null) {
-      dataSet.setSlug(slug);
+    if (dataSetId != null) {
+      dataSet.setDataSetId(dataSetId);
     } else {
-      dataSet.setSlug(new Slugify().slugify(name));
+      dataSet.setDataSetId(new Slugify().slugify(name));
     }
     dataSet.setDescription(description);
     dataSet.setSource(source);

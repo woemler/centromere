@@ -28,7 +28,8 @@ import org.springframework.data.repository.query.Param;
  */
 @ModelResource("datafiles")
 public interface DataFileRepository extends ModelRepository<DataFile, String> {
-	Optional<DataFile> findByFilePath(@Param("path") String filePath );
+	Optional<DataFile> findByDataFileId(String dataFileId);
+  Optional<DataFile> findByFilePath(@Param("path") String filePath );
   List<DataFile> findByDataType(String dataType);
 	List<DataFile> findByDataSetId(String dataSetId);
 	List<DataFile> findByModel(String model);

@@ -62,7 +62,7 @@ public abstract class AbstractRepositoryTests {
     List<Gene> genes = new ArrayList<>();
 
     Gene geneA = new Gene();
-    geneA.setPrimaryReferenceId("1");
+    geneA.setGeneId("1");
     geneA.setPrimaryGeneSymbol("GeneA");
     geneA.setTaxId(9606);
     geneA.setChromosome("1");
@@ -73,7 +73,7 @@ public abstract class AbstractRepositoryTests {
     genes.add(geneA);
 
     Gene geneB = new Gene();
-    geneB.setPrimaryReferenceId("2");
+    geneB.setGeneId("2");
     geneB.setPrimaryGeneSymbol("GeneB");
     geneB.setTaxId(9606);
     geneB.setChromosome("5");
@@ -84,7 +84,7 @@ public abstract class AbstractRepositoryTests {
     genes.add(geneB);
 
     Gene geneC = new Gene();
-    geneC.setPrimaryReferenceId("3");
+    geneC.setGeneId("3");
     geneC.setPrimaryGeneSymbol("GeneC");
     geneC.setTaxId(9606);
     geneC.setChromosome("9");
@@ -95,7 +95,7 @@ public abstract class AbstractRepositoryTests {
     genes.add(geneC);
 
     Gene geneD = new Gene();
-    geneD.setPrimaryReferenceId("4");
+    geneD.setGeneId("4");
     geneD.setPrimaryGeneSymbol("GeneD");
     geneD.setTaxId(9606);
     geneD.setChromosome("X");
@@ -106,7 +106,7 @@ public abstract class AbstractRepositoryTests {
     genes.add(geneD);
 
     Gene geneE = new Gene();
-    geneE.setPrimaryReferenceId("5");
+    geneE.setGeneId("5");
     geneE.setPrimaryGeneSymbol("GeneE");
     geneE.setTaxId(9606);
     geneE.setChromosome("13");
@@ -123,7 +123,7 @@ public abstract class AbstractRepositoryTests {
     List<DataSet> dataSets = new ArrayList<>();
 
     DataSet dataSetA = new DataSet();
-    dataSetA.setSlug("DataSetA");
+    dataSetA.setDataSetId("DataSetA");
     dataSetA.setName("DataSetA");
     dataSetA.setSource("Internal");
     dataSetA.setVersion("1.0");
@@ -131,7 +131,7 @@ public abstract class AbstractRepositoryTests {
     dataSets.add(dataSetA);
 
     DataSet dataSetB = new DataSet();
-    dataSetB.setSlug("DataSetB");
+    dataSetB.setDataSetId("DataSetB");
     dataSetA.setName("DataSetB");
     dataSetB.setSource("External");
     dataSetB.setVersion("1.0");
@@ -139,7 +139,7 @@ public abstract class AbstractRepositoryTests {
     dataSets.add(dataSetB);
 
     DataSet dataSetC = new DataSet();
-    dataSetC.setSlug("DataSetC");
+    dataSetC.setDataSetId("DataSetC");
     dataSetC.setName("DataSetC");
     dataSetC.setSource("Internal");
     dataSetC.setVersion("2.0");
@@ -147,7 +147,7 @@ public abstract class AbstractRepositoryTests {
     dataSets.add(dataSetC);
 
     DataSet dataSetD = new DataSet();
-    dataSetD.setSlug("DataSetD");
+    dataSetD.setDataSetId("DataSetD");
     dataSetD.setName("DataSetD");
     dataSetD.setSource("External");
     dataSetD.setVersion("1.0");
@@ -155,7 +155,7 @@ public abstract class AbstractRepositoryTests {
     dataSets.add(dataSetD);
 
     DataSet dataSetE = new DataSet();
-    dataSetE.setSlug("DataSetE");
+    dataSetE.setDataSetId("DataSetE");
     dataSetE.setName("DataSetE");
     dataSetE.setSource("Internal");
     dataSetE.setVersion("1.0");
@@ -230,7 +230,7 @@ public abstract class AbstractRepositoryTests {
     List<Sample> samples = new ArrayList<>();
 
     Sample sampleA = new Sample();
-    sampleA.setName("SampleA");
+    sampleA.setSampleId("SampleA");
     sampleA.setTissue("Lung");
     sampleA.setHistology("carcinoma");
     sampleA.setSampleType("cell line");
@@ -241,7 +241,7 @@ public abstract class AbstractRepositoryTests {
     samples.add(sampleA);
 
     Sample sampleB = new Sample();
-    sampleB.setName("SampleB");
+    sampleB.setSampleId("SampleB");
     sampleB.setTissue("Liver");
     sampleB.setHistology("carcinoma");
     sampleB.setSampleType("cell line");
@@ -252,7 +252,7 @@ public abstract class AbstractRepositoryTests {
     samples.add(sampleB);
 
     Sample sampleC = new Sample();
-    sampleC.setName("SampleC");
+    sampleC.setSampleId("SampleC");
     sampleC.setTissue("Liver");
     sampleC.setHistology("carcinoma: HCC");
     sampleC.setSampleType("PDX");
@@ -263,7 +263,7 @@ public abstract class AbstractRepositoryTests {
     samples.add(sampleC);
 
     Sample sampleD = new Sample();
-    sampleD.setName("SampleD");
+    sampleD.setSampleId("SampleD");
     sampleD.setTissue("Breast");
     sampleD.setHistology("ductal carcinoma");
     sampleD.setSampleType("cell line");
@@ -274,7 +274,7 @@ public abstract class AbstractRepositoryTests {
     samples.add(sampleD);
 
     Sample sampleE = new Sample();
-    sampleE.setName("SampleE");
+    sampleE.setSampleId("SampleE");
     sampleE.setTissue("Breast");
     sampleE.setHistology("ductal carcinoma");
     sampleE.setSampleType("PDX");

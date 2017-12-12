@@ -33,7 +33,7 @@ public class TcgaSampleReader extends ColumnRecordFileReader<Sample> {
   @Override
   protected void setModelAttribute(Sample record, String attribute, String value) {
     if (attribute.equalsIgnoreCase("hybridization ref")){
-      record.setName(value.toLowerCase());
+      record.setSampleId(value.toLowerCase());
     } else if (attribute.equalsIgnoreCase("gender")){
       record.setGender(value);
     } else {

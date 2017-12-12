@@ -35,7 +35,7 @@ public interface GeneRepository extends
 		MetadataOperations<Gene>,
 		AttributeOperations<Gene> {
 
-	Optional<Gene> findByPrimaryReferenceId(@Param("refId") String refId);
+	Optional<Gene> findByGeneId(@Param("geneId") String geneId);
 
 	List<Gene> findByPrimaryGeneSymbol(@Param("symbol") String symbol);
 
@@ -49,7 +49,7 @@ public interface GeneRepository extends
 	@Override
 	default List<Gene> guess(@Param("keyword") String keyword){
 		List<Gene> genes = new ArrayList<>();
-		QueryCriteria criteria = new QueryCriteria("primaryReferenceId", keyword);
+		QueryCriteria criteria = new QueryCriteria("geneId", keyword);
 		genes.addAll((List<Gene>) find(Collections.singleton(criteria)));
     criteria = new QueryCriteria("primaryGeneSymbol", keyword);
     genes.addAll((List<Gene>) find(Collections.singleton(criteria)));
@@ -64,7 +64,7 @@ public interface GeneRepository extends
 
     List<Gene> genes = new ArrayList<>();
 
-    QueryCriteria criteria = new QueryCriteria("primaryReferenceId", keyword);
+    QueryCriteria criteria = new QueryCriteria("geneId", keyword);
     genes.addAll((List<Gene>) find(Collections.singleton(criteria)));
     if (!genes.isEmpty()){
       return Optional.of(genes.get(0));

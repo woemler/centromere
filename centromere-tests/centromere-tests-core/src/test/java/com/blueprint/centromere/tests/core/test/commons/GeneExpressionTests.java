@@ -66,7 +66,7 @@ public class GeneExpressionTests extends AbstractRepositoryTests {
     Assert.isTrue(geneExpressionRepository.count() == 0);
 
     DataSet dataSet = new DataSet();
-    dataSet.setSlug("example");
+    dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
     for (Sample sample: sampleRepository.findAll()){
@@ -75,7 +75,7 @@ public class GeneExpressionTests extends AbstractRepositoryTests {
     dataSet.setSampleIds(sampleIds);
     dataSetRepository.insert(dataSet);
     Assert.notNull(dataSet.getId());
-    Assert.isTrue(dataSetRepository.findBySlug("example").isPresent());
+    Assert.isTrue(dataSetRepository.findByDataSetId("example").isPresent());
     
     DataFile dataFile = new DataFile();
     dataFile.setFilePath(gctGeneExpressionFile.getFile().getAbsolutePath());

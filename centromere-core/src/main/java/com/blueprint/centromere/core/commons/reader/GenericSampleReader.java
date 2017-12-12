@@ -78,7 +78,7 @@ public class GenericSampleReader extends AbstractRecordFileReader<Sample>
     
     Sample sample = new Sample();
     BeanUtils.copyProperties(dataImportProperties.getSample(), sample);
-    sample.setName(bits[0].trim());
+    sample.setSampleId(bits[0].trim());
 
     for (Map.Entry<String, Integer> entry : headerMap.entrySet()) {
       if (entry.getKey().equalsIgnoreCase("tissue")) {

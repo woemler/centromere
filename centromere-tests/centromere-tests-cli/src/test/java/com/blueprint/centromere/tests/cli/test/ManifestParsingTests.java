@@ -53,7 +53,7 @@ public class ManifestParsingTests {
         Assert.notNull(manifest.getAttributes());
         Assert.notEmpty(manifest.getAttributes());
 		Assert.isTrue("Test Manifest".equals(manifest.getName()));
-		Assert.isTrue("test".equals(manifest.getSlug()));
+		Assert.isTrue("test".equals(manifest.getDataSetId()));
 		Assert.isTrue("This is a test".equals(manifest.getDescription()));
 		Assert.isTrue("internal".equals(manifest.getSource()));
 		Assert.isTrue("1.0".equals(manifest.getVersion()));

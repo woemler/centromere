@@ -51,7 +51,7 @@ public class TermTests extends AbstractRepositoryTests {
   
   @Test
   public void termExtractionTest() throws Exception {
-    Gene gene = geneRepository.findByPrimaryReferenceId("1").orElse(null);
+    Gene gene = geneRepository.findByGeneId("1").orElse(null);
     Assert.notNull(gene);
     List<Term> terms = Term.getModelTerms(gene);
     System.out.println(terms);
@@ -65,7 +65,7 @@ public class TermTests extends AbstractRepositoryTests {
       }
       else if (term.getField().equals("aliases")){
         Assert.isTrue("ABC".equals(term.getTerm()));
-      } else if (term.getField().equals("primaryReferenceId")){
+      } else if (term.getField().equals("geneId")){
         Assert.isTrue("1".equals(term.getTerm()));
       }
     }
@@ -75,7 +75,7 @@ public class TermTests extends AbstractRepositoryTests {
   public void mapTermExtractiontest() throws Exception {
     Sample sample = new Sample();
     sample.setId("abc123");
-    sample.setName("SampleX");
+    sample.setSampleId("SampleX");
     sample.setHistology("Histology Y");
     sample.setTissue("Tissue Z");
     Map<String, String> attributes = new HashMap<>();
@@ -127,7 +127,7 @@ public class TermTests extends AbstractRepositoryTests {
   
   @Test
   public void findByFieldTest() throws Exception {
-    List<Term> terms = termRepository.findByField("name");
+    List<Term> terms = termRepository.findByField("sampleId");
     Assert.notNull(terms);
     Assert.notEmpty(terms);
     Assert.isTrue(terms.size() == sampleRepository.count());

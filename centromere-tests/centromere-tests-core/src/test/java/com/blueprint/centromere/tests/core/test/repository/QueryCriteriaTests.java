@@ -121,10 +121,10 @@ public class QueryCriteriaTests {
     }
     Assert.notNull(descriptorMap);
     Assert.notEmpty(descriptorMap);
-    Assert.isTrue(descriptorMap.size() == 10, String.format("Size is actually %s", descriptorMap.size()));
+    Assert.isTrue(descriptorMap.size() == 9, String.format("Size is actually %s", descriptorMap.size()));
     Assert.isTrue(descriptorMap.containsKey("attributes.\\w+"));
     Assert.isTrue(!descriptorMap.containsKey("attributes"));
-    QueryParameterDescriptor descriptor = descriptorMap.get("primaryReferenceId");
+    QueryParameterDescriptor descriptor = descriptorMap.get("geneId");
     Assert.notNull(descriptor);
     Assert.isTrue(descriptor.getType().equals(String.class));
     descriptor = descriptorMap.get("primaryGeneSymbol");

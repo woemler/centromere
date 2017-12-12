@@ -18,11 +18,13 @@ package com.blueprint.centromere.core.commons.model;
 
 import com.blueprint.centromere.core.commons.support.ManagedTerm;
 import com.blueprint.centromere.core.model.Ignored;
+import com.blueprint.centromere.core.model.Model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -31,21 +33,49 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document
 @Data
-public class Gene extends AbstractMongoModel implements Attributes {
+public class Gene implements Model<String>, Attributes {
 
-	@Indexed(unique = true) @ManagedTerm private String primaryReferenceId;
-	@Indexed @ManagedTerm private String primaryGeneSymbol;
+	@Id
+  @ManagedTerm 
+  private String geneId;
+	
+	@Indexed 
+  @ManagedTerm 
+  private String primaryGeneSymbol;
+	
 	private Integer taxId;
+	
 	private String chromosome;
-	@Ignored private String chromosomeLocation;
+	
+	@Ignored 
+  private String chromosomeLocation;
+	
 	private String geneType;
-	@Ignored private String description;
+	
+	@Ignored 
+  private String description;
+	
 	private String referenceSource;
-	@Indexed @ManagedTerm private List<String> aliases = new ArrayList<>();
+	
+	@Indexed 
+  @ManagedTerm 
+  private List<String> aliases = new ArrayList<>();
+	
 	private Map<String, String> attributes = new HashMap<>();
+	
 	private Map<String, String> externalReferences = new HashMap<>();
 
-	public void addExternalReference(String name, String value){
+  @Override
+  public String getId() {
+    return getGeneId();
+  }
+
+  @Override
+  public void setId(String id) {
+    setGeneId(id);
+  }
+
+  public void addExternalReference(String name, String value){
 		externalReferences.put(name, value);
 	}
 

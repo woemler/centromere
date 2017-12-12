@@ -44,7 +44,7 @@ public class SampleTests {
 	public void tcgaSubjectReaderTest() throws Exception {
     ClassPathResource resource = new ClassPathResource("samples/tcga_sample_subjects.txt");
 	  DataSet dataSet = new DataSet();
-		dataSet.setSlug("test");
+		dataSet.setDataSetId("test");
 		dataSet.setName("Test");
 		dataSet.setId("test");
 		DataFile dataFile = new DataFile();
@@ -72,11 +72,11 @@ public class SampleTests {
     Assert.isTrue(samples.size() == 5);
     Sample subject = samples.get(0);
     Assert.notNull(subject);
-    Assert.isTrue("tcga-2y-a9gv".equals(subject.getName()));
+    Assert.isTrue("tcga-2y-a9gv".equals(subject.getSampleId()));
     Assert.isTrue("liver".equals(subject.getAttribute("tumor_tissue_site")));
     subject = samples.get(4);
     Assert.notNull(subject);
-    Assert.isTrue("tcga-bc-a110".equals(subject.getName()));
+    Assert.isTrue("tcga-bc-a110".equals(subject.getSampleId()));
     Assert.isTrue("black or african american".equals(subject.getAttribute("race")));
 	}
 	

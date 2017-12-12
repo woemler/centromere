@@ -32,7 +32,6 @@ public class GeneValidator implements Validator {
 	}
 
 	@Override public void validate(Object o, Errors errors) {
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "primaryReferenceId", "primaryReferenceId.empty");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "primaryGeneSymbol", "primaryGeneSymbol.empty");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "taxId", "taxId.empty");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "chromosome", "chromosome.empty");

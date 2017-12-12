@@ -53,14 +53,14 @@ public class CommonsModelRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findUniqueGeneTest(){
     
-    Optional<Gene> optional = geneRepository.findByPrimaryReferenceId("1");
+    Optional<Gene> optional = geneRepository.findByGeneId("1");
     Assert.notNull(optional, "Optional must not be null");
     Assert.isTrue(optional.isPresent(), "Object must be present");
     Gene gene = optional.get();
     Assert.notNull(gene, "Object must not be null");
-    Assert.isTrue("1".equals(gene.getPrimaryReferenceId()), "Primary ID must be '1'");
+    Assert.isTrue("1".equals(gene.getGeneId()), "Primary ID must be '1'");
     
-    optional = geneRepository.findByPrimaryReferenceId("1000");
+    optional = geneRepository.findByGeneId("1000");
     Assert.notNull(optional, "Optional must not be null");
     Assert.isTrue(!optional.isPresent(), "Object must not be present");
     
@@ -69,14 +69,14 @@ public class CommonsModelRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findUniqueDataSetTest(){
 
-    Optional<DataSet> optional = dataSetRepository.findBySlug("DataSetA");
+    Optional<DataSet> optional = dataSetRepository.findByDataSetId("DataSetA");
     Assert.notNull(optional, "Optional must not be null");
     Assert.isTrue(optional.isPresent(), "Object must be present");
     DataSet dataSet = optional.get();
     Assert.notNull(dataSet, "Object must not be null");
-    Assert.isTrue("DataSetA".equals(dataSet.getSlug()), "Primary ID must be 'DataSetA'");
+    Assert.isTrue("DataSetA".equals(dataSet.getDataSetId()), "Primary ID must be 'DataSetA'");
 
-    optional = dataSetRepository.findBySlug("DataSetZ");
+    optional = dataSetRepository.findByDataSetId("DataSetZ");
     Assert.notNull(optional, "Optional must not be null");
     Assert.isTrue(!optional.isPresent(), "Object must not be present");
 
@@ -85,14 +85,14 @@ public class CommonsModelRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findUniqueSubjectTest(){
 
-    Optional<Sample> optional = sampleRepository.findByName("SampleA");
+    Optional<Sample> optional = sampleRepository.findBySampleId("SampleA");
     Assert.notNull(optional, "Optional must not be null");
     Assert.isTrue(optional.isPresent(), "Object must be present");
     Sample sample = optional.get();
     Assert.notNull(sample, "Object must not be null");
-    Assert.isTrue("SampleA".equals(sample.getName()), "Primary ID must be 'SampleA'");
+    Assert.isTrue("SampleA".equals(sample.getSampleId()), "Primary ID must be 'SampleA'");
 
-    optional = sampleRepository.findByName("SampleZ");
+    optional = sampleRepository.findBySampleId("SampleZ");
     Assert.notNull(optional, "Optional must not be null");
     Assert.isTrue(!optional.isPresent(), "Object must not be present");
 

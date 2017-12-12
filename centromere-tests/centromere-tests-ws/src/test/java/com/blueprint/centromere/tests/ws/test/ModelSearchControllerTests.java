@@ -115,9 +115,9 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
   @Test
   public void findDataBySampleMetadata() throws Exception {
 
-    Sample sample = sampleRepository.findByName("SampleA").get();
+    Sample sample = sampleRepository.findBySampleId("SampleA").get();
 
-    mockMvc.perform(get(DATA_URL + "/sample?name=SampleA"))
+    mockMvc.perform(get(DATA_URL + "/sample?sampleId=SampleA"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[0]", hasKey("sampleId")))
@@ -139,9 +139,9 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
   @Test
   public void findDataByDataSetMetadata() throws Exception {
 
-    DataSet dataSet = dataSetRepository.findBySlug("DataSetA").get();
+    DataSet dataSet = dataSetRepository.findByDataSetId("DataSetA").get();
 
-    mockMvc.perform(get(DATA_URL + "/dataset?slug=DataSetA"))
+    mockMvc.perform(get(DATA_URL + "/dataset?dataSetId=DataSetA"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(6)))
         .andExpect(jsonPath("$[0]", hasKey("dataSetId")))

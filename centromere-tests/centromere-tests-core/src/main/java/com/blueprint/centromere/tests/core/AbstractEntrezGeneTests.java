@@ -31,7 +31,7 @@ public abstract class AbstractEntrezGeneTests {
     geneRepository.deleteAll();
     EntrezGeneInfoReader reader = new EntrezGeneInfoReader();
     DataSet dataSet = new DataSet();
-    dataSet.setSlug("metadata");
+    dataSet.setDataSetId("metadata");
     dataSet.setName("Metadata");
     dataSetRepository.insert(dataSet);
     DataFile dataFile = new DataFile();

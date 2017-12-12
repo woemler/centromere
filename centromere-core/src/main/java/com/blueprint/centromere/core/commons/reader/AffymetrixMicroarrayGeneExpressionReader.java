@@ -87,7 +87,7 @@ public abstract class AffymetrixMicroarrayGeneExpressionReader<T extends Affymet
           String header = headers.get(i);
           if (!header.equals("empty")
               && !header.toLowerCase().equals("description")
-              && !header.toLowerCase().equals("name")) {
+              && !header.toLowerCase().equals("sampleId")) {
 
             Sample sample = sampleMap.get(headers.get(i));
 

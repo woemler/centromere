@@ -73,7 +73,7 @@ public class TcgaRnaSeqGeneExpressionFileReader
     sampleMap = new HashMap<>();
 		geneMap = new HashMap<>();
 		for (Gene gene: geneRepository.findAll()){
-		  geneMap.put(gene.getPrimaryReferenceId(), gene);
+		  geneMap.put(gene.getGeneId(), gene);
     }
 	}
 

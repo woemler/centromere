@@ -81,7 +81,7 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     ImportCommandParameters parameters = new ImportCommandParameters();
     parameters.setDataType("entrez_gene");
     parameters.setFilePath(geneInfoFile.getFile().getAbsolutePath());
-    parameters.setDataSetKey("DataSetA");
+    parameters.setDataSetId("DataSetA");
     Exception exception = null;
     
     try {
@@ -105,7 +105,7 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     Optional<DataSet> dataSetOptional = dataSetRepository.findById(dataFile.getDataSetId());
     Assert.isTrue(dataSetOptional.isPresent());
     DataSet dataSet = dataSetOptional.get();
-    Assert.isTrue("DataSetA".equals(dataSet.getSlug()));
+    Assert.isTrue("DataSetA".equals(dataSet.getDataSetId()));
     Assert.isTrue(dataSet.getDataFileIds().contains(dataFile.getId()));
     
   }
@@ -118,7 +118,7 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     Assert.isTrue(geneExpressionRepository.count() == 0);
     
     DataSet dataSet = new DataSet();
-    dataSet.setSlug("example");
+    dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
     for (Sample sample: sampleRepository.findAll()){
@@ -127,12 +127,12 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     dataSet.setSampleIds(sampleIds);
     dataSetRepository.insert(dataSet);
     Assert.notNull(dataSet.getId());
-    Assert.isTrue(dataSetRepository.findBySlug("example").isPresent());
+    Assert.isTrue(dataSetRepository.findByDataSetId("example").isPresent());
 
     ImportCommandParameters parameters = new ImportCommandParameters();
     parameters.setDataType("gct_gene_expression");
     parameters.setFilePath(gctGeneExpressionFile.getFile().getAbsolutePath());
-    parameters.setDataSetKey("example");
+    parameters.setDataSetId("example");
     parameters.setSkipInvalidGenes(true);
     parameters.setSkipInvalidSamples(true);
     Exception exception = null;
@@ -173,7 +173,7 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     Assert.isTrue(mutationRepository.count() == 0);
 
     DataSet dataSet = new DataSet();
-    dataSet.setSlug("example");
+    dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
     for (Sample sample: sampleRepository.findAll()){
@@ -182,12 +182,12 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     dataSet.setSampleIds(sampleIds);
     dataSetRepository.insert(dataSet);
     Assert.notNull(dataSet.getId());
-    Assert.isTrue(dataSetRepository.findBySlug("example").isPresent());
+    Assert.isTrue(dataSetRepository.findByDataSetId("example").isPresent());
 
     ImportCommandParameters parameters = new ImportCommandParameters();
     parameters.setDataType("maf_mutation");
     parameters.setFilePath(mafFile.getFile().getAbsolutePath());
-    parameters.setDataSetKey("example");
+    parameters.setDataSetId("example");
     parameters.setSkipInvalidGenes(true);
     parameters.setSkipInvalidSamples(true);
     Exception exception = null;
@@ -218,7 +218,7 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     Assert.notNull(record.getSampleId());
     Optional<Sample> sampleOptional = sampleRepository.findById(record.getSampleId());
     Assert.isTrue(sampleOptional.isPresent());
-    Assert.isTrue("SampleB".equals(sampleOptional.get().getName()));
+    Assert.isTrue("SampleB".equals(sampleOptional.get().getSampleId()));
     Assert.notNull(record.getGeneId());
     Optional<Gene> geneOptional = geneRepository.findById(record.getGeneId());
     Assert.isTrue(geneOptional.isPresent());
@@ -237,7 +237,7 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     Assert.notNull(record.getSampleId());
     sampleOptional = sampleRepository.findById(record.getSampleId());
     Assert.isTrue(sampleOptional.isPresent());
-    Assert.isTrue("SampleD".equals(sampleOptional.get().getName()));
+    Assert.isTrue("SampleD".equals(sampleOptional.get().getSampleId()));
     Assert.notNull(record.getGeneId());
     geneOptional = geneRepository.findById(record.getGeneId());
     Assert.isTrue(geneOptional.isPresent());
@@ -265,7 +265,7 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     Assert.isTrue(mutationRepository.count() == 0);
 
     DataSet dataSet = new DataSet();
-    dataSet.setSlug("example");
+    dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
     for (Sample sample: sampleRepository.findAll()){
@@ -274,12 +274,12 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     dataSet.setSampleIds(sampleIds);
     dataSetRepository.insert(dataSet);
     Assert.notNull(dataSet.getId());
-    Assert.isTrue(dataSetRepository.findBySlug("example").isPresent());
+    Assert.isTrue(dataSetRepository.findByDataSetId("example").isPresent());
 
     ImportCommandParameters parameters = new ImportCommandParameters();
     parameters.setDataType("maf_mutation");
     parameters.setFilePath(mafFile.getFile().getAbsolutePath());
-    parameters.setDataSetKey("example");
+    parameters.setDataSetId("example");
     parameters.setSkipInvalidGenes(true);
     Exception exception = null;
 
@@ -314,7 +314,7 @@ public class ImportCommandTests extends AbstractRepositoryTests {
   public void nonexistentFileImportTest() throws Exception {
 
     DataSet dataSet = new DataSet();
-    dataSet.setSlug("example");
+    dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
     for (Sample sample: sampleRepository.findAll()){
@@ -323,12 +323,12 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     dataSet.setSampleIds(sampleIds);
     dataSetRepository.insert(dataSet);
     Assert.notNull(dataSet.getId());
-    Assert.isTrue(dataSetRepository.findBySlug("example").isPresent());
+    Assert.isTrue(dataSetRepository.findByDataSetId("example").isPresent());
 
     ImportCommandParameters parameters = new ImportCommandParameters();
     parameters.setDataType("maf_mutation");
     parameters.setFilePath("/path/to/no/file");
-    parameters.setDataSetKey("example");
+    parameters.setDataSetId("example");
     parameters.setSkipInvalidGenes(true);
     parameters.setSkipInvalidSamples(true);
     Exception exception = null;
@@ -361,7 +361,7 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     Assert.isTrue(mutationRepository.count() == 0);
 
     DataSet dataSet = new DataSet();
-    dataSet.setSlug("example");
+    dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
     for (Sample sample: sampleRepository.findAll()){
@@ -370,12 +370,12 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     dataSet.setSampleIds(sampleIds);
     dataSetRepository.insert(dataSet);
     Assert.notNull(dataSet.getId());
-    Assert.isTrue(dataSetRepository.findBySlug("example").isPresent());
+    Assert.isTrue(dataSetRepository.findByDataSetId("example").isPresent());
 
     ImportCommandParameters parameters = new ImportCommandParameters();
     parameters.setDataType("bad_type");
     parameters.setFilePath(mafFile.getFile().getAbsolutePath());
-    parameters.setDataSetKey("example");
+    parameters.setDataSetId("example");
     parameters.setSkipInvalidGenes(true);
     parameters.setSkipInvalidSamples(true);
     Exception exception = null;
@@ -409,7 +409,7 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     ImportCommandParameters parameters = new ImportCommandParameters();
     parameters.setDataType("maf_mutation");
     parameters.setFilePath(mafFile.getFile().getAbsolutePath());
-    parameters.setDataSetKey("bad-data-set");
+    parameters.setDataSetId("bad-data-set");
     parameters.setSkipInvalidGenes(true);
     parameters.setSkipInvalidSamples(true);
     Exception exception = null;

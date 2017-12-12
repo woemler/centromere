@@ -121,14 +121,18 @@ public class GenericRecordProcessor<T extends Model<?>>
 	  // Checks that DataSet, DataFile, and ImportOptions are set
 	  try {
       afterPropertiesSet();
+      Assert.notNull(dataFileRepository, "DataFileRepository must not be null.");
+      Assert.notNull(dataSetRepository, "DataSetRepository must not be null.");
       Assert.notNull(dataSet, "DataSet record is not set.");
-      Assert.notNull(dataSet.getId(), "DataSet record has not been persisted to the database.");
+      Assert.notNull(dataSet.getId(), "DataSetId has not been set");
+      Assert.isTrue(dataSetRepository.findById(dataSet.getId()).isPresent(), 
+          "DataSet record has not been persisted to the database");
       Assert.notNull(dataFile, "DataFile record is not set");
-      Assert.notNull(dataFile.getId(), "DataFile record has not been persisted to the database.");
+      Assert.notNull(dataFile.getId(), "DataFileId has not been set.");
+      Assert.isTrue(dataFileRepository.findById(dataFile.getId()).isPresent(),
+          "DataFile record has not been persisted to the database");
       Assert.notNull(dataFile.getFilePath(), "No DataFile file path has been set");
       Assert.notNull(dataImportProperties, "Import DataImportProperties has not been set.");
-      Assert.notNull(dataSetRepository, "DataSetRepository must not be null.");
-      Assert.notNull(dataFileRepository, "DataFileRepository must not be null.");
     } catch (Exception e){
 	    isInFailedState = true;
 	    throw new DataImportException(e);

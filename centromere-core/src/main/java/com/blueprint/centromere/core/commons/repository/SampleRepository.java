@@ -33,7 +33,7 @@ public interface SampleRepository extends
 		MetadataOperations<Sample>,
 		AttributeOperations<Sample> {
 
-	Optional<Sample> findByName(@Param("name") String name);
+	Optional<Sample> findBySampleId(@Param("sampleId") String sampleId);
 	List<Sample> findByAliases(@Param("alias") String alias);
 	List<Sample> findBySampleType(@Param("type") String sampleType);
 	List<Sample> findByTissue(@Param("tissue") String tissue);
@@ -43,7 +43,7 @@ public interface SampleRepository extends
 	@Override
 	default List<Sample> guess(@Param("keyword") String keyword){
 		List<Sample> samples = new ArrayList<>();
-		Optional<Sample> optional = this.findByName(keyword);
+		Optional<Sample> optional = this.findBySampleId(keyword);
 		if (optional.isPresent()) samples.add(optional.get());
 		samples.addAll(this.findByAliases(keyword));
 		samples.addAll(findByTissue(keyword));
@@ -54,7 +54,7 @@ public interface SampleRepository extends
 
   @Override
   default Optional<Sample> bestGuess(String keyword){
-    Optional<Sample> optional = findByName(keyword);
+    Optional<Sample> optional = findBySampleId(keyword);
     if (optional.isPresent()) return optional;
     List<Sample> samples = this.findByAliases(keyword);
     return samples.isEmpty() ? Optional.empty() : Optional.of(samples.get(0));

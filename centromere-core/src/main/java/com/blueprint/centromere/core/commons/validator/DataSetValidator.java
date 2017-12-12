@@ -34,7 +34,6 @@ public class DataSetValidator implements Validator {
 	@Override 
 	public void validate(Object o, Errors errors) {
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "name.empty");
-    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "slug", "slug.empty");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "source", "source.empty");
 	}
 }

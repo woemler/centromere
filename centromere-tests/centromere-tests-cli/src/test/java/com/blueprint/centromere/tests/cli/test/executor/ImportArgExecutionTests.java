@@ -116,7 +116,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     Optional<DataSet> dataSetOptional = dataSetRepository.findById(dataFile.getDataSetId());
     Assert.isTrue(dataSetOptional.isPresent());
     DataSet dataSet = dataSetOptional.get();
-    Assert.isTrue("DataSetA".equals(dataSet.getSlug()));
+    Assert.isTrue("DataSetA".equals(dataSet.getDataSetId()));
     Assert.isTrue(dataSet.getDataFileIds().contains(dataFile.getId()));
     
   }
@@ -129,7 +129,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     Assert.isTrue(geneExpressionRepository.count() == 0);
     
     DataSet dataSet = new DataSet();
-    dataSet.setSlug("example");
+    dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
     for (Sample sample: sampleRepository.findAll()){
@@ -138,12 +138,12 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     dataSet.setSampleIds(sampleIds);
     dataSetRepository.insert(dataSet);
     Assert.notNull(dataSet.getId());
-    Assert.isTrue(dataSetRepository.findBySlug("example").isPresent());
+    Assert.isTrue(dataSetRepository.findByDataSetId("example").isPresent());
 
     ImportCommandParameters parameters = new ImportCommandParameters();
     parameters.setDataType("gct_gene_expression");
     parameters.setFilePath(gctGeneExpressionFile.getFile().getAbsolutePath());
-    parameters.setDataSetKey("example");
+    parameters.setDataSetId("example");
     parameters.setSkipInvalidGenes(true);
     parameters.setSkipInvalidSamples(true);
 
@@ -185,7 +185,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
   public void mafMutationImportTest() throws Exception {
 
     DataSet dataSet = new DataSet();
-    dataSet.setSlug("example");
+    dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
     for (Sample sample: sampleRepository.findAll()){
@@ -194,7 +194,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     dataSet.setSampleIds(sampleIds);
     dataSetRepository.insert(dataSet);
     Assert.notNull(dataSet.getId());
-    Assert.isTrue(dataSetRepository.findBySlug("example").isPresent());
+    Assert.isTrue(dataSetRepository.findByDataSetId("example").isPresent());
     
     Assert.isTrue(!dataFileRepository.findByFilePath(mafFile.getFile().getAbsolutePath()).isPresent());
 
@@ -229,7 +229,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     Assert.notNull(record.getSampleId());
     Optional<Sample> sampleOptional = sampleRepository.findById(record.getSampleId());
     Assert.isTrue(sampleOptional.isPresent());
-    Assert.isTrue("SampleB".equals(sampleOptional.get().getName()));
+    Assert.isTrue("SampleB".equals(sampleOptional.get().getSampleId()));
     Assert.notNull(record.getGeneId());
     Optional<Gene> geneOptional = geneRepository.findById(record.getGeneId());
     Assert.isTrue(geneOptional.isPresent());
@@ -248,7 +248,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     Assert.notNull(record.getSampleId());
     sampleOptional = sampleRepository.findById(record.getSampleId());
     Assert.isTrue(sampleOptional.isPresent());
-    Assert.isTrue("SampleD".equals(sampleOptional.get().getName()));
+    Assert.isTrue("SampleD".equals(sampleOptional.get().getSampleId()));
     Assert.notNull(record.getGeneId());
     geneOptional = geneRepository.findById(record.getGeneId());
     Assert.isTrue(geneOptional.isPresent());
@@ -273,7 +273,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
   public void invalidSampleTest() throws Exception {
 
     DataSet dataSet = new DataSet();
-    dataSet.setSlug("example");
+    dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
     for (Sample sample: sampleRepository.findAll()){
@@ -282,7 +282,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     dataSet.setSampleIds(sampleIds);
     dataSetRepository.insert(dataSet);
     Assert.notNull(dataSet.getId());
-    Assert.isTrue(dataSetRepository.findBySlug("example").isPresent());
+    Assert.isTrue(dataSetRepository.findByDataSetId("example").isPresent());
 
     String[] args = { "import", "-t", "maf_mutation", "-f", mafFile.getFile().getAbsolutePath(),
         "-d", "example", "--skip-invalid-genes" };
@@ -320,7 +320,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
   public void nonexistentFileImportTest() throws Exception {
 
     DataSet dataSet = new DataSet();
-    dataSet.setSlug("example");
+    dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
     for (Sample sample: sampleRepository.findAll()){
@@ -329,7 +329,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     dataSet.setSampleIds(sampleIds);
     dataSetRepository.insert(dataSet);
     Assert.notNull(dataSet.getId());
-    Assert.isTrue(dataSetRepository.findBySlug("example").isPresent());
+    Assert.isTrue(dataSetRepository.findByDataSetId("example").isPresent());
 
     String[] args = { "import", "-t", "maf_mutation", "-f", "/path/to/no/file",
         "-d", "example", "--skip-invalid-samples", "--skip-invalid-genes" };
@@ -361,7 +361,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
   public void invalidDataTypeTest() throws Exception {
 
     DataSet dataSet = new DataSet();
-    dataSet.setSlug("example");
+    dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
     for (Sample sample: sampleRepository.findAll()){
@@ -370,7 +370,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     dataSet.setSampleIds(sampleIds);
     dataSetRepository.insert(dataSet);
     Assert.notNull(dataSet.getId());
-    Assert.isTrue(dataSetRepository.findBySlug("example").isPresent());
+    Assert.isTrue(dataSetRepository.findByDataSetId("example").isPresent());
 
     String[] args = { "import", "-t", "bad_type", "-f", mafFile.getFile().getAbsolutePath(),
         "-d", "example", "--skip-invalid-samples", "--skip-invalid-genes" };
@@ -403,7 +403,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     ImportCommandParameters parameters = new ImportCommandParameters();
     parameters.setDataType("maf_mutation");
     parameters.setFilePath(mafFile.getFile().getAbsolutePath());
-    parameters.setDataSetKey("bad-data-set");
+    parameters.setDataSetId("bad-data-set");
     parameters.setSkipInvalidGenes(true);
     parameters.setSkipInvalidSamples(true);
 

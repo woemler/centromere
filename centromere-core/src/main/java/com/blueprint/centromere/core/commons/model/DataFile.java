@@ -18,23 +18,31 @@ package com.blueprint.centromere.core.commons.model;
 
 import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Linked;
+import com.blueprint.centromere.core.model.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.util.Assert;
 
 /**
  * @author woemler
  */
 @Document
 @Data
-public class DataFile extends AbstractMongoModel implements Attributes {
+public class DataFile implements Model<String>, Attributes {
+  
+  @Id
+  private String dataFileId;
 	
-	@Indexed(unique = true) 
-  private String filePath;
+  @Indexed(unique = true)
+	private String filePath;
   
 	private String dataType;
 	
@@ -50,12 +58,30 @@ public class DataFile extends AbstractMongoModel implements Attributes {
   private Date dateUpdated;
 	
 	@Indexed 
-  @Linked(model = DataSet.class, rel = "dataSet") 
+  @Linked(model = DataSet.class, rel = "dataSet", field = "dataFileId") 
   private String dataSetId;
 	
 	private Map<String, String> attributes = new HashMap<>();
 
-	@JsonIgnore
+  public String getDataFileId() {
+    return dataFileId;
+  }
+
+  public void setDataFileId(String dataFileId) {
+    this.dataFileId = dataFileId;
+  }
+
+  @Override
+  public String getId() {
+    return getDataFileId();
+  }
+
+  @Override
+  public void setId(String id) {
+    setDataFileId(id);
+  }
+
+  @JsonIgnore
   public Class<?> getModelType() throws ClassNotFoundException {
     return Class.forName(model);
   }
@@ -92,5 +118,15 @@ public class DataFile extends AbstractMongoModel implements Attributes {
 	public String getAttribute(String name) {
 		return attributes.getOrDefault(name, null);
 	}
+
+  /**
+   * Generates a {@link #dataFileId} by hashing uniquely identifiable attributes.
+   */
+	public void generateFileId() throws NoSuchAlgorithmException {
+    Assert.notNull(filePath, "FilePath must not be null");
+    Assert.notNull(dataSetId, "DataSetId must not be null");
+    Assert.notNull(model, "Model must not be null");
+    setDataFileId(UUID.nameUUIDFromBytes((filePath + "-" + dataSetId + "-" + model).getBytes()).toString());
+  }
 
 }

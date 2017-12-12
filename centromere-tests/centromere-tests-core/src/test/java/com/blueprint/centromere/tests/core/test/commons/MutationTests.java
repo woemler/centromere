@@ -60,7 +60,7 @@ public class MutationTests extends AbstractRepositoryTests {
     
     List<Mutation> mutations = new ArrayList<>();
     
-    DataSet dataSet = dataSetRepository.findBySlug("DataSetA").get();
+    DataSet dataSet = dataSetRepository.findByDataSetId("DataSetA").get();
     Assert.notNull(dataSet);
     DataFile dataFile = new DataFile();
     dataFile.setDataSetId(dataSet.getId());
@@ -94,7 +94,7 @@ public class MutationTests extends AbstractRepositoryTests {
     Assert.notNull(record.getSampleId());
     Optional<Sample> sampleOptional = sampleRepository.findById(record.getSampleId());
     Assert.isTrue(sampleOptional.isPresent());
-    Assert.isTrue("SampleB".equals(sampleOptional.get().getName()));
+    Assert.isTrue("SampleB".equals(sampleOptional.get().getSampleId()));
     Assert.notNull(record.getGeneId());
     Optional<Gene> geneOptional = geneRepository.findById(record.getGeneId());
     Assert.isTrue(geneOptional.isPresent());
@@ -113,7 +113,7 @@ public class MutationTests extends AbstractRepositoryTests {
     Assert.notNull(record.getSampleId());
     sampleOptional = sampleRepository.findById(record.getSampleId());
     Assert.isTrue(sampleOptional.isPresent());
-    Assert.isTrue("SampleD".equals(sampleOptional.get().getName()));
+    Assert.isTrue("SampleD".equals(sampleOptional.get().getSampleId()));
     Assert.notNull(record.getGeneId());
     geneOptional = geneRepository.findById(record.getGeneId());
     Assert.isTrue(geneOptional.isPresent());
@@ -139,7 +139,7 @@ public class MutationTests extends AbstractRepositoryTests {
     
     Assert.isTrue(mutationRepository.count() == 0);
 
-    DataSet dataSet = dataSetRepository.findBySlug("DataSetA").get();
+    DataSet dataSet = dataSetRepository.findByDataSetId("DataSetA").get();
     Assert.notNull(dataSet);
     DataFile dataFile = new DataFile();
     dataFile.setDataSetId(dataSet.getId());
@@ -173,7 +173,7 @@ public class MutationTests extends AbstractRepositoryTests {
     Assert.notNull(record.getSampleId());
     Optional<Sample> sampleOptional = sampleRepository.findById(record.getSampleId());
     Assert.isTrue(sampleOptional.isPresent());
-    Assert.isTrue("SampleB".equals(sampleOptional.get().getName()));
+    Assert.isTrue("SampleB".equals(sampleOptional.get().getSampleId()));
     Assert.notNull(record.getGeneId());
     Optional<Gene> geneOptional = geneRepository.findById(record.getGeneId());
     Assert.isTrue(geneOptional.isPresent());
@@ -192,7 +192,7 @@ public class MutationTests extends AbstractRepositoryTests {
     Assert.notNull(record.getSampleId());
     sampleOptional = sampleRepository.findById(record.getSampleId());
     Assert.isTrue(sampleOptional.isPresent());
-    Assert.isTrue("SampleD".equals(sampleOptional.get().getName()));
+    Assert.isTrue("SampleD".equals(sampleOptional.get().getSampleId()));
     Assert.notNull(record.getGeneId());
     geneOptional = geneRepository.findById(record.getGeneId());
     Assert.isTrue(geneOptional.isPresent());

@@ -18,11 +18,13 @@ package com.blueprint.centromere.core.commons.model;
 
 import com.blueprint.centromere.core.commons.support.ManagedTerm;
 import com.blueprint.centromere.core.model.Ignored;
+import com.blueprint.centromere.core.model.Model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -34,11 +36,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document
 @Data
-public class Sample extends AbstractMongoModel implements Attributes {
+public class Sample implements Model<String>, Attributes {
 
-	@Indexed(unique = true) 
+	@Id
   @ManagedTerm 
-  private String name;
+  private String sampleId;
 	
 	@ManagedTerm
 	private String sampleType;
@@ -63,7 +65,17 @@ public class Sample extends AbstractMongoModel implements Attributes {
 	@Indexed
   private List<String> aliases = new ArrayList<>();
 
-	@Override
+  @Override
+  public String getId() {
+    return getSampleId();
+  }
+
+  @Override
+  public void setId(String id) {
+    setSampleId(id);
+  }
+
+  @Override
 	public void addAttribute(String name, String value) {
 		attributes.put(name, value);
 	}

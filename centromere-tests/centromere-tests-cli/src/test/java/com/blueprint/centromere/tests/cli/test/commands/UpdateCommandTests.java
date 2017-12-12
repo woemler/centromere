@@ -58,13 +58,12 @@ public class UpdateCommandTests extends AbstractRepositoryTests {
   public void mergeTest() throws Exception {
     
     DataSet dataSet1 = new DataSet();
-    dataSet1.setId("123");
-    dataSet1.setSlug("test");
+    dataSet1.setDataSetId("test");
     dataSet1.setName("This is a test");
     dataSet1.setSampleIds(Arrays.asList("12345"));
     
     DataSet dataSet2 = new DataSet();
-    dataSet2.setSlug("new-name");
+    dataSet2.setDataSetId("new-name");
     dataSet2.setSource("internal");
     Map<String, String> map = new HashMap<>();
     map.put("key", "value");
@@ -75,9 +74,8 @@ public class UpdateCommandTests extends AbstractRepositoryTests {
     System.out.println(dataSet1.toString());
     
     Assert.notNull(dataSet1.getId());
-    Assert.isTrue("123".equals(dataSet1.getId()));
-    Assert.notNull(dataSet1.getSlug());
-    Assert.isTrue("new-name".equals(dataSet1.getSlug()));
+    Assert.notNull(dataSet1.getDataSetId());
+    Assert.isTrue("new-name".equals(dataSet1.getDataSetId()));
     Assert.notNull(dataSet1.getName());
     Assert.isTrue("This is a test".equals(dataSet1.getName()));
     Assert.notNull(dataSet1.getSampleIds());
@@ -110,11 +108,11 @@ public class UpdateCommandTests extends AbstractRepositoryTests {
   @Test
   public void mergeUpdateDataSetTest(){
 
-    Optional<DataSet> optional = dataSetRepository.findBySlug("DataSetA");
+    Optional<DataSet> optional = dataSetRepository.findByDataSetId("DataSetA");
     Assert.isTrue(optional.isPresent(), "DataSet must exist already.");
     String id = optional.get().getId();
 
-    String json = "{\"slug\": \"test\", \"sampleIds\": [\"ABC123\"], \"attributes\": {\"key\": \"value\" } }";
+    String json = "{\"dataSetId\": \"DataSetA\", \"name\": \"test\", \"sampleIds\": [\"ABC123\"], \"attributes\": {\"key\": \"value\" } }";
     UpdateCommandParameters parameters = new UpdateCommandParameters();
     parameters.setModel("dataset");
     parameters.setData(json);
@@ -128,14 +126,14 @@ public class UpdateCommandTests extends AbstractRepositoryTests {
     }
     Assert.isTrue(exception == null, "Exception must be null");
 
-    optional = dataSetRepository.findBySlug("DataSetA");
+    optional = dataSetRepository.findByName("DataSetA");
     Assert.isTrue(!optional.isPresent());
-    optional = dataSetRepository.findBySlug("test");
+    optional = dataSetRepository.findByName("test");
     Assert.isTrue(optional.isPresent());
     DataSet dataSet = optional.get();
     Assert.notNull(dataSet.getId());
     Assert.isTrue(dataSet.getId().equals(id));
-    Assert.isTrue("test".equals(dataSet.getSlug()));
+    Assert.isTrue("test".equals(dataSet.getName()));
     Assert.notEmpty(dataSet.getSampleIds());
     Assert.isTrue(dataSet.getSampleIds().contains("ABC123"));
     Assert.notEmpty(dataSet.getAttributes());
@@ -147,11 +145,11 @@ public class UpdateCommandTests extends AbstractRepositoryTests {
   @Test
   public void replaceUpdateDataSetTest(){
 
-    Optional<DataSet> optional = dataSetRepository.findBySlug("DataSetA");
+    Optional<DataSet> optional = dataSetRepository.findByDataSetId("DataSetA");
     Assert.isTrue(optional.isPresent(), "DataSet must exist already.");
     String id = optional.get().getId();
 
-    String json = "{\"slug\": \"test\", \"sampleIds\": [\"ABC123\"], \"attributes\": {\"key\": \"value\" } }";
+    String json = "{\"dataSetId\": \"DataSetA\", \"name\": \"test\", \"sampleIds\": [\"ABC123\"], \"attributes\": {\"key\": \"value\" } }";
     UpdateCommandParameters parameters = new UpdateCommandParameters();
     parameters.setModel("dataset");
     parameters.setData(json);
@@ -166,14 +164,14 @@ public class UpdateCommandTests extends AbstractRepositoryTests {
     }
     Assert.isTrue(exception == null, "Exception must be null");
 
-    optional = dataSetRepository.findBySlug("DataSetA");
+    optional = dataSetRepository.findByName("DataSetA");
     Assert.isTrue(!optional.isPresent());
-    optional = dataSetRepository.findBySlug("test");
+    optional = dataSetRepository.findByName("test");
     Assert.isTrue(optional.isPresent());
     DataSet dataSet = optional.get();
     Assert.notNull(dataSet.getId());
     Assert.isTrue(dataSet.getId().equals(id));
-    Assert.isTrue("test".equals(dataSet.getSlug()));
+    Assert.isTrue("test".equals(dataSet.getName()));
     Assert.notEmpty(dataSet.getSampleIds());
     Assert.isTrue(dataSet.getSampleIds().contains("ABC123"));
     Assert.notEmpty(dataSet.getAttributes());
@@ -185,11 +183,11 @@ public class UpdateCommandTests extends AbstractRepositoryTests {
   @Test
   public void invalidModelTest(){
 
-    Optional<DataSet> optional = dataSetRepository.findBySlug("DataSetA");
+    Optional<DataSet> optional = dataSetRepository.findByDataSetId("DataSetA");
     Assert.isTrue(optional.isPresent(), "DataSet must exist already.");
     String id = optional.get().getId();
 
-    String json = "{\"slug\": \"test\", \"name\": \"This is a test\", \"source\": \"internal\"}";
+    String json = "{\"dataSetId\": \"test\", \"name\": \"This is a test\", \"source\": \"internal\"}";
     UpdateCommandParameters parameters = new UpdateCommandParameters();
     parameters.setModel("invalid");
     parameters.setData(json);
@@ -210,11 +208,11 @@ public class UpdateCommandTests extends AbstractRepositoryTests {
   @Test
   public void badJsonTest(){
 
-    Optional<DataSet> optional = dataSetRepository.findBySlug("DataSetA");
+    Optional<DataSet> optional = dataSetRepository.findByDataSetId("DataSetA");
     Assert.isTrue(optional.isPresent(), "DataSet must exist already.");
     String id = optional.get().getId();
 
-    String json = "{\"slug\" \"test\", \"name\" \"This is a test\", \"source\" \"internal\"}";
+    String json = "{\"dataSetId\" \"test\", \"name\" \"This is a test\", \"source\" \"internal\"}";
     UpdateCommandParameters parameters = new UpdateCommandParameters();
     parameters.setModel("dataset");
     parameters.setData(json);
@@ -235,11 +233,11 @@ public class UpdateCommandTests extends AbstractRepositoryTests {
   @Test
   public void invalidAttributeTest(){
 
-    Optional<DataSet> optional = dataSetRepository.findBySlug("DataSetA");
+    Optional<DataSet> optional = dataSetRepository.findByDataSetId("DataSetA");
     Assert.isTrue(optional.isPresent(), "DataSet must exist already.");
     String id = optional.get().getId();
 
-    String json = "{\"slug\" \"test\", \"name\" \"This is a test\", \"invalid\" \"internal\"}";
+    String json = "{\"dataSetId\" \"test\", \"name\" \"This is a test\", \"invalid\" \"internal\"}";
     UpdateCommandParameters parameters = new UpdateCommandParameters();
     parameters.setModel("dataset");
     parameters.setData(json);
@@ -260,7 +258,7 @@ public class UpdateCommandTests extends AbstractRepositoryTests {
   @Test
   public void invaliIdTest(){
 
-    String json = "{\"slug\" \"test\", \"name\" \"This is a test\", \"invalid\" \"internal\"}";
+    String json = "{\"dataSetId\" \"test\", \"name\" \"This is a test\", \"invalid\" \"internal\"}";
     UpdateCommandParameters parameters = new UpdateCommandParameters();
     parameters.setModel("dataset");
     parameters.setData(json);

@@ -18,12 +18,14 @@ package com.blueprint.centromere.core.commons.model;
 
 import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Linked;
+import com.blueprint.centromere.core.model.Model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -35,12 +37,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document
 @Data
-public class DataSet extends AbstractMongoModel implements Attributes {
-	
-	private String name;
-	
-	@Indexed(unique = true) 
-  private String slug;
+public class DataSet implements Model<String>, Attributes {
+
+  @Id
+  private String dataSetId;
+  
+  @Indexed(unique = true)
+  private String name;
 	
 	@Indexed 
   private String source;
@@ -51,10 +54,10 @@ public class DataSet extends AbstractMongoModel implements Attributes {
 	@Ignored 
   private String description;
 	
-	@Linked(model = DataFile.class, rel = "dataFiles") 
+	@Linked(model = DataFile.class, rel = "dataFiles", field = "dataFileId") 
   private List<String> dataFileIds = new ArrayList<>();
   
-	@Linked(model = Sample.class, rel = "samples") 
+	@Linked(model = Sample.class, rel = "samples", field = "sampleId") 
   private List<String> sampleIds = new ArrayList<>();
 	
   private Map<String, String> attributes = new HashMap<>();
@@ -62,7 +65,17 @@ public class DataSet extends AbstractMongoModel implements Attributes {
   @Ignored 
   private Map<String, String> parameters = new HashMap<>();
 
-	@Override
+  @Override
+  public String getId() {
+    return getDataSetId();
+  }
+
+  @Override
+  public void setId(String id) {
+    setDataSetId(id);
+  }
+
+  @Override
 	public Map<String, String> getAttributes() {
 		return attributes;
 	}

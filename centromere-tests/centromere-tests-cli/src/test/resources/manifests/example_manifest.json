@@ -1,6 +1,6 @@
 {
   "name": "Test Manifest",
-  "slug": "test",
+  "dataSetId": "test",
   "description": "This is a test",
   "source": "internal",
   "version": "1.0",

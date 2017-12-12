@@ -1,6 +1,6 @@
 <manifest>
     <name>Test Manifest</name>
-    <slug>test</slug>
+    <dataSetId>test</dataSetId>
     <description>This is a test</description>
     <source>internal</source>
     <version>1.0</version>
