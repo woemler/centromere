@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * @author woemler
  * @since 0.5.0
  */
-public abstract class GctFileReader<T extends SimpleData> extends MultiRecordLineFileReader<T>
+public abstract class GctFileReader<T extends SimpleData<?>> extends MultiRecordLineFileReader<T>
 		implements SampleAware {
 
   private static final Logger logger = LoggerFactory.getLogger(GctFileReader.class);
@@ -134,10 +134,10 @@ public abstract class GctFileReader<T extends SimpleData> extends MultiRecordLin
 					}
 				}
 				
-				record.setDataFileId(this.getDataFile().getId());
-				record.setDataSetId(getDataSet().getId());
-				record.setGeneId(gene.getId());
-				record.setSampleId(sample.getId());
+				record.setDataFileId(this.getDataFile().getDataFileId());
+				record.setDataSetId(getDataSet().getDataSetId());
+				record.setGeneId(gene.getGeneId());
+				record.setSampleId(sample.getSampleId());
 				
 				record = getRecordValue(record, sample, gene, line, i);
 				

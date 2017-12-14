@@ -24,22 +24,26 @@ import com.blueprint.centromere.core.model.ModelSupport;
 /**
  * @author woemler
  */
-public class EntrezGeneInfoReader extends StandardRecordFileReader<Gene>
-		implements ModelSupport<Gene> {
+public class EntrezGeneInfoReader<T extends Gene<?>> extends StandardRecordFileReader<T>
+		implements ModelSupport<T> {
 
-	private Class<Gene> model = Gene.class;
+	private final Class<T> model;
 
-	protected Gene getRecordFromLine(String line) throws DataImportException {
+  public EntrezGeneInfoReader(Class<T> model) {
+    this.model = model;
+  }
+
+  protected T getRecordFromLine(String line) throws DataImportException {
 		String[] bits = line.split("\\t");
-		Gene gene;
+		T gene;
 		try {
-			gene = new Gene();
+			gene = model.newInstance();
 		} catch (Exception e){
 			throw new DataImportException(String.format("Cannot create instance of model class: %s", model.getName()), e);
 		}
 		gene.setTaxId(Integer.parseInt(bits[0]));
 		gene.setGeneId(bits[1]);
-		gene.setPrimaryGeneSymbol(bits[2]);
+		gene.setSymbol(bits[2]);
 		for (String alias: bits[4].split("\\|")){
 			if (!alias.replaceAll("-", "").equals("")) gene.addAlias(alias);
 		}
@@ -51,7 +55,6 @@ public class EntrezGeneInfoReader extends StandardRecordFileReader<Gene>
 		gene.setChromosomeLocation(bits[7]);
 		gene.setDescription(bits[8]);
 		gene.setGeneType(bits[9]);
-		gene.setReferenceSource("NCBI");
 		return gene;
 	}
 
@@ -66,12 +69,12 @@ public class EntrezGeneInfoReader extends StandardRecordFileReader<Gene>
   }
 
   @Override
-	public Class<Gene> getModel() {
+	public Class<T> getModel() {
 		return model;
 	}
 
 	@Override 
-	public void setModel(Class<Gene> model) {
-		this.model = model;
+	public void setModel(Class<T> model) {
+		//this.model = model;
 	}
 }

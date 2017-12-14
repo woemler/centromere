@@ -16,9 +16,6 @@
 
 package com.blueprint.centromere.core.config;
 
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.model.Sample;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Data;
@@ -46,9 +43,9 @@ public class DataImportProperties {
   private String tempDir;
   private Map<String, String> attributes = new HashMap<>();
   
-  private DataSet dataSet = new DataSet();
-  private DataFile dataFile = new DataFile();
-  private Sample sample = new Sample();
+//  private DataSet dataSet = new DataSet();
+//  private DataFile dataFile = new DataFile();
+//  private Sample sample = new Sample();
   
   public boolean hasAttribute(String attribute){
     return this.attributes.containsKey(attribute);

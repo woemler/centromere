@@ -25,31 +25,32 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.BeanUtils;
 
 /**
  * @author woemler
  */
-public class GenericSampleReader extends AbstractRecordFileReader<Sample> 
-    implements SampleAware{
+public class GenericSampleReader<T extends Sample<?>> extends AbstractRecordFileReader<T> 
+    implements SampleAware {
   
+  private final Class<T> model;
   private final DataImportProperties dataImportProperties;
   
   private Map<String, Integer> headerMap = new HashMap<>();
   private String defaultEmptyValue = "n/a";
   private String delimiter = "\t";
 
-  public GenericSampleReader(DataImportProperties dataImportProperties) {
+  public GenericSampleReader(Class<T> model, DataImportProperties dataImportProperties) {
+    this.model = model;
     this.dataImportProperties = dataImportProperties;
   }
 
   @Override
-  public Sample readRecord() throws DataImportException {
+  public T readRecord() throws DataImportException {
     try {
       String line  = this.getReader().readLine();
       while (line != null){
         if (!line.toLowerCase().startsWith("sample")){
-          Sample sample = getRecordFromLine(line);
+          T sample = getRecordFromLine(line);
           if (sample != null) return sample;
         } else {
           headerMap = new HashMap<>();
@@ -72,12 +73,17 @@ public class GenericSampleReader extends AbstractRecordFileReader<Sample>
    * Parses a line of text and returns a single model record.  Should return null if the line does
    * not contain a valid record.
    */
-  protected Sample getRecordFromLine(String line) throws DataImportException {
+  protected T getRecordFromLine(String line) throws DataImportException {
     
     String[] bits = line.split(delimiter);
+    T sample;
     
-    Sample sample = new Sample();
-    BeanUtils.copyProperties(dataImportProperties.getSample(), sample);
+    try {
+      sample = model.newInstance();
+    } catch (Exception e){
+      throw new DataImportException(e);
+    }
+    //BeanUtils.copyProperties(dataImportProperties.getSample(), sample);
     sample.setSampleId(bits[0].trim());
 
     for (Map.Entry<String, Integer> entry : headerMap.entrySet()) {

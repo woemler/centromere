@@ -16,6 +16,7 @@
 
 package com.blueprint.centromere.core.config;
 
+import com.blueprint.centromere.core.mongodb.MongoConfiguration;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -34,7 +35,7 @@ import org.springframework.context.annotation.Import;
 @Target(ElementType.TYPE)
 @Inherited
 @Configuration
-@Import({ CoreConfiguration.class })
+@Import({ CoreConfiguration.class, MongoConfiguration.class})
 public @interface AutoConfigureCentromere {
 
   /**

@@ -7,6 +7,7 @@ import com.blueprint.centromere.cli.parameters.UpdateCommandParameters;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
 import com.blueprint.centromere.tests.cli.CommandLineTestInitializer;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import java.beans.PropertyDescriptor;
@@ -34,7 +35,7 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CommandLineTestInitializer.class, webEnvironment = WebEnvironment.NONE)
-@ActiveProfiles({ Profiles.CLI_PROFILE, CentromereCommandLineInitializer.SINGLE_COMMAND_PROFILE })
+@ActiveProfiles({ Profiles.SCHEMA_DEFAULT, Profiles.CLI_PROFILE, CentromereCommandLineInitializer.SINGLE_COMMAND_PROFILE })
 public class UpdateCommandTests extends AbstractRepositoryTests {
 
   @Autowired private UpdateCommandExecutor executor;
@@ -57,12 +58,12 @@ public class UpdateCommandTests extends AbstractRepositoryTests {
   @Test
   public void mergeTest() throws Exception {
     
-    DataSet dataSet1 = new DataSet();
+    DataSet dataSet1 = new MongoDataSet();
     dataSet1.setDataSetId("test");
     dataSet1.setName("This is a test");
     dataSet1.setSampleIds(Arrays.asList("12345"));
     
-    DataSet dataSet2 = new DataSet();
+    DataSet dataSet2 = new MongoDataSet();
     dataSet2.setDataSetId("new-name");
     dataSet2.setSource("internal");
     Map<String, String> map = new HashMap<>();
@@ -110,7 +111,7 @@ public class UpdateCommandTests extends AbstractRepositoryTests {
 
     Optional<DataSet> optional = dataSetRepository.findByDataSetId("DataSetA");
     Assert.isTrue(optional.isPresent(), "DataSet must exist already.");
-    String id = optional.get().getId();
+    String id = (String) optional.get().getId();
 
     String json = "{\"dataSetId\": \"DataSetA\", \"name\": \"test\", \"sampleIds\": [\"ABC123\"], \"attributes\": {\"key\": \"value\" } }";
     UpdateCommandParameters parameters = new UpdateCommandParameters();
@@ -147,7 +148,7 @@ public class UpdateCommandTests extends AbstractRepositoryTests {
 
     Optional<DataSet> optional = dataSetRepository.findByDataSetId("DataSetA");
     Assert.isTrue(optional.isPresent(), "DataSet must exist already.");
-    String id = optional.get().getId();
+    String id = (String) optional.get().getId();
 
     String json = "{\"dataSetId\": \"DataSetA\", \"name\": \"test\", \"sampleIds\": [\"ABC123\"], \"attributes\": {\"key\": \"value\" } }";
     UpdateCommandParameters parameters = new UpdateCommandParameters();
@@ -185,7 +186,7 @@ public class UpdateCommandTests extends AbstractRepositoryTests {
 
     Optional<DataSet> optional = dataSetRepository.findByDataSetId("DataSetA");
     Assert.isTrue(optional.isPresent(), "DataSet must exist already.");
-    String id = optional.get().getId();
+    String id = (String) optional.get().getId();
 
     String json = "{\"dataSetId\": \"test\", \"name\": \"This is a test\", \"source\": \"internal\"}";
     UpdateCommandParameters parameters = new UpdateCommandParameters();
@@ -210,7 +211,7 @@ public class UpdateCommandTests extends AbstractRepositoryTests {
 
     Optional<DataSet> optional = dataSetRepository.findByDataSetId("DataSetA");
     Assert.isTrue(optional.isPresent(), "DataSet must exist already.");
-    String id = optional.get().getId();
+    String id = (String) optional.get().getId();
 
     String json = "{\"dataSetId\" \"test\", \"name\" \"This is a test\", \"source\" \"internal\"}";
     UpdateCommandParameters parameters = new UpdateCommandParameters();
@@ -235,7 +236,7 @@ public class UpdateCommandTests extends AbstractRepositoryTests {
 
     Optional<DataSet> optional = dataSetRepository.findByDataSetId("DataSetA");
     Assert.isTrue(optional.isPresent(), "DataSet must exist already.");
-    String id = optional.get().getId();
+    String id = (String) optional.get().getId();
 
     String json = "{\"dataSetId\" \"test\", \"name\" \"This is a test\", \"invalid\" \"internal\"}";
     UpdateCommandParameters parameters = new UpdateCommandParameters();

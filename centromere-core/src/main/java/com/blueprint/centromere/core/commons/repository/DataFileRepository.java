@@ -18,19 +18,21 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.repository.ModelRepository;
-import com.blueprint.centromere.core.repository.ModelResource;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
 
 /**
  * @author woemler
  */
-@ModelResource("datafiles")
-public interface DataFileRepository extends ModelRepository<DataFile, String> {
-	Optional<DataFile> findByDataFileId(String dataFileId);
-  Optional<DataFile> findByFilePath(@Param("path") String filePath );
-  List<DataFile> findByDataType(String dataType);
-	List<DataFile> findByDataSetId(String dataSetId);
-	List<DataFile> findByModel(String model);
+@NoRepositoryBean
+public interface DataFileRepository<T extends DataFile<ID>, ID extends Serializable> 
+    extends ModelRepository<T, ID> {
+	Optional<T> findByDataFileId(String dataFileId);
+  Optional<T> findByFilePath(@Param("path") String filePath );
+  List<T> findByDataType(String dataType);
+	List<T> findByDataSetId(String dataSetId);
+	List<T> findByModel(String model);
 }

@@ -16,12 +16,15 @@
 
 package com.blueprint.centromere.core.commons.model;
 
+import java.io.Serializable;
+import org.hibernate.validator.constraints.NotEmpty;
+
 /**
  * @author woemler
  */
 @lombok.Data
-public abstract class AffymetrixArrayData extends SimpleData {
+public abstract class AffymetrixArrayData<ID extends Serializable> extends SimpleData<ID> {
 	
-	private String probeSetId;
+	@NotEmpty private String probeSetId;
 	
 }

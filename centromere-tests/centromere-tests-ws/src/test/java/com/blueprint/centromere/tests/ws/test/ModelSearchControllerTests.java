@@ -49,7 +49,7 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = WebTestInitializer.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(value = { Profiles.WEB_PROFILE, Profiles.NO_SECURITY, Profiles.API_DOCUMENTATION_DISABLED_PROFILE })
+@ActiveProfiles(value = { Profiles.SCHEMA_DEFAULT, Profiles.WEB_PROFILE, Profiles.NO_SECURITY, Profiles.API_DOCUMENTATION_DISABLED_PROFILE })
 @AutoConfigureMockMvc
 public class ModelSearchControllerTests extends AbstractRepositoryTests {
 
@@ -103,7 +103,7 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
   @Test
   public void findDataByGeneMetadata() throws Exception {
 
-    Gene gene = geneRepository.findByPrimaryGeneSymbol("GeneB").get(0);
+    Gene gene = (Gene) geneRepository.findBySymbol("GeneB").get(0);
     
     mockMvc.perform(get(DATA_URL + "/gene?primaryGeneSymbol=GeneB"))
         .andExpect(status().isOk())
@@ -115,7 +115,7 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
   @Test
   public void findDataBySampleMetadata() throws Exception {
 
-    Sample sample = sampleRepository.findBySampleId("SampleA").get();
+    Sample sample = (Sample) sampleRepository.findBySampleId("SampleA").get();
 
     mockMvc.perform(get(DATA_URL + "/sample?sampleId=SampleA"))
         .andExpect(status().isOk())
@@ -127,7 +127,7 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
   @Test
   public void findDataByDataFileMetadata() throws Exception {
 
-    DataFile dataFile = dataFileRepository.findByDataType("GCT RNA-Seq gene expression").get(0);
+    DataFile dataFile = (DataFile) dataFileRepository.findByDataType("GCT RNA-Seq gene expression").get(0);
 
     mockMvc.perform(get(DATA_URL + "/datafile?dataType=GCT RNA-Seq gene expression"))
         .andExpect(status().isOk())
@@ -139,7 +139,7 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
   @Test
   public void findDataByDataSetMetadata() throws Exception {
 
-    DataSet dataSet = dataSetRepository.findByDataSetId("DataSetA").get();
+    DataSet dataSet = (DataSet) dataSetRepository.findByDataSetId("DataSetA").get();
 
     mockMvc.perform(get(DATA_URL + "/dataset?dataSetId=DataSetA"))
         .andExpect(status().isOk())

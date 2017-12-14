@@ -20,67 +20,57 @@ import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Linked;
 import com.blueprint.centromere.core.model.Model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import javax.validation.constraints.Past;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.Assert;
 
 /**
  * @author woemler
  */
-@Document
 @Data
-public class DataFile implements Model<String>, Attributes {
-  
-  @Id
-  private String dataFileId;
-	
+public abstract class DataFile<ID extends Serializable> implements Model<ID>, Attributes {
+
   @Indexed(unique = true)
+  @NotEmpty
+  private String dataFileId;
+  
+  @NotEmpty
 	private String filePath;
   
+  @NotEmpty
 	private String dataType;
 	
+  @NotEmpty
 	private String model;
 	
 	@Ignored 
+  @NotEmpty
   private String checksum;
 	
 	@Ignored 
+  @Past
   private Date dateCreated;
 	
-	@Ignored 
+	@Ignored
+  @Past 
   private Date dateUpdated;
 	
 	@Indexed 
-  @Linked(model = DataSet.class, rel = "dataSet", field = "dataFileId") 
+  @Linked(model = DataSet.class, rel = "dataSet", field = "dataSetId") 
   private String dataSetId;
 	
 	private Map<String, String> attributes = new HashMap<>();
 
-  public String getDataFileId() {
-    return dataFileId;
-  }
-
-  public void setDataFileId(String dataFileId) {
-    this.dataFileId = dataFileId;
-  }
-
-  @Override
-  public String getId() {
-    return getDataFileId();
-  }
-
-  @Override
-  public void setId(String id) {
-    setDataFileId(id);
-  }
-
+	@Transient
   @JsonIgnore
   public Class<?> getModelType() throws ClassNotFoundException {
     return Class.forName(model);
@@ -89,7 +79,7 @@ public class DataFile implements Model<String>, Attributes {
   public void setModel(Class<?> modelType){
 	  this.model = modelType.getName();
   }
-
+  
 	@Override
 	public Map<String, String> getAttributes() {
 		return attributes;
@@ -122,11 +112,11 @@ public class DataFile implements Model<String>, Attributes {
   /**
    * Generates a {@link #dataFileId} by hashing uniquely identifiable attributes.
    */
-	public void generateFileId() throws NoSuchAlgorithmException {
-    Assert.notNull(filePath, "FilePath must not be null");
-    Assert.notNull(dataSetId, "DataSetId must not be null");
-    Assert.notNull(model, "Model must not be null");
-    setDataFileId(UUID.nameUUIDFromBytes((filePath + "-" + dataSetId + "-" + model).getBytes()).toString());
+	public static String generateFileId(DataFile dataFile) throws NoSuchAlgorithmException {
+    Assert.notNull(dataFile.getFilePath(), "FilePath must not be null");
+    Assert.notNull(dataFile.getDataSetId(), "DataSetId must not be null");
+    Assert.notNull(dataFile.getModel(), "Model must not be null");
+    return UUID.nameUUIDFromBytes((dataFile.getFilePath() + "-" + dataFile.getDataSetId() + "-" + dataFile.getModel()).getBytes()).toString();
   }
 
 }

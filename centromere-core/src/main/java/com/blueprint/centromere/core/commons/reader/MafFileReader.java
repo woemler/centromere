@@ -45,29 +45,38 @@ import org.slf4j.LoggerFactory;
  * @author woemler
  * @since 0.5.0
  */
-public class MafFileReader extends StandardRecordFileReader<Mutation> implements SampleAware {
+public class MafFileReader<T extends Mutation<?>> extends StandardRecordFileReader<T> implements SampleAware {
   
   private static final Logger logger = LoggerFactory.getLogger(MafFileReader.class);
   
+  private final Class<T> model;
   private final GeneRepository geneRepository;
   private final SampleRepository sampleRepository;
   private final DataImportProperties dataImportProperties;
   
   private Map<String, Sample> sampleMap = new HashMap<>();
 
-  public MafFileReader(GeneRepository geneRepository,
+  public MafFileReader(
+      Class<T> model,
+      GeneRepository geneRepository,
       SampleRepository sampleRepository,
       DataImportProperties dataImportProperties) {
+    this.model = model;
     this.geneRepository = geneRepository;
     this.sampleRepository = sampleRepository;
     this.dataImportProperties = dataImportProperties;
   }
 
   @Override
-  protected Mutation getRecordFromLine(String line) throws DataImportException {
+  protected T getRecordFromLine(String line) throws DataImportException {
     
     String[] bits = line.split(this.getDelimiter());
-    Mutation mutation = new Mutation();
+    T mutation;
+    try {
+      mutation = model.newInstance();
+    } catch (Exception e){
+      throw new DataImportException(e);
+    }
     
     // Get gene
     Optional<Gene> geneOptional = getRecordGene(line);
@@ -93,10 +102,10 @@ public class MafFileReader extends StandardRecordFileReader<Mutation> implements
     }
     Sample sample = sampleOptional.get();
     
-    mutation.setSampleId(sample.getId());
-    mutation.setGeneId(gene.getId());
-    mutation.setDataFileId(this.getDataFile().getId());
-    mutation.setDataSetId(this.getDataSet().getId());
+    mutation.setSampleId(sample.getSampleId());
+    mutation.setGeneId(gene.getGeneId());
+    mutation.setDataFileId(this.getDataFile().getDataFileId());
+    mutation.setDataSetId(this.getDataSet().getDataSetId());
     
     for (int i = 0; i < bits.length; i++){
       
@@ -136,6 +145,7 @@ public class MafFileReader extends StandardRecordFileReader<Mutation> implements
    * @return
    * @throws DataImportException
    */
+  @SuppressWarnings("unchecked")
   protected Optional<Gene> getRecordGene(String line) throws DataImportException {
     Optional<Gene> geneOptional = Optional.empty();
     if (this.hasColumn("entrez_gene_id")) geneOptional = geneRepository.bestGuess(getColumnValue(line, "entrez_gene_id"));
@@ -152,6 +162,7 @@ public class MafFileReader extends StandardRecordFileReader<Mutation> implements
    * @return
    * @throws DataImportException
    */
+  @SuppressWarnings("unchecked")
   protected Optional<Sample> getRecordSample(String line) throws DataImportException {
     Optional<Sample> optional = Optional.empty();
     if (this.hasColumn("tumor_sample_barcode")){

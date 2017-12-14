@@ -50,6 +50,7 @@ public class ListCommandExecutor implements EnvironmentAware {
   private DataFileRepository dataFileRepository;
   private Environment environment;
 
+  @SuppressWarnings("unchecked")
   public void run(String arg, boolean showDetails) throws CommandLineRunnerException {
 
     arg = arg.trim().toLowerCase().replaceAll("-", "");
@@ -96,7 +97,7 @@ public class ListCommandExecutor implements EnvironmentAware {
       case "dataset":
         
         List<String> dataSets = new ArrayList<>();
-        for (DataSet dataSet: dataSetRepository.findAll()){
+        for (DataSet dataSet: (List<DataSet>) dataSetRepository.findAll()){
           dataSets.add(showDetails ? dataSet.toString() : dataSet.getName());
         }
         if (!dataSets.isEmpty()){
@@ -113,7 +114,7 @@ public class ListCommandExecutor implements EnvironmentAware {
 
       case "datafile":
         List<String> dataFiles = new ArrayList<>();
-        for (DataFile dataFile: dataFileRepository.findAll()){
+        for (DataFile dataFile: (List<DataFile>) dataFileRepository.findAll()){
           dataFiles.add(showDetails ? dataFile.toString() : dataFile.getFilePath());
         }
         if (!dataFiles.isEmpty()){

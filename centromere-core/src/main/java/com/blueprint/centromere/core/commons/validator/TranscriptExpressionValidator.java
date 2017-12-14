@@ -27,7 +27,7 @@ public class TranscriptExpressionValidator extends DataValidator {
 
 	@Override 
 	public boolean supports(Class<?> aClass) {
-		return aClass.equals(TranscriptExpression.class);
+		return TranscriptExpression.class.isAssignableFrom(aClass);
 	}
 
 	@Override 

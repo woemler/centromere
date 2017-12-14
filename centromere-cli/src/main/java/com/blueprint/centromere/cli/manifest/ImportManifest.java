@@ -16,9 +16,7 @@
 
 package com.blueprint.centromere.cli.manifest;
 
-import com.blueprint.centromere.core.commons.model.DataSet;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.github.slugify.Slugify;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,21 +38,5 @@ public class ImportManifest {
   private LinkedHashMap<String, String> parameters = new LinkedHashMap<>();
   private LinkedHashMap<String, String> attributes = new LinkedHashMap<>();
   private List<ManifestFile> files = new ArrayList<>();
-
-  public DataSet createDataSet(){
-    DataSet dataSet = new DataSet();
-    dataSet.setName(name);
-    if (dataSetId != null) {
-      dataSet.setDataSetId(dataSetId);
-    } else {
-      dataSet.setDataSetId(new Slugify().slugify(name));
-    }
-    dataSet.setDescription(description);
-    dataSet.setSource(source);
-    dataSet.setVersion(version);
-    dataSet.setAttributes(attributes);
-    dataSet.setParameters(parameters);
-    return dataSet;
-  }
 
 }

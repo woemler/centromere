@@ -76,7 +76,8 @@ public class CentromereCommandLineInitializer {
     if (source.isAnnotationPresent(AutoConfigureCentromere.class)){
       AutoConfigureCentromere annotation = source.getAnnotation(AutoConfigureCentromere.class);
       profiles = annotation.useCustomSchema() ?
-          new String[] { Profiles.CLI_PROFILE, Profiles.SCHEMA_CUSTOM } : new String[] { Profiles.CLI_PROFILE };
+          new String[] { Profiles.CLI_PROFILE, Profiles.SCHEMA_CUSTOM } : 
+          new String[] { Profiles.CLI_PROFILE, Profiles.SCHEMA_DEFAULT };
       logger.info(String.format("Running Centromere with profiles: %s", Arrays.asList(profiles)));
     } else {
       logger.info("Running Centromere with default profiles.");

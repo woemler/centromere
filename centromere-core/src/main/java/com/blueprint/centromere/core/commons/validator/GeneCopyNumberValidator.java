@@ -26,7 +26,7 @@ public class GeneCopyNumberValidator extends DataValidator {
 
 	@Override 
 	public boolean supports(Class<?> aClass) {
-		return aClass.equals(GeneCopyNumber.class);
+		return GeneCopyNumber.class.isAssignableFrom(aClass);
 	}
 
 	@Override 

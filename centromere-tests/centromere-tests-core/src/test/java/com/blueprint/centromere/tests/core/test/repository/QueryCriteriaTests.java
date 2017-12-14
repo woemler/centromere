@@ -121,18 +121,18 @@ public class QueryCriteriaTests {
     }
     Assert.notNull(descriptorMap);
     Assert.notEmpty(descriptorMap);
-    Assert.isTrue(descriptorMap.size() == 9, String.format("Size is actually %s", descriptorMap.size()));
+    Assert.isTrue(descriptorMap.size() == 8, String.format("Size is actually %s", descriptorMap.size()));
     Assert.isTrue(descriptorMap.containsKey("attributes.\\w+"));
     Assert.isTrue(!descriptorMap.containsKey("attributes"));
     QueryParameterDescriptor descriptor = descriptorMap.get("geneId");
     Assert.notNull(descriptor);
     Assert.isTrue(descriptor.getType().equals(String.class));
-    descriptor = descriptorMap.get("primaryGeneSymbol");
+    descriptor = descriptorMap.get("symbol");
     Assert.notNull(descriptor);
-    Assert.isTrue("primaryGeneSymbol".equals(descriptor.getParamName()));
-    Assert.isTrue("primaryGeneSymbol".equals(descriptor.getFieldName()));
+    Assert.isTrue("symbol".equals(descriptor.getParamName()));
+    Assert.isTrue("symbol".equals(descriptor.getFieldName()));
     Assert.isTrue(Evaluation.EQUALS.equals(descriptor.getEvaluation()));
-    Assert.isTrue(!descriptorMap.containsKey("symbol"));
+    Assert.isTrue(!descriptorMap.containsKey("geneSymbol"));
   }
 
   @Test

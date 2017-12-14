@@ -23,6 +23,7 @@ import com.blueprint.centromere.core.commons.validator.SampleValidator;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter;
+import java.io.Serializable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,12 +32,13 @@ import org.springframework.stereotype.Component;
  */
 @DataTypes(value = "tcga_samples", description = "TCGA sample metadata")
 @Component
-public class TcgaSampleProcessor extends GenericRecordProcessor<Sample> {
+public class TcgaSampleProcessor<T extends Sample<ID>, ID extends Serializable> 
+    extends GenericRecordProcessor<T> {
 
     @Autowired
-    public TcgaSampleProcessor(SampleRepository repository) {
-      this.setModel(Sample.class);
-      this.setReader(new TcgaSampleReader());
+    public TcgaSampleProcessor(Class<T> model, SampleRepository<T, ID> repository) {
+      this.setModel(model);
+      this.setReader(new TcgaSampleReader<>(model));
       this.setValidator(new SampleValidator());
       this.setWriter(new RepositoryRecordWriter<>(repository));
         

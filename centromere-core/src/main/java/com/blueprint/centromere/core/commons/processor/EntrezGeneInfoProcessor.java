@@ -23,8 +23,7 @@ import com.blueprint.centromere.core.commons.validator.GeneValidator;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.io.Serializable;
 
 /**
  * Default processor for {@link Gene} records originating from Entrez Gene flat files.
@@ -33,17 +32,14 @@ import org.springframework.stereotype.Component;
  * @since 0.5.0
  */
 @DataTypes(value = "entrez_gene", description = "Entrez Gene records")
-@Component
-public class EntrezGeneInfoProcessor extends GenericRecordProcessor<Gene> {
+public class EntrezGeneInfoProcessor<T extends Gene<ID>, ID extends Serializable> 
+    extends GenericRecordProcessor<T> {
 
-    @Autowired
-    public EntrezGeneInfoProcessor(
-        GeneRepository geneRepository
-    ) {
-        this.setReader(new EntrezGeneInfoReader());
+    public EntrezGeneInfoProcessor(Class<T> model, GeneRepository<T, ID> geneRepository) {
+        this.setReader(new EntrezGeneInfoReader<>(model));
         this.setValidator(new GeneValidator());
         this.setWriter(new RepositoryRecordWriter<>(geneRepository));
-        this.setModel(Gene.class);
+        this.setModel(model);
     }
 
 }

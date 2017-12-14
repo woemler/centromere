@@ -18,9 +18,13 @@ package com.blueprint.centromere.tests.core.test.repository;
 
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.GeneExpression;
-import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
-import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.config.CoreConfiguration;
+import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.mongodb.MongoConfiguration;
+import com.blueprint.centromere.core.mongodb.model.MongoGene;
+import com.blueprint.centromere.core.mongodb.model.MongoGeneExpression;
+import com.blueprint.centromere.core.mongodb.repository.MongoGeneExpressionRepository;
+import com.blueprint.centromere.core.mongodb.repository.MongoGeneRepository;
 import com.blueprint.centromere.core.repository.Evaluation;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
@@ -34,27 +38,28 @@ import java.util.Set;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
 /**
  * @author woemler
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = {
     MongoDataSourceConfig.class,
     CoreConfiguration.CommonConfiguration.class,
-    CoreConfiguration.DefaultModelConfiguration.class
+    MongoConfiguration.MongoRepositoryConfiguration.class
 })
+@ActiveProfiles({ Profiles.SCHEMA_DEFAULT })
 public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
-  @SuppressWarnings("SpringJavaAutowiringInspection")
-  @Autowired private GeneRepository geneRepository;
-  @Autowired private GeneExpressionRepository expressionRepository;
+  @Autowired private MongoGeneRepository geneRepository;
+  @Autowired private MongoGeneExpressionRepository expressionRepository;
 
   @Test
   public void findOneByBadIdTest(){
@@ -65,13 +70,13 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findByIdTest(){
 
-    List<Gene> genes = (List<Gene>) geneRepository.findAll();
+    List<MongoGene> genes = (List<MongoGene>) geneRepository.findAll();
 
-    Optional<Gene> optional = geneRepository.findById(genes.get(0).getId());
+    Optional<MongoGene> optional = geneRepository.findById(genes.get(0).getId());
     Assert.isTrue(optional.isPresent());
     Gene gene = optional.get();
     Assert.isTrue(gene.getGeneId().equals("1"));
-    Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
+    Assert.isTrue("GeneA".equals(gene.getSymbol()));
     Assert.notNull(gene.getAliases());
     Assert.notEmpty(gene.getAliases());
     Assert.isTrue(gene.getAliases().size() == 1);
@@ -82,7 +87,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findAllTest(){
 
-    List<Gene> genes = (List<Gene>) geneRepository.findAll();
+    List<MongoGene> genes = (List<MongoGene>) geneRepository.findAll();
     Assert.notNull(genes);
     Assert.notEmpty(genes);
     Assert.isTrue(genes.size() == 5);
@@ -90,7 +95,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     Gene gene = genes.get(0);
     Assert.notNull(gene);
     Assert.isTrue(gene.getGeneId().equals("1"));
-    Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
+    Assert.isTrue("GeneA".equals(gene.getSymbol()));
     Assert.notNull(gene.getAliases());
     Assert.notEmpty(gene.getAliases());
     Assert.isTrue(gene.getAliases().size() == 1);
@@ -115,8 +120,8 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
   @Test
   public void findBySimpleParamQueryCriteriaTest(){
-    QueryCriteria criteria = new QueryCriteria("primaryGeneSymbol", "GeneB");
-    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singletonList(criteria));
+    QueryCriteria criteria = new QueryCriteria("symbol", "GeneB");
+    List<MongoGene> genes = (List<MongoGene>) geneRepository.find(Collections.singletonList(criteria));
     Assert.notNull(genes);
     Assert.notEmpty(genes);
     Assert.isTrue(genes.size() == 1);
@@ -124,7 +129,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     Gene gene = genes.get(0);
     Assert.notNull(gene);
     Assert.isTrue(gene.getGeneId().equals("2"));
-    Assert.isTrue("GeneB".equals(gene.getPrimaryGeneSymbol()));
+    Assert.isTrue("GeneB".equals(gene.getSymbol()));
 
   }
 
@@ -135,7 +140,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     criterias.add(new QueryCriteria("geneType", "protein-coding"));
     criterias.add(new QueryCriteria("chromosome", "5"));
 
-    List<Gene> genes = (List<Gene>) geneRepository.find(criterias);
+    List<MongoGene> genes = (List<MongoGene>) geneRepository.find(criterias);
     Assert.notNull(genes);
     Assert.notEmpty(genes);
     Assert.isTrue(genes.size() == 1);
@@ -143,7 +148,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     Gene gene = genes.get(0);
     Assert.notNull(gene);
     Assert.isTrue(gene.getGeneId().equals("2"));
-    Assert.isTrue("GeneB".equals(gene.getPrimaryGeneSymbol()));
+    Assert.isTrue("GeneB".equals(gene.getSymbol()));
 
   }
 
@@ -152,7 +157,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
     QueryCriteria criteria = new QueryCriteria("aliases", "DEF");
   
-    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singletonList(criteria));
+    List<MongoGene> genes = (List<MongoGene>) geneRepository.find(Collections.singletonList(criteria));
     Assert.notNull(genes);
     Assert.notEmpty(genes);
     Assert.isTrue(genes.size() == 1);
@@ -160,7 +165,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     Gene gene = genes.get(0);
     Assert.notNull(gene);
     Assert.isTrue(gene.getGeneId().equals("2"));
-    Assert.isTrue("GeneB".equals(gene.getPrimaryGeneSymbol()));
+    Assert.isTrue("GeneB".equals(gene.getSymbol()));
     Assert.isTrue("DEF".equals(gene.getAliases().get(0)));
 
   }
@@ -170,7 +175,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
     QueryCriteria criteria = new QueryCriteria("attributes.isKinase", "Y");
     
-    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singletonList(criteria));
+    List<MongoGene> genes = (List<MongoGene>) geneRepository.find(Collections.singletonList(criteria));
     Assert.notNull(genes);
     Assert.notEmpty(genes);
     Assert.isTrue(genes.size() == 2);
@@ -178,7 +183,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     Gene gene = genes.get(0);
     Assert.notNull(gene);
     Assert.isTrue(gene.getGeneId().equals("1"));
-    Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
+    Assert.isTrue("GeneA".equals(gene.getSymbol()));
     Assert.isTrue(gene.getAttributes().size() == 1);
     Assert.isTrue(gene.getAttributes().containsKey("isKinase"));
     Assert.isTrue("Y".equals(gene.getAttributes().get("isKinase")));
@@ -188,7 +193,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findSortedTest(){
     Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "geneId"));
-    List<Gene> genes = (List<Gene>) geneRepository.findAll(sort);
+    List<MongoGene> genes = (List<MongoGene>) geneRepository.findAll(sort);
     Assert.notNull(genes);
     Assert.notEmpty(genes);
     Assert.isTrue(genes.size() == 5);
@@ -199,7 +204,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   public void findAndSortTest(){
     QueryCriteria criteria = new QueryCriteria("geneType", "protein-coding");
     Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "geneId"));
-    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singletonList(criteria), sort);
+    List<MongoGene> genes = (List<MongoGene>) geneRepository.find(Collections.singletonList(criteria), sort);
     Assert.notNull(genes);
     Assert.notEmpty(genes);
     Assert.isTrue(genes.size() == 3);
@@ -210,12 +215,12 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   public void findPagedTest(){
 
     PageRequest pageRequest = new PageRequest(1, 2);
-    Page<Gene> page = geneRepository.findAll(pageRequest);
+    Page<MongoGene> page = geneRepository.findAll(pageRequest);
     Assert.notNull(page);
     Assert.isTrue(page.getTotalPages() == 3);
     Assert.isTrue(page.getTotalElements() == 5);
 
-    List<Gene> genes = page.getContent();
+    List<MongoGene> genes = page.getContent();
     Assert.notNull(genes);
     Assert.notEmpty(genes);
     Assert.isTrue(genes.size() == 2);
@@ -232,12 +237,12 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     QueryCriteria criteria = new QueryCriteria("geneType", "protein-coding");
 
     PageRequest pageRequest = new PageRequest(1, 2);
-    Page<Gene> page = geneRepository.find(Collections.singletonList(criteria), pageRequest);
+    Page<MongoGene> page = geneRepository.find(Collections.singletonList(criteria), pageRequest);
     Assert.notNull(page);
     Assert.isTrue(page.getTotalElements() == 3);
     Assert.isTrue(page.getTotalPages() == 2);
 
-    List<Gene> genes = page.getContent();
+    List<MongoGene> genes = page.getContent();
     Assert.notNull(genes);
     Assert.notEmpty(genes);
     Assert.isTrue(genes.size() == 1);
@@ -251,84 +256,84 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findByCriteriaNotEqualsTest(){
     QueryCriteria criteria = new QueryCriteria("geneType", "protein-coding", Evaluation.NOT_EQUALS);
-    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singleton(criteria));
+    List<MongoGene> genes = (List<MongoGene>) geneRepository.find(Collections.singleton(criteria));
     Assert.notNull(genes, "Result set must not be null");
     Assert.notEmpty(genes, "Result set must not be empty");
     Assert.isTrue(genes.size() == 2, "Expected result set size of 2");
     Gene gene = genes.get(0);
-    Assert.isTrue("GeneC".equals(gene.getPrimaryGeneSymbol()), "Record does not have expected value");
+    Assert.isTrue("GeneC".equals(gene.getSymbol()), "Record does not have expected value");
   }
 
   @Test
   public void findByCriteriaInTest(){
-    QueryCriteria criteria = new QueryCriteria("primaryGeneSymbol", Arrays.asList("GeneA", "GeneB"), Evaluation.IN);
-    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singleton(criteria));
+    QueryCriteria criteria = new QueryCriteria("symbol", Arrays.asList("GeneA", "GeneB"), Evaluation.IN);
+    List<MongoGene> genes = (List<MongoGene>) geneRepository.find(Collections.singleton(criteria));
     Assert.notNull(genes, "Result set must not be null");
     Assert.notEmpty(genes, "Result set must not be empty");
     Assert.isTrue(genes.size() == 2, "Expected result set size of 2");
     Gene gene = genes.get(0);
-    Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()), "Record does not have expected value");
+    Assert.isTrue("GeneA".equals(gene.getSymbol()), "Record does not have expected value");
   }
 
   @Test
   public void findByCriteriaNotInTest(){
-    QueryCriteria criteria = new QueryCriteria("primaryGeneSymbol", Arrays.asList("GeneA", "GeneB"), Evaluation.NOT_IN);
-    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singleton(criteria));
+    QueryCriteria criteria = new QueryCriteria("symbol", Arrays.asList("GeneA", "GeneB"), Evaluation.NOT_IN);
+    List<MongoGene> genes = (List<MongoGene>) geneRepository.find(Collections.singleton(criteria));
     Assert.notNull(genes, "Result set must not be null");
     Assert.notEmpty(genes, "Result set must not be empty");
     Assert.isTrue(genes.size() == 3, "Expected result set size of 3");
     Gene gene = genes.get(0);
-    Assert.isTrue("GeneC".equals(gene.getPrimaryGeneSymbol()), "Record does not have expected value");
+    Assert.isTrue("GeneC".equals(gene.getSymbol()), "Record does not have expected value");
   }
 
   @Test
   public void findByCriteriaLikeTest(){
     QueryCriteria criteria = new QueryCriteria("geneType", "protein", Evaluation.LIKE);
-    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singleton(criteria));
+    List<MongoGene> genes = (List<MongoGene>) geneRepository.find(Collections.singleton(criteria));
     Assert.notNull(genes, "Result set must not be null");
     Assert.notEmpty(genes, "Result set must not be empty");
     Assert.isTrue(genes.size() == 3, "Expected result set size of 3");
     Gene gene = genes.get(0);
-    Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()), "Record does not have expected value");
+    Assert.isTrue("GeneA".equals(gene.getSymbol()), "Record does not have expected value");
   }
 
   @Test
   public void findByCriteriaNotLikeTest(){
     QueryCriteria criteria = new QueryCriteria("geneType", "protein", Evaluation.NOT_LIKE);
-    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singleton(criteria));
+    List<MongoGene> genes = (List<MongoGene>) geneRepository.find(Collections.singleton(criteria));
     Assert.notNull(genes, "Result set must not be null");
     Assert.notEmpty(genes, "Result set must not be empty");
     Assert.isTrue(genes.size() == 2, "Expected result set size of 2");
     Gene gene = genes.get(0);
-    Assert.isTrue("GeneC".equals(gene.getPrimaryGeneSymbol()), "Record does not have expected value");
+    Assert.isTrue("GeneC".equals(gene.getSymbol()), "Record does not have expected value");
   }
 
   @Test
   public void findByCriteriaStartsWithTest(){
     QueryCriteria criteria = new QueryCriteria("geneType", "protein", Evaluation.STARTS_WITH);
-    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singleton(criteria));
+    List<MongoGene> genes = (List<MongoGene>) geneRepository.find(Collections.singleton(criteria));
     Assert.notNull(genes, "Result set must not be null");
     Assert.notEmpty(genes, "Result set must not be empty");
     Assert.isTrue(genes.size() == 3, "Expected result set size of 3");
     Gene gene = genes.get(0);
-    Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()), "Record does not have expected value");
+    Assert.isTrue("GeneA".equals(gene.getSymbol()), "Record does not have expected value");
   }
 
   @Test
   public void findByCriteriaEndsWithTest(){
     QueryCriteria criteria = new QueryCriteria("geneType", "coding", Evaluation.ENDS_WITH);
-    List<Gene> genes = (List<Gene>) geneRepository.find(Collections.singleton(criteria));
+    List<MongoGene> genes = (List<MongoGene>) geneRepository.find(Collections.singleton(criteria));
     Assert.notNull(genes, "Result set must not be null");
     Assert.notEmpty(genes, "Result set must not be empty");
     Assert.isTrue(genes.size() == 3, "Expected result set size of 3");
     Gene gene = genes.get(0);
-    Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()), "Record does not have expected value");
+    Assert.isTrue("GeneA".equals(gene.getSymbol()), "Record does not have expected value");
   }
   
   @Test
   public void findByNumberGreaterThanTest(){
     QueryCriteria criteria = new QueryCriteria("value", 5.0, Evaluation.GREATER_THAN);
-    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singleton(criteria));
+    List<MongoGeneExpression> records = (List<MongoGeneExpression>) expressionRepository.find(Collections.singleton(criteria));
     Assert.notNull(records, "Result set must not be null");
     Assert.notEmpty(records, "Result set must not be empty");
     Assert.isTrue(records.size() == 3, "Expected result set size of 3");
@@ -339,7 +344,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findByNumberGreaterThanOrEqualsTest(){
     QueryCriteria criteria = new QueryCriteria("value", 4.56, Evaluation.GREATER_THAN_EQUALS);
-    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singleton(criteria));
+    List<MongoGeneExpression> records = (List<MongoGeneExpression>) expressionRepository.find(Collections.singleton(criteria));
     Assert.notNull(records, "Result set must not be null");
     Assert.notEmpty(records, "Result set must not be empty");
     Assert.isTrue(records.size() == 4, "Expected result set size of 4");
@@ -350,7 +355,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findByNumberLessThanTest(){
     QueryCriteria criteria = new QueryCriteria("value", 5.0, Evaluation.LESS_THAN);
-    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singleton(criteria));
+    List<MongoGeneExpression> records = (List<MongoGeneExpression>) expressionRepository.find(Collections.singleton(criteria));
     Assert.notNull(records, "Result set must not be null");
     Assert.notEmpty(records, "Result set must not be empty");
     Assert.isTrue(records.size() == 3, "Expected result set size of 3");
@@ -361,7 +366,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findByNumberLessThanOrEqualsTest(){
     QueryCriteria criteria = new QueryCriteria("value", 4.56, Evaluation.LESS_THAN_EQUALS);
-    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singleton(criteria));
+    List<MongoGeneExpression> records = (List<MongoGeneExpression>) expressionRepository.find(Collections.singleton(criteria));
     Assert.notNull(records, "Result set must not be null");
     Assert.notEmpty(records, "Result set must not be empty");
     Assert.isTrue(records.size() == 3, "Expected result set size of 3");
@@ -372,7 +377,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findByNumberBetweenTest(){
     QueryCriteria criteria = new QueryCriteria("value", Arrays.asList(3.0, 7.0), Evaluation.BETWEEN);
-    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singleton(criteria));
+    List<MongoGeneExpression> records = (List<MongoGeneExpression>) expressionRepository.find(Collections.singleton(criteria));
     Assert.notNull(records, "Result set must not be null");
     Assert.notEmpty(records, "Result set must not be empty");
     Assert.isTrue(records.size() == 2, "Expected result set size of 2");
@@ -383,7 +388,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findByNumberOutsideTest(){
     QueryCriteria criteria = new QueryCriteria("value", Arrays.asList(3.0, 7.0), Evaluation.OUTSIDE);
-    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singleton(criteria));
+    List<MongoGeneExpression> records = (List<MongoGeneExpression>) expressionRepository.find(Collections.singleton(criteria));
     Assert.notNull(records, "Result set must not be null");
     Assert.notEmpty(records, "Result set must not be empty");
     Assert.isTrue(records.size() == 4, "Expected result set size of 2");
@@ -394,7 +399,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findByNumberEqualsTest(){
     QueryCriteria criteria = new QueryCriteria("value", 4.56, Evaluation.EQUALS);
-    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singleton(criteria));
+    List<MongoGeneExpression> records = (List<MongoGeneExpression>) expressionRepository.find(Collections.singleton(criteria));
     Assert.notNull(records, "Result set must not be null");
     Assert.notEmpty(records, "Result set must not be empty");
     Assert.isTrue(records.size() == 1, "Expected result set size of 1");
@@ -405,7 +410,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findByNumberInTest(){
     QueryCriteria criteria = new QueryCriteria("value", Arrays.asList(2.34, 4.56), Evaluation.IN);
-    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singleton(criteria));
+    List<MongoGeneExpression> records = (List<MongoGeneExpression>) expressionRepository.find(Collections.singleton(criteria));
     Assert.notNull(records, "Result set must not be null");
     Assert.notEmpty(records, "Result set must not be empty");
     Assert.isTrue(records.size() == 2, "Expected result set size of 2");
@@ -416,7 +421,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findByNumberNotInTest(){
     QueryCriteria criteria = new QueryCriteria("value", Arrays.asList(2.34, 4.56), Evaluation.NOT_IN);
-    List<GeneExpression> records = (List<GeneExpression>) expressionRepository.find(Collections.singletonList(criteria));
+    List<MongoGeneExpression> records = (List<MongoGeneExpression>) expressionRepository.find(Collections.singletonList(criteria));
     Assert.notNull(records, "Result set must not be null");
     Assert.notEmpty(records, "Result set must not be empty");
     Assert.isTrue(records.size() == 4, "Expected result set size of 4");
@@ -427,25 +432,25 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findByNumberNotInTest2(){
     QueryCriteria criteria = new QueryCriteria("taxId", Arrays.asList(9606, 1000), Evaluation.NOT_IN);
-    List<Gene> records = (List<Gene>) geneRepository.find(Collections.singletonList(criteria));
+    List<MongoGene> records = (List<MongoGene>) geneRepository.find(Collections.singletonList(criteria));
     Assert.notNull(records, "Result set must not be null");
     Assert.isTrue(records.size() == 0, "Result set must be empty");
   }
 
   @Test
   public void insertTest(){
-    Gene gene = new Gene();
+    MongoGene gene = new MongoGene();
     gene.setGeneId("100");
-    gene.setPrimaryGeneSymbol("TEST");
+    gene.setSymbol("TEST");
     gene.setTaxId(9606);
     gene.setChromosome("1");
     gene.setGeneType("protein-coding");
     geneRepository.save(gene);
 
-    Gene created = geneRepository.findByGeneId("100").get();
+    MongoGene created = geneRepository.findByGeneId("100").get();
     Assert.notNull(created);
     Assert.isTrue(created.getGeneId().equals("100"));
-    Assert.isTrue("TEST".equals(created.getPrimaryGeneSymbol()));
+    Assert.isTrue("TEST".equals(created.getSymbol()));
 
     geneRepository.delete(created);
 
@@ -453,23 +458,23 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
   @Test
   public void insertMultipleTest(){
-    List<Gene> genes = new ArrayList<>();
-    Gene gene1 = new Gene();
+    List<MongoGene> genes = new ArrayList<>();
+    MongoGene gene1 = new MongoGene();
     gene1.setGeneId("100");
-    gene1.setPrimaryGeneSymbol("TEST");
+    gene1.setSymbol("TEST");
     gene1.setTaxId(9606);
     gene1.setChromosome("1");
     gene1.setGeneType("protein-coding");
     genes.add(gene1);
-    Gene gene2 = new Gene();
+    MongoGene gene2 = new MongoGene();
     gene2.setGeneId("101");
-    gene2.setPrimaryGeneSymbol("TEST2");
+    gene2.setSymbol("TEST2");
     gene2.setTaxId(9606);
     gene2.setChromosome("12");
     gene2.setGeneType("pseudo");
     genes.add(gene2);
     geneRepository.save(genes);
-    Optional<Gene> optional = geneRepository.findByGeneId("100");
+    Optional<MongoGene> optional = geneRepository.findByGeneId("100");
     Assert.notNull(optional);
     Assert.isTrue(optional.isPresent());
     Gene gene = optional.get();
@@ -485,41 +490,41 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void updateTest(){
 
-    Gene gene = new Gene();
+    MongoGene gene = new MongoGene();
     gene.setGeneId("100");
-    gene.setPrimaryGeneSymbol("TEST");
+    gene.setSymbol("TEST");
     gene.setTaxId(9606);
     gene.setChromosome("1");
     gene.setGeneType("protein-coding");
     geneRepository.save(gene);
 
-    gene.setPrimaryGeneSymbol("TEST_TEST");
+    gene.setSymbol("TEST_TEST");
     gene.setGeneType("pseudogene");
     geneRepository.save(gene);
 
-    Optional<Gene> optional = geneRepository.findByGeneId("100");
+    Optional<MongoGene> optional = geneRepository.findByGeneId("100");
     Assert.notNull(optional);
     Assert.isTrue(optional.isPresent());
-    Gene updated = optional.get();
+    MongoGene updated = optional.get();
     Assert.notNull(updated);
-    Assert.isTrue("TEST_TEST".equals(updated.getPrimaryGeneSymbol()));
+    Assert.isTrue("TEST_TEST".equals(updated.getSymbol()));
     Assert.isTrue("pseudogene".equals(updated.getGeneType()));
 
   }
 
   @Test
   public void updateMultipleTest(){
-    List<Gene> genes = new ArrayList<>();
-    Gene gene1 = new Gene();
+    List<MongoGene> genes = new ArrayList<>();
+    MongoGene gene1 = new MongoGene();
     gene1.setGeneId("100");
-    gene1.setPrimaryGeneSymbol("TEST");
+    gene1.setSymbol("TEST");
     gene1.setTaxId(9606);
     gene1.setChromosome("1");
     gene1.setGeneType("protein-coding");
     genes.add(gene1);
-    Gene gene2 = new Gene();
+    MongoGene gene2 = new MongoGene();
     gene2.setGeneId("101");
-    gene2.setPrimaryGeneSymbol("TEST2");
+    gene2.setSymbol("TEST2");
     gene2.setTaxId(9606);
     gene2.setChromosome("12");
     gene2.setGeneType("pseudo");
@@ -534,7 +539,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     genes.add(gene2);
     geneRepository.save(genes);
 
-    Optional<Gene> optional = geneRepository.findByGeneId("100");
+    Optional<MongoGene> optional = geneRepository.findByGeneId("100");
     Assert.notNull(optional);
     Assert.isTrue(optional.isPresent());
     Gene gene = optional.get();
@@ -551,18 +556,18 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void deleteTest(){
 
-    Gene gene = new Gene();
+    MongoGene gene = new MongoGene();
     gene.setGeneId("100");
-    gene.setPrimaryGeneSymbol("TEST");
+    gene.setSymbol("TEST");
     gene.setTaxId(9606);
     gene.setChromosome("1");
     gene.setGeneType("protein-coding");
     geneRepository.save(gene);
 
-    Optional<Gene> optional = geneRepository.findByGeneId("100");
+    Optional<MongoGene> optional = geneRepository.findByGeneId("100");
     Assert.notNull(optional);
     Assert.isTrue(optional.isPresent());
-    Gene created = optional.get();
+    MongoGene created = optional.get();
     Assert.notNull(created);
     Assert.isTrue(created.getGeneId().equals("100"));
 
@@ -575,7 +580,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
   @Test
   public void distinctTest(){
-    Set<Object> geneSymbols = geneRepository.distinct("primaryGeneSymbol");
+    Set<Object> geneSymbols = geneRepository.distinct("symbol");
     Assert.notNull(geneSymbols);
     Assert.notEmpty(geneSymbols);
     Assert.isTrue(geneSymbols.size() == 5);
@@ -585,8 +590,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void distinctQueryCriteriaTest(){
     QueryCriteria criteria = new QueryCriteria("geneType", "protein-coding");
-    Set<Object> geneSymbols = geneRepository.distinct("primaryGeneSymbol", 
-        Collections.singletonList(criteria));
+    Set<Object> geneSymbols = geneRepository.distinct("symbol", Collections.singletonList(criteria));
     Assert.notNull(geneSymbols);
     Assert.notEmpty(geneSymbols);
     Assert.isTrue(geneSymbols.size() == 3);
@@ -596,7 +600,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void guessGeneTest() throws Exception {
 
-    List<Gene> genes = geneRepository.guess("GeneA");
+    List<MongoGene> genes = geneRepository.guess("GeneA");
     Assert.notNull(genes);
     Assert.notEmpty(genes);
 

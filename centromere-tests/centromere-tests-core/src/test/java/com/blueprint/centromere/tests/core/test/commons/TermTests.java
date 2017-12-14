@@ -4,10 +4,16 @@ import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.model.Term;
-import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.commons.repository.TermRepository;
+import com.blueprint.centromere.core.commons.model.Term.TermGenerator;
 import com.blueprint.centromere.core.config.CoreConfiguration;
+import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.mongodb.MongoConfiguration;
+import com.blueprint.centromere.core.mongodb.model.MongoGene;
+import com.blueprint.centromere.core.mongodb.model.MongoSample;
+import com.blueprint.centromere.core.mongodb.model.MongoTerm;
+import com.blueprint.centromere.core.mongodb.repository.MongoGeneRepository;
+import com.blueprint.centromere.core.mongodb.repository.MongoSampleRepository;
+import com.blueprint.centromere.core.mongodb.repository.MongoTermRepository;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import java.util.HashMap;
@@ -17,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
@@ -28,13 +35,16 @@ import org.springframework.util.Assert;
 @ContextConfiguration(classes = {
     MongoDataSourceConfig.class,
     CoreConfiguration.CommonConfiguration.class,
-    CoreConfiguration.DefaultModelConfiguration.class
+    MongoConfiguration.MongoRepositoryConfiguration.class
 })
+@ActiveProfiles({ Profiles.SCHEMA_DEFAULT })
 public class TermTests extends AbstractRepositoryTests {
 
-  @Autowired private TermRepository termRepository;
-  @Autowired private GeneRepository geneRepository;
-  @Autowired private SampleRepository sampleRepository;
+  @Autowired private MongoTermRepository termRepository;
+  @Autowired private MongoGeneRepository geneRepository;
+  @Autowired private MongoSampleRepository sampleRepository;
+  
+  private final TermGenerator<MongoTerm, String> termGenerator = new TermGenerator<>(MongoTerm.class);
   
   @Override
   @Before
@@ -42,10 +52,10 @@ public class TermTests extends AbstractRepositoryTests {
     super.setup();
     termRepository.deleteAll();
     for (Gene gene: geneRepository.findAll()){
-      termRepository.saveTerms(Term.getModelTerms(gene));
+      termRepository.saveTerms(termGenerator.getModelTerms(gene));
     }
     for (Sample sample: sampleRepository.findAll()){
-      termRepository.saveTerms(Term.getModelTerms(sample));
+      termRepository.saveTerms(termGenerator.getModelTerms(sample));
     }
   }
   
@@ -53,13 +63,13 @@ public class TermTests extends AbstractRepositoryTests {
   public void termExtractionTest() throws Exception {
     Gene gene = geneRepository.findByGeneId("1").orElse(null);
     Assert.notNull(gene);
-    List<Term> terms = Term.getModelTerms(gene);
+    List<MongoTerm> terms = termGenerator.getModelTerms(gene);
     System.out.println(terms);
     Assert.notNull(terms);
     Assert.notEmpty(terms);
     Assert.isTrue(terms.size() == 3);
     for (Term term: terms){
-      Assert.isTrue(term.getModelType().equals(Gene.class));
+      Assert.isTrue(term.getModelType().equals(MongoGene.class));
       if (term.getField().equals("primaryGeneSymbol")){
         Assert.isTrue("GeneA".equals(term.getTerm()));
       }
@@ -73,7 +83,7 @@ public class TermTests extends AbstractRepositoryTests {
   
   @Test
   public void mapTermExtractiontest() throws Exception {
-    Sample sample = new Sample();
+    Sample sample = new MongoSample();
     sample.setId("abc123");
     sample.setSampleId("SampleX");
     sample.setHistology("Histology Y");
@@ -83,7 +93,7 @@ public class TermTests extends AbstractRepositoryTests {
     attributes.put("type", "patient");
     sample.setAttributes(attributes);
     sample.setSampleType("blood");
-    List<Term> terms = Term.getModelTerms(sample);
+    List<Term> terms = termGenerator.getModelTerms(sample);
     Assert.notNull(terms);
     Assert.notEmpty(terms);
     Map<String, Term> termMap = new HashMap<>();
@@ -99,24 +109,24 @@ public class TermTests extends AbstractRepositoryTests {
   
   @Test
   public void termInspectionTest() throws Exception {
-    Assert.isTrue(Term.modelHasManagedTerms(Gene.class));
-    Assert.isTrue(!Term.modelHasManagedTerms(GeneExpression.class));
+    Assert.isTrue(termGenerator.modelHasManagedTerms(Gene.class));
+    Assert.isTrue(!termGenerator.modelHasManagedTerms(GeneExpression.class));
   }
   
   @Test
   public void findByTermTest() throws Exception {
-    List<Term> terms = termRepository.findByTerm("carcinoma");
+    List<MongoTerm> terms = termRepository.findByTerm("carcinoma");
     Assert.notNull(terms);
     Assert.notEmpty(terms);
     Assert.isTrue(terms.size() == 1);
-    Assert.isTrue(terms.get(0).getModelType().equals(Sample.class));
+    Assert.isTrue(Sample.class.isAssignableFrom(terms.get(0).getModelType()));
     Assert.isTrue("histology".equals(terms.get(0).getField()));
     Assert.isTrue(terms.get(0).getReferenceIds().size() == 2);
   }
 
   @Test
   public void findByModelTest(){
-    List<Term> terms = termRepository.findByModel(Gene.class);
+    List<MongoTerm> terms = termRepository.findByModel(MongoGene.class);
     Assert.notNull(terms);
     Assert.notEmpty(terms);
     String id = terms.get(0).getReferenceIds().get(0);
@@ -127,21 +137,21 @@ public class TermTests extends AbstractRepositoryTests {
   
   @Test
   public void findByFieldTest() throws Exception {
-    List<Term> terms = termRepository.findByField("sampleId");
+    List<MongoTerm> terms = termRepository.findByField("sampleId");
     Assert.notNull(terms);
     Assert.notEmpty(terms);
     Assert.isTrue(terms.size() == sampleRepository.count());
-    Assert.isTrue(Sample.class.equals(terms.get(0).getModelType()));
+    Assert.isTrue(Sample.class.isAssignableFrom(terms.get(0).getModelType()));
   }
   
   @Test
   public void guessTest() throws Exception {
     
-    List<Term> terms = termRepository.guess("breast");
+    List<MongoTerm> terms = termRepository.guess("breast");
     Assert.notNull(terms);
     Assert.notEmpty(terms);
     Term term = terms.get(0);
-    Assert.isTrue(Sample.class.equals(term.getModelType()));
+    Assert.isTrue(Sample.class.isAssignableFrom(term.getModelType()));
     Assert.isTrue("tissue".equals(term.getField()));
 
     terms = termRepository.guess("breast", "Gene");
@@ -152,12 +162,12 @@ public class TermTests extends AbstractRepositoryTests {
     Assert.notNull(terms);
     Assert.notEmpty(terms);
     Assert.isTrue(terms.size() == 1);
-    Assert.isTrue(Gene.class.equals(terms.get(0).getModelType()));
+    Assert.isTrue(Gene.class.isAssignableFrom(terms.get(0).getModelType()));
 
     terms = termRepository.guess("mplea");
     Assert.notNull(terms);
     Assert.notEmpty(terms);
-    Assert.isTrue(Sample.class.equals(terms.get(0).getModelType()));
+    Assert.isTrue(Sample.class.isAssignableFrom(terms.get(0).getModelType()));
     Assert.isTrue("SampleA".equals(terms.get(0).getTerm()));
     
   }

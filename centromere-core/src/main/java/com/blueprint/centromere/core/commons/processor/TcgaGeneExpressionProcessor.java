@@ -27,27 +27,25 @@ import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter.WriteMode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.io.Serializable;
 
 /**
  * @author woemler
  */
 @DataTypes(value = { "tcga_gene_expression" }, description = "Gene-normalized RNA-Seq expression data from the TCGA")
-@Component
-public class TcgaGeneExpressionProcessor extends GenericRecordProcessor<GeneExpression> {
+public class TcgaGeneExpressionProcessor<T extends GeneExpression<ID>, ID extends Serializable> 
+    extends GenericRecordProcessor<T> {
 
-    @SuppressWarnings("SpringJavaAutowiringInspection")
-    @Autowired
     public TcgaGeneExpressionProcessor(
+        Class<T> model,
         GeneRepository geneRepository,
         SampleRepository sampleRepository,
         DataImportProperties dataImportProperties,
-        GeneExpressionRepository repository
+        GeneExpressionRepository<T, ID> repository
     ) {
-      this.setReader(new TcgaRnaSeqGeneExpressionFileReader(geneRepository, sampleRepository, dataImportProperties));
+      this.setReader(new TcgaRnaSeqGeneExpressionFileReader<>(model, geneRepository, sampleRepository, dataImportProperties));
       this.setValidator(new GeneExpressionValidator());
       this.setWriter(new RepositoryRecordWriter<>(repository, WriteMode.INSERT, 200));
-      this.setModel(GeneExpression.class);
+      this.setModel(model);
     }
 }

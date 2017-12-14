@@ -19,14 +19,13 @@ package com.blueprint.centromere.core.commons.model;
 import com.blueprint.centromere.core.commons.support.ManagedTerm;
 import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Model;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Model for representing biological samples in analyses.  It is presumed that a single sample can 
@@ -34,11 +33,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * 
  * @author woemler
  */
-@Document
 @Data
-public class Sample implements Model<String>, Attributes {
+public abstract class Sample<ID extends Serializable> implements Model<ID>, Attributes {
 
-	@Id
   @ManagedTerm 
   private String sampleId;
 	
@@ -64,16 +61,6 @@ public class Sample implements Model<String>, Attributes {
 	
 	@Indexed
   private List<String> aliases = new ArrayList<>();
-
-  @Override
-  public String getId() {
-    return getSampleId();
-  }
-
-  @Override
-  public void setId(String id) {
-    setSampleId(id);
-  }
 
   @Override
 	public void addAttribute(String name, String value) {

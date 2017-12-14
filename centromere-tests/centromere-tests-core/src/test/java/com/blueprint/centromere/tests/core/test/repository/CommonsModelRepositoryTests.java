@@ -19,41 +19,48 @@ package com.blueprint.centromere.tests.core.test.repository;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Sample;
-import com.blueprint.centromere.core.commons.repository.DataFileRepository;
-import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.config.CoreConfiguration;
+import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.mongodb.MongoConfiguration;
+import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
+import com.blueprint.centromere.core.mongodb.model.MongoGene;
+import com.blueprint.centromere.core.mongodb.model.MongoSample;
+import com.blueprint.centromere.core.mongodb.repository.MongoDataFileRepository;
+import com.blueprint.centromere.core.mongodb.repository.MongoDataSetRepository;
+import com.blueprint.centromere.core.mongodb.repository.MongoGeneRepository;
+import com.blueprint.centromere.core.mongodb.repository.MongoSampleRepository;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 
 /**
  * @author woemler
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = {
     MongoDataSourceConfig.class,
     CoreConfiguration.CommonConfiguration.class,
-    CoreConfiguration.DefaultModelConfiguration.class
+    MongoConfiguration.MongoRepositoryConfiguration.class
 })
+@ActiveProfiles({ Profiles.SCHEMA_DEFAULT })
 public class CommonsModelRepositoryTests extends AbstractRepositoryTests {
 
-  @Autowired private GeneRepository geneRepository;
-  @Autowired private SampleRepository sampleRepository;
-  @Autowired private DataSetRepository dataSetRepository;
-  @Autowired private DataFileRepository dataFileRepository;
+  @Autowired private MongoGeneRepository geneRepository;
+  @Autowired private MongoSampleRepository sampleRepository;
+  @Autowired private MongoDataSetRepository dataSetRepository;
+  @Autowired private MongoDataFileRepository dataFileRepository;
   
   @Test
   public void findUniqueGeneTest(){
     
-    Optional<Gene> optional = geneRepository.findByGeneId("1");
+    Optional<MongoGene> optional = geneRepository.findByGeneId("1");
     Assert.notNull(optional, "Optional must not be null");
     Assert.isTrue(optional.isPresent(), "Object must be present");
     Gene gene = optional.get();
@@ -69,7 +76,7 @@ public class CommonsModelRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findUniqueDataSetTest(){
 
-    Optional<DataSet> optional = dataSetRepository.findByDataSetId("DataSetA");
+    Optional<MongoDataSet> optional = dataSetRepository.findByDataSetId("DataSetA");
     Assert.notNull(optional, "Optional must not be null");
     Assert.isTrue(optional.isPresent(), "Object must be present");
     DataSet dataSet = optional.get();
@@ -85,7 +92,7 @@ public class CommonsModelRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findUniqueSubjectTest(){
 
-    Optional<Sample> optional = sampleRepository.findBySampleId("SampleA");
+    Optional<MongoSample> optional = sampleRepository.findBySampleId("SampleA");
     Assert.notNull(optional, "Optional must not be null");
     Assert.isTrue(optional.isPresent(), "Object must be present");
     Sample sample = optional.get();

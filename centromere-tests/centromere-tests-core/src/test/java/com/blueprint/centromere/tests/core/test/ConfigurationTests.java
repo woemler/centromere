@@ -16,15 +16,18 @@
 
 package com.blueprint.centromere.tests.core.test;
 
-import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.config.CoreConfiguration;
 import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.mongodb.MongoConfiguration;
+import com.blueprint.centromere.core.mongodb.model.MongoGene;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
@@ -35,9 +38,10 @@ import org.springframework.util.Assert;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
     MongoDataSourceConfig.class,
-    CoreConfiguration.DefaultModelConfiguration.class,
-    CoreConfiguration.CommonConfiguration.class
+    CoreConfiguration.CommonConfiguration.class,
+    MongoConfiguration.MongoRepositoryConfiguration.class
 })
+@ActiveProfiles({ Profiles.SCHEMA_DEFAULT })
 public class ConfigurationTests {
 
   @Autowired(required = false) private ModelRepositoryRegistry resourceRegistry;
@@ -48,8 +52,8 @@ public class ConfigurationTests {
     System.out.println(resourceRegistry.getRegisteredModels().toString());
     System.out.println(resourceRegistry.getModelRepositories().toString());
     Assert.isTrue(resourceRegistry.isRegisteredResource("genes"));
-    Assert.isTrue(resourceRegistry.isRegisteredModel(Gene.class));
-    ModelRepository repository = resourceRegistry.getRepositoryByModel(Gene.class);
+    Assert.isTrue(resourceRegistry.isRegisteredModel(MongoGene.class));
+    ModelRepository repository = resourceRegistry.getRepositoryByModel(MongoGene.class);
     Assert.notNull(repository, "GeneRepository is not registered.");
     Assert.isTrue(repository instanceof GeneRepository, "Repository does not implement GeneRepository");
   }

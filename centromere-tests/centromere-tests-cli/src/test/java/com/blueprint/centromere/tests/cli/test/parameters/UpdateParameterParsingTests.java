@@ -5,6 +5,7 @@ import com.beust.jcommander.ParameterException;
 import com.blueprint.centromere.cli.parameters.BaseParameters;
 import com.blueprint.centromere.cli.parameters.UpdateCommandParameters;
 import com.blueprint.centromere.core.commons.model.DataSet;
+import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,7 +61,7 @@ public class UpdateParameterParsingTests {
     DataSet dataSet = null;
     
     try {
-      dataSet = objectMapper.readValue(parameters.getData(), DataSet.class);
+      dataSet = objectMapper.readValue(parameters.getData(), MongoDataSet.class);
     } catch (Exception e){
       e.printStackTrace();
       exception = e;

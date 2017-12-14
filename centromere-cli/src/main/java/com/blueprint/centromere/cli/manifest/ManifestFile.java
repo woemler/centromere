@@ -16,9 +16,7 @@
 
 package com.blueprint.centromere.cli.manifest;
 
-import com.blueprint.centromere.core.commons.model.DataFile;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import lombok.Data;
 
@@ -34,15 +32,5 @@ public class ManifestFile {
   private String type;
   private LinkedHashMap<String, String> parameters = new LinkedHashMap<>();
   private LinkedHashMap<String, String> attributes = new LinkedHashMap<>();
-  
-  public DataFile createDataFile(){
-    DataFile dataFile = new DataFile();
-    dataFile.setFilePath(path);
-    dataFile.setDataType(type);
-    dataFile.setDateCreated(new Date());
-    dataFile.setDateUpdated(new Date());
-    dataFile.setAttributes(attributes);
-    return dataFile;
-  }
 
 }

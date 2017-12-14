@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.repository;
+package com.blueprint.centromere.core.mongodb;
 
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.repository.ModelPersistenceException;
+import com.blueprint.centromere.core.repository.ModelRepository;
+import com.blueprint.centromere.core.repository.QueryCriteria;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;

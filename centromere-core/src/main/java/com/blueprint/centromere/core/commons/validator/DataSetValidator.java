@@ -28,7 +28,7 @@ public class DataSetValidator implements Validator {
 
 	@Override 
 	public boolean supports(Class<?> aClass) {
-		return aClass.equals(DataSet.class);
+		return DataSet.class.isAssignableFrom(aClass);
 	}
 
 	@Override 

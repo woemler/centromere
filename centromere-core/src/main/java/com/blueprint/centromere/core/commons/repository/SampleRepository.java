@@ -18,32 +18,31 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.repository.ModelRepository;
-import com.blueprint.centromere.core.repository.ModelResource;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
 
 /**
  * @author woemler
  */
-@ModelResource("samples")
-public interface SampleRepository extends
-		ModelRepository<Sample, String>,
-		MetadataOperations<Sample>,
-		AttributeOperations<Sample> {
+@NoRepositoryBean
+public interface SampleRepository<T extends Sample<ID>, ID extends Serializable> 
+    extends ModelRepository<T, ID>, MetadataOperations<T>, AttributeOperations<T> {
 
-	Optional<Sample> findBySampleId(@Param("sampleId") String sampleId);
-	List<Sample> findByAliases(@Param("alias") String alias);
-	List<Sample> findBySampleType(@Param("type") String sampleType);
-	List<Sample> findByTissue(@Param("tissue") String tissue);
-	List<Sample> findByHistology(@Param("histology") String histology);
-	List<Sample> findBySpecies(@Param("species") String species);
+	Optional<T> findBySampleId(@Param("sampleId") String sampleId);
+	List<T> findByAliases(@Param("alias") String alias);
+	List<T> findBySampleType(@Param("type") String sampleType);
+	List<T> findByTissue(@Param("tissue") String tissue);
+	List<T> findByHistology(@Param("histology") String histology);
+	List<T> findBySpecies(@Param("species") String species);
 	
 	@Override
-	default List<Sample> guess(@Param("keyword") String keyword){
-		List<Sample> samples = new ArrayList<>();
-		Optional<Sample> optional = this.findBySampleId(keyword);
+	default List<T> guess(@Param("keyword") String keyword){
+		List<T> samples = new ArrayList<>();
+		Optional<T> optional = this.findBySampleId(keyword);
 		if (optional.isPresent()) samples.add(optional.get());
 		samples.addAll(this.findByAliases(keyword));
 		samples.addAll(findByTissue(keyword));
@@ -53,10 +52,10 @@ public interface SampleRepository extends
 	}
 
   @Override
-  default Optional<Sample> bestGuess(String keyword){
-    Optional<Sample> optional = findBySampleId(keyword);
+  default Optional<T> bestGuess(String keyword){
+    Optional<T> optional = findBySampleId(keyword);
     if (optional.isPresent()) return optional;
-    List<Sample> samples = this.findByAliases(keyword);
+    List<T> samples = this.findByAliases(keyword);
     return samples.isEmpty() ? Optional.empty() : Optional.of(samples.get(0));
   }
 	

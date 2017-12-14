@@ -18,14 +18,17 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.Mutation;
 import com.blueprint.centromere.core.repository.ModelRepository;
-import com.blueprint.centromere.core.repository.ModelResource;
+import java.io.Serializable;
 import java.util.List;
+import org.springframework.data.repository.NoRepositoryBean;
 
 /**
  * @author woemler
  */
-@ModelResource("mutations")
-public interface MutationRepository extends ModelRepository<Mutation, String>,
-    DataOperations<Mutation> {
-  List<Mutation> findByVariantClassification(String variantClassification);
+@NoRepositoryBean
+public interface MutationRepository<T extends Mutation<ID>, ID extends Serializable> 
+    extends ModelRepository<T, ID>, DataOperations<T> {
+  List<T> findByVariantClassification(String variantClassification);
+  List<T> findByVariantType(String variantType);
+  
 }

@@ -92,7 +92,11 @@ public class BatchCommandExecutor {
         return;
       }
     } else {
-      dataSet = new DataSet();
+      try {
+        dataSet = (DataSet) dataSetRepository.getModel().newInstance();
+      } catch (Exception e){
+        throw new CommandLineRunnerException(e);
+      }
       dataSet.setDataSetId(manifest.getDataSetId());
     }
     if (manifest.getName() != null && !"".equalsIgnoreCase(manifest.getName())) {
@@ -110,9 +114,9 @@ public class BatchCommandExecutor {
     dataSet.addAttributes(manifest.getAttributes());
     dataSet.addParameters(manifest.getParameters());
     if (dataSet.getId() != null){
-      dataSet = dataSetRepository.update(dataSet);
+      dataSet = (DataSet) dataSetRepository.update(dataSet);
     } else {
-      dataSet = dataSetRepository.insert(dataSet);
+      dataSet = (DataSet) dataSetRepository.insert(dataSet);
     }
 		
 		// Import each file
@@ -120,7 +124,12 @@ public class BatchCommandExecutor {
 		  
 		  Printer.print(String.format("Processing manifest file: %s", mf.toString()), logger, Level.INFO);
 
-      DataFile dataFile = new DataFile();
+      DataFile dataFile;
+      try {
+        dataFile = (DataFile) dataFileRepository.getModel().newInstance();
+      } catch (Exception e){
+        throw new CommandLineRunnerException(e);
+      }
       dataFile.addAttributes(mf.getAttributes());
 		  String partialPath = mf.getPath();
 			File df = new File(partialPath);

@@ -18,6 +18,7 @@ package com.blueprint.centromere.tests.core.test.dataimport;
 
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.mongodb.model.MongoGene;
 import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -80,14 +81,14 @@ public class ColumnMappingReaderTests {
 	@Test
 	public void modelBeanWrapperTest() throws Exception {
 		ConversionService conversionService = new DefaultConversionService();
-		BeanWrapperImpl wrapper = new BeanWrapperImpl(Gene.class);
+		BeanWrapperImpl wrapper = new BeanWrapperImpl(MongoGene.class);
 		String entrezGeneId = "7";
 		String geneSymbol = "TEST";
 		String taxId = "9606";
 		String aliases = "AAA,BBB,CCC";
 		String xrefs = "db1=ABC;db2=DEF";
 		
-		Class<?> type = wrapper.getPropertyType("primaryGeneSymbol");
+		Class<?> type = wrapper.getPropertyType("symbol");
 		Object value = geneSymbol;
 		if (!type.equals(String.class)){
 			if (conversionService.canConvert(type, String.class)){
@@ -96,7 +97,7 @@ public class ColumnMappingReaderTests {
 				System.out.println(String.format("Cannot convert %s to String", type.getName()));
 			}
 		}
-		wrapper.setPropertyValue("primaryGeneSymbol", value);
+		wrapper.setPropertyValue("symbol", value);
 
 		type = wrapper.getPropertyType("geneId");
 		value = entrezGeneId;
@@ -144,8 +145,8 @@ public class ColumnMappingReaderTests {
 		
 		Gene gene = (Gene) wrapper.getWrappedInstance();
 		Assert.notNull(gene);
-		Assert.notNull(gene.getPrimaryGeneSymbol());
-		Assert.isTrue("TEST".equals(gene.getPrimaryGeneSymbol()));
+		Assert.notNull(gene.getSymbol());
+		Assert.isTrue("TEST".equals(gene.getSymbol()));
 		Assert.notNull(gene.getGeneId());
 		Assert.isTrue(gene.getGeneId() == "7");
 		Assert.notNull(gene.getTaxId());

@@ -39,11 +39,12 @@ import org.slf4j.LoggerFactory;
 /**
  * @author woemler
  */
-public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader<GeneCopyNumber> 
-    implements SampleAware {
+public class GenericGeneCopyNumberMatrixReader<T extends GeneCopyNumber<?>> 
+    extends MultiRecordLineFileReader<T> implements SampleAware {
   
   private static final Logger logger = LoggerFactory.getLogger(GenericGeneCopyNumberMatrixReader.class);
   
+  private final Class<T> model;
   private final GeneRepository geneRepository;
   private final SampleRepository sampleRepository;
   private final DataImportProperties dataImportProperties;
@@ -51,9 +52,11 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
   private Map<Integer, Sample> samples = new HashMap<>();
 
   public GenericGeneCopyNumberMatrixReader(
+      Class<T> model,
       GeneRepository geneRepository,
       SampleRepository sampleRepository,
       DataImportProperties dataImportProperties) {
+    this.model = model;
     this.geneRepository = geneRepository;
     this.sampleRepository = sampleRepository;
     this.dataImportProperties = dataImportProperties;
@@ -64,10 +67,11 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
    * an empty list should be returned.
    */
   @Override
-  protected List<GeneCopyNumber> getRecordsFromLine(String line) throws DataImportException {
+  @SuppressWarnings("unchecked")
+  protected List<T> getRecordsFromLine(String line) throws DataImportException {
     
     String[] bits = line.trim().split(this.getDelimiter());
-    List<GeneCopyNumber> records = new ArrayList<>();
+    List<T> records = new ArrayList<>();
     
     Optional<Gene> optional = geneRepository.bestGuess(bits[0].replaceAll("['\"]", ""));
     if (!optional.isPresent()) {
@@ -84,15 +88,20 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
     Gene gene = optional.get();
     
     for (int i = 2; i < bits.length; i++){
-      GeneCopyNumber record = new GeneCopyNumber();
+      T record;
+      try {
+        record = model.newInstance();
+      } catch (Exception e){
+        throw new DataImportException(e);
+      }
       if (samples.containsKey(i)){
-        record.setSampleId(samples.get(i).getId());
+        record.setSampleId(samples.get(i).getSampleId());
       } else {
         continue;
       }
-      record.setDataFileId(this.getDataFile().getId());
-      record.setGeneId(gene.getId());
-      record.setDataSetId(this.getDataSet().getId());
+      record.setDataFileId(this.getDataFile().getDataFileId());
+      record.setGeneId(gene.getGeneId());
+      record.setDataSetId(this.getDataSet().getDataSetId());
       try {
         Double val = Double.parseDouble(bits[i].replaceAll("['\"]", ""));
         record.setValue(val);
@@ -115,6 +124,7 @@ public class GenericGeneCopyNumberMatrixReader extends MultiRecordLineFileReader
    * Extracts the column names from the header line in the file.
    */
   @Override
+  @SuppressWarnings("unchecked")
   protected void parseHeader(String line) throws DataImportException {
     String[] bits = line.trim().split(this.getDelimiter());
     for (int i = 2; i < bits.length; i++){

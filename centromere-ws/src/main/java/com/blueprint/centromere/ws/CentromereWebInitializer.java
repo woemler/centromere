@@ -54,7 +54,7 @@ public class CentromereWebInitializer extends SpringBootServletInitializer {
           ? Profiles.API_DOCUMENTATION_ENABLED_PROFILE : Profiles.API_DOCUMENTATION_DISABLED_PROFILE;
       profiles = annotation.useCustomSchema() ? 
           new String[] { Profiles.WEB_PROFILE, securityProfile, apiDocumentationProfile, Profiles.SCHEMA_CUSTOM } : 
-          new String[] { Profiles.WEB_PROFILE, securityProfile, apiDocumentationProfile };
+          new String[] { Profiles.WEB_PROFILE, securityProfile, apiDocumentationProfile, Profiles.SCHEMA_DEFAULT };
       logger.info(String.format("Running Centromere with profiles: %s", Arrays.asList(profiles)));
     } else {
       logger.info("Running Centromere with default profiles.");

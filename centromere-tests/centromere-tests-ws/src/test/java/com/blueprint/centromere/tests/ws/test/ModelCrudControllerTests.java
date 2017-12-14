@@ -59,7 +59,7 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = WebTestInitializer.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(value = { Profiles.WEB_PROFILE, Profiles.NO_SECURITY, Profiles.API_DOCUMENTATION_DISABLED_PROFILE })
+@ActiveProfiles(value = { Profiles.SCHEMA_DEFAULT, Profiles.WEB_PROFILE, Profiles.NO_SECURITY, Profiles.API_DOCUMENTATION_DISABLED_PROFILE })
 @AutoConfigureMockMvc
 public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
@@ -85,7 +85,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
     System.out.println("Gene URI: " + registry.getModelUri(Gene.class));
     System.out.println(String.format("Registered models: %s", registry.getRegisteredModels()));
 
-    Gene gene = geneRepository.findByGeneId("1").get();
+    Gene gene = (Gene) geneRepository.findByGeneId("1").get();
 
     mockMvc.perform(get(BASE_URL + "/{id}", gene.getId())
         .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
@@ -100,7 +100,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   @Test
   public void findByIdNoHal() throws Exception {
 
-    Gene gene = geneRepository.findByGeneId("1").get();
+    Gene gene = (Gene) geneRepository.findByGeneId("1").get();
 
     mockMvc.perform(get(BASE_URL + "/{id}", gene.getId()))
         .andExpect(status().isOk())
@@ -118,7 +118,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   @Test
   public void findByIdFiltered() throws Exception {
 
-    Gene gene = geneRepository.findByGeneId("1").get();
+    Gene gene = (Gene) geneRepository.findByGeneId("1").get();
 
     mockMvc.perform(get(BASE_URL + "/{id}?exclude=links,primaryGeneSymbol", gene.getId()))
         .andExpect(status().isOk())
@@ -130,7 +130,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   @Test
   public void findByIdWithoutLinks() throws Exception {
 
-    Gene gene = geneRepository.findByGeneId("1").get();
+    Gene gene = (Gene) geneRepository.findByGeneId("1").get();
 
     mockMvc.perform(get(BASE_URL + "/{id}", gene.getId()))
         .andExpect(status().isOk())
@@ -469,9 +469,9 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   @Test
   public void createTest() throws Exception {
 
-    Gene gene = new Gene();
+    Gene gene = (Gene) geneRepository.getModel().newInstance();
     gene.setGeneId("6");
-    gene.setPrimaryGeneSymbol("GeneF");
+    gene.setSymbol("GeneF");
     gene.setTaxId(9606);
     gene.setChromosome("10");
     gene.setGeneType("protein-coding");
@@ -487,7 +487,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .andExpect(jsonPath("$", hasKey("geneId")))
         .andExpect(jsonPath("$.geneId", is("6")));
 
-    Gene newGene = geneRepository.findByGeneId("6").get();
+    Gene newGene = (Gene) geneRepository.findByGeneId("6").get();
 
     mockMvc.perform(get(BASE_URL + "/{id}", newGene.getId()))
         .andExpect(status().isOk())
@@ -508,12 +508,12 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
         .andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneA")));
 
-    List<Gene> genes = geneRepository.findByPrimaryGeneSymbol("GeneA");
+    List<Gene> genes = geneRepository.findBySymbol("GeneA");
     Assert.notNull(genes);
     Assert.notEmpty(genes);
     Gene gene = genes.get(0);
-    Assert.isTrue("GeneA".equals(gene.getPrimaryGeneSymbol()));
-    gene.setPrimaryGeneSymbol("GeneX");
+    Assert.isTrue("GeneA".equals(gene.getSymbol()));
+    gene.setSymbol("GeneX");
     Assert.notNull(gene.getId());
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -542,9 +542,9 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   @Test
   public void deleteTest() throws Exception {
 
-    Gene gene = new Gene();
+    Gene gene = (Gene) geneRepository.getModel().newInstance();
     gene.setGeneId("7");
-    gene.setPrimaryGeneSymbol("GeneG");
+    gene.setSymbol("GeneG");
     gene.setTaxId(9606);
     gene.setChromosome("10");
     gene.setGeneType("protein-coding");

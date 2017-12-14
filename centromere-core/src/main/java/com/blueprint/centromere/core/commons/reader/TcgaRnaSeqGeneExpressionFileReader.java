@@ -30,6 +30,7 @@ import com.blueprint.centromere.core.dataimport.exception.InvalidSampleException
 import com.blueprint.centromere.core.dataimport.reader.MultiRecordLineFileReader;
 import com.blueprint.centromere.core.model.ModelSupport;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,25 +44,27 @@ import org.slf4j.LoggerFactory;
  * @author woemler
  * @since 0.4.3
  */
-public class TcgaRnaSeqGeneExpressionFileReader
-		extends MultiRecordLineFileReader<GeneExpression>
-		implements ModelSupport<GeneExpression>, SampleAware {
+public class TcgaRnaSeqGeneExpressionFileReader<T extends GeneExpression<?>>
+		extends MultiRecordLineFileReader<T>
+		implements ModelSupport<T>, SampleAware {
 
 	private static final Logger logger = LoggerFactory.getLogger(TcgaRnaSeqGeneExpressionFileReader.class);
 
+	private final Class<T> model;
 	private final GeneRepository geneRepository;
 	private final SampleRepository sampleRepository;
 	private final DataImportProperties dataImportProperties;
 	
 	private Map<String, Sample> sampleMap;
 	private Map<String, Gene> geneMap;
-	private Class<GeneExpression> model = GeneExpression.class;
 
 	public TcgaRnaSeqGeneExpressionFileReader(
+	    Class<T> model,
       GeneRepository geneRepository,
       SampleRepository sampleRepository,
       DataImportProperties dataImportProperties
 	){
+	  this.model = model;
     this.geneRepository = geneRepository;
     this.sampleRepository = sampleRepository;
     this.dataImportProperties = dataImportProperties;
@@ -72,14 +75,14 @@ public class TcgaRnaSeqGeneExpressionFileReader
 		super.doBefore();
     sampleMap = new HashMap<>();
 		geneMap = new HashMap<>();
-		for (Gene gene: geneRepository.findAll()){
+		for (Gene gene: (Collection<Gene>) geneRepository.findAll()){
 		  geneMap.put(gene.getGeneId(), gene);
     }
 	}
 
   @Override
-	protected List<GeneExpression> getRecordsFromLine(String line) throws DataImportException {
-		List<GeneExpression> records = new ArrayList<>();
+	protected List<T> getRecordsFromLine(String line) throws DataImportException {
+		List<T> records = new ArrayList<>();
 		String[] bits = line.trim().split(this.getDelimiter());
 		if (bits.length > 1){
 			Gene gene = getGene(bits[0]);
@@ -92,7 +95,12 @@ public class TcgaRnaSeqGeneExpressionFileReader
         }
 			}
 			for (int i = 1; i < bits.length; i++){
-				GeneExpression record  = new GeneExpression();
+				T record;
+				try {
+				  record = model.newInstance();
+        } catch (Exception e){
+				  throw new DataImportException(e);
+        }
 				Sample sample = getSample(i);
 				if (sample == null){
 				  if (dataImportProperties.isSkipInvalidSamples()){
@@ -113,10 +121,10 @@ public class TcgaRnaSeqGeneExpressionFileReader
 						throw new InvalidRecordException(String.format("Cannot parse value: %s", bits[i]));
 					}
 				}
-				record.setDataFileId(this.getDataFile().getId());
-				record.setDataSetId(getDataSet().getId());
-				record.setGeneId(gene.getId());
-				record.setSampleId(sample.getId());
+				record.setDataFileId(this.getDataFile().getDataFileId());
+				record.setDataSetId(getDataSet().getDataSetId());
+				record.setGeneId(gene.getGeneId());
+				record.setSampleId(sample.getSampleId());
 				records.add(record);
 			}
 			
@@ -165,13 +173,13 @@ public class TcgaRnaSeqGeneExpressionFileReader
 	}
 
 	@Override 
-	public Class<GeneExpression> getModel() {
+	public Class<T> getModel() {
 		return model;
 	}
 
 	@Override 
-	public void setModel(Class<GeneExpression> model) {
-		this.model = model;
+	public void setModel(Class<T> model) {
+    //this.model = model;
 	}
 
   @Override

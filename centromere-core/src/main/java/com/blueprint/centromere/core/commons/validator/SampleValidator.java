@@ -29,7 +29,7 @@ public class SampleValidator implements Validator {
 
 	@Override 
 	public boolean supports(Class<?> aClass) {
-		return aClass.equals(Sample.class);
+		return Sample.class.isAssignableFrom(aClass);
 	}
 
 	@Override 

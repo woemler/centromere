@@ -27,29 +27,25 @@ import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter.WriteMode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.io.Serializable;
 
 /**
  * @author woemler
  */
 @DataTypes(value = { "gct_gene_expression" }, description = "Gene-normalized expression data from GCT files")
-@Component
-public class GctGeneExpressionProcessor extends GenericRecordProcessor<GeneExpression> {
+public class GctGeneExpressionProcessor<T extends GeneExpression<ID>, ID extends Serializable> 
+    extends GenericRecordProcessor<T> {
 
-  @SuppressWarnings("SpringJavaAutowiringInspection")
-  @Autowired
   public GctGeneExpressionProcessor(
+      Class<T> model,
       GeneRepository geneRepository, 
-      GeneExpressionRepository repository,
+      GeneExpressionRepository<T, ID> repository,
       SampleRepository sampleRepository,
       DataImportProperties dataImportProperties
   ) {
-    this.setModel(GeneExpression.class);
-    this.setReader(new GctGeneExpressionFileReader(geneRepository, sampleRepository, dataImportProperties));
+    this.setModel(model);
+    this.setReader(new GctGeneExpressionFileReader<>(model, geneRepository, sampleRepository, dataImportProperties));
     this.setValidator(new GeneExpressionValidator());
     this.setWriter(new RepositoryRecordWriter<>(repository, WriteMode.INSERT, 200));
-//    this.setWriter(new MongoImportTempFileWriter<>(dataImportProperties, mongoTemplate));
-//    this.setImporter(new MongoImportTempFileImporter<>(GeneExpression.class, databaseProperties));
   }
 }

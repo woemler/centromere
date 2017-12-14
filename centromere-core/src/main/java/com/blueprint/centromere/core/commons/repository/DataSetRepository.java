@@ -18,19 +18,21 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.repository.ModelRepository;
-import com.blueprint.centromere.core.repository.ModelResource;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.repository.NoRepositoryBean;
 
 /**
  * @author woemler
  */
-@ModelResource("datasets")
-public interface DataSetRepository extends ModelRepository<DataSet, String> {
-	Optional<DataSet> findByDataSetId(String dataSetId); 
-	Optional<DataSet> findByName(String name);
-	List<DataSet> findBySource(String source);
-	@Query("{ 'sampleIds': ?0 }")  List<DataSet> findBySampleId(String sampleId);
-  @Query("{ 'dataFileIds': ?0 }")  List<DataSet> findByDataFileId(String dataFileId);
+@NoRepositoryBean
+public interface DataSetRepository<T extends DataSet<ID>, ID extends Serializable> 
+    extends ModelRepository<T, ID> {
+	Optional<T> findByDataSetId(String dataSetId); 
+	Optional<T> findByName(String name);
+	List<T> findBySource(String source);
+	@Query("{ 'sampleIds': ?0 }")  List<T> findBySampleId(String sampleId);
+  @Query("{ 'dataFileIds': ?0 }")  List<T> findByDataFileId(String dataFileId);
 }

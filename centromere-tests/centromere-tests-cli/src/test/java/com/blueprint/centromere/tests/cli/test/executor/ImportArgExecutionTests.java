@@ -18,6 +18,7 @@ import com.blueprint.centromere.core.commons.repository.MutationRepository;
 import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.dataimport.exception.InvalidSampleException;
+import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
 import com.blueprint.centromere.tests.cli.CommandLineTestInitializer;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import java.io.FileNotFoundException;
@@ -44,7 +45,7 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CommandLineTestInitializer.class, webEnvironment = WebEnvironment.NONE)
-@ActiveProfiles({ Profiles.CLI_PROFILE, CentromereCommandLineInitializer.SINGLE_COMMAND_PROFILE })
+@ActiveProfiles({ Profiles.SCHEMA_DEFAULT, Profiles.CLI_PROFILE, CentromereCommandLineInitializer.SINGLE_COMMAND_PROFILE })
 @FixMethodOrder
 public class ImportArgExecutionTests extends AbstractRepositoryTests {
   
@@ -110,7 +111,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     Assert.isTrue(dataFileOptional.isPresent());
     DataFile dataFile = dataFileOptional.get();
     Assert.isTrue(geneInfoFile.getFile().getAbsolutePath().equals(dataFile.getFilePath()));
-    Assert.isTrue(Gene.class.equals(dataFile.getModelType()));
+    Assert.isTrue(Gene.class.isAssignableFrom(dataFile.getModelType()));
     Assert.isTrue("entrez_gene".equals(dataFile.getDataType()));
 
     Optional<DataSet> dataSetOptional = dataSetRepository.findById(dataFile.getDataSetId());
@@ -128,12 +129,12 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     geneExpressionRepository.deleteAll();
     Assert.isTrue(geneExpressionRepository.count() == 0);
     
-    DataSet dataSet = new DataSet();
+    DataSet dataSet = new MongoDataSet();
     dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
-    for (Sample sample: sampleRepository.findAll()){
-      sampleIds.add(sample.getId());
+    for (Sample sample: (List<Sample>) sampleRepository.findAll()){
+      sampleIds.add(sample.getSampleId());
     }
     dataSet.setSampleIds(sampleIds);
     dataSetRepository.insert(dataSet);
@@ -165,7 +166,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
         .findByFilePath(gctGeneExpressionFile.getFile().getAbsolutePath());
     Assert.isTrue(dataFileOptional.isPresent());
     DataFile dataFile = dataFileOptional.get();
-    Assert.isTrue(GeneExpression.class.equals(dataFile.getModelType()));
+    Assert.isTrue(GeneExpression.class.isAssignableFrom(dataFile.getModelType()));
     Assert.isTrue("gct_gene_expression".equals(dataFile.getDataType()));
 
     Assert.isTrue(geneExpressionRepository.count() == 25, 
@@ -184,12 +185,12 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
   @Test
   public void mafMutationImportTest() throws Exception {
 
-    DataSet dataSet = new DataSet();
+    DataSet dataSet = new MongoDataSet();
     dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
-    for (Sample sample: sampleRepository.findAll()){
-      sampleIds.add(sample.getId());
+    for (Sample sample: (List<Sample>) sampleRepository.findAll()){
+      sampleIds.add(sample.getSampleId());
     }
     dataSet.setSampleIds(sampleIds);
     dataSetRepository.insert(dataSet);
@@ -216,7 +217,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
         .findByFilePath(mafFile.getFile().getAbsolutePath());
     Assert.isTrue(dataFileOptional.isPresent());
     DataFile dataFile = dataFileOptional.get();
-    Assert.isTrue(Mutation.class.equals(dataFile.getModelType()));
+    Assert.isTrue(Mutation.class.isAssignableFrom(dataFile.getModelType()));
     Assert.isTrue("maf_mutation".equals(dataFile.getDataType()));
 
     Assert.isTrue(mutationRepository.count() == 8,
@@ -233,7 +234,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     Assert.notNull(record.getGeneId());
     Optional<Gene> geneOptional = geneRepository.findById(record.getGeneId());
     Assert.isTrue(geneOptional.isPresent());
-    Assert.isTrue("GeneA".equals(geneOptional.get().getPrimaryGeneSymbol()));
+    Assert.isTrue("GeneA".equals(geneOptional.get().getSymbol()));
     Assert.isTrue("Missense_Mutation".equals(record.getVariantClassification()));
     Assert.isTrue("SNP".equals(record.getVariantType()));
     Assert.isTrue(140994602 == record.getDnaStartPosition());
@@ -252,7 +253,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     Assert.notNull(record.getGeneId());
     geneOptional = geneRepository.findById(record.getGeneId());
     Assert.isTrue(geneOptional.isPresent());
-    Assert.isTrue("GeneE".equals(geneOptional.get().getPrimaryGeneSymbol()));
+    Assert.isTrue("GeneE".equals(geneOptional.get().getSymbol()));
     Assert.isTrue("Nonsense_Mutation".equals(record.getVariantClassification()));
     Assert.isTrue("SNP".equals(record.getVariantType()));
     Assert.isTrue(22157034 == record.getDnaStartPosition());
@@ -272,12 +273,12 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
   @Test
   public void invalidSampleTest() throws Exception {
 
-    DataSet dataSet = new DataSet();
+    DataSet dataSet = new MongoDataSet();
     dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
-    for (Sample sample: sampleRepository.findAll()){
-      sampleIds.add(sample.getId());
+    for (Sample sample: (List<Sample>) sampleRepository.findAll()){
+      sampleIds.add(sample.getSampleId());
     }
     dataSet.setSampleIds(sampleIds);
     dataSetRepository.insert(dataSet);
@@ -319,12 +320,12 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
   @Test
   public void nonexistentFileImportTest() throws Exception {
 
-    DataSet dataSet = new DataSet();
+    DataSet dataSet = new MongoDataSet();
     dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
-    for (Sample sample: sampleRepository.findAll()){
-      sampleIds.add(sample.getId());
+    for (Sample sample: (List<Sample>) sampleRepository.findAll()){
+      sampleIds.add(sample.getSampleId());
     }
     dataSet.setSampleIds(sampleIds);
     dataSetRepository.insert(dataSet);
@@ -360,12 +361,12 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
   @Test
   public void invalidDataTypeTest() throws Exception {
 
-    DataSet dataSet = new DataSet();
+    DataSet dataSet = new MongoDataSet();
     dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
-    for (Sample sample: sampleRepository.findAll()){
-      sampleIds.add(sample.getId());
+    for (Sample sample: (List<Sample>) sampleRepository.findAll()){
+      sampleIds.add(sample.getSampleId());
     }
     dataSet.setSampleIds(sampleIds);
     dataSetRepository.insert(dataSet);

@@ -31,17 +31,18 @@ import com.blueprint.centromere.core.dataimport.exception.DataImportException;
  * @author woemler
  * @since 0.5.0
  */
-public class GctTranscriptExpressionFileReader extends GctFileReader<TranscriptExpression> {
+public class GctTranscriptExpressionFileReader<T extends TranscriptExpression<?>> extends GctFileReader<T> {
 
   public GctTranscriptExpressionFileReader(
+      Class<T> model,
       GeneRepository geneRepository,
       SampleRepository sampleRepository,
       DataImportProperties dataImportProperties) {
-    super(TranscriptExpression.class, geneRepository, sampleRepository, dataImportProperties);
+    super(model, geneRepository, sampleRepository, dataImportProperties);
   }
 
   @Override
-  protected TranscriptExpression getRecordValue(TranscriptExpression record, Sample sample,
+  protected T getRecordValue(T record, Sample sample,
       Gene gene, String line, int index) throws DataImportException {
     record = super.getRecordValue(record, sample, gene, line, index);
     String[] bits = line.split(this.getDelimiter());

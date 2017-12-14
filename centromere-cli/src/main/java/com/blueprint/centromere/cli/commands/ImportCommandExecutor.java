@@ -37,6 +37,7 @@ import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -61,6 +62,7 @@ public class ImportCommandExecutor {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ImportCommandExecutor.class);
 	
+	@SuppressWarnings("unchecked")
 	public void run(ImportCommandParameters parameters) throws CommandLineRunnerException {
 	  
 	  // If help flag is active, show info and exit.
@@ -84,7 +86,7 @@ public class ImportCommandExecutor {
 		Printer.print(String.format("Running file import: data-type=%s  file=%s", dataType, filePath), logger, Level.INFO);
 		
 	  // Get the data set
-    Optional<DataSet> dataSetOptional = Optional.ofNullable(dataSetRepository.findOne(dataSetId));
+    Optional<DataSet> dataSetOptional = Optional.ofNullable((DataSet) dataSetRepository.findOne(dataSetId));
     if (!dataSetOptional.isPresent()){
       dataSetOptional = dataSetRepository.findByDataSetId(dataSetId);
     }
@@ -139,7 +141,7 @@ public class ImportCommandExecutor {
 
         // If possible, delete the associated records for the file
         if (r instanceof DataOperations) {
-          ((DataOperations) r).deleteByDataFileId(dataFile.getId());
+          ((DataOperations) r).deleteByDataFileId((String) dataFile.getId());
         } else {
           Printer.print("Data is not over-writable.  Exiting.", logger, Level.WARN);
           return;
@@ -150,14 +152,14 @@ public class ImportCommandExecutor {
         //dataFileRepository.delete(dataFile);
         
         try {
-          dataFile.generateFileId();
+          dataFile.setDataFileId(DataFile.generateFileId(dataFile));
         } catch (Exception e){
           throw new CommandLineRunnerException(e);
         }
 
         Printer.print(String.format("Updating existing data file record: %s", dataFile.toString()),
             logger, Level.INFO);
-        dataFile = dataFileRepository.update(dataFile);
+        dataFile = (DataFile) dataFileRepository.update(dataFile);
         
       }
     } 
@@ -165,11 +167,15 @@ public class ImportCommandExecutor {
     // New file
     else {
 
-      dataFile = new DataFile();
+      try {
+        dataFile = (DataFile) dataFileRepository.getModel().newInstance();
+      } catch (Exception e){
+        throw new CommandLineRunnerException(e);
+      }
       dataFile.setFilePath(filePath);
       dataFile.setDataType(dataType);
       dataFile.setModel(processor.getModel());
-      dataFile.setDataSetId(dataSet.getId());
+      dataFile.setDataSetId(dataSet.getDataSetId());
       dataFile.setDateCreated(new Date());
       dataFile.setDateUpdated(new Date());
       try {
@@ -179,14 +185,14 @@ public class ImportCommandExecutor {
         throw new CommandLineRunnerException(e);
       }
       try {
-        dataFile.generateFileId();
+        dataFile.setDataFileId(DataFile.generateFileId(dataFile));
       } catch (Exception e){
         throw new CommandLineRunnerException(e);
       }
 
       Printer.print(String.format("Registering new data file record: %s", dataFile.toString()),
           logger, Level.INFO);
-      dataFile = dataFileRepository.insert(dataFile);
+      dataFile = (DataFile) dataFileRepository.insert(dataFile);
       
     }
 
@@ -255,7 +261,7 @@ public class ImportCommandExecutor {
     System.out.println("\nAvailable data sets:");
     System.out.println("    ShortName  ID");
     System.out.println("    ----  -----------");
-    for (DataSet dataSet: dataSetRepository.findAll(new Sort(Direction.ASC, "dataSetId"))){
+    for (DataSet dataSet: (List<DataSet>) dataSetRepository.findAll(new Sort(Direction.ASC, "dataSetId"))){
       System.out.println(String.format("    %s: %s", dataSet.getDataSetId(), dataSet.getId()));
     }
   }

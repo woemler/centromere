@@ -20,6 +20,9 @@ import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.reader.TcgaSampleReader;
+import com.blueprint.centromere.core.mongodb.model.MongoDataFile;
+import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
+import com.blueprint.centromere.core.mongodb.model.MongoSample;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
@@ -43,23 +46,23 @@ public class SampleTests {
 	@Test
 	public void tcgaSubjectReaderTest() throws Exception {
     ClassPathResource resource = new ClassPathResource("samples/tcga_sample_subjects.txt");
-	  DataSet dataSet = new DataSet();
+	  DataSet dataSet = new MongoDataSet();
 		dataSet.setDataSetId("test");
 		dataSet.setName("Test");
 		dataSet.setId("test");
-		DataFile dataFile = new DataFile();
+		DataFile dataFile = new MongoDataFile();
 		dataFile.setFilePath(resource.getPath());
-		dataFile.setDataSetId(dataSet.getId());
+		dataFile.setDataSetId((String) dataSet.getId());
 		dataFile.setId("test");
-		TcgaSampleReader reader = new TcgaSampleReader();
+		TcgaSampleReader<MongoSample> reader = new TcgaSampleReader<>(MongoSample.class);
 		reader.setDataSet(dataSet);
 		reader.setDataFile(dataFile);
-		Assert.isTrue(Sample.class.equals(reader.getModel()), String.format("Expected %s, got %s",
+		Assert.isTrue(MongoSample.class.equals(reader.getModel()), String.format("Expected %s, got %s",
     Sample.class.getName(), reader.getModel().getName()));
-    List<Sample> samples = new ArrayList<>();
+    List<MongoSample> samples = new ArrayList<>();
 		try {
 			reader.doBefore();
-			Sample sample = reader.readRecord();
+      MongoSample sample = reader.readRecord();
       while (sample != null){
           samples.add(sample);
           sample = reader.readRecord();

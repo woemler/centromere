@@ -19,8 +19,8 @@ package com.blueprint.centromere.core.commons.repository;
 import com.blueprint.centromere.core.commons.model.Term;
 import com.blueprint.centromere.core.repository.Evaluation;
 import com.blueprint.centromere.core.repository.ModelRepository;
-import com.blueprint.centromere.core.repository.ModelResource;
 import com.blueprint.centromere.core.repository.QueryCriteria;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,32 +29,32 @@ import java.util.Optional;
 /**
  * @author woemler
  */
-@ModelResource("terms")
-public interface TermRepository extends ModelRepository<Term, String> {
+public interface TermRepository<T extends Term<ID>, ID extends Serializable> 
+    extends ModelRepository<T, ID> {
   
-  List<Term> findByTerm(String term);
+  List<T> findByTerm(String term);
   
-  List<Term> findByModel(String model);
+  List<T> findByModel(String model);
 
-  default List<Term> findByModel(Class<?> model){
+  default List<T> findByModel(Class<?> model){
     return findByModel(model.getName());
   }
   
-  List<Term> findByField(String field);
+  List<T> findByField(String field);
   
-  List<Term> findByModelAndField(String model, String field);
+  List<T> findByModelAndField(String model, String field);
 
-  default List<Term> findByModelAndField(Class<?> model, String field){
+  default List<T> findByModelAndField(Class<?> model, String field){
     return findByModelAndField(model.getName(), field);
   }
   
-  Optional<Term> findByModelAndFieldAndTerm(String model, String field, String term);
+  Optional<T> findByModelAndFieldAndTerm(String model, String field, String term);
 
-  default Optional<Term> findByModelAndFieldAndTerm(Class<?> model, String field, String term){
+  default Optional<T> findByModelAndFieldAndTerm(Class<?> model, String field, String term){
     return findByModelAndFieldAndTerm(model.getName(), field, term);
   }
   
-  default List<Term> guess(String keyword, String model, String field){
+  default List<T> guess(String keyword, String model, String field){
     List<QueryCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(new QueryCriteria("term", keyword, Evaluation.LIKE));
     if (model != null){
@@ -63,22 +63,22 @@ public interface TermRepository extends ModelRepository<Term, String> {
     if (field != null){
       criteriaList.add(new QueryCriteria("field", field));
     }
-    return (List<Term>) this.find(criteriaList);
+    return (List<T>) this.find(criteriaList);
   }
   
-  default List<Term> guess(String keyword, Class<?> model, String field){
+  default List<T> guess(String keyword, Class<?> model, String field){
     return guess(keyword, model.getName(), field);
   }
 
-  default List<Term> guess(String keyword){
+  default List<T> guess(String keyword){
     return guess(keyword, (String) null, null);
   }
   
-  default List<Term> guess(String keyword, Class<?> model){
+  default List<T> guess(String keyword, Class<?> model){
     return guess(keyword, model, null);
   }
 
-  default List<Term> guess(String keyword, String model){
+  default List<T> guess(String keyword, String model){
     return guess(keyword, model, null);
   }
 
@@ -88,10 +88,10 @@ public interface TermRepository extends ModelRepository<Term, String> {
    * 
    * @param term record to be saved
    */
-  default void saveTerm(Term term){
-    Optional<Term> optional = findByModelAndFieldAndTerm(term.getModel(), term.getField(), term.getTerm());
+  default void saveTerm(T term){
+    Optional<T> optional = findByModelAndFieldAndTerm(term.getModel(), term.getField(), term.getTerm());
     if (optional.isPresent()){
-      Term t = optional.get();
+      T t = optional.get();
       t.addReferenceIds(term.getReferenceIds());
       this.update(t);
     } else {
@@ -104,8 +104,8 @@ public interface TermRepository extends ModelRepository<Term, String> {
    * 
    * @param terms
    */
-  default void saveTerms(Collection<Term> terms){
-    for (Term term: terms){
+  default void saveTerms(Collection<T> terms){
+    for (T term: terms){
       saveTerm(term);
     }
   }

@@ -18,12 +18,13 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.GeneCopyNumber;
 import com.blueprint.centromere.core.repository.ModelRepository;
-import com.blueprint.centromere.core.repository.ModelResource;
+import java.io.Serializable;
+import org.springframework.data.repository.NoRepositoryBean;
 
 /**
  * @author woemler
  */
-@ModelResource("genecopynumber")
-public interface GeneCopyNumberRepository extends ModelRepository<GeneCopyNumber, String>,
-		DataOperations<GeneCopyNumber> {
+@NoRepositoryBean
+public interface GeneCopyNumberRepository<T extends GeneCopyNumber<ID>, ID extends Serializable> 
+    extends ModelRepository<T, ID>, DataOperations<T> {
 }

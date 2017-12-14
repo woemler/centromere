@@ -16,19 +16,19 @@
 
 package com.blueprint.centromere.core.commons.model;
 
-import org.springframework.data.mongodb.core.mapping.Document;
+import java.io.Serializable;
+import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  * @author woemler
  */
-@Document
 @lombok.Data
-public class SegmentCopyNumber extends Data {
+public abstract class SegmentCopyNumber<ID extends Serializable> extends SimpleData<ID> {
 	
-	private String chromosome;
-	private Long segmentStart;
-	private Long segmentEnd;
+  @NotEmpty private String chromosome;
+	@NotNull private Long segmentStart;
+	@NotNull private Long segmentEnd;
 	private Integer probeCount;
-	private Double value; 
 
 }

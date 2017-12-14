@@ -45,10 +45,11 @@ import org.springframework.util.Assert;
  * @author woemler
  * @since 0.5.0
  */
-public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
+public class SnpEffVcfReader<T extends Mutation<?>> extends MultiRecordLineFileReader<T> {
   
   private static final Logger logger = LoggerFactory.getLogger(SnpEffVcfReader.class);
   
+  private final Class<T> model;
   private final GeneRepository geneRepository;
   private final SampleRepository sampleRepository;
   private final DataImportProperties dataImportProperties;
@@ -56,10 +57,12 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
   private boolean formatTestFlag = false;
 
   public SnpEffVcfReader(
+      Class<T> model,
       GeneRepository geneRepository,
       SampleRepository sampleRepository,
       DataImportProperties dataImportProperties
   ) {
+    this.model = model;
     this.geneRepository = geneRepository;
     this.sampleRepository = sampleRepository;
     this.dataImportProperties = dataImportProperties;
@@ -70,9 +73,9 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
    * an empty list should be returned.
    */
   @Override
-  protected List<Mutation> getRecordsFromLine(String line) throws DataImportException {
+  protected List<T> getRecordsFromLine(String line) throws DataImportException {
     if (!formatTestFlag) testFileFormat();
-    List<Mutation> mutations = new ArrayList<>();
+    List<T> mutations = new ArrayList<>();
     String[] bits = line.split(this.getDelimiter());
     for (int i = 9; i < bits.length; i++){
       
@@ -86,10 +89,15 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
       }
       Sample sample = sampleOptional.get();
 
-      Mutation mutation = new Mutation();
-      mutation.setSampleId(sample.getId());
-      mutation.setDataSetId(this.getDataSet().getId());
-      mutation.setDataFileId(this.getDataFile().getId());
+      T mutation;
+      try {
+        mutation = model.newInstance();
+      } catch (Exception e){
+        throw new DataImportException(e);
+      }
+      mutation.setSampleId(sample.getSampleId());
+      mutation.setDataSetId(this.getDataSet().getDataSetId());
+      mutation.setDataFileId(this.getDataFile().getDataFileId());
       
       mutation.setChromosome(bits[0].trim());
       mutation.setDnaStartPosition(Integer.parseInt(bits[1].trim()));
@@ -104,7 +112,7 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
 
       Gene gene = getGene(info.getOrDefault("SNPEFF_GENE_NAME", "n/a"));
       if (gene != null){
-        mutation.setGeneId(gene.getId());
+        mutation.setGeneId(gene.getGeneId());
       }
 
       mutation.setVariantClassification(info.getOrDefault("SNPEFF_FUNCTIONAL_CLASS", "n/a"));
@@ -155,13 +163,14 @@ public class SnpEffVcfReader extends MultiRecordLineFileReader<Mutation> {
         transcript.setTranscriptId(bits[7]);
         transcript.setVariantClassification(bits[1]);
         Gene gene = getGene(bits[4]);
-        if (gene != null) transcript.setGeneId(gene.getId());
+        if (gene != null) transcript.setGeneId(gene.getGeneId());
         transcripts.add(transcript);
       }
     }
     return transcripts;
   }
   
+  @SuppressWarnings("unchecked")
   protected Gene getGene(String identifier) throws InvalidGeneException {
     Optional<Gene> optional = geneRepository.bestGuess(identifier);
     return optional.orElse(null);

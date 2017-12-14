@@ -16,12 +16,13 @@
 
 package com.blueprint.centromere.core.commons.model;
 
-import org.springframework.data.mongodb.core.mapping.Document;
+import java.io.Serializable;
+import lombok.Data;
 
 /**
  * @author woemler
  */
-@Document
-public class GeneExpression extends SimpleData {
+@Data
+public abstract class GeneExpression<ID extends Serializable> extends SimpleData<ID> {
 
 }

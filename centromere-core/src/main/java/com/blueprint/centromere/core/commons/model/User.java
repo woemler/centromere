@@ -17,11 +17,13 @@
 package com.blueprint.centromere.core.commons.model;
 
 import com.blueprint.centromere.core.model.Ignored;
+import com.blueprint.centromere.core.model.Model;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,14 +34,22 @@ import org.springframework.security.core.userdetails.UserDetails;
  * 
  * @author woemler
  */
-@Document
-public class User extends AbstractMongoModel implements UserDetails {
+public abstract class User<ID extends Serializable> implements Model<ID>, UserDetails {
 	
-	@Indexed(unique = true) private String username;
-	@Ignored private String password;
+	@Indexed(unique = true) 
+  @NotEmpty
+  private String username;
+	
+	@Ignored 
+  @NotEmpty
+  private String password;
+	
 	private boolean accountNonExpired = true;
+	
 	private boolean accountNonLocked = true;
+	
 	private boolean enabled = false;
+	
 	private boolean credentialsNonExpired = true;
 	
 	private List<SimpleGrantedAuthority> authorities = new ArrayList<>();

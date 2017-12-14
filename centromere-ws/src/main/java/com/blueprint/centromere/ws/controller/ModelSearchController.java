@@ -279,19 +279,20 @@ public class ModelSearchController {
     Map<String,String[]> parameterMap = request.getParameterMap();
     String mediaType = request.getHeader("Accept");
 
-    Class<? extends Model<?>> metaModel;
+    Class<? extends Model<?>> metaModel = (Class<? extends Model<?>>) registry.getModelByResource(meta);
+    if (metaModel == null){
+      logger.error(String.format("URI does not map to a linked metadata model: %s", meta));
+      throw new ResourceNotFoundException();
+    }
     String metaField;
-    if ("sample".equals(meta.toLowerCase())){
-      metaModel = Sample.class;
+    //TODO: more programatic way of assigning metaField from model
+    if (Sample.class.isAssignableFrom(metaModel)){
       metaField = "sampleId";
-    } else if ("gene".equals(meta.toLowerCase())){
-      metaModel = Gene.class;
+    } else if (Gene.class.isAssignableFrom(metaModel)){
       metaField = "geneId";
-    } else if ("datafile".equals(meta.toLowerCase())){
-      metaModel = DataFile.class;
+    } else if (DataFile.class.isAssignableFrom(metaModel)){
       metaField = "dataFileId";
-    } else if ("dataset".equals(meta.toLowerCase())){
-      metaModel = DataSet.class;
+    } else if (DataSet.class.isAssignableFrom(metaModel)){
       metaField = "dataSetId";
     } else {
       logger.error(String.format("URI does not map to a linked metadata model: %s", meta));

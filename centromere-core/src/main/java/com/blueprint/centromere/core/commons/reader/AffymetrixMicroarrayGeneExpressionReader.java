@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author woemler
  */
-public abstract class AffymetrixMicroarrayGeneExpressionReader<T extends AffymetrixArrayData> 
+public abstract class AffymetrixMicroarrayGeneExpressionReader<T extends AffymetrixArrayData<?>> 
     extends MultiRecordLineFileReader<T> implements SampleAware, ModelSupport<T> {
   
   private static final Logger logger = LoggerFactory.getLogger(AffymetrixMicroarrayGeneExpressionReader.class);
@@ -93,10 +93,10 @@ public abstract class AffymetrixMicroarrayGeneExpressionReader<T extends Affymet
 
             try {
               T record = this.getModel().newInstance();
-              record.setDataSetId(this.getDataSet().getId());
-              record.setDataFileId(this.getDataFile().getId());
-              record.setGeneId(gene.getId());
-              record.setSampleId(sample.getId());
+              record.setDataSetId(this.getDataSet().getDataSetId());
+              record.setDataFileId(this.getDataFile().getDataFileId());
+              record.setGeneId(gene.getGeneId());
+              record.setSampleId(sample.getSampleId());
               record.setProbeSetId(accession);
               record.setValue(Double.parseDouble(bits[i].trim()));
               dtoList.add(record);

@@ -26,7 +26,7 @@ public class MutationValidator extends DataValidator {
 
 	@Override 
 	public boolean supports(Class<?> aClass) {
-		return aClass.equals(Mutation.class);
+		return Mutation.class.isAssignableFrom(aClass);
 	}
 
 	@Override 

@@ -20,6 +20,9 @@ import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.reader.EntrezGeneInfoReader;
+import com.blueprint.centromere.core.mongodb.model.MongoDataFile;
+import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
+import com.blueprint.centromere.core.mongodb.model.MongoGene;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,30 +43,31 @@ public class EntrezGeneTests {
 
   @Before
   public void setup(){
-    dataSet = new DataSet();
+    dataSet = new MongoDataSet();
     dataSet.setDataSetId("test");
     dataSet.setName("Test");
-    dataSet.setId("test");
-    dataFile = new DataFile();
-    dataFile.setId("test");
-    dataFile.setDataSetId(dataSet.getId());
+    dataSet.setDataSetId("test");
+    dataFile = new MongoDataFile();
+    dataFile.setDataFileId("test");
+    dataFile.setDataSetId(dataSet.getDataSetId());
   }
 	
 	@Test
 	public void geneInfoReaderTest() throws Exception {
 		ClassPathResource resource = new ClassPathResource("samples/Homo_sapiens.gene_info");
 		dataFile.setFilePath(resource.getPath());
-		EntrezGeneInfoReader reader = new EntrezGeneInfoReader();
+		EntrezGeneInfoReader<MongoGene> reader = new EntrezGeneInfoReader<>(MongoGene.class);
 		reader.setDataSet(dataSet);
 		reader.setDataFile(dataFile);
-		Assert.isTrue(Gene.class.equals(reader.getModel()), String.format("Expected %s, got %s",
-				Gene.class.getName(), reader.getModel().getName()));
+		Assert.isTrue(MongoGene.class.equals(reader.getModel()), String.format("Expected %s, got %s",
+				MongoGene.class.getName(), reader.getModel().getName()));
 		try {
 			reader.doBefore();
 			Gene gene = reader.readRecord();
 			Assert.notNull(gene);
-			Assert.isTrue(gene instanceof Gene);
-			Assert.isTrue("A1BG".equals(gene.getPrimaryGeneSymbol()));
+			System.out.println(gene.toString());
+			Assert.isTrue(gene instanceof MongoGene);
+			Assert.isTrue("A1BG".equals(gene.getSymbol()));
 		} finally {
 			reader.doAfter();
 		}

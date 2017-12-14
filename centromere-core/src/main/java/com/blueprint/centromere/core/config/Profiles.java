@@ -23,8 +23,7 @@ public class Profiles {
   
   // Schema and repositories
   public static final String SCHEMA_CUSTOM = "schema_custom";
-  public static final String SCHEMA_DEFAULT = "!"+SCHEMA_CUSTOM;
-  
+  public static final String SCHEMA_DEFAULT = "schema_default";
 
   // Application modes
   public static final String WEB_PROFILE = "mode_web";

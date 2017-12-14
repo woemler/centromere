@@ -16,15 +16,15 @@
 
 package com.blueprint.centromere.core.commons.model;
 
-import org.springframework.data.mongodb.core.mapping.Document;
+import java.io.Serializable;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  * @author woemler
  */
-@Document
 @lombok.Data
-public class TranscriptExpression extends SimpleData {
+public abstract class TranscriptExpression<ID extends Serializable> extends SimpleData<ID> {
 	
-	private String transcriptAccession;
+	@NotEmpty private String transcriptAccession;
 
 }

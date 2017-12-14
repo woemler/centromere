@@ -17,6 +17,7 @@
 package com.blueprint.centromere.core.commons.processor;
 
 import com.blueprint.centromere.core.commons.model.Term;
+import com.blueprint.centromere.core.commons.model.Term.TermGenerator;
 import com.blueprint.centromere.core.commons.repository.TermRepository;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
@@ -24,10 +25,10 @@ import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor
 import com.blueprint.centromere.core.dataimport.processor.RecordProcessor;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.ModelRepository;
+import java.io.Serializable;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 /**
  * This processor will extract all values from {@link Model} fields with {@link com.blueprint.centromere.core.commons.support.ManagedTerm}
@@ -37,16 +38,18 @@ import org.springframework.stereotype.Component;
  */
 @DataTypes(value = { "managed_terms", "terms" }, description = "Builds a dictionary of managed terms," 
     + " extracting field values from models with @ManagedTerm annotations.")
-@Component
-public class ManagedTermProcessor extends GenericRecordProcessor<Term> {
+public class ManagedTermProcessor<T extends Term<ID>, ID extends Serializable> 
+    extends GenericRecordProcessor<T> {
   
   private static final Logger logger = LoggerFactory.getLogger(ManagedTermProcessor.class);
   
-  private TermRepository termRepository;
+  private final TermRepository termRepository;
+  private final TermGenerator<T, ID> termGenerator;
 
-  public ManagedTermProcessor(TermRepository termRepository) {
+  public ManagedTermProcessor(Class<T> model, TermRepository termRepository) {
     this.termRepository = termRepository;
-    this.setModel(Term.class);
+    this.termGenerator = new TermGenerator<>(model);
+    this.setModel(model);
   }
 
   /**
@@ -81,15 +84,16 @@ public class ManagedTermProcessor extends GenericRecordProcessor<Term> {
    * {@link RecordProcessor#run()}
    */
   @Override
+  @SuppressWarnings("unchecked")
   public void run() throws DataImportException {
     for (Class<?> model: this.getRegistry().getRegisteredModels()){
-      if (Term.modelHasManagedTerms(model)){
+      if (termGenerator.modelHasManagedTerms(model)){
         ModelRepository<?,?> repository = this.getRegistry().getRepositoryByModel(model);
         for (Model<?> record: repository.findAll()){
           try {
-            List<Term> terms = Term.getModelTerms(record);
+            List<T> terms = termGenerator.getModelTerms((Model<ID>) record);
             termRepository.saveTerms(terms);
-          } catch (IllegalAccessException e){
+          } catch (Exception e){
             throw new DataImportException(e);
           }
         }

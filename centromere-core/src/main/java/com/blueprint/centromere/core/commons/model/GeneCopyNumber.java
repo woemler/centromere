@@ -16,17 +16,12 @@
 
 package com.blueprint.centromere.core.commons.model;
 
-import org.springframework.data.mongodb.core.mapping.Document;
+import java.io.Serializable;
 
 /**
  * @author woemler
  */
-@Document
 @lombok.Data
-public class GeneCopyNumber extends Data {
-	
-	private Double value;
-	private Double lossOfHeterozygosity;
-	private Double ploidy;
+public abstract class GeneCopyNumber<ID extends Serializable> extends SimpleData<ID> {
 
 }

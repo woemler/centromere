@@ -28,13 +28,14 @@ import com.blueprint.centromere.core.config.DataImportProperties;
  * @author woemler
  * @since 0.5.0
  */
-public class GctGeneExpressionFileReader extends GctFileReader<GeneExpression>  {
+public class GctGeneExpressionFileReader<T extends GeneExpression<?>> extends GctFileReader<T>  {
 
   public GctGeneExpressionFileReader(
+      Class<T> model,
       GeneRepository geneRepository,
       SampleRepository sampleRepository,
       DataImportProperties dataImportProperties) {
-    super(GeneExpression.class, geneRepository, sampleRepository, dataImportProperties);
+    super(model, geneRepository, sampleRepository, dataImportProperties);
   }
 
 }

@@ -29,7 +29,7 @@ public class DataFileValidator implements Validator {
 
 	@Override 
 	public boolean supports(Class<?> aClass) {
-		return aClass.equals(DataFile.class);
+		return DataFile.class.isAssignableFrom(aClass);
 	}
 
 	@Override 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.repository;
+package com.blueprint.centromere.core.mongodb;
 
 import java.io.Serializable;
 import org.springframework.data.mongodb.core.MongoOperations;

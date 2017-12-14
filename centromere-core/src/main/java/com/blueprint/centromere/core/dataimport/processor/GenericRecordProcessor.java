@@ -173,7 +173,7 @@ public class GenericRecordProcessor<T extends Model<?>>
       List<String> sampleIds = dataSet.getSampleIds();
       for (Sample sample : samples) {
         if (!sampleIds.contains(sample.getId())) {
-          sampleIds.add(sample.getId());
+          sampleIds.add(sample.getSampleId());
         }
       }
       dataSet.setSampleIds(new ArrayList<>(sampleIds));
@@ -183,7 +183,7 @@ public class GenericRecordProcessor<T extends Model<?>>
     // Associate the DataFile with the appropriate DataSet record
     List<String> dataFileIds = dataSet.getDataFileIds();
     if (!dataFileIds.contains(dataFile.getId())) {
-      dataFileIds.add(dataFile.getId());
+      dataFileIds.add(dataFile.getDataFileId());
       dataSet.setDataFileIds(new ArrayList<>(dataFileIds));
       dataSetRepository.update(dataSet);
     }
@@ -204,7 +204,7 @@ public class GenericRecordProcessor<T extends Model<?>>
         DataOperations dataOperations = (DataOperations) repository;
         if (dataFile.getId() != null) {
           logger.warn(String.format("Rolling back inserted records for data file: %s", dataFile.getFilePath()));
-          dataOperations.deleteByDataFileId(dataFile.getId());
+          dataOperations.deleteByDataFileId(dataFile.getDataFileId());
         }
       }
     }
@@ -430,11 +430,13 @@ public class GenericRecordProcessor<T extends Model<?>>
 	}
 
   @Autowired
+  @SuppressWarnings("SpringJavaAutowiringInspection")
   public void setDataSetRepository(DataSetRepository dataSetRepository) {
     this.dataSetRepository = dataSetRepository;
   }
 
   @Autowired
+  @SuppressWarnings("SpringJavaAutowiringInspection")
   public void setDataFileRepository(DataFileRepository dataFileRepository) {
     this.dataFileRepository = dataFileRepository;
   }

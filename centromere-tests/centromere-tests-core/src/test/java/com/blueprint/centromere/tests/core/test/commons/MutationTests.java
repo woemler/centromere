@@ -1,19 +1,22 @@
 package com.blueprint.centromere.tests.core.test.commons;
 
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Mutation;
-import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.processor.MafMutationProcessor;
 import com.blueprint.centromere.core.commons.reader.MafFileReader;
-import com.blueprint.centromere.core.commons.repository.DataFileRepository;
-import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.repository.MutationRepository;
-import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.config.CoreConfiguration;
 import com.blueprint.centromere.core.config.DataImportProperties;
+import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.mongodb.MongoConfiguration;
+import com.blueprint.centromere.core.mongodb.model.MongoDataFile;
+import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
+import com.blueprint.centromere.core.mongodb.model.MongoGene;
+import com.blueprint.centromere.core.mongodb.model.MongoMutation;
+import com.blueprint.centromere.core.mongodb.model.MongoSample;
+import com.blueprint.centromere.core.mongodb.repository.MongoDataFileRepository;
+import com.blueprint.centromere.core.mongodb.repository.MongoDataSetRepository;
+import com.blueprint.centromere.core.mongodb.repository.MongoGeneRepository;
+import com.blueprint.centromere.core.mongodb.repository.MongoMutationRepository;
+import com.blueprint.centromere.core.mongodb.repository.MongoSampleRepository;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import java.util.ArrayList;
@@ -25,6 +28,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
@@ -36,15 +40,16 @@ import org.springframework.util.Assert;
 @ContextConfiguration(classes = {
     MongoDataSourceConfig.class,
     CoreConfiguration.CommonConfiguration.class,
-    CoreConfiguration.DefaultModelConfiguration.class
+    MongoConfiguration.MongoRepositoryConfiguration.class
 })
+@ActiveProfiles({ Profiles.SCHEMA_DEFAULT })
 public class MutationTests extends AbstractRepositoryTests {
   
-  @Autowired private SampleRepository sampleRepository;
-  @Autowired private GeneRepository geneRepository;
-  @Autowired private DataFileRepository dataFileRepository;
-  @Autowired private DataSetRepository dataSetRepository;
-  @Autowired private MutationRepository mutationRepository;
+  @Autowired private MongoSampleRepository sampleRepository;
+  @Autowired private MongoGeneRepository geneRepository;
+  @Autowired private MongoDataFileRepository dataFileRepository;
+  @Autowired private MongoDataSetRepository dataSetRepository;
+  @Autowired private MongoMutationRepository mutationRepository;
   
   private static final Resource mafFile = new ClassPathResource("samples/mutations.maf");
 
@@ -60,10 +65,10 @@ public class MutationTests extends AbstractRepositoryTests {
     
     List<Mutation> mutations = new ArrayList<>();
     
-    DataSet dataSet = dataSetRepository.findByDataSetId("DataSetA").get();
+    MongoDataSet dataSet = dataSetRepository.findByDataSetId("DataSetA").get();
     Assert.notNull(dataSet);
-    DataFile dataFile = new DataFile();
-    dataFile.setDataSetId(dataSet.getId());
+    MongoDataFile dataFile = new MongoDataFile();
+    dataFile.setDataSetId((String) dataSet.getId());
     dataFile.setFilePath(mafFile.getFile().getAbsolutePath());
     dataFile.setModel(Mutation.class);
     dataFileRepository.insert(dataFile);
@@ -72,7 +77,7 @@ public class MutationTests extends AbstractRepositoryTests {
     properties.setSkipInvalidSamples(true);
     properties.setSkipInvalidGenes(true);
     
-    MafFileReader reader = new MafFileReader(geneRepository, sampleRepository, properties);
+    MafFileReader<MongoMutation> reader = new MafFileReader<>(MongoMutation.class, geneRepository, sampleRepository, properties);
     reader.setDataFile(dataFile);
     reader.setDataSet(dataSet);
     reader.doBefore();
@@ -92,13 +97,13 @@ public class MutationTests extends AbstractRepositoryTests {
     
     Mutation record = mutations.get(0);
     Assert.notNull(record.getSampleId());
-    Optional<Sample> sampleOptional = sampleRepository.findById(record.getSampleId());
+    Optional<MongoSample> sampleOptional = sampleRepository.findById(record.getSampleId());
     Assert.isTrue(sampleOptional.isPresent());
     Assert.isTrue("SampleB".equals(sampleOptional.get().getSampleId()));
     Assert.notNull(record.getGeneId());
-    Optional<Gene> geneOptional = geneRepository.findById(record.getGeneId());
+    Optional<MongoGene> geneOptional = geneRepository.findById(record.getGeneId());
     Assert.isTrue(geneOptional.isPresent());
-    Assert.isTrue("GeneA".equals(geneOptional.get().getPrimaryGeneSymbol()));
+    Assert.isTrue("GeneA".equals(geneOptional.get().getSymbol()));
     Assert.isTrue("Missense_Mutation".equals(record.getVariantClassification()));
     Assert.isTrue("SNP".equals(record.getVariantType()));
     Assert.isTrue(140994602 == record.getDnaStartPosition());
@@ -117,7 +122,7 @@ public class MutationTests extends AbstractRepositoryTests {
     Assert.notNull(record.getGeneId());
     geneOptional = geneRepository.findById(record.getGeneId());
     Assert.isTrue(geneOptional.isPresent());
-    Assert.isTrue("GeneE".equals(geneOptional.get().getPrimaryGeneSymbol()));
+    Assert.isTrue("GeneE".equals(geneOptional.get().getSymbol()));
     Assert.isTrue("Nonsense_Mutation".equals(record.getVariantClassification()));
     Assert.isTrue("SNP".equals(record.getVariantType()));
     Assert.isTrue(22157034 == record.getDnaStartPosition());
@@ -139,9 +144,9 @@ public class MutationTests extends AbstractRepositoryTests {
     
     Assert.isTrue(mutationRepository.count() == 0);
 
-    DataSet dataSet = dataSetRepository.findByDataSetId("DataSetA").get();
+    MongoDataSet dataSet = dataSetRepository.findByDataSetId("DataSetA").get();
     Assert.notNull(dataSet);
-    DataFile dataFile = new DataFile();
+    MongoDataFile dataFile = new MongoDataFile();
     dataFile.setDataSetId(dataSet.getId());
     dataFile.setFilePath(mafFile.getFile().getAbsolutePath());
     dataFile.setModel(Mutation.class);
@@ -151,7 +156,7 @@ public class MutationTests extends AbstractRepositoryTests {
     properties.setSkipInvalidSamples(true);
     properties.setSkipInvalidGenes(true);
 
-    MafMutationProcessor processor = new MafMutationProcessor(geneRepository, mutationRepository, sampleRepository, properties);
+    MafMutationProcessor<MongoMutation, String> processor = new MafMutationProcessor<>(MongoMutation.class, geneRepository, mutationRepository, sampleRepository, properties);
     processor.setDataImportProperties(properties);
     processor.setDataSet(dataSet);
     processor.setDataFile(dataFile);
@@ -165,19 +170,19 @@ public class MutationTests extends AbstractRepositoryTests {
     Assert.isTrue(processor.isSupportedDataType("maf_mutation"));
 
     Assert.isTrue(mutationRepository.count() > 0);
-    List<Mutation> mutations = (List<Mutation>) mutationRepository.findAll();
+    List<MongoMutation> mutations = (List<MongoMutation>) mutationRepository.findAll();
     Assert.notEmpty(mutations);
     Assert.isTrue(mutations.size() == 8);
 
     Mutation record = mutations.get(0);
     Assert.notNull(record.getSampleId());
-    Optional<Sample> sampleOptional = sampleRepository.findById(record.getSampleId());
+    Optional<MongoSample> sampleOptional = sampleRepository.findById(record.getSampleId());
     Assert.isTrue(sampleOptional.isPresent());
     Assert.isTrue("SampleB".equals(sampleOptional.get().getSampleId()));
     Assert.notNull(record.getGeneId());
-    Optional<Gene> geneOptional = geneRepository.findById(record.getGeneId());
+    Optional<MongoGene> geneOptional = geneRepository.findById(record.getGeneId());
     Assert.isTrue(geneOptional.isPresent());
-    Assert.isTrue("GeneA".equals(geneOptional.get().getPrimaryGeneSymbol()));
+    Assert.isTrue("GeneA".equals(geneOptional.get().getSymbol()));
     Assert.isTrue("Missense_Mutation".equals(record.getVariantClassification()));
     Assert.isTrue("SNP".equals(record.getVariantType()));
     Assert.isTrue(140994602 == record.getDnaStartPosition());
@@ -196,7 +201,7 @@ public class MutationTests extends AbstractRepositoryTests {
     Assert.notNull(record.getGeneId());
     geneOptional = geneRepository.findById(record.getGeneId());
     Assert.isTrue(geneOptional.isPresent());
-    Assert.isTrue("GeneE".equals(geneOptional.get().getPrimaryGeneSymbol()));
+    Assert.isTrue("GeneE".equals(geneOptional.get().getSymbol()));
     Assert.isTrue("Nonsense_Mutation".equals(record.getVariantClassification()));
     Assert.isTrue("SNP".equals(record.getVariantType()));
     Assert.isTrue(22157034 == record.getDnaStartPosition());

@@ -27,26 +27,24 @@ import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter.WriteMode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.io.Serializable;
 
 /**
  * @author woemler
  */
 @DataTypes({ "snpeff_vcf" })
-@Component
-public class SnpEffVcfProcessor extends GenericRecordProcessor<Mutation> {
+public class SnpEffVcfProcessor<T extends Mutation<ID>, ID extends Serializable> 
+    extends GenericRecordProcessor<T> {
 
-  @SuppressWarnings("SpringJavaAutowiringInspection")
-  @Autowired
   public SnpEffVcfProcessor(
+      Class<T> model,
       GeneRepository geneRepository, 
       SampleRepository sampleRepository, 
-      MutationRepository mutationRepository, 
+      MutationRepository<T, ID> mutationRepository, 
       DataImportProperties dataImportProperties
   ) {
-    this.setModel(Mutation.class);
-    this.setReader(new SnpEffVcfReader(geneRepository, sampleRepository, dataImportProperties));
+    this.setModel(model);
+    this.setReader(new SnpEffVcfReader<>(model, geneRepository, sampleRepository, dataImportProperties));
     this.setValidator(new MutationValidator());
     this.setWriter(new RepositoryRecordWriter<>(mutationRepository, WriteMode.INSERT, 200));
   }

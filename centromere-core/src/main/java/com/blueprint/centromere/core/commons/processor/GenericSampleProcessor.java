@@ -24,23 +24,22 @@ import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.io.Serializable;
 
 /**
  * @author woemler
  */
 @DataTypes(value = "generic_samples", description = "Generic sample metadata")
-@Component
-public class GenericSampleProcessor extends GenericRecordProcessor<Sample> {
+public class GenericSampleProcessor<T extends Sample<ID>, ID extends Serializable> 
+    extends GenericRecordProcessor<T> {
 
-    @Autowired
     public GenericSampleProcessor(
-        SampleRepository sampleRepository,
+        Class<T> model,
+        SampleRepository<T, ID> sampleRepository,
         DataImportProperties dataImportProperties
     ) {
-      this.setModel(Sample.class);
-      this.setReader(new GenericSampleReader(dataImportProperties));
+      this.setModel(model);
+      this.setReader(new GenericSampleReader<>(model, dataImportProperties));
       this.setValidator(new SampleValidator());
       this.setWriter(new RepositoryRecordWriter<>(sampleRepository));
     }

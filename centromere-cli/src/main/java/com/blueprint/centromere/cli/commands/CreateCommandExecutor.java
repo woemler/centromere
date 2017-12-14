@@ -11,7 +11,6 @@ import com.blueprint.centromere.core.repository.ModelRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -49,11 +48,11 @@ public class CreateCommandExecutor {
     }
     
     // Get the requested model and repository
-    if (!repositoryRegistry.isRegisteredModel(parameters.getModel())){
+    if (!repositoryRegistry.isRegisteredResource(parameters.getModel())){
       throw new CommandLineRunnerException(String.format("%s is not a valid model. Available models: %s", 
           parameters.getModel(), getAvailableModels()));
     }
-    Class<T> model = (Class<T>) repositoryRegistry.getRegisteredModel(parameters.getModel());
+    Class<T> model = (Class<T>) repositoryRegistry.getModelByResource(parameters.getModel());
     ModelRepository<T, ?> repository = repositoryRegistry.getRepositoryByModel(model);
     
     // Convert the model
@@ -131,12 +130,7 @@ public class CreateCommandExecutor {
    * @return
    */
   private List<String> getAvailableModels(){
-    List<String> models = new ArrayList<>();
-    for (Class<?> model: repositoryRegistry.getRegisteredModels()){
-      models.add(model.getSimpleName().replace(".class", "").toLowerCase());
-    }
-    Collections.sort(models);
-    return models;
+    return new ArrayList<>(repositoryRegistry.getRegisteredResources());
   }
 
   @Autowired

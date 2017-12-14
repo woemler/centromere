@@ -17,12 +17,13 @@
 package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.AffymetrixArrayData;
+import java.io.Serializable;
 
 /**
  * @author woemler
  * @since 0.5.0
  */
-public interface AffymetrixArrayOperations<T extends AffymetrixArrayData> {
+public interface AffymetrixArrayOperations<T extends AffymetrixArrayData<ID>, ID extends Serializable> {
 
   Iterable<T> findByProbeSetId(String probeSetId);
   

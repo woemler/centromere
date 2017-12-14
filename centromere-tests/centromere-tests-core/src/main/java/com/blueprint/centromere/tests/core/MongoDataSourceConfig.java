@@ -16,8 +16,6 @@
 
 package com.blueprint.centromere.tests.core;
 
-import com.blueprint.centromere.core.repository.MongoModelRepository;
-import com.blueprint.centromere.core.repository.MongoModelRepositoryFactoryBean;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
@@ -31,7 +29,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 /**
  * @author woemler

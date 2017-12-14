@@ -16,31 +16,33 @@
 
 package com.blueprint.centromere.core.commons.model;
 
+import com.blueprint.centromere.core.model.Model;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * @author woemler
  */
-@Document
 @lombok.Data
-public class Mutation extends Data implements Attributes {
+public abstract class Mutation<ID extends Serializable> 
+    extends Data implements Model<ID>, Attributes {
   
-  private String chromosome;
-  private Integer dnaStartPosition;
+  @NotEmpty private String chromosome;
+  @NotEmpty private Integer dnaStartPosition;
   private Integer dnaStopPosition;
 	private String strand;
-	@Indexed private String variantClassification;
-	@Indexed private String variantType;
+	@NotEmpty @Indexed private String variantClassification;
+	@NotEmpty @Indexed private String variantType;
   private Set<String> externalReferences = new HashSet<>();
-	private String referenceAllele;
-	private String alternateAllele;
+	@NotEmpty private String referenceAllele;
+	@NotEmpty private String alternateAllele;
   private String codonChange;
 	private String nucleotideChange;
 	private String nucleotideTranscript;

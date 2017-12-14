@@ -23,6 +23,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * TODO: Might have to change how link processor handles linking, so that it links to resource whose class extends the model.
+ * 
  * @author woemler
  */
 @Inherited
@@ -35,7 +37,7 @@ public @interface Linked {
    *
    * @return
    */
-  Class<? extends Model<?>> model();
+  Class<?> model();
 
   /**
    * Field name in the source {@link Model} type that the annotated field references.  Used to

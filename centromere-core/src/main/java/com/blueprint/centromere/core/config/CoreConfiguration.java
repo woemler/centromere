@@ -16,15 +16,11 @@
 
 package com.blueprint.centromere.core.config;
 
-import com.blueprint.centromere.core.repository.MongoModelRepository;
-import com.blueprint.centromere.core.repository.MongoModelRepositoryFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 /**
  * Configures required components, such as repositories and data import beans.
@@ -32,37 +28,8 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  * @author woemler
  */
 public class CoreConfiguration {
-
-	@Configuration
-	public static class DefaultModelConfiguration {
-
-	  @Profile({ Profiles.SCHEMA_DEFAULT })
-		@Configuration
-		@EnableMongoRepositories(
-		    basePackages = {"com.blueprint.centromere.core.commons.repository"},
-				repositoryBaseClass = MongoModelRepository.class,
-				repositoryFactoryBeanClass = MongoModelRepositoryFactoryBean.class)
-		public static class DefaultMongoSchemaConfiguration { }
-
-		
-    @Profile({ Profiles.CLI_PROFILE })
-		@Configuration
-    @Import({ DataImportProperties.class })
-		@ComponentScan(basePackages = {
-				"com.blueprint.centromere.core.commons.reader",
-				"com.blueprint.centromere.core.commons.processor",
-        "com.blueprint.centromere.core.commons.support"
-		})
-		public static class CommandLineComponentConfiguration { }
-		
-		@Profile({ Profiles.WEB_PROFILE })
-    @Configuration
-    @Import({ WebProperties.class })
-    public static class WebComponentConfiguration { }
-
-	}
   
-  @Configuration
+	@Configuration
   @Import({ DatabaseProperties.class })
   public static class CommonConfiguration {
 
@@ -72,5 +39,10 @@ public class CoreConfiguration {
     }
 
   }
+
+  @Profile({ Profiles.WEB_PROFILE })
+  @Configuration
+  @Import({ WebProperties.class })
+  public static class WebComponentConfiguration { }
 
 }

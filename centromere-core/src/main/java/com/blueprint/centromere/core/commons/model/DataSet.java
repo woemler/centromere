@@ -19,15 +19,15 @@ package com.blueprint.centromere.core.commons.model;
 import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Linked;
 import com.blueprint.centromere.core.model.Model;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Model representation of an annotated set of data, which may be compromised of multiple data types
@@ -35,17 +35,19 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * 
  * @author woemler
  */
-@Document
 @Data
-public class DataSet implements Model<String>, Attributes {
+public abstract class DataSet<ID extends Serializable> implements Model<ID>, Attributes {
 
-  @Id
+  @Indexed(unique = true)
+  @NotEmpty
   private String dataSetId;
   
   @Indexed(unique = true)
+  @NotEmpty
   private String name;
 	
 	@Indexed 
+  @NotEmpty
   private String source;
 	
 	@Ignored 
@@ -64,16 +66,6 @@ public class DataSet implements Model<String>, Attributes {
 	
   @Ignored 
   private Map<String, String> parameters = new HashMap<>();
-
-  @Override
-  public String getId() {
-    return getDataSetId();
-  }
-
-  @Override
-  public void setId(String id) {
-    setDataSetId(id);
-  }
 
   @Override
 	public Map<String, String> getAttributes() {

@@ -16,15 +16,17 @@
 
 package com.blueprint.centromere.core.commons.model;
 
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.blueprint.centromere.core.model.Model;
+import java.io.Serializable;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author woemler
  */
-@Document
 @lombok.Data
-public abstract class SimpleData extends Data {
+public abstract class SimpleData<ID extends Serializable> extends Data implements Model<ID> {
 	
+  @NotNull
 	private Double value;
 
 }

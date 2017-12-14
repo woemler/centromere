@@ -52,7 +52,7 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { WebTestInitializer.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(value = {Profiles.WEB_PROFILE, Profiles.SECURE_READ_WRITE_PROFILE, Profiles.API_DOCUMENTATION_DISABLED_PROFILE})
+@ActiveProfiles(value = {Profiles.SCHEMA_DEFAULT, Profiles.WEB_PROFILE, Profiles.SECURE_READ_WRITE_PROFILE, Profiles.API_DOCUMENTATION_DISABLED_PROFILE})
 @AutoConfigureMockMvc
 @SuppressWarnings("SpringJavaAutowiringInspection")
 public class WebSecurityTests {
@@ -68,7 +68,7 @@ public class WebSecurityTests {
 	public void setup() throws Exception {
 		if (!isConfigured){
 			userRepository.deleteAll();
-			User user = new User();
+			User user = (User) userRepository.getModel().newInstance();
 			user.setUsername("user");
 			user.setPassword(new BCryptPasswordEncoder().encode("password"));
 			user.setEnabled(true);

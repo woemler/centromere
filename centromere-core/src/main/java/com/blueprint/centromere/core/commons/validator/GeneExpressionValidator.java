@@ -26,7 +26,7 @@ public class GeneExpressionValidator extends DataValidator {
 
 	@Override 
 	public boolean supports(Class<?> aClass) {
-		return aClass.equals(GeneExpression.class);
+		return GeneExpression.class.isAssignableFrom(aClass);
 	}
 
 	@Override 

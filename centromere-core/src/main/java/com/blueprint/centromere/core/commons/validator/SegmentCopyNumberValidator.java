@@ -26,7 +26,7 @@ public class SegmentCopyNumberValidator extends DataValidator {
 
 	@Override 
 	public boolean supports(Class<?> aClass) {
-		return aClass.equals(SegmentCopyNumber.class);
+		return SegmentCopyNumber.class.isAssignableFrom(aClass);
 	}
 
 	@Override 

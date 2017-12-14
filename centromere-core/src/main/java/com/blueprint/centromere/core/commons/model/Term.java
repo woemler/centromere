@@ -29,10 +29,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Model for representing controlled and/or indexed terms.  Can be used for reference ontologies, 
@@ -40,16 +39,21 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * 
  * @author woemler
  */
-@CompoundIndexes({
-    @CompoundIndex(def = "{ 'model': 1, 'field': 1, 'term': 1 }", unique = true)
-})
-@Document
-public class Term extends AbstractMongoModel {
+public abstract class Term<ID extends Serializable> implements Model<ID> {
 	
-	@Indexed private String term;
-	@Indexed private String model;
-	@Indexed private String field;
-	private List<String> referenceIds;
+	@Indexed 
+  @NotEmpty
+  private String term;
+	
+	@Indexed 
+  @NotEmpty
+  private String model;
+	
+	@Indexed 
+  @NotEmpty
+  private String field;
+	
+	private List<ID> referenceIds;
 
   public String getTerm() {
     return term;
@@ -58,20 +62,14 @@ public class Term extends AbstractMongoModel {
   public void setTerm(String term) {
     this.term = term;
   }
-  
-  @JsonIgnore
-  public Class<?> getModelType() throws ClassNotFoundException {
-    return Class.forName(model);
-  }
 
   public String getModel() {
     return model;
   }
 
-  public void setModel(Class<?> modelType){
-    this.model = modelType.getName();
+  public void setModel(String model) {
+    this.model = model;
   }
-
 
   public String getField() {
     return field;
@@ -81,143 +79,158 @@ public class Term extends AbstractMongoModel {
     this.field = field;
   }
 
-  public List<String> getReferenceIds() {
+  public List<ID> getReferenceIds() {
     return referenceIds;
   }
 
-  public void setReferenceIds(List<String> referenceIds) {
+  public void setReferenceIds(List<ID> referenceIds) {
     this.referenceIds = referenceIds;
   }
-  
-  public void addReferenceId(String referenceId){
+
+  @Transient
+  @JsonIgnore
+  public Class<?> getModelType() throws ClassNotFoundException {
+    return Class.forName(model);
+  }
+
+  public void setModel(Class<?> modelType){
+    this.model = modelType.getName();
+  }
+
+
+  public void addReferenceId(ID referenceId){
     if (!referenceIds.contains(referenceId)) {
       referenceIds.add(referenceId);
     }
   }
   
-  public void addReferenceIds(Collection<String> referenceIds){
-    for (String ref: referenceIds){
+  public void addReferenceIds(Collection<ID> referenceIds){
+    for (ID ref: referenceIds){
       this.addReferenceId(ref);
     }
   }
   
-  public static <T extends Model<?>> List<Term> getModelTerms(T model) throws IllegalAccessException {
+  public static class TermGenerator<T extends Term<ID>, ID extends Serializable> {
     
-    List<Term> terms = new ArrayList<>();
-    
-    if (!modelHasManagedTerms(model.getClass())) return terms;
-    
-    Class<?> current = model.getClass();
-    
-    while (current.getSuperclass() != null){
-      
-      for (Field field: current.getDeclaredFields()){
-        
-        if (field.isAnnotationPresent(ManagedTerm.class)){
-          
-          ManagedTerm annotation = field.getAnnotation(ManagedTerm.class);
-          
-          // String fields
-          if (field.getType().isAssignableFrom(String.class)) {
-            field.setAccessible(true);
-            Term term = new Term();
-            String val = (String) field.get(model);
-            if (val != null && !val.trim().equals("")) {
-              term.setTerm(val);
-              term.setModel(model.getClass());
-              term.setField(field.getName());
-              term.setReferenceIds(Collections.singletonList(model.getId().toString()));
-              terms.add(term);
-            }
-          } 
-          // Map fields
-          else if (Map.class.isAssignableFrom(field.getType())
-              && field.getGenericType() instanceof ParameterizedType){
-            Type[] args = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
-            if (String.class.isAssignableFrom((Class<?>) args[0]) 
-                && Serializable.class.isAssignableFrom((Class<?>) args[1])){
+    private final Class<T> type;
+
+    public TermGenerator(Class<T> type) {
+      this.type = type;
+    }
+
+    public List<T> getModelTerms(Model<ID> model) 
+        throws IllegalAccessException, InstantiationException {
+
+      List<T> terms = new ArrayList<>();
+
+      if (!modelHasManagedTerms(model.getClass())) return terms;
+
+      Class<?> current = model.getClass();
+
+      while (current.getSuperclass() != null){
+
+        for (Field field: current.getDeclaredFields()){
+
+          if (field.isAnnotationPresent(ManagedTerm.class)){
+
+            ManagedTerm annotation = field.getAnnotation(ManagedTerm.class);
+
+            // String fields
+            if (field.getType().isAssignableFrom(String.class)) {
               field.setAccessible(true);
-              Map<String, Serializable> map = (Map<String, Serializable>) field.get(model);
-              if (Arrays.asList(annotation.keys()).isEmpty()){
-                for (Map.Entry<String, Serializable> entry: map.entrySet()){
-                  String val = entry.getValue().toString();
-                  if (val != null && !val.trim().equals("")) {
-                    Term term = new Term();
-                    term.setTerm(val);
-                    term.setModel(model.getClass());
-                    term.setField(entry.getKey());
-                    term.setReferenceIds(Collections.singletonList(model.getId().toString()));
-                    terms.add(term);
-                  }
-                }
-              } else {
-                for (String key : annotation.keys()) {
-                  if (map.containsKey(key)) {
-                    String val = map.get(key).toString();
+              T term = type.newInstance();
+              String val = (String) field.get(model);
+              if (val != null && !val.trim().equals("")) {
+                term.setTerm(val);
+                term.setModel(model.getClass());
+                term.setField(field.getName());
+                term.setReferenceIds(Collections.singletonList(model.getId()));
+                terms.add(term);
+              }
+            }
+            // Map fields
+            else if (Map.class.isAssignableFrom(field.getType())
+                && field.getGenericType() instanceof ParameterizedType){
+              Type[] args = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
+              if (String.class.isAssignableFrom((Class<?>) args[0])
+                  && Serializable.class.isAssignableFrom((Class<?>) args[1])){
+                field.setAccessible(true);
+                Map<String, Serializable> map = (Map<String, Serializable>) field.get(model);
+                if (Arrays.asList(annotation.keys()).isEmpty()){
+                  for (Map.Entry<String, Serializable> entry: map.entrySet()){
+                    String val = entry.getValue().toString();
                     if (val != null && !val.trim().equals("")) {
-                      Term term = new Term();
+                      T term = type.newInstance();
                       term.setTerm(val);
                       term.setModel(model.getClass());
-                      term.setField(field.getName());
-                      term.setReferenceIds(Collections.singletonList(model.getId().toString()));
+                      term.setField(entry.getKey());
+                      term.setReferenceIds(Collections.singletonList(model.getId()));
                       terms.add(term);
+                    }
+                  }
+                } else {
+                  for (String key : annotation.keys()) {
+                    if (map.containsKey(key)) {
+                      String val = map.get(key).toString();
+                      if (val != null && !val.trim().equals("")) {
+                        T term = type.newInstance();
+                        term.setTerm(val);
+                        term.setModel(model.getClass());
+                        term.setField(field.getName());
+                        term.setReferenceIds(Collections.singletonList(model.getId()));
+                        terms.add(term);
+                      }
                     }
                   }
                 }
               }
             }
-          } 
-          // Collection fields
-          else if (Collection.class.isAssignableFrom(field.getType()) 
-              && field.getGenericType() instanceof ParameterizedType){
-            Type[] args = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
-            if (Serializable.class.isAssignableFrom((Class<?>) args[0])){
-              field.setAccessible(true);
-              for (Object val: (Collection<?>) field.get(model)){
-                if (val != null && !val.toString().trim().equals("")) {
-                  Term term = new Term();
-                  term.setTerm(val.toString());
-                  term.setModel(model.getClass());
-                  term.setField(field.getName());
-                  term.setReferenceIds(Collections.singletonList(model.getId().toString()));
-                  terms.add(term);
+            // Collection fields
+            else if (Collection.class.isAssignableFrom(field.getType())
+                && field.getGenericType() instanceof ParameterizedType){
+              Type[] args = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
+              if (Serializable.class.isAssignableFrom((Class<?>) args[0])){
+                field.setAccessible(true);
+                for (Object val: (Collection<?>) field.get(model)){
+                  if (val != null && !val.toString().trim().equals("")) {
+                    T term = type.newInstance();
+                    term.setTerm(val.toString());
+                    term.setModel(model.getClass());
+                    term.setField(field.getName());
+                    term.setReferenceIds(Collections.singletonList(model.getId()));
+                    terms.add(term);
+                  }
                 }
               }
             }
+
           }
-          
+
         }
-        
+
+        current = current.getSuperclass();
+
       }
-      
-      current = current.getSuperclass();
-      
+
+      return terms;
+
     }
-    
-    return terms;
+
+    public boolean modelHasManagedTerms(Class<?> model){
+      Class<?> current = model;
+      while (current.getSuperclass() != null){
+        for (Field field: current.getDeclaredFields()){
+          if (field.isAnnotationPresent(ManagedTerm.class)){
+            return true;
+          }
+        }
+        current = current.getSuperclass();
+      }
+      return false;
+    }
     
   }
   
-  public static boolean modelHasManagedTerms(Class<?> model){
-    Class<?> current = model;
-    while (current.getSuperclass() != null){
-      for (Field field: current.getDeclaredFields()){
-        if (field.isAnnotationPresent(ManagedTerm.class)){ 
-          return true;
-        }
-      }
-      current = current.getSuperclass();
-    }
-    return false;
-  }
+  
 
-  @Override
-  public String toString() {
-    return "Term{" +
-        "term='" + term + '\'' +
-        ", model='" + model + '\'' +
-        ", field='" + field + '\'' +
-        ", referenceIds=" + referenceIds +
-        '}';
-  }
 }

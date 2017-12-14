@@ -27,29 +27,27 @@ import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter.WriteMode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.io.Serializable;
 
 /**
  * @author woemler
  */
 @DataTypes(value = { "ccle_gene_copy_number" }, 
     description = "Gene-normalized copy number values, in a sample-gene matrix format, from the CCLE.")
-@Component
-public class CcleGeneCopyNumberProcessor extends GenericRecordProcessor<GeneCopyNumber> {
+public class CcleGeneCopyNumberProcessor<T extends GeneCopyNumber<ID>, ID extends Serializable> 
+    extends GenericRecordProcessor<T> {
 
-  @SuppressWarnings("SpringJavaAutowiringInspection")
-  @Autowired
   public CcleGeneCopyNumberProcessor(
+      Class<T> model,
       GeneRepository geneRepository,
-      GeneCopyNumberRepository repository,
+      GeneCopyNumberRepository<T, ID> repository,
       SampleRepository sampleRepository,
       DataImportProperties dataImportProperties
   ) {
-    this.setReader(new GenericGeneCopyNumberMatrixReader(geneRepository, sampleRepository, dataImportProperties));
+    this.setReader(new GenericGeneCopyNumberMatrixReader<>(model, geneRepository, sampleRepository, dataImportProperties));
     this.setValidator(new GeneCopyNumberValidator());
     this.setWriter(new RepositoryRecordWriter<>(repository, WriteMode.INSERT, 200));
-    this.setModel(GeneCopyNumber.class);
+    this.setModel(model);
   }
   
 }

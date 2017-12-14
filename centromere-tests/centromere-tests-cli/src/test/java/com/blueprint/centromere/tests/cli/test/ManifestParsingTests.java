@@ -39,7 +39,7 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CommandLineTestInitializer.class)
-@ActiveProfiles({Profiles.CLI_PROFILE, CommandLineTestInitializer.SINGLE_COMMAND_PROFILE})
+@ActiveProfiles({Profiles.SCHEMA_DEFAULT, Profiles.CLI_PROFILE, CommandLineTestInitializer.SINGLE_COMMAND_PROFILE})
 @FixMethodOrder
 public class ManifestParsingTests {
 	

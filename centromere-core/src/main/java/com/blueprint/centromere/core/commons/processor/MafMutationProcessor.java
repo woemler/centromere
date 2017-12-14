@@ -27,26 +27,23 @@ import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter;
 import com.blueprint.centromere.core.dataimport.writer.RepositoryRecordWriter.WriteMode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.io.Serializable;
 
 /**
  * @author woemler
  */
 @DataTypes(value = { "maf_mutation" }, description = "Mutation calls extracted from generic MAF files.")
-@Component
-public class MafMutationProcessor extends GenericRecordProcessor<Mutation> {
+public class MafMutationProcessor<T extends Mutation<ID>, ID extends Serializable> extends GenericRecordProcessor<T> {
 
-  @SuppressWarnings("SpringJavaAutowiringInspection")
-  @Autowired
   public MafMutationProcessor(
+      Class<T> model,
       GeneRepository geneRepository, 
-      MutationRepository repository,
+      MutationRepository<T, ID> repository,
       SampleRepository sampleRepository,
       DataImportProperties dataImportProperties
   ) {
-    this.setModel(Mutation.class);
-    this.setReader(new MafFileReader(geneRepository, sampleRepository, dataImportProperties));
+    this.setModel(model);
+    this.setReader(new MafFileReader<>(model, geneRepository, sampleRepository, dataImportProperties));
     this.setValidator(new MutationValidator());
     this.setWriter(new RepositoryRecordWriter<>(repository, WriteMode.INSERT, 200));
   }

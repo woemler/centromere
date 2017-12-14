@@ -18,12 +18,13 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.SegmentCopyNumber;
 import com.blueprint.centromere.core.repository.ModelRepository;
-import com.blueprint.centromere.core.repository.ModelResource;
+import java.io.Serializable;
+import org.springframework.data.repository.NoRepositoryBean;
 
 /**
  * @author woemler
  */
-@ModelResource("segmentcopynumber")
-public interface SegmentCopyNumberRepository extends ModelRepository<SegmentCopyNumber, String>,
-		DataOperations<SegmentCopyNumber> {
+@NoRepositoryBean
+public interface SegmentCopyNumberRepository<T extends SegmentCopyNumber<ID>, ID extends Serializable> 
+    extends ModelRepository<T, ID>, DataOperations<T> {
 }

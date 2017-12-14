@@ -18,8 +18,9 @@ package com.blueprint.centromere.core.commons.repository;
 
 import com.blueprint.centromere.core.commons.model.User;
 import com.blueprint.centromere.core.repository.ModelRepository;
-import com.blueprint.centromere.core.repository.ModelResource;
+import java.io.Serializable;
 import java.util.Optional;
+import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -27,14 +28,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
  * @author woemler
  * @since 0.5.0
  */
-@ModelResource(name = "users", ignored = true)
-public interface UserRepository extends ModelRepository<User, String>, UserDetailsService {
+@NoRepositoryBean
+public interface UserRepository<T extends User<ID>, ID extends Serializable> 
+    extends ModelRepository<T, ID>, UserDetailsService {
 
-  Optional<User> findByUsername(String username);
+  Optional<T> findByUsername(String username);
 
 	@Override 
-	default User loadUserByUsername(String username) throws UsernameNotFoundException {
-    Optional<User> optional = findByUsername(username);
+	default T loadUserByUsername(String username) throws UsernameNotFoundException {
+    Optional<T> optional = findByUsername(username);
 		return optional.isPresent() ? optional.get() : null;
 	}
 }

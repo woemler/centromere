@@ -71,11 +71,11 @@ public class ModelResourceAssembler
       for (Field field : current.getDeclaredFields()) {
         if (field.isAnnotationPresent(Linked.class)) {
           Linked linked = field.getAnnotation(Linked.class);
-          Class<? extends Model<?>> fkClass = linked.model();
           String relName = linked.rel().equals("") ? field.getName() : linked.rel();
           String fieldName = linked.field().equals("") ? field.getName() : linked.field();
-          if (!Model.class.isAssignableFrom(fkClass))
+          if (!Model.class.isAssignableFrom(linked.model()))
             continue;
+          Class<? extends Model<?>> fkClass = (Class<? extends Model<?>>) linked.model();
           Link link = null;
           try {
             field.setAccessible(true);

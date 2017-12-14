@@ -27,7 +27,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
  * @since 0.4.3
  */
 @lombok.Data
-public abstract class Data extends AbstractMongoModel {
+public abstract class Data {
 
 	@Indexed
 	@Linked(model = Sample.class, rel = "sample", field = "sampleId")

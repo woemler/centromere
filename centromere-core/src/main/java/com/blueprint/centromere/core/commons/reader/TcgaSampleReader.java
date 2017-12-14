@@ -24,10 +24,10 @@ import com.blueprint.centromere.core.dataimport.reader.ColumnRecordFileReader;
  * 
  * @author woemler
  */
-public class TcgaSampleReader extends ColumnRecordFileReader<Sample> {
+public class TcgaSampleReader<T extends Sample<?>> extends ColumnRecordFileReader<T> {
 
-  public TcgaSampleReader() {
-    super(Sample.class);
+  public TcgaSampleReader(Class<T> model) {
+    super(model);
   }
 
   @Override

@@ -19,43 +19,50 @@ package com.blueprint.centromere.core.commons.model;
 import com.blueprint.centromere.core.commons.support.ManagedTerm;
 import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Model;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
+ * Base gene model implementation.  Allows for varied metadata sources, such as EntrezGene or Ensembl.
+ *   The {@link #geneId} field should correspond to the uniquely identifying ID for the genes, where
+ *   the {@link #symbol} field should correspond to the primary gene symbol (eg HGNC).  The {@link #aliases}
+ *   field can contain all non-primary gene symbols associated with the gene.
+ * 
  * @author woemler
  */
-@Document
 @Data
-public class Gene implements Model<String>, Attributes {
+public abstract class Gene<ID extends Serializable> implements Model<ID>, Attributes {
 
-	@Id
-  @ManagedTerm 
+	@ManagedTerm 
+  @Indexed(unique = true)
+  @NotEmpty
   private String geneId;
 	
 	@Indexed 
   @ManagedTerm 
-  private String primaryGeneSymbol;
+  @NotEmpty
+  private String symbol;
 	
+	@NotEmpty
 	private Integer taxId;
 	
+	@NotEmpty
 	private String chromosome;
 	
 	@Ignored 
   private String chromosomeLocation;
 	
+	@NotEmpty
 	private String geneType;
 	
 	@Ignored 
   private String description;
-	
-	private String referenceSource;
 	
 	@Indexed 
   @ManagedTerm 
@@ -64,17 +71,7 @@ public class Gene implements Model<String>, Attributes {
 	private Map<String, String> attributes = new HashMap<>();
 	
 	private Map<String, String> externalReferences = new HashMap<>();
-
-  @Override
-  public String getId() {
-    return getGeneId();
-  }
-
-  @Override
-  public void setId(String id) {
-    setGeneId(id);
-  }
-
+  
   public void addExternalReference(String name, String value){
 		externalReferences.put(name, value);
 	}

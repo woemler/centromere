@@ -50,6 +50,7 @@ public class DeleteCommandExecutor implements EnvironmentAware {
   private Repositories repositories;
   private Environment environment;
   
+  @SuppressWarnings("unchecked")
   public void run(String category, List<String> toDelete) throws CommandLineRunnerException {
     
     category = category.toLowerCase().replaceAll("-", "");
@@ -71,7 +72,7 @@ public class DeleteCommandExecutor implements EnvironmentAware {
           if (optional.isPresent()){
             dataFile = optional.get();
           } else {
-            dataFile = dataFileRepository.findOne(item);
+            dataFile = (DataFile) dataFileRepository.findOne(item);
           }
           
           if (dataFile == null){
@@ -97,7 +98,7 @@ public class DeleteCommandExecutor implements EnvironmentAware {
           if (optional.isPresent()){
             dataSet = optional.get();
           } else {
-            dataSet = dataSetRepository.findOne(item);
+            dataSet = (DataSet) dataSetRepository.findOne(item);
           }
 
           if (dataSet == null){
@@ -108,11 +109,11 @@ public class DeleteCommandExecutor implements EnvironmentAware {
 
           Printer.print(String.format("Deleting DataSet %s and all associated records and samples",
               dataSet.getDataSetId()), logger, Level.INFO);
-          for (String dataFileId: dataSet.getDataFileIds()){
-            DataFile dataFile = dataFileRepository.findOne(dataFileId);
+          for (String dataFileId: (List<String>) dataSet.getDataFileIds()){
+            DataFile dataFile = (DataFile) dataFileRepository.findOne(dataFileId);
             deleteDataFile(dataFile);
           }
-          for (String sampleId: dataSet.getSampleIds()){
+          for (String sampleId: (List<String>) dataSet.getSampleIds()){
             sampleRepository.delete(sampleId);
           }
           
@@ -141,8 +142,8 @@ public class DeleteCommandExecutor implements EnvironmentAware {
     if (repository instanceof DataOperations){
       
       DataOperations operations = (DataOperations) repository;
-      operations.deleteByDataFileId(dataFile.getId());
-      DataSet dataSet = dataSetRepository.findOne(dataFile.getDataSetId());
+      operations.deleteByDataFileId(dataFile.getDataFileId());
+      DataSet dataSet = (DataSet) dataSetRepository.findOne(dataFile.getDataSetId());
       List<String> dataFileIds = dataSet.getDataFileIds();
       dataFileIds.remove(dataFile.getId());
       dataSet.setDataFileIds(dataFileIds);

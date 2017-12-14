@@ -28,14 +28,13 @@ public class GeneValidator implements Validator {
 
 	@Override 
 	public boolean supports(Class<?> aClass) {
-		return aClass.equals(Gene.class);
+		return Gene.class.isAssignableFrom(aClass);
 	}
 
 	@Override public void validate(Object o, Errors errors) {
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "primaryGeneSymbol", "primaryGeneSymbol.empty");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "symbol", "symbol.empty");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "taxId", "taxId.empty");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "chromosome", "chromosome.empty");
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "geneType", "geneType.empty");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "referenceSource", "referenceSource.empty");
 	}
 }

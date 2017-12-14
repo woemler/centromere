@@ -26,7 +26,6 @@ import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.annotation.AnnotatedElementUtils;
 
 /**
  * Creates a registry of {@link ModelRepository} instances that have the {@link ModelResource} annotation,
@@ -49,24 +48,22 @@ public class ModelRepositoryRegistry {
 
   @PostConstruct
   public void afterPropertiesSet(){
-    for (Map.Entry entry: context.getBeansWithAnnotation(ModelResource.class).entrySet()){
+    for (Map.Entry<String, Object> entry: context.getBeansWithAnnotation(ModelResource.class).entrySet()){
       Class<?> type = entry.getValue().getClass();
       ModelRepository repository = (ModelRepository) entry.getValue();
       Class<? extends Model<?>> model = repository.getModel();
       String name = model.getSimpleName().toLowerCase();
       repositoryTypeMap.put(model, repository);
-      if (AnnotatedElementUtils.hasAnnotation(type, ModelResource.class)){
-        ModelResource annotation = AnnotatedElementUtils.findMergedAnnotation(repository.getClass(), ModelResource.class);
-        if (!"".equals(annotation.name())){
-          name = annotation.name().toLowerCase();
-        } else if (!"".equals(annotation.value())){
-          name = annotation.value().toLowerCase();
-        }
+      ModelResource annotation = context.findAnnotationOnBean(entry.getKey(), ModelResource.class);
+      //ModelResource annotation = AnnotatedElementUtils.findMergedAnnotation(repository.getClass(), ModelResource.class);
+      if (!annotation.name().trim().equals("")){
+        name = annotation.name().toLowerCase();
+      } else if (!annotation.value().trim().equals("")){
+        name = annotation.value().toLowerCase();
       }
       typeNameMap.put(name, model);
-
       logger.info(String.format("Registered repository %s for model %s",
-          repository.getClass().getName(), model.getName()));
+          type.getName(), model.getName()));
     }
   }
 
