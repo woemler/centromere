@@ -48,7 +48,7 @@ public class QueryParameterUtil {
    * @return map of parameter names and their descriptors
    */
   public static Map<String,QueryParameterDescriptor> getAvailableQueryParameters(
-      Class<? extends Model> model, boolean recursive)
+      Class<? extends Model<?>> model, boolean recursive)
   {
 
     logger.debug(String.format("Determining available query parameters for model: %s", model.getName()));
@@ -58,6 +58,8 @@ public class QueryParameterUtil {
     while (current.getSuperclass() != null) {
 
       for (Field field : current.getDeclaredFields()) {
+
+        logger.info(String.format("Inspecting field %s for model: %s", field.getName(), model.getName()));
 
         String fieldName = field.getName();
         String paramName = field.getName();
@@ -106,7 +108,7 @@ public class QueryParameterUtil {
    * @param model model to inspect
    * @return map of parameter names and their descriptors
    */
-  public static Map<String,QueryParameterDescriptor> getAvailableQueryParameters(Class<? extends Model> model) {
+  public static Map<String,QueryParameterDescriptor> getAvailableQueryParameters(Class<? extends Model<?>> model) {
     return getAvailableQueryParameters(model, true);
   }
 

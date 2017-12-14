@@ -79,7 +79,7 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findDistinctFiltered() throws Exception {
-    mockMvc.perform(get(BASE_URL + "/distinct/primaryGeneSymbol?geneType=protein-coding"))
+    mockMvc.perform(get(BASE_URL + "/distinct/symbol?geneType=protein-coding"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[2]", is("GeneD")));
@@ -90,8 +90,8 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
     mockMvc.perform(get(BASE_URL + "/guess?keyword=DEF"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
-        .andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneB")));
+        .andExpect(jsonPath("$[0]", hasKey("symbol")))
+        .andExpect(jsonPath("$[0].symbol", is("GeneB")));
   }
   
   @Test
@@ -105,7 +105,7 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
 
     Gene gene = (Gene) geneRepository.findBySymbol("GeneB").get(0);
     
-    mockMvc.perform(get(DATA_URL + "/gene?primaryGeneSymbol=GeneB"))
+    mockMvc.perform(get(DATA_URL + "/genes?symbol=GeneB"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[0]", hasKey("geneId")))

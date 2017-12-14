@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.ws.config;
 
-import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.WebProperties;
 import com.blueprint.centromere.ws.controller.ModelCrudController;
@@ -75,7 +75,7 @@ public class WebApplicationConfig extends WebMvcConfigurerAdapter {
 
   @Bean
   public ModelResourceAssembler mappingModelResourceAssembler(
-      ModelRepositoryRegistry modelRepositoryRegistry){
+      DefaultModelRepositoryRegistry modelRepositoryRegistry){
     return new ModelResourceAssembler(modelRepositoryRegistry);
   }
 

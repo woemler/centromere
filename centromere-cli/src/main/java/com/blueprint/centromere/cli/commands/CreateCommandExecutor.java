@@ -5,7 +5,8 @@ import com.blueprint.centromere.cli.CommandLineRunnerException;
 import com.blueprint.centromere.cli.Printer;
 import com.blueprint.centromere.cli.Printer.Level;
 import com.blueprint.centromere.cli.parameters.CreateCommandParameters;
-import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
+import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,7 +32,7 @@ public class CreateCommandExecutor {
   
   private static final Logger logger = LoggerFactory.getLogger(CreateCommandExecutor.class);
   
-  private ModelRepositoryRegistry repositoryRegistry;
+  private DefaultModelRepositoryRegistry repositoryRegistry;
   private ObjectMapper objectMapper;
   private ConversionService conversionService;
   
@@ -52,8 +53,15 @@ public class CreateCommandExecutor {
       throw new CommandLineRunnerException(String.format("%s is not a valid model. Available models: %s", 
           parameters.getModel(), getAvailableModels()));
     }
-    Class<T> model = (Class<T>) repositoryRegistry.getModelByResource(parameters.getModel());
-    ModelRepository<T, ?> repository = repositoryRegistry.getRepositoryByModel(model);
+
+    Class<T> model;
+    ModelRepository<T, ?> repository;
+    try {
+      model = (Class<T>) repositoryRegistry.getModelByUri(parameters.getModel());
+      repository = repositoryRegistry.getRepositoryByModel(model);
+    } catch (ModelRegistryException e){
+      throw new CommandLineRunnerException(e);
+    }
     
     // Convert the model
     T object;
@@ -135,7 +143,7 @@ public class CreateCommandExecutor {
 
   @Autowired
   public void setRepositoryRegistry(
-      ModelRepositoryRegistry repositoryRegistry) {
+      DefaultModelRepositoryRegistry repositoryRegistry) {
     this.repositoryRegistry = repositoryRegistry;
   }
 

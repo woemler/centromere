@@ -16,7 +16,8 @@
 
 package com.blueprint.centromere.ws.controller;
 
-import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
+import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import com.blueprint.centromere.core.repository.QueryCriteria;
@@ -68,7 +69,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @SuppressWarnings({"unchecked", "SpringJavaAutowiringInspection"})
 public class ModelCrudController {
 
-  @Autowired private ModelRepositoryRegistry registry;
+  @Autowired private DefaultModelRepositoryRegistry registry;
   @Autowired private ModelResourceAssembler assembler;
   @Autowired /*@Qualifier("defaultConversionService")*/ private ConversionService conversionService;
   @Autowired private ObjectMapper objectMapper;
@@ -112,8 +113,14 @@ public class ModelCrudController {
       logger.error(String.format("URI does not map to a registered model: %s", uri));
       throw new ResourceNotFoundException();
     }
-    Class<T> model = (Class<T>) registry.getModelByResource(uri);
-    ModelRepository<T, ID> repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+    Class<T> model = (Class<T>) registry.getModelByUri(uri);
+    ModelRepository<T, ID> repository;
+    try {
+       repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+    } catch (ModelRegistryException e){
+      e.printStackTrace();
+      throw new ResourceNotFoundException();
+    }
     if (RequestUtils.requestContainsNonDefaultParameters(RequestUtils.findOneParameters(), request.getParameterMap())){
       throw new InvalidParameterException("Request contains invalid query string parameters.");
     }
@@ -177,8 +184,14 @@ public class ModelCrudController {
       throw new ResourceNotFoundException();
     }
     
-    Class<T> model = (Class<T>) registry.getModelByResource(uri);
-    ModelRepository<T, ID> repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+    Class<T> model = (Class<T>) registry.getModelByUri(uri);
+    ModelRepository<T, ID> repository;
+    try {
+      repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+    } catch (ModelRegistryException e){
+      e.printStackTrace();
+      throw new ResourceNotFoundException();
+    }
     logger.info(String.format("Resolved request to model %s and repository %s",
         model.getName(), repository.getClass().getName()));
 
@@ -271,9 +284,15 @@ public class ModelCrudController {
       throw new ResourceNotFoundException();
     }
 
-    Class<T> model = (Class<T>) registry.getModelByResource(uri);
+    Class<T> model = (Class<T>) registry.getModelByUri(uri);
     entity = convertObjectToModel(entity, model);
-    ModelRepository<T, ID> repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+    ModelRepository<T, ID> repository;
+    try {
+      repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+    } catch (ModelRegistryException e){
+      e.printStackTrace();
+      throw new ResourceNotFoundException();
+    }
     logger.info(String.format("Resolved request to model %s and repository %s",
         model.getName(), repository.getClass().getName()));
 
@@ -327,10 +346,16 @@ public class ModelCrudController {
       throw new ResourceNotFoundException();
     }
 
-    Class<T> model = (Class<T>) registry.getModelByResource(uri);
+    Class<T> model = (Class<T>) registry.getModelByUri(uri);
     T record = convertObjectToModel(entity, model);
     logger.info(String.format("Converted object: %s", record.toString()));
-    ModelRepository<T, ID> repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+    ModelRepository<T, ID> repository;
+    try {
+      repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+    } catch (ModelRegistryException e){
+      e.printStackTrace();
+      throw new ResourceNotFoundException();
+    }
     logger.info(String.format("Resolved request to model %s and repository %s",
         model.getName(), repository.getClass().getName()));
 
@@ -378,8 +403,14 @@ public class ModelCrudController {
       logger.error(String.format("URI does not map to a registered model: %s", uri));
       throw new ResourceNotFoundException();
     }
-    Class<T> model = (Class<T>) registry.getModelByResource(uri);
-    ModelRepository repository = registry.getRepositoryByModel(model);
+    Class<T> model = (Class<T>) registry.getModelByUri(uri);
+    ModelRepository<T, ID> repository;
+    try {
+      repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+    } catch (ModelRegistryException e){
+      e.printStackTrace();
+      throw new ResourceNotFoundException();
+    }
     repository.delete(convertModelIdParameter(id, model));
     return new ResponseEntity<>(HttpStatus.OK);
   }

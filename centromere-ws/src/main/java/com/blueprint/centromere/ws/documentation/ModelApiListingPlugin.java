@@ -1,7 +1,8 @@
 package com.blueprint.centromere.ws.documentation;
 
-import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
 import com.blueprint.centromere.core.config.WebProperties;
+import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Model;
 import com.fasterxml.classmate.TypeResolver;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ import springfox.documentation.swagger.common.SwaggerPluginSupport;
  */
 public class ModelApiListingPlugin implements ApiListingBuilderPlugin {
 
-  @Autowired private ModelRepositoryRegistry registry;
+  @Autowired private DefaultModelRepositoryRegistry registry;
   @Autowired private WebProperties webProperties;
   @Autowired private TypeResolver typeResolver;
 
@@ -35,8 +36,12 @@ public class ModelApiListingPlugin implements ApiListingBuilderPlugin {
     Assert.notNull(webProperties, "WebProperties must not be null.");
     List<ApiDescription> descriptions = new ArrayList<>();
     for (Class<? extends Model<?>> model: registry.getRegisteredModels()){
-      String path = webProperties.getApi().getRootUrl() + "/" + registry.getModelUri(model);
-      descriptions.addAll(SwaggerPluginUtil.getModelApiDescriptions(model, typeResolver, path));
+      try {
+        String path = webProperties.getApi().getRootUrl() + "/" + registry.getUriByModel(model);
+        descriptions.addAll(SwaggerPluginUtil.getModelApiDescriptions(model, typeResolver, path));
+      } catch (ModelRegistryException e){
+        throw new RuntimeException(e); //TODO better exception handling
+      }
     }
     return descriptions;
   }

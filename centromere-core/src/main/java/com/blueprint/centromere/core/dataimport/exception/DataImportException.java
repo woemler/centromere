@@ -16,14 +16,14 @@
 
 package com.blueprint.centromere.core.dataimport.exception;
 
-import org.springframework.boot.ExitCodeGenerator;
+import com.blueprint.centromere.core.exceptions.CentromereException;
 
 /**
  * Generic exception thrown when a data import component encounters a problem.
  * 
  * @author woemler
  */
-public class DataImportException extends Exception implements ExitCodeGenerator {
+public class DataImportException extends CentromereException {
 
 	public DataImportException() {
 	}
@@ -45,8 +45,4 @@ public class DataImportException extends Exception implements ExitCodeGenerator 
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
 
-  @Override
-  public int getExitCode() {
-    return 1;
-  }
 }

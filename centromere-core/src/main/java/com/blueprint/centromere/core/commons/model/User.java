@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -113,8 +114,7 @@ public abstract class User<ID extends Serializable> implements Model<ID>, UserDe
 		this.credentialsNonExpired = credentialsNonExpired;
 	}
 
-	public void setAuthorities(
-			List<SimpleGrantedAuthority> authorities) {
+	public void setAuthorities(List<SimpleGrantedAuthority> authorities) {
 		this.authorities = authorities;
 	}
 	
@@ -124,7 +124,8 @@ public abstract class User<ID extends Serializable> implements Model<ID>, UserDe
 		}
 		authorities.add(new SimpleGrantedAuthority(role));
 	}
-	
+
+	@Transient
 	public List<String> getRoles(){
 		List<String> roles = new ArrayList<>();
 		for (GrantedAuthority authority: authorities){
@@ -141,4 +142,5 @@ public abstract class User<ID extends Serializable> implements Model<ID>, UserDe
 		}
 		return false;
 	}
+
 }

@@ -32,8 +32,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
 import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.mongodb.model.MongoGene;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.ws.WebTestInitializer;
 import com.blueprint.centromere.ws.config.ApiMediaTypes;
@@ -69,7 +70,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   @Autowired private GeneRepository geneRepository;
   @Autowired private GeneExpressionRepository geneExpressionRepository;
   @Autowired private MockMvc mockMvc;
-  @Autowired private ModelRepositoryRegistry registry;
+  @Autowired private DefaultModelRepositoryRegistry registry;
 
   @Test
   public void headTest() throws Exception {
@@ -82,7 +83,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   @Test
   public void findById() throws Exception {
     
-    System.out.println("Gene URI: " + registry.getModelUri(Gene.class));
+    System.out.println("Gene URI: " + registry.getUriByModel(MongoGene.class));
     System.out.println(String.format("Registered models: %s", registry.getRegisteredModels()));
 
     Gene gene = (Gene) geneRepository.findByGeneId("1").get();
@@ -91,7 +92,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.geneId", is("1")))
-        .andExpect(jsonPath("$.primaryGeneSymbol", is("GeneA")))
+        .andExpect(jsonPath("$.symbol", is("GeneA")))
         .andExpect(jsonPath("$.links", hasSize(1)))
         .andExpect(jsonPath("$.links[0].rel", is("self")))
         .andExpect(jsonPath("$.links[0].href", endsWith(BASE_URL + "/" + gene.getId())));
@@ -105,7 +106,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
     mockMvc.perform(get(BASE_URL + "/{id}", gene.getId()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.geneId", is("1")))
-        .andExpect(jsonPath("$.primaryGeneSymbol", is("GeneA")))
+        .andExpect(jsonPath("$.symbol", is("GeneA")))
         .andExpect(jsonPath("$", not(hasKey("links"))));
   }
 
@@ -120,10 +121,10 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
     Gene gene = (Gene) geneRepository.findByGeneId("1").get();
 
-    mockMvc.perform(get(BASE_URL + "/{id}?exclude=links,primaryGeneSymbol", gene.getId()))
+    mockMvc.perform(get(BASE_URL + "/{id}?exclude=links,symbol", gene.getId()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.geneId", is("1")))
-        .andExpect(jsonPath("$", not(hasKey("primaryGeneSymbol"))))
+        .andExpect(jsonPath("$", not(hasKey("symbol"))))
         .andExpect(jsonPath("$", not(hasKey("links"))));
   }
 
@@ -135,7 +136,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
     mockMvc.perform(get(BASE_URL + "/{id}", gene.getId()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.geneId", is("1")))
-        .andExpect(jsonPath("$.primaryGeneSymbol", is("GeneA")))
+        .andExpect(jsonPath("$.symbol", is("GeneA")))
         .andExpect(jsonPath("$", not(hasKey("links"))));
   }
 
@@ -167,26 +168,26 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findFiltered() throws Exception {
-    mockMvc.perform(get(BASE_URL + "?exclude=links,primaryGeneSymbol").accept(
+    mockMvc.perform(get(BASE_URL + "?exclude=links,symbol").accept(
         ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$.content", hasSize(5)))
         .andExpect(jsonPath("$.content[0]", hasKey("geneId")))
         .andExpect(jsonPath("$.content[0].geneId", is("1")))
-        .andExpect(jsonPath("$.content[0]", not(hasKey("primaryGeneSymbol"))))
+        .andExpect(jsonPath("$.content[0]", not(hasKey("symbol"))))
         .andExpect(jsonPath("$.content[0]", not(hasKey("links"))));
   }
 
   @Test
   public void findFieldFiltered() throws Exception {
-    mockMvc.perform(get(BASE_URL + "?fields=links,primaryGeneSymbol").accept(
+    mockMvc.perform(get(BASE_URL + "?fields=links,symbol").accept(
         ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$.content", hasSize(5)))
         .andExpect(jsonPath("$.content[0]", not(hasKey("geneId"))))
-        .andExpect(jsonPath("$.content[0]", hasKey("primaryGeneSymbol")))
+        .andExpect(jsonPath("$.content[0]", hasKey("symbol")))
         .andExpect(jsonPath("$.content[0]", hasKey("links")));
   }
 
@@ -257,7 +258,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findSorted() throws Exception {
-    mockMvc.perform(get(BASE_URL + "?sort=primaryGeneSymbol,desc").accept(
+    mockMvc.perform(get(BASE_URL + "?sort=symbol,desc").accept(
         ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
@@ -270,11 +271,11 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   
   @Test
   public void findByStringLike() throws Exception {
-    mockMvc.perform(get(BASE_URL + "?primaryGeneSymbolLike=eneB"))
+    mockMvc.perform(get(BASE_URL + "?symbolLike=eneB"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
-        .andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneB")));
+        .andExpect(jsonPath("$[0]", hasKey("symbol")))
+        .andExpect(jsonPath("$[0].symbol", is("GeneB")));
   }
 
   @Test
@@ -290,8 +291,8 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
     mockMvc.perform(get(BASE_URL + "?geneTypeStartsWith=protein"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(3)))
-        .andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
-        .andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneA")));
+        .andExpect(jsonPath("$[0]", hasKey("symbol")))
+        .andExpect(jsonPath("$[0].symbol", is("GeneA")));
   }
 
   @Test
@@ -304,11 +305,11 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findByStringEndsWith() throws Exception {
-    mockMvc.perform(get(BASE_URL + "?primaryGeneSymbolEndsWith=eneB"))
+    mockMvc.perform(get(BASE_URL + "?symbolEndsWith=eneB"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
-        .andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneB")));
+        .andExpect(jsonPath("$[0]", hasKey("symbol")))
+        .andExpect(jsonPath("$[0].symbol", is("GeneB")));
   }
 
   @Test
@@ -321,11 +322,11 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findByStringIn() throws Exception {
-    mockMvc.perform(get(BASE_URL + "?primaryGeneSymbolIn=GeneA,GeneB"))
+    mockMvc.perform(get(BASE_URL + "?symbolIn=GeneA,GeneB"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)))
-        .andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
-        .andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneA")));
+        .andExpect(jsonPath("$[0]", hasKey("symbol")))
+        .andExpect(jsonPath("$[0].symbol", is("GeneA")));
   }
 
   @Test
@@ -333,17 +334,17 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
     mockMvc.perform(get(BASE_URL + "?taxIdIn=9606,1000"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(5)))
-        .andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
-        .andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneA")));
+        .andExpect(jsonPath("$[0]", hasKey("symbol")))
+        .andExpect(jsonPath("$[0].symbol", is("GeneA")));
   }
 
   @Test
   public void findByStringNotIn() throws Exception {
-    mockMvc.perform(get(BASE_URL + "?primaryGeneSymbolNotIn=GeneA,GeneB"))
+    mockMvc.perform(get(BASE_URL + "?symbolNotIn=GeneA,GeneB"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(3)))
-        .andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
-        .andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneC")));
+        .andExpect(jsonPath("$[0]", hasKey("symbol")))
+        .andExpect(jsonPath("$[0].symbol", is("GeneC")));
   }
 
   @Test
@@ -502,11 +503,11 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   @Test
   public void updateTest() throws Exception {
 
-    mockMvc.perform(get(BASE_URL + "?primaryGeneSymbol=GeneA"))
+    mockMvc.perform(get(BASE_URL + "?symbol=GeneA"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0]", hasKey("primaryGeneSymbol")))
-        .andExpect(jsonPath("$[0].primaryGeneSymbol", is("GeneA")));
+        .andExpect(jsonPath("$[0]", hasKey("symbol")))
+        .andExpect(jsonPath("$[0].symbol", is("GeneA")));
 
     List<Gene> genes = geneRepository.findBySymbol("GeneA");
     Assert.notNull(genes);
@@ -528,12 +529,12 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(gene)))
         .andExpect(status().isCreated())
-        .andExpect(jsonPath("$", hasKey("primaryGeneSymbol")))
-        .andExpect(jsonPath("$.primaryGeneSymbol", is("GeneX")));
+        .andExpect(jsonPath("$", hasKey("symbol")))
+        .andExpect(jsonPath("$.symbol", is("GeneX")));
 
     mockMvc.perform(get(BASE_URL + "/{id}", gene.getId()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.primaryGeneSymbol", is("GeneX")));
+        .andExpect(jsonPath("$.symbol", is("GeneX")));
 
   }
   

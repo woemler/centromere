@@ -1,7 +1,7 @@
 package com.blueprint.centromere.tests.core.test.repository;
 
-import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.exceptions.QueryParameterException;
+import com.blueprint.centromere.core.mongodb.model.MongoGene;
 import com.blueprint.centromere.core.repository.Evaluation;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.core.repository.QueryParameterDescriptor;
@@ -114,7 +114,7 @@ public class QueryCriteriaTests {
   @Test
   public void modelToDescriptorTest(){
     Map<String,QueryParameterDescriptor> descriptorMap
-        = QueryParameterUtil.getAvailableQueryParameters(Gene.class);
+        = QueryParameterUtil.getAvailableQueryParameters(MongoGene.class);
     for (Map.Entry entry: descriptorMap.entrySet()){
       System.out.println(String.format("param: %s   descriptor: %s", entry.getKey(),
           (entry.getValue()).toString()));

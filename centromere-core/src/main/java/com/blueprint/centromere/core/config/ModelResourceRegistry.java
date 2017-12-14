@@ -18,18 +18,18 @@ package com.blueprint.centromere.core.config;
 
 import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.repository.ModelRepository;
 import java.util.Collection;
 
 /**
  * @author woemler
  */
-public interface ModelRepositoryRegistry {
+public interface ModelResourceRegistry {
 
+  boolean isRegisteredResource(String uri) throws ModelRegistryException;
   boolean isRegisteredModel(Class<?> type) throws ModelRegistryException;
-  ModelRepository<?, ?> getRepositoryByModel(Class<? extends Model<?>> model)
-      throws ModelRegistryException;
-  Collection<? extends ModelRepository<?,?>> getRegisteredModelRepositories();
+  Class<? extends Model<?>> getModelByUri(String uri) throws ModelRegistryException;
+  String getUriByModel(Class<? extends Model<?>> model) throws ModelRegistryException;
+  Collection<String> getRegisteredModelUris();
   Collection<Class<? extends Model<?>>> getRegisteredModels();
 
 }

@@ -5,7 +5,8 @@ import com.blueprint.centromere.cli.CommandLineRunnerException;
 import com.blueprint.centromere.cli.Printer;
 import com.blueprint.centromere.cli.Printer.Level;
 import com.blueprint.centromere.cli.parameters.UpdateCommandParameters;
-import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
+import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,7 +36,7 @@ public class UpdateCommandExecutor {
   
   private static final Logger logger = LoggerFactory.getLogger(UpdateCommandExecutor.class);
   
-  private ModelRepositoryRegistry repositoryRegistry;
+  private DefaultModelRepositoryRegistry repositoryRegistry;
   private ObjectMapper objectMapper;
   private ConversionService conversionService;
   
@@ -57,8 +58,14 @@ public class UpdateCommandExecutor {
       throw new CommandLineRunnerException(String.format("%s is not a valid model. Available models: %s", 
           parameters.getModel(), getAvailableModels()));
     }
-    Class<T> model = (Class<T>) repositoryRegistry.getModelByResource(parameters.getModel());
-    ModelRepository<T, ID> repository = repositoryRegistry.getRepositoryByModel(model);
+    Class<T> model;
+    ModelRepository<T, ID> repository;
+    try {
+      model = (Class<T>) repositoryRegistry.getModelByUri(parameters.getModel());
+      repository = repositoryRegistry.getRepositoryByModel(model);
+    } catch (ModelRegistryException e){
+      throw new CommandLineRunnerException(e);
+    }
     
     // Get the existing record
     
@@ -133,7 +140,7 @@ public class UpdateCommandExecutor {
 
   @Autowired
   public void setRepositoryRegistry(
-      ModelRepositoryRegistry repositoryRegistry) {
+      DefaultModelRepositoryRegistry repositoryRegistry) {
     this.repositoryRegistry = repositoryRegistry;
   }
 

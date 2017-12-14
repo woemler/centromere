@@ -24,7 +24,8 @@ import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.MetadataOperations;
-import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
+import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.Evaluation;
 import com.blueprint.centromere.core.repository.ModelRepository;
@@ -81,7 +82,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @SuppressWarnings({"unchecked", "SpringJavaAutowiringInspection"})
 public class ModelSearchController {
 
-  @Autowired private ModelRepositoryRegistry registry;
+  @Autowired private DefaultModelRepositoryRegistry registry;
   @Autowired private ModelResourceAssembler assembler;
   @Autowired /*@Qualifier("defaultConversionService")*/ private ConversionService conversionService;
   @Autowired private ObjectMapper objectMapper;
@@ -123,14 +124,21 @@ public class ModelSearchController {
       throw new ResourceNotFoundException();
     }
     
-    Class<T> model = (Class<T>) registry.getModelByResource(uri);
+    Class<T> model = (Class<T>) registry.getModelByUri(uri);
 
     BeanWrapper wrapper = new BeanWrapperImpl(model);
     if (!wrapper.isReadableProperty(field)){
       throw new InvalidParameterException(String.format("Requested field is not a valid model property: %s", field));
     }
-    
-    ModelRepository<T, ID> repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+
+    ModelRepository<T, ID> repository;
+    try {
+      repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+    } catch (ModelRegistryException e){
+      e.printStackTrace();
+      throw new ResourceNotFoundException();
+    }
+
     List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromFindDistinctRequest(model, request);
     Set<Object> distinct = repository.distinct(field, queryCriterias);
     ResponseEnvelope<Object> envelope = null;
@@ -184,8 +192,14 @@ public class ModelSearchController {
       throw new ResourceNotFoundException();
     }
     
-    Class<T> model = (Class<T>) registry.getModelByResource(uri);
-    ModelRepository<T, ID> repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+    Class<T> model = (Class<T>) registry.getModelByUri(uri);
+    ModelRepository<T, ID> repository;
+    try {
+      repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+    } catch (ModelRegistryException e){
+      e.printStackTrace();
+      throw new ResourceNotFoundException();
+    }
     
     if (!(repository instanceof MetadataOperations)){
       throw new ResourceNotFoundException();
@@ -259,14 +273,20 @@ public class ModelSearchController {
       logger.error(String.format("URI does not map to a registered model: %s", uri));
       throw new ResourceNotFoundException();
     }
-    Class<T> model = (Class<T>) registry.getModelByResource(uri);
+    Class<T> model = (Class<T>) registry.getModelByUri(uri);
 
     if (!Data.class.isAssignableFrom(model)){
       logger.error(String.format("URI does not map to a valid model: %s", uri));
       throw new ResourceNotFoundException();
     }
 
-    ModelRepository<T, ID> repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+    ModelRepository<T, ID> repository;
+    try {
+      repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+    } catch (ModelRegistryException e){
+      e.printStackTrace();
+      throw new ResourceNotFoundException();
+    }
     logger.info(String.format("Resolved request to model %s and repository %s",
         model.getName(), repository.getClass().getName()));
 
@@ -279,7 +299,7 @@ public class ModelSearchController {
     Map<String,String[]> parameterMap = request.getParameterMap();
     String mediaType = request.getHeader("Accept");
 
-    Class<? extends Model<?>> metaModel = (Class<? extends Model<?>>) registry.getModelByResource(meta);
+    Class<? extends Model<?>> metaModel = (Class<? extends Model<?>>) registry.getModelByUri(meta);
     if (metaModel == null){
       logger.error(String.format("URI does not map to a linked metadata model: %s", meta));
       throw new ResourceNotFoundException();
@@ -298,7 +318,14 @@ public class ModelSearchController {
       logger.error(String.format("URI does not map to a linked metadata model: %s", meta));
       throw new ResourceNotFoundException();
     }
-    ModelRepository<?,?> metaRepository = registry.getRepositoryByModel(metaModel);
+
+    ModelRepository<?,?> metaRepository;
+    try {
+      metaRepository = registry.getRepositoryByModel(metaModel);
+    } catch (ModelRegistryException e){
+      e.printStackTrace();
+      throw new ResourceNotFoundException();
+    }
     logger.info(String.format("Resolved linked metadata model to %s and repository to %s", 
         metaModel.getName(), metaRepository.getClass().getName()));
 

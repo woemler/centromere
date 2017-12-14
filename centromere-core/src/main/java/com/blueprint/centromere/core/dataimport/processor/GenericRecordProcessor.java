@@ -26,7 +26,7 @@ import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.config.DataImportProperties;
-import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
 import com.blueprint.centromere.core.dataimport.DataImportComponent;
 import com.blueprint.centromere.core.dataimport.DataTypeSupport;
 import com.blueprint.centromere.core.dataimport.DataTypes;
@@ -41,6 +41,7 @@ import com.blueprint.centromere.core.dataimport.importer.RecordImporter;
 import com.blueprint.centromere.core.dataimport.reader.RecordReader;
 import com.blueprint.centromere.core.dataimport.writer.RecordWriter;
 import com.blueprint.centromere.core.dataimport.writer.TempFileWriter;
+import com.blueprint.centromere.core.exceptions.ConfigurationException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import java.util.ArrayList;
@@ -73,7 +74,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 
   private DataSetRepository dataSetRepository;
   private DataFileRepository dataFileRepository;
-  private ModelRepositoryRegistry registry;
+  private DefaultModelRepositoryRegistry registry;
   private DataImportProperties dataImportProperties;
   
 	private Class<T> model;
@@ -195,18 +196,23 @@ public class GenericRecordProcessor<T extends Model<?>>
    * {@link #doAfter()} method.
    */
   @Override
-  public void doOnFailure() {
+  public void doOnFailure() throws DataImportException {
 
     // Roll back data records
-    if (registry.isRegisteredModel(this.getModel())){
-      ModelRepository repository = registry.getRepositoryByModel(this.getModel());
-      if (repository instanceof DataOperations){
-        DataOperations dataOperations = (DataOperations) repository;
-        if (dataFile.getId() != null) {
-          logger.warn(String.format("Rolling back inserted records for data file: %s", dataFile.getFilePath()));
-          dataOperations.deleteByDataFileId(dataFile.getDataFileId());
+    try {
+      if (registry.isRegisteredModel(this.getModel())) {
+        ModelRepository repository = registry.getRepositoryByModel(this.getModel());
+        if (repository instanceof DataOperations) {
+          DataOperations dataOperations = (DataOperations) repository;
+          if (dataFile.getId() != null) {
+            logger.warn(String
+                .format("Rolling back inserted records for data file: %s", dataFile.getFilePath()));
+            dataOperations.deleteByDataFileId(dataFile.getDataFileId());
+          }
         }
       }
+    } catch (ConfigurationException e){
+      throw new DataImportException(e);
     }
     
     // Delete dataFile records
@@ -442,7 +448,7 @@ public class GenericRecordProcessor<T extends Model<?>>
   }
 
   @Autowired
-  public void setRegistry(ModelRepositoryRegistry registry) {
+  public void setRegistry(DefaultModelRepositoryRegistry registry) {
     this.registry = registry;
   }
 
@@ -451,7 +457,7 @@ public class GenericRecordProcessor<T extends Model<?>>
     this.dataImportProperties = dataImportProperties;
   }
   
-  protected ModelRepositoryRegistry getRegistry(){
+  protected DefaultModelRepositoryRegistry getRegistry(){
 	  return registry;
   }
 

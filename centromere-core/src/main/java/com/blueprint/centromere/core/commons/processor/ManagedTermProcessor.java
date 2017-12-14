@@ -23,6 +23,7 @@ import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.processor.GenericRecordProcessor;
 import com.blueprint.centromere.core.dataimport.processor.RecordProcessor;
+import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import java.io.Serializable;
@@ -86,9 +87,14 @@ public class ManagedTermProcessor<T extends Term<ID>, ID extends Serializable>
   @Override
   @SuppressWarnings("unchecked")
   public void run() throws DataImportException {
-    for (Class<?> model: this.getRegistry().getRegisteredModels()){
+    for (Class<? extends Model<?>> model: this.getRegistry().getRegisteredModels()){
       if (termGenerator.modelHasManagedTerms(model)){
-        ModelRepository<?,?> repository = this.getRegistry().getRepositoryByModel(model);
+        ModelRepository<?, ?> repository;
+        try {
+          repository = this.getRegistry().getRepositoryByModel(model);
+        } catch (ModelRegistryException e){
+          throw new DataImportException(e);
+        }
         for (Model<?> record: repository.findAll()){
           try {
             List<T> terms = termGenerator.getModelTerms((Model<ID>) record);

@@ -28,7 +28,7 @@ public class SwaggerPluginUtil {
 	/* API Descriptions */
 
   public static List<ApiDescription> getModelApiDescriptions(
-      Class<? extends Model> model,
+      Class<? extends Model<?>> model,
       TypeResolver typeResolver,
       String rootUrl
   ){
@@ -69,7 +69,7 @@ public class SwaggerPluginUtil {
   }
 
   private static List<Operation> getFindCollectionModelOperations(
-      Class<? extends Model> model, TypeResolver typeResolver){
+      Class<? extends Model<?>> model, TypeResolver typeResolver){
     List<Operation> operations = new ArrayList<>();
     operations.add(getFindAllOperation(model, typeResolver));
     operations.add(getPostOperation(model, typeResolver));
@@ -122,7 +122,7 @@ public class SwaggerPluginUtil {
    * @return
    */
   private static Operation getFindAllOperation(
-      Class<? extends Model> model, TypeResolver typeResolver){
+      Class<? extends Model<?>> model, TypeResolver typeResolver){
     return new Operation(
         HttpMethod.GET,
         "Fetch all records",
@@ -350,7 +350,7 @@ public class SwaggerPluginUtil {
 	/* Parameters */
 
   public static List<Parameter> getModelParameters(
-      Class<? extends Model> model, TypeResolver typeResolver){
+      Class<? extends Model<?>> model, TypeResolver typeResolver){
     return QueryParameterUtil.getAvailableQueryParameters(model, false).values().stream()
         .map(descriptor -> createParameterFromDescriptior(descriptor, typeResolver))
         .collect(Collectors.toList());
@@ -436,7 +436,7 @@ public class SwaggerPluginUtil {
   // Find All
 
   private static List<Parameter> findAllParameters(
-      Class<? extends Model> model, TypeResolver typeResolver){
+      Class<? extends Model<?>> model, TypeResolver typeResolver){
     List<Parameter> parameters = new ArrayList<>();
     parameters.addAll(paginationParameters(typeResolver));
     parameters.addAll(fieldFilteringParameters(typeResolver));

@@ -53,7 +53,7 @@ public abstract class Term<ID extends Serializable> implements Model<ID> {
   @NotEmpty
   private String field;
 	
-	private List<ID> referenceIds;
+	private List<String> referenceIds;
 
   public String getTerm() {
     return term;
@@ -79,11 +79,11 @@ public abstract class Term<ID extends Serializable> implements Model<ID> {
     this.field = field;
   }
 
-  public List<ID> getReferenceIds() {
+  public List<String> getReferenceIds() {
     return referenceIds;
   }
 
-  public void setReferenceIds(List<ID> referenceIds) {
+  public void setReferenceIds(List<String> referenceIds) {
     this.referenceIds = referenceIds;
   }
 
@@ -98,14 +98,14 @@ public abstract class Term<ID extends Serializable> implements Model<ID> {
   }
 
 
-  public void addReferenceId(ID referenceId){
+  public void addReferenceId(String referenceId){
     if (!referenceIds.contains(referenceId)) {
       referenceIds.add(referenceId);
     }
   }
   
-  public void addReferenceIds(Collection<ID> referenceIds){
-    for (ID ref: referenceIds){
+  public void addReferenceIds(Collection<String> referenceIds){
+    for (String ref: referenceIds){
       this.addReferenceId(ref);
     }
   }
@@ -144,7 +144,7 @@ public abstract class Term<ID extends Serializable> implements Model<ID> {
                 term.setTerm(val);
                 term.setModel(model.getClass());
                 term.setField(field.getName());
-                term.setReferenceIds(Collections.singletonList(model.getId()));
+                term.setReferenceIds(Collections.singletonList(model.getId().toString()));
                 terms.add(term);
               }
             }
@@ -164,7 +164,7 @@ public abstract class Term<ID extends Serializable> implements Model<ID> {
                       term.setTerm(val);
                       term.setModel(model.getClass());
                       term.setField(entry.getKey());
-                      term.setReferenceIds(Collections.singletonList(model.getId()));
+                      term.setReferenceIds(Collections.singletonList(model.getId().toString()));
                       terms.add(term);
                     }
                   }
@@ -177,7 +177,7 @@ public abstract class Term<ID extends Serializable> implements Model<ID> {
                         term.setTerm(val);
                         term.setModel(model.getClass());
                         term.setField(field.getName());
-                        term.setReferenceIds(Collections.singletonList(model.getId()));
+                        term.setReferenceIds(Collections.singletonList(model.getId().toString()));
                         terms.add(term);
                       }
                     }
@@ -197,7 +197,7 @@ public abstract class Term<ID extends Serializable> implements Model<ID> {
                     term.setTerm(val.toString());
                     term.setModel(model.getClass());
                     term.setField(field.getName());
-                    term.setReferenceIds(Collections.singletonList(model.getId()));
+                    term.setReferenceIds(Collections.singletonList(model.getId().toString()));
                     terms.add(term);
                   }
                 }

@@ -16,27 +16,36 @@
 
 package com.blueprint.centromere.core.exceptions;
 
+import org.springframework.boot.ExitCodeGenerator;
+
 /**
  * @author woemler
  */
-public class ConfigurationException extends CentromereException {
-	public ConfigurationException() {
-	}
+public class CentromereException extends Exception implements ExitCodeGenerator {
 
-	public ConfigurationException(String message) {
-		super(message);
-	}
+  public CentromereException() {
+  }
 
-	public ConfigurationException(String message, Throwable cause) {
-		super(message, cause);
-	}
+  public CentromereException(String message) {
+    super(message);
+  }
 
-	public ConfigurationException(Throwable cause) {
-		super(cause);
-	}
+  public CentromereException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-	public ConfigurationException(String message, Throwable cause, boolean enableSuppression,
-			boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
+  public CentromereException(Throwable cause) {
+    super(cause);
+  }
+
+  public CentromereException(String message, Throwable cause, boolean enableSuppression,
+      boolean writableStackTrace) {
+    super(message, cause, enableSuppression, writableStackTrace);
+  }
+
+  @Override
+  public int getExitCode() {
+    return 1;
+  }
+
 }

@@ -34,8 +34,8 @@ public class CoreConfiguration {
   public static class CommonConfiguration {
 
     @Bean
-    public ModelRepositoryRegistry modelRepositoryRegistry(ApplicationContext applicationContext){
-      return new ModelRepositoryRegistry(applicationContext);
+    public DefaultModelRepositoryRegistry modelRepositoryRegistry(ApplicationContext applicationContext){
+      return new DefaultModelRepositoryRegistry(applicationContext);
     }
 
   }

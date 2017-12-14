@@ -4,9 +4,11 @@ package com.blueprint.centromere.ws.controller;
  * @author woemler
  */
 
-import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
+import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Linked;
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.ws.exception.RequestFailureException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,18 +30,22 @@ public class ModelResourceAssembler
     extends ResourceAssemblerSupport<Model, FilterableResource> {
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
-  private final ModelRepositoryRegistry registry;
+  private final DefaultModelRepositoryRegistry registry;
 
   @Value("${centromere.web.api.root-url}")
   private String rootUrl;
 
-  public ModelResourceAssembler(ModelRepositoryRegistry registry){
+  public ModelResourceAssembler(DefaultModelRepositoryRegistry registry){
     super(ModelCrudController.class, FilterableResource.class);
     this.registry = registry;
   }
 
-  private String getModelUri(Class<? extends Model> model){
-    return rootUrl + "/" + registry.getModelUri(model);
+  private String getModelUri(Class<? extends Model<?>> model) {
+    try {
+      return rootUrl + "/" + registry.getUriByModel(model);
+    } catch (ModelRegistryException e){
+      throw new RequestFailureException(String.format("Model cannot be mapped to valid resource: %s", model.getName()));
+    }
   }
 
   /**
@@ -50,7 +56,7 @@ public class ModelResourceAssembler
    */
   public FilterableResource toResource(Model t) {
     FilterableResource<Model> resource = new FilterableResource<>(t);
-    resource.add(new Link(getModelUri(t.getClass()) + "/" + t.getId(), "self"));
+    resource.add(new Link(getModelUri((Class<? extends Model<?>>) t.getClass()) + "/" + t.getId(), "self"));
     List<Link> links = addLinks(new ArrayList<>());
     links.addAll(this.addLinkedModelLinks(t));
     resource.add(links);

@@ -1,7 +1,7 @@
 package com.blueprint.centromere.ws.config;
 
 import com.blueprint.centromere.core.commons.model.User;
-import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.WebProperties;
 import com.blueprint.centromere.ws.documentation.ModelApiListingPlugin;
@@ -38,7 +38,7 @@ public class SwaggerConfig {
 
   @Autowired private WebProperties webProperties;
   @Autowired private TypeResolver typeResolver;
-  @Autowired private ModelRepositoryRegistry registry;
+  @Autowired private DefaultModelRepositoryRegistry registry;
 
   @Bean
   public Docket api(){
