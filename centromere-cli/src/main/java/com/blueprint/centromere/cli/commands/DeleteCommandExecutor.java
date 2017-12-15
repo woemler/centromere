@@ -16,120 +16,133 @@
 
 package com.blueprint.centromere.cli.commands;
 
+import com.beust.jcommander.JCommander;
 import com.blueprint.centromere.cli.CommandLineRunnerException;
 import com.blueprint.centromere.cli.Printer;
 import com.blueprint.centromere.cli.Printer.Level;
+import com.blueprint.centromere.cli.parameters.DeleteCommandParameters;
 import com.blueprint.centromere.core.commons.model.DataFile;
 import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.repository.DataFileRepository;
 import com.blueprint.centromere.core.commons.repository.DataOperations;
 import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.commons.repository.SampleRepository;
+import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.ModelResourceRegistry;
+import com.blueprint.centromere.core.exceptions.ModelRegistryException;
+import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.ModelRepository;
-import java.util.Arrays;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.EnvironmentAware;
-import org.springframework.core.env.Environment;
-import org.springframework.data.repository.support.Repositories;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.TypeDescriptor;
 
 /**
  * @author woemler
  */
-public class DeleteCommandExecutor implements EnvironmentAware {
+public class DeleteCommandExecutor {
   
   private static final Logger logger = LoggerFactory.getLogger(DeleteCommandExecutor.class);
-  private static final List<String> deleteable = Arrays.asList("dataset", "datafile");
   
   private DataSetRepository dataSetRepository;
   private DataFileRepository dataFileRepository;
-  private SampleRepository sampleRepository;
-  private Repositories repositories;
-  private Environment environment;
+  private ModelResourceRegistry resourceRegistry;
+  private ModelRepositoryRegistry repositoryRegistry;
+  private ConversionService conversionService;
   
   @SuppressWarnings("unchecked")
-  public void run(String category, List<String> toDelete) throws CommandLineRunnerException {
-    
-    category = category.toLowerCase().replaceAll("-", "");
-    if (!deleteable.contains(category)){
-      throw new CommandLineRunnerException(String.format("The selected category is not supported for deletion:, %s", category));
+  public <T extends Model<ID>, ID extends Serializable> void run(DeleteCommandParameters parameters) 
+      throws CommandLineRunnerException {
+
+    // If help flag is present, display usage and return
+    if (parameters.isHelp()){
+      JCommander.newBuilder()
+          .addCommand(DeleteCommandParameters.COMMAND, new DeleteCommandParameters())
+          .build()
+          .usage();
+      System.out.println(String.format("Available models: %s", getAvailableModels()));
+      return;
     }
-    if (toDelete.isEmpty()){
-      throw new CommandLineRunnerException(String.format("No items selected for deletion for category: %s", category));
+
+    // Get the requested model and repository
+    Class<T> model;
+    ModelRepository<T, ID> repository;
+    try {
+      if (!resourceRegistry.isRegisteredResource(parameters.getModel())){
+        throw new CommandLineRunnerException(String.format("%s is not a valid model. Available models: %s",
+            parameters.getModel(), getAvailableModels()));
+      }
+      model = (Class<T>) resourceRegistry.getModelByUri(parameters.getModel());
+      repository = (ModelRepository<T, ID>) repositoryRegistry.getRepositoryByModel(model);
+    } catch (ModelRegistryException e){
+      throw new CommandLineRunnerException(e);
     }
     
-    switch (category){
+    // Convert the ID to the correct type
+    ID id;
+    Class<ID> idType;
+    try {
+      idType = (Class<ID>) model.getMethod("getId").getReturnType();
+    } catch (NoSuchMethodException e){
+      throw new CommandLineRunnerException(e);
+    }
+    if (String.class.isAssignableFrom(idType)){
+      id = (ID) parameters.getId();
+    } else if (conversionService.canConvert(String.class, idType)) {
+      id = (ID) conversionService.convert(parameters.getId(), TypeDescriptor.valueOf(String.class), 
+          TypeDescriptor.valueOf(idType));
+    } else {
+      throw new CommandLineRunnerException(String.format("Cannot convert requested ID value to " 
+          + "target type: %s", idType.getName()));
+    }
       
-      case "datafile":
-        
-        for (String item: toDelete){
-          
-          DataFile dataFile = null;
-          Optional<DataFile> optional = dataFileRepository.findByFilePath(item);
-          if (optional.isPresent()){
-            dataFile = optional.get();
-          } else {
-            dataFile = (DataFile) dataFileRepository.findOne(item);
-          }
-          
-          if (dataFile == null){
-            Printer.print(String.format("Unable to identify item for deletion: category=%s  item=%s",
-                category, item), logger, Level.WARN);
-            continue;
-          }
-
-          Printer.print(String.format("Deleting DataFile %s and all associated records",
-              dataFile.getFilePath()), logger, Level.INFO);
-          deleteDataFile(dataFile);
-          
+    // Get the target record
+    Optional<T> optional = repository.findById(id);
+    if (!optional.isPresent()){
+      Printer.print(String.format("No record for model %s can be found with ID: %s", model.getName(), parameters.getId()));
+    }
+    T record = optional.get();
+    
+    // Delete the record(s)
+    if (DataFile.class.isAssignableFrom(model)){
+      
+      DataFile dataFile = (DataFile) record;
+      Printer.print(String.format("Deleting DataFile %s and all associated records",
+          dataFile.getFilePath()), logger, Level.INFO);
+      deleteDataFile(dataFile);
+      
+    } else if (DataSet.class.isAssignableFrom(model)){
+      
+      DataSet dataSet = (DataSet) record;
+      Printer.print(String.format("Deleting DataSet %s and all associated records and samples",
+          dataSet.getDataSetId()), logger, Level.INFO);
+      for (String dataFileId: (List<String>) dataSet.getDataFileIds()){
+        Optional<DataFile> dfOptional = dataFileRepository.findByDataFileId(dataFileId);
+        if (dfOptional.isPresent()) {
+          deleteDataFile(dfOptional.get());
         }
-        
-        return;
-        
-      case "dataset":
-
-        for (String item: toDelete){
-
-          DataSet dataSet = null;
-          Optional<DataSet> optional = dataSetRepository.findByDataSetId(item);
-          if (optional.isPresent()){
-            dataSet = optional.get();
-          } else {
-            dataSet = (DataSet) dataSetRepository.findOne(item);
-          }
-
-          if (dataSet == null){
-            Printer.print(String.format("Unable to identify item for deletion: category=%s  item=%s",
-                category, item), logger, Level.WARN);
-            continue;
-          }
-
-          Printer.print(String.format("Deleting DataSet %s and all associated records and samples",
-              dataSet.getDataSetId()), logger, Level.INFO);
-          for (String dataFileId: (List<String>) dataSet.getDataFileIds()){
-            DataFile dataFile = (DataFile) dataFileRepository.findOne(dataFileId);
-            deleteDataFile(dataFile);
-          }
-          for (String sampleId: (List<String>) dataSet.getSampleIds()){
-            sampleRepository.delete(sampleId);
-          }
-          
-          dataSetRepository.delete(dataSet);
-
-        }
-        
-        return;
+      }
+      dataSetRepository.delete(dataSet);
+      
+    } else {
+      
+      Printer.print(String.format("Deleting requested model %s record: %s", model.getName(), 
+          parameters.getId()), logger, Level.INFO);
+      repository.delete(id);
       
     }
     
   }
   
+  @SuppressWarnings("unchecked")
   private void deleteDataFile(DataFile dataFile) throws CommandLineRunnerException{
     
-    Class<?> model = null;
+    Class<? extends Model<?>> model;
+    ModelRepository repository;
     
     try {
       model = dataFile.getModelType();
@@ -137,15 +150,18 @@ public class DeleteCommandExecutor implements EnvironmentAware {
       throw new CommandLineRunnerException(e);
     }
     
-    ModelRepository repository = (ModelRepository) repositories.getRepositoryFor(model);
+    try {
+      repository = repositoryRegistry.getRepositoryByModel(model);
+    } catch (ModelRegistryException e){
+      throw new CommandLineRunnerException(e);
+    }
     
     if (repository instanceof DataOperations){
-      
       DataOperations operations = (DataOperations) repository;
       operations.deleteByDataFileId(dataFile.getDataFileId());
       DataSet dataSet = (DataSet) dataSetRepository.findOne(dataFile.getDataSetId());
       List<String> dataFileIds = dataSet.getDataFileIds();
-      dataFileIds.remove(dataFile.getId());
+      dataFileIds.remove(dataFile.getDataFileId());
       dataSet.setDataFileIds(dataFileIds);
       dataSetRepository.update(dataSet);
       dataFileRepository.delete(dataFile);
@@ -155,32 +171,37 @@ public class DeleteCommandExecutor implements EnvironmentAware {
     
   }
 
-  @Override
-  @Autowired
-  public void setEnvironment(Environment environment) {
-    this.environment = environment;
+  /**
+   * Returns a list of lower-case model names, which server as available arguments for creatable models.
+   *
+   * @return
+   */
+  private List<String> getAvailableModels(){
+    return new ArrayList<>(resourceRegistry.getRegisteredModelUris());
   }
 
   @Autowired
-  public void setDataSetRepository(
-      DataSetRepository dataSetRepository) {
+  public void setDataSetRepository(DataSetRepository dataSetRepository) {
     this.dataSetRepository = dataSetRepository;
   }
 
   @Autowired
-  public void setDataFileRepository(
-      DataFileRepository dataFileRepository) {
+  public void setDataFileRepository(DataFileRepository dataFileRepository) {
     this.dataFileRepository = dataFileRepository;
   }
 
   @Autowired
-  public void setSampleRepository(
-      SampleRepository sampleRepository) {
-    this.sampleRepository = sampleRepository;
+  public void setResourceRegistry(ModelResourceRegistry resourceRegistry) {
+    this.resourceRegistry = resourceRegistry;
   }
 
   @Autowired
-  public void setRepositories(Repositories repositories) {
-    this.repositories = repositories;
+  public void setRepositoryRegistry(ModelRepositoryRegistry repositoryRegistry) {
+    this.repositoryRegistry = repositoryRegistry;
+  }
+
+  @Autowired
+  public void setConversionService(ConversionService conversionService) {
+    this.conversionService = conversionService;
   }
 }

@@ -43,7 +43,8 @@ public class UpdateCommandExecutor {
   private ConversionService conversionService;
   
   @SuppressWarnings("unchecked")
-  public <ID extends Serializable, T extends Model<ID>> void run(UpdateCommandParameters parameters) throws CommandLineRunnerException {
+  public <ID extends Serializable, T extends Model<ID>> void run(UpdateCommandParameters parameters) 
+      throws CommandLineRunnerException {
     
     // If help flag is present, display usage and return
     if (parameters.isHelp()){
@@ -73,7 +74,8 @@ public class UpdateCommandExecutor {
     
     T existing = repository.findOne((ID) parameters.getId());
     if (existing == null){
-      throw new CommandLineRunnerException(String.format("Cannot find %s record for ID: %s", model.getSimpleName(), parameters.getId()));
+      throw new CommandLineRunnerException(String.format("Cannot find %s record for ID: %s", 
+          model.getSimpleName(), parameters.getId()));
     }
     
     // Convert the model

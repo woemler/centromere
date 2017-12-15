@@ -32,9 +32,7 @@ import com.blueprint.centromere.cli.parameters.DeleteCommandParameters;
 import com.blueprint.centromere.cli.parameters.ImportCommandParameters;
 import com.blueprint.centromere.cli.parameters.ListCommandParameters;
 import com.blueprint.centromere.cli.parameters.UpdateCommandParameters;
-import com.blueprint.centromere.core.config.DataImportProperties;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +56,6 @@ public class JCommanderInputExecutor implements ApplicationRunner {
 	private DeleteCommandExecutor deleteCommandExecutor;
 	private CreateCommandExecutor createCommandExecutor;
 	private UpdateCommandExecutor updateCommandExecutor;
-	private DataImportProperties dataImportProperties;
 	
 	private JCommander jc;
 
@@ -199,20 +196,8 @@ public class JCommanderInputExecutor implements ApplicationRunner {
     // Delete command
     else if (DeleteCommandParameters.COMMAND.equals(mainCommand)){
 
-		  String deleteable = "";
-      List<String> toDelete = deleteParameters.getArgs();
-		  if (toDelete != null && !toDelete.isEmpty()){
-        deleteable = toDelete.remove(0);
-		    if (toDelete.size() > 0) {
-          deleteCommandExecutor.run(deleteable, toDelete);
-          code = 0;
-        } else {
-		      Printer.print(String.format("No items selected for deletion: %s", deleteable), logger, Level.WARN);
-        }
-		    
-      } else {
-		    //deleteJc.usage();
-      }
+      deleteCommandExecutor.run(deleteParameters);
+      code = 0;
 		  
 		} else {
 			jc.usage();
@@ -262,11 +247,6 @@ public class JCommanderInputExecutor implements ApplicationRunner {
   @Autowired
   public void setCreateCommandExecutor(CreateCommandExecutor createCommandExecutor) {
     this.createCommandExecutor = createCommandExecutor;
-  }
-
-  @Autowired
-  public void setDataImportProperties(DataImportProperties dataImportProperties) { 
-	  this.dataImportProperties = dataImportProperties;
   }
 
   @Autowired

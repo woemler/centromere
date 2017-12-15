@@ -10,6 +10,7 @@ import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.GeneExpression;
 import com.blueprint.centromere.core.commons.model.Mutation;
 import com.blueprint.centromere.core.commons.model.Sample;
+import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.dataimport.exception.InvalidSampleException;
 import com.blueprint.centromere.core.mongodb.model.MongoDataFile;
@@ -60,6 +61,7 @@ public class ImportCommandTests extends AbstractRepositoryTests {
   @Autowired private MongoGeneRepository geneRepository;
   @Autowired private MongoGeneExpressionRepository geneExpressionRepository;
   @Autowired private MongoMutationRepository mutationRepository;
+  @Autowired private DataImportProperties dataImportProperties;
   
   @Test
   public void helpTest(){
@@ -99,7 +101,7 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     
     Assert.isTrue(exception == null, "Exception should be null");
     Assert.isTrue(geneRepository.count() > 0, "GeneRepository should not be empty");
-    Assert.isTrue(dataFileRepository.count() == dfCount+1, "DaatFile record count should have iterated by one");
+    Assert.isTrue(dataFileRepository.count() == dfCount+1, "DataFile record count should have iterated by one");
 
     Optional<MongoDataFile> dataFileOptional = dataFileRepository.findByFilePath(geneInfoFile.getFile().getAbsolutePath());
     Assert.isTrue(dataFileOptional.isPresent());
@@ -113,6 +115,11 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     DataSet dataSet = dataSetOptional.get();
     Assert.isTrue("DataSetA".equals(dataSet.getDataSetId()));
     Assert.isTrue(dataSet.getDataFileIds().contains(dataFile.getId()));
+
+    Assert.isTrue(!dataImportProperties.isSkipInvalidGenes());
+    Assert.isTrue(!dataImportProperties.isSkipInvalidSamples());
+    Assert.isTrue(!dataImportProperties.isSkipInvalidRecords());
+    Assert.isTrue(!dataImportProperties.isSkipInvalidFiles());
     
   }
   
@@ -167,6 +174,11 @@ public class ImportCommandTests extends AbstractRepositoryTests {
     Assert.isTrue(geneExpression.getValue() > 0);
     Assert.isTrue(dataFile.getId().equals(geneExpression.getDataFileId()));
     Assert.isTrue(dataSet.getId().equals(geneExpression.getDataSetId()));
+    
+    Assert.isTrue(dataImportProperties.isSkipInvalidGenes());
+    Assert.isTrue(dataImportProperties.isSkipInvalidSamples());
+    Assert.isTrue(!dataImportProperties.isSkipInvalidRecords());
+    Assert.isTrue(!dataImportProperties.isSkipInvalidFiles());
     
     System.out.println(geneExpression.toString());
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 William Oemler, Blueprint Medicines
+ * Copyright 2017 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.springframework.core.convert.converter.Converter;
  * @author woemler
  * @since 0.4.1
  */
+@Deprecated
 public class KeyValueMapModelConverter implements Converter<Map<String, String>, Object> {
 
 	private final Class<? extends Model> model;

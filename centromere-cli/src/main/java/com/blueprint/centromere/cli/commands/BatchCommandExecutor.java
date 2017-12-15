@@ -114,9 +114,9 @@ public class BatchCommandExecutor {
     dataSet.addAttributes(manifest.getAttributes());
     dataSet.addParameters(manifest.getParameters());
     if (dataSet.getId() != null){
-      dataSet = (DataSet) dataSetRepository.update(dataSet);
+      dataSetRepository.update(dataSet);
     } else {
-      dataSet = (DataSet) dataSetRepository.insert(dataSet);
+      dataSetRepository.insert(dataSet);
     }
 		
 		// Import each file

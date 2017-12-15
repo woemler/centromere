@@ -23,6 +23,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author woemler
  */
+@Deprecated
 public class StringToMapParameterConverter implements Converter<String, Map<String,String>> {
 
   @Override

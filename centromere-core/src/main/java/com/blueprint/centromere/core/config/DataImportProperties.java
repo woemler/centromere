@@ -43,10 +43,6 @@ public class DataImportProperties {
   private String tempDir;
   private Map<String, String> attributes = new HashMap<>();
   
-//  private DataSet dataSet = new DataSet();
-//  private DataFile dataFile = new DataFile();
-//  private Sample sample = new Sample();
-  
   public boolean hasAttribute(String attribute){
     return this.attributes.containsKey(attribute);
   }

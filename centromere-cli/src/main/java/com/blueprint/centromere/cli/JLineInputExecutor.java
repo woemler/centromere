@@ -13,8 +13,6 @@ import com.blueprint.centromere.cli.parameters.DeleteCommandParameters;
 import com.blueprint.centromere.cli.parameters.ImportCommandParameters;
 import com.blueprint.centromere.cli.parameters.ListCommandParameters;
 import com.blueprint.centromere.cli.parameters.UpdateCommandParameters;
-import com.blueprint.centromere.core.config.DataImportProperties;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +34,6 @@ public class JLineInputExecutor {
   private DeleteCommandExecutor deleteCommandExecutor;
   private CreateCommandExecutor createCommandExecutor;
   private UpdateCommandExecutor updateCommandExecutor;
-  private DataImportProperties dataImportProperties;
 
   @ShellMethod(key = ImportCommandParameters.COMMAND, value = ImportCommandParameters.HELP)
   public void importCommand(@ShellOption(optOut = true) ImportCommandParameters parameters) throws Exception {
@@ -93,16 +90,7 @@ public class JLineInputExecutor {
 
   @ShellMethod(key = DeleteCommandParameters.COMMAND, value = DeleteCommandParameters.HELP)
   public void deleteCommand(@ShellOption(optOut = true) DeleteCommandParameters parameters) throws Exception {
-    String deleteable = "";
-    List<String> toDelete = parameters.getArgs();
-    if (toDelete != null && !toDelete.isEmpty()){
-      deleteable = toDelete.remove(0);
-      if (toDelete.size() > 0) {
-        deleteCommandExecutor.run(deleteable, toDelete);
-      } else {
-        Printer.print(String.format("No items selected for deletion: %s", deleteable), logger, Level.WARN);
-      }
-    }
+    deleteCommandExecutor.run(parameters);
   }
 
   @Autowired
@@ -128,11 +116,6 @@ public class JLineInputExecutor {
   @Autowired
   public void setCreateCommandExecutor(CreateCommandExecutor createCommandExecutor) {
     this.createCommandExecutor = createCommandExecutor;
-  }
-
-  @Autowired
-  public void setDataImportProperties(DataImportProperties dataImportProperties) {
-    this.dataImportProperties = dataImportProperties;
   }
 
   @Autowired
