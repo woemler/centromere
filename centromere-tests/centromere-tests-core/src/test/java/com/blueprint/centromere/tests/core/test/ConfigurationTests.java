@@ -16,9 +16,11 @@
 
 package com.blueprint.centromere.tests.core.test;
 
+import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.config.CoreConfiguration;
-import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.ModelResourceRegistry;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.mongodb.MongoConfiguration;
 import com.blueprint.centromere.core.mongodb.model.MongoGene;
@@ -44,16 +46,19 @@ import org.springframework.util.Assert;
 @ActiveProfiles({ Profiles.SCHEMA_DEFAULT })
 public class ConfigurationTests {
 
-  @Autowired(required = false) private DefaultModelRepositoryRegistry resourceRegistry;
+  @Autowired(required = false) private ModelRepositoryRegistry repositoryRegistry;
+  @Autowired(required = false) private ModelResourceRegistry resourceRegistry;
 
   @Test
   public void modelResourceTest() throws Exception {
-    Assert.notNull(resourceRegistry, "Repositories must not be null");
+    Assert.notNull(resourceRegistry, "ResourceRegistrymust not be null");
+    Assert.notNull(repositoryRegistry, "RepositoryRegistry must not be null");
     System.out.println(resourceRegistry.getRegisteredModels().toString());
-    System.out.println(resourceRegistry.getRegisteredModelRepositories().toString());
+    System.out.println(repositoryRegistry.getRegisteredModelRepositories().toString());
     Assert.isTrue(resourceRegistry.isRegisteredResource("genes"));
+    Assert.isTrue(resourceRegistry.isRegisteredModel(Gene.class));
     Assert.isTrue(resourceRegistry.isRegisteredModel(MongoGene.class));
-    ModelRepository repository = resourceRegistry.getRepositoryByModel(MongoGene.class);
+    ModelRepository repository = repositoryRegistry.getRepositoryByModel(MongoGene.class);
     Assert.notNull(repository, "GeneRepository is not registered.");
     Assert.isTrue(repository instanceof GeneRepository, "Repository does not implement GeneRepository");
   }

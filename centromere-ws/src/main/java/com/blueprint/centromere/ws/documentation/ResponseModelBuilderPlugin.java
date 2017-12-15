@@ -1,6 +1,6 @@
 package com.blueprint.centromere.ws.documentation;
 
-import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.ModelResourceRegistry;
 import com.fasterxml.classmate.TypeResolver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -17,7 +17,7 @@ import springfox.documentation.swagger.common.SwaggerPluginSupport;
  */
 public class ResponseModelBuilderPlugin implements ModelBuilderPlugin {
 
-  @Autowired private DefaultModelRepositoryRegistry registry;
+  @Autowired private ModelResourceRegistry registry;
   @Autowired private TypeResolver typeResolver;
   @Autowired private ObjectMapper objectMapper;
 

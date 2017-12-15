@@ -26,7 +26,7 @@ import com.blueprint.centromere.core.commons.support.DataFileAware;
 import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.config.DataImportProperties;
-import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.dataimport.DataImportComponent;
 import com.blueprint.centromere.core.dataimport.DataTypeSupport;
 import com.blueprint.centromere.core.dataimport.DataTypes;
@@ -74,7 +74,7 @@ public class GenericRecordProcessor<T extends Model<?>>
 
   private DataSetRepository dataSetRepository;
   private DataFileRepository dataFileRepository;
-  private DefaultModelRepositoryRegistry registry;
+  private ModelRepositoryRegistry registry;
   private DataImportProperties dataImportProperties;
   
 	private Class<T> model;
@@ -448,7 +448,7 @@ public class GenericRecordProcessor<T extends Model<?>>
   }
 
   @Autowired
-  public void setRegistry(DefaultModelRepositoryRegistry registry) {
+  public void setRegistry(ModelRepositoryRegistry registry) {
     this.registry = registry;
   }
 
@@ -457,7 +457,7 @@ public class GenericRecordProcessor<T extends Model<?>>
     this.dataImportProperties = dataImportProperties;
   }
   
-  protected DefaultModelRepositoryRegistry getRegistry(){
+  protected ModelRepositoryRegistry getRegistry(){
 	  return registry;
   }
 

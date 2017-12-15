@@ -4,7 +4,7 @@ package com.blueprint.centromere.ws.controller;
  * @author woemler
  */
 
-import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.ModelResourceRegistry;
 import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Linked;
 import com.blueprint.centromere.core.model.Model;
@@ -30,12 +30,12 @@ public class ModelResourceAssembler
     extends ResourceAssemblerSupport<Model, FilterableResource> {
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
-  private final DefaultModelRepositoryRegistry registry;
+  private final ModelResourceRegistry registry;
 
   @Value("${centromere.web.api.root-url}")
   private String rootUrl;
 
-  public ModelResourceAssembler(DefaultModelRepositoryRegistry registry){
+  public ModelResourceAssembler(ModelResourceRegistry registry){
     super(ModelCrudController.class, FilterableResource.class);
     this.registry = registry;
   }

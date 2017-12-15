@@ -16,7 +16,8 @@
 
 package com.blueprint.centromere.ws.controller;
 
-import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.ModelResourceRegistry;
 import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.ModelRepository;
@@ -69,7 +70,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @SuppressWarnings({"unchecked", "SpringJavaAutowiringInspection"})
 public class ModelCrudController {
 
-  @Autowired private DefaultModelRepositoryRegistry registry;
+  @Autowired private ModelRepositoryRegistry repositoryRegistry;
+  @Autowired private ModelResourceRegistry resourceRegistry;
   @Autowired private ModelResourceAssembler assembler;
   @Autowired /*@Qualifier("defaultConversionService")*/ private ConversionService conversionService;
   @Autowired private ObjectMapper objectMapper;
@@ -109,14 +111,15 @@ public class ModelCrudController {
       @PathVariable String uri,
       HttpServletRequest request
   ) {
-    if (!registry.isRegisteredResource(uri)){
-      logger.error(String.format("URI does not map to a registered model: %s", uri));
-      throw new ResourceNotFoundException();
-    }
-    Class<T> model = (Class<T>) registry.getModelByUri(uri);
     ModelRepository<T, ID> repository;
+    Class<T> model;
     try {
-       repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+      if (!resourceRegistry.isRegisteredResource(uri)){
+        logger.error(String.format("URI does not map to a registered model: %s", uri));
+        throw new ResourceNotFoundException();
+      }
+      model = (Class<T>) resourceRegistry.getModelByUri(uri);
+      repository = (ModelRepository<T, ID>) repositoryRegistry.getRepositoryByModel(model);
     } catch (ModelRegistryException e){
       e.printStackTrace();
       throw new ResourceNotFoundException();
@@ -178,16 +181,15 @@ public class ModelCrudController {
       PagedResourcesAssembler pagedResourcesAssembler,
       HttpServletRequest request
   ) {
-    
-    if (!registry.isRegisteredResource(uri)){
-      logger.error(String.format("URI does not map to a registered model: %s", uri));
-      throw new ResourceNotFoundException();
-    }
-    
-    Class<T> model = (Class<T>) registry.getModelByUri(uri);
+    Class<T> model;
     ModelRepository<T, ID> repository;
     try {
-      repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+      if (!resourceRegistry.isRegisteredResource(uri)){
+        logger.error(String.format("URI does not map to a registered model: %s", uri));
+        throw new ResourceNotFoundException();
+      }
+      model = (Class<T>) resourceRegistry.getModelByUri(uri);
+      repository = (ModelRepository<T, ID>) repositoryRegistry.getRepositoryByModel(model);
     } catch (ModelRegistryException e){
       e.printStackTrace();
       throw new ResourceNotFoundException();
@@ -279,16 +281,16 @@ public class ModelCrudController {
       HttpServletRequest request
   ) {
 
-    if (!registry.isRegisteredResource(uri)){
-      logger.error(String.format("URI does not map to a registered model: %s", uri));
-      throw new ResourceNotFoundException();
-    }
-
-    Class<T> model = (Class<T>) registry.getModelByUri(uri);
-    entity = convertObjectToModel(entity, model);
+    Class<T> model;
     ModelRepository<T, ID> repository;
     try {
-      repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+      if (!resourceRegistry.isRegisteredResource(uri)){
+        logger.error(String.format("URI does not map to a registered model: %s", uri));
+        throw new ResourceNotFoundException();
+      }
+      model = (Class<T>) resourceRegistry.getModelByUri(uri);
+      entity = convertObjectToModel(entity, model);
+      repository = (ModelRepository<T, ID>) repositoryRegistry.getRepositoryByModel(model);
     } catch (ModelRegistryException e){
       e.printStackTrace();
       throw new ResourceNotFoundException();
@@ -341,17 +343,18 @@ public class ModelCrudController {
       HttpServletRequest request
   ) {
 
-    if (!registry.isRegisteredResource(uri)){
-      logger.error(String.format("URI does not map to a registered model: %s", uri));
-      throw new ResourceNotFoundException();
-    }
-
-    Class<T> model = (Class<T>) registry.getModelByUri(uri);
-    T record = convertObjectToModel(entity, model);
-    logger.info(String.format("Converted object: %s", record.toString()));
+    Class<T> model;
     ModelRepository<T, ID> repository;
+    T record;
     try {
-      repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+      if (!resourceRegistry.isRegisteredResource(uri)){
+        logger.error(String.format("URI does not map to a registered model: %s", uri));
+        throw new ResourceNotFoundException();
+      }
+      model = (Class<T>) resourceRegistry.getModelByUri(uri);
+      record = convertObjectToModel(entity, model);
+      logger.info(String.format("Converted object: %s", record.toString()));
+      repository = (ModelRepository<T, ID>) repositoryRegistry.getRepositoryByModel(model);
     } catch (ModelRegistryException e){
       e.printStackTrace();
       throw new ResourceNotFoundException();
@@ -399,14 +402,16 @@ public class ModelCrudController {
       @ApiParam(name = "id", value = "Model record primary id.") @PathVariable String id,
       @PathVariable String uri,
       HttpServletRequest request) {
-    if (!registry.isRegisteredResource(uri)){
-      logger.error(String.format("URI does not map to a registered model: %s", uri));
-      throw new ResourceNotFoundException();
-    }
-    Class<T> model = (Class<T>) registry.getModelByUri(uri);
+    
+    Class<T> model;
     ModelRepository<T, ID> repository;
     try {
-      repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+      if (!resourceRegistry.isRegisteredResource(uri)){
+        logger.error(String.format("URI does not map to a registered model: %s", uri));
+        throw new ResourceNotFoundException();
+      }
+      model = (Class<T>) resourceRegistry.getModelByUri(uri);
+      repository = (ModelRepository<T, ID>) repositoryRegistry.getRepositoryByModel(model);
     } catch (ModelRegistryException e){
       e.printStackTrace();
       throw new ResourceNotFoundException();
@@ -427,8 +432,13 @@ public class ModelCrudController {
   })
   @RequestMapping(value = { "/{uri}", "/{uri}/**" }, method = RequestMethod.HEAD)
   public ResponseEntity<?> head(HttpServletRequest request, @PathVariable String uri){
-    if (!registry.isRegisteredResource(uri)){
-      logger.error(String.format("URI does not map to a registered model: %s", uri));
+    try {
+      if (!resourceRegistry.isRegisteredResource(uri)) {
+        logger.error(String.format("URI does not map to a registered model: %s", uri));
+        throw new ResourceNotFoundException();
+      }
+    } catch (ModelRegistryException e){
+      e.printStackTrace();
       throw new ResourceNotFoundException();
     }
     return new ResponseEntity<>(HttpStatus.OK);
@@ -447,8 +457,13 @@ public class ModelCrudController {
   })
   @RequestMapping(value = { "/{uri}", "/{uri}/**" }, method = RequestMethod.OPTIONS)
   public ResponseEntity<?> options(HttpServletRequest request, @PathVariable String uri) {
-    if (!registry.isRegisteredResource(uri)){
-      logger.error(String.format("URI does not map to a registered model: %s", uri));
+    try {
+      if (!resourceRegistry.isRegisteredResource(uri)) {
+        logger.error(String.format("URI does not map to a registered model: %s", uri));
+        throw new ResourceNotFoundException();
+      }
+    } catch (ModelRegistryException e){
+      e.printStackTrace();
       throw new ResourceNotFoundException();
     }
     return new ResponseEntity<>(HttpStatus.OK);

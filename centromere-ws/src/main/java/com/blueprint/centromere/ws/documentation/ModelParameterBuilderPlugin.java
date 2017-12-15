@@ -1,6 +1,6 @@
 package com.blueprint.centromere.ws.documentation;
 
-import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.ModelResourceRegistry;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.QueryParameterDescriptor;
 import com.blueprint.centromere.core.repository.QueryParameterUtil;
@@ -29,7 +29,7 @@ import springfox.documentation.swagger.common.SwaggerPluginSupport;
 public class ModelParameterBuilderPlugin implements OperationBuilderPlugin {
 
   @Autowired private TypeResolver typeResolver;
-  @Autowired private DefaultModelRepositoryRegistry registry;
+  @Autowired private ModelResourceRegistry registry;
   private static final String FIND_METHOD = "find";
   private static final Logger logger = LoggerFactory.getLogger(ModelParameterBuilderPlugin.class);
 

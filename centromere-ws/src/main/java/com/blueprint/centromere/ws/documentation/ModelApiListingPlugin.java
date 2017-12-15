@@ -1,6 +1,6 @@
 package com.blueprint.centromere.ws.documentation;
 
-import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.ModelResourceRegistry;
 import com.blueprint.centromere.core.config.WebProperties;
 import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Model;
@@ -21,7 +21,7 @@ import springfox.documentation.swagger.common.SwaggerPluginSupport;
  */
 public class ModelApiListingPlugin implements ApiListingBuilderPlugin {
 
-  @Autowired private DefaultModelRepositoryRegistry registry;
+  @Autowired private ModelResourceRegistry registry;
   @Autowired private WebProperties webProperties;
   @Autowired private TypeResolver typeResolver;
 

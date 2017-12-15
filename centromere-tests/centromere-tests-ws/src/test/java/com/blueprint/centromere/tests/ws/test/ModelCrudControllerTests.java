@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
 import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.ModelResourceRegistry;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.mongodb.model.MongoGene;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
@@ -70,7 +70,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   @Autowired private GeneRepository geneRepository;
   @Autowired private GeneExpressionRepository geneExpressionRepository;
   @Autowired private MockMvc mockMvc;
-  @Autowired private DefaultModelRepositoryRegistry registry;
+  @Autowired private ModelResourceRegistry registry;
 
   @Test
   public void headTest() throws Exception {

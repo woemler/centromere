@@ -126,10 +126,6 @@ public class DefaultModelRepositoryRegistry implements ModelRepositoryRegistry, 
     return repositoryTypeMap.keySet();
   }
   
-  public Collection<String> getRegisteredResources(){
-    return uriMap.keySet();
-  }
-
   @Override
   public Collection<? extends ModelRepository<?,?>> getRegisteredModelRepositories(){
     return repositoryTypeMap.values();

@@ -24,7 +24,8 @@ import com.blueprint.centromere.core.commons.model.DataSet;
 import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.commons.repository.MetadataOperations;
-import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
+import com.blueprint.centromere.core.config.ModelResourceRegistry;
 import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.Evaluation;
@@ -82,7 +83,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @SuppressWarnings({"unchecked", "SpringJavaAutowiringInspection"})
 public class ModelSearchController {
 
-  @Autowired private DefaultModelRepositoryRegistry registry;
+  @Autowired private ModelResourceRegistry resourceRegistry;
+  @Autowired private ModelRepositoryRegistry repositoryRegistry;
   @Autowired private ModelResourceAssembler assembler;
   @Autowired /*@Qualifier("defaultConversionService")*/ private ConversionService conversionService;
   @Autowired private ObjectMapper objectMapper;
@@ -118,13 +120,18 @@ public class ModelSearchController {
       @PathVariable("uri") String uri,
       HttpServletRequest request)
   {
-    
-    if (!registry.isRegisteredResource(uri)){
-      logger.error(String.format("URI does not map to a registered model: %s", uri));
+
+    Class<T> model;
+    try {
+      if (!resourceRegistry.isRegisteredResource(uri)) {
+        logger.error(String.format("URI does not map to a registered model: %s", uri));
+        throw new ResourceNotFoundException();
+      }
+      model = (Class<T>) resourceRegistry.getModelByUri(uri);
+    } catch (ModelRegistryException e){
+      e.printStackTrace();
       throw new ResourceNotFoundException();
     }
-    
-    Class<T> model = (Class<T>) registry.getModelByUri(uri);
 
     BeanWrapper wrapper = new BeanWrapperImpl(model);
     if (!wrapper.isReadableProperty(field)){
@@ -133,7 +140,7 @@ public class ModelSearchController {
 
     ModelRepository<T, ID> repository;
     try {
-      repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+      repository = (ModelRepository<T, ID>) repositoryRegistry.getRepositoryByModel(model);
     } catch (ModelRegistryException e){
       e.printStackTrace();
       throw new ResourceNotFoundException();
@@ -186,16 +193,16 @@ public class ModelSearchController {
       @PathVariable String uri,
       HttpServletRequest request)
   {
-    
-    if (!registry.isRegisteredResource(uri)){
-      logger.error(String.format("URI does not map to a registered model: %s", uri));
-      throw new ResourceNotFoundException();
-    }
-    
-    Class<T> model = (Class<T>) registry.getModelByUri(uri);
+
+    Class<T> model;
     ModelRepository<T, ID> repository;
     try {
-      repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+      if (!resourceRegistry.isRegisteredResource(uri)){
+        logger.error(String.format("URI does not map to a registered model: %s", uri));
+        throw new ResourceNotFoundException();
+      }
+      model = (Class<T>) resourceRegistry.getModelByUri(uri);
+      repository = (ModelRepository<T, ID>) repositoryRegistry.getRepositoryByModel(model);
     } catch (ModelRegistryException e){
       e.printStackTrace();
       throw new ResourceNotFoundException();
@@ -269,20 +276,19 @@ public class ModelSearchController {
       HttpServletRequest request
   ) {
 
-    if (!registry.isRegisteredResource(uri)){
-      logger.error(String.format("URI does not map to a registered model: %s", uri));
-      throw new ResourceNotFoundException();
-    }
-    Class<T> model = (Class<T>) registry.getModelByUri(uri);
-
-    if (!Data.class.isAssignableFrom(model)){
-      logger.error(String.format("URI does not map to a valid model: %s", uri));
-      throw new ResourceNotFoundException();
-    }
-
+    Class<T> model;
     ModelRepository<T, ID> repository;
     try {
-      repository = (ModelRepository<T, ID>) registry.getRepositoryByModel(model);
+      if (!resourceRegistry.isRegisteredResource(uri)){
+        logger.error(String.format("URI does not map to a registered model: %s", uri));
+        throw new ResourceNotFoundException();
+      }
+      model = (Class<T>) resourceRegistry.getModelByUri(uri);
+      if (!Data.class.isAssignableFrom(model)){
+        logger.error(String.format("URI does not map to a valid model: %s", uri));
+        throw new ResourceNotFoundException();
+      }
+      repository = (ModelRepository<T, ID>) repositoryRegistry.getRepositoryByModel(model);
     } catch (ModelRegistryException e){
       e.printStackTrace();
       throw new ResourceNotFoundException();
@@ -299,12 +305,22 @@ public class ModelSearchController {
     Map<String,String[]> parameterMap = request.getParameterMap();
     String mediaType = request.getHeader("Accept");
 
-    Class<? extends Model<?>> metaModel = (Class<? extends Model<?>>) registry.getModelByUri(meta);
+    Class<? extends Model<?>> metaModel;
+    ModelRepository<?,?> metaRepository;
+    String metaField;
+    
+    try {
+      metaModel = resourceRegistry.getModelByUri(meta);
+      metaRepository = repositoryRegistry.getRepositoryByModel(metaModel);
+    } catch (ModelRegistryException e){
+      e.printStackTrace();
+      throw new ResourceNotFoundException();
+    }
     if (metaModel == null){
       logger.error(String.format("URI does not map to a linked metadata model: %s", meta));
       throw new ResourceNotFoundException();
     }
-    String metaField;
+    
     //TODO: more programatic way of assigning metaField from model
     if (Sample.class.isAssignableFrom(metaModel)){
       metaField = "sampleId";
@@ -319,13 +335,6 @@ public class ModelSearchController {
       throw new ResourceNotFoundException();
     }
 
-    ModelRepository<?,?> metaRepository;
-    try {
-      metaRepository = registry.getRepositoryByModel(metaModel);
-    } catch (ModelRegistryException e){
-      e.printStackTrace();
-      throw new ResourceNotFoundException();
-    }
     logger.info(String.format("Resolved linked metadata model to %s and repository to %s", 
         metaModel.getName(), metaRepository.getClass().getName()));
 
