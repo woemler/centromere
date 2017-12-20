@@ -81,5 +81,9 @@ public abstract class Sample<ID extends Serializable> implements Model<ID>, Attr
 	public String getAttribute(String name) {
 		return attributes.getOrDefault(name, null);
 	}
+	
+	public void addAlias(String alias){
+    if (!aliases.contains(alias)) aliases.add(alias);
+  }
 
 }

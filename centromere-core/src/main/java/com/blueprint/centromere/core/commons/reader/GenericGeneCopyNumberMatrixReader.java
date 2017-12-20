@@ -133,7 +133,9 @@ public class GenericGeneCopyNumberMatrixReader<T extends GeneCopyNumber<?>>
         samples.put(i, optional.get());
       } else {
         if (!dataImportProperties.isSkipInvalidSamples()){
-          throw new InvalidSampleException(String.format("Unable to identify subject for sample: %s", bits[i]));
+          throw new InvalidSampleException(String.format("Unable to identify sample: %s", bits[i]));
+        } else {
+          logger.warn(String.format("Skipping unknown sample: %s", bits[i]));
         }
       }
     }

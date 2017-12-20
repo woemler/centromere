@@ -79,7 +79,7 @@ public class SnpEffVcfReader<T extends Mutation<?>> extends MultiRecordLineFileR
     String[] bits = line.split(this.getDelimiter());
     for (int i = 9; i < bits.length; i++){
       
-      Optional<Sample> sampleOptional = sampleRepository.bestGuess(getHeaders().get(i));
+      Optional<Sample> sampleOptional = getSample(getHeaders().get(i));
       if (!sampleOptional.isPresent()){
         if (dataImportProperties.isSkipInvalidSamples()){
           continue;
@@ -168,6 +168,10 @@ public class SnpEffVcfReader<T extends Mutation<?>> extends MultiRecordLineFileR
       }
     }
     return transcripts;
+  }
+  
+  protected Optional<Sample> getSample(String identifier) throws InvalidSampleException {
+    return sampleRepository.bestGuess(identifier);
   }
   
   @SuppressWarnings("unchecked")
