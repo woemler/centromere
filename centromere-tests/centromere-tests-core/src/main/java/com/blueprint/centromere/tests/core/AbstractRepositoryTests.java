@@ -68,6 +68,7 @@ public abstract class AbstractRepositoryTests {
 
     Gene geneA = new MongoGene();
     geneA.setGeneId("1");
+    geneA.setReferenceId("1");
     geneA.setSymbol("GeneA");
     geneA.setTaxId(9606);
     geneA.setChromosome("1");
@@ -79,6 +80,7 @@ public abstract class AbstractRepositoryTests {
 
     Gene geneB = new MongoGene();
     geneB.setGeneId("2");
+    geneB.setReferenceId("2");
     geneB.setSymbol("GeneB");
     geneB.setTaxId(9606);
     geneB.setChromosome("5");
@@ -90,6 +92,7 @@ public abstract class AbstractRepositoryTests {
 
     Gene geneC = new MongoGene();
     geneC.setGeneId("3");
+    geneC.setReferenceId("3");
     geneC.setSymbol("GeneC");
     geneC.setTaxId(9606);
     geneC.setChromosome("9");
@@ -101,6 +104,7 @@ public abstract class AbstractRepositoryTests {
 
     Gene geneD = new MongoGene();
     geneD.setGeneId("4");
+    geneD.setReferenceId("4");
     geneD.setSymbol("GeneD");
     geneD.setTaxId(9606);
     geneD.setChromosome("X");
@@ -112,6 +116,7 @@ public abstract class AbstractRepositoryTests {
 
     Gene geneE = new MongoGene();
     geneE.setGeneId("5");
+    geneE.setReferenceId("5");
     geneE.setSymbol("GeneE");
     geneE.setTaxId(9606);
     geneE.setChromosome("13");
@@ -236,6 +241,7 @@ public abstract class AbstractRepositoryTests {
 
     Sample sampleA = new MongoSample();
     sampleA.setSampleId("SampleA");
+    sampleA.setName("SampleA");
     sampleA.setTissue("Lung");
     sampleA.setHistology("carcinoma");
     sampleA.setSampleType("cell line");
@@ -247,6 +253,7 @@ public abstract class AbstractRepositoryTests {
 
     Sample sampleB = new MongoSample();
     sampleB.setSampleId("SampleB");
+    sampleB.setName("SampleB");
     sampleB.setTissue("Liver");
     sampleB.setHistology("carcinoma");
     sampleB.setSampleType("cell line");
@@ -258,6 +265,7 @@ public abstract class AbstractRepositoryTests {
 
     Sample sampleC = new MongoSample();
     sampleC.setSampleId("SampleC");
+    sampleC.setName("SampleC");
     sampleC.setTissue("Liver");
     sampleC.setHistology("carcinoma: HCC");
     sampleC.setSampleType("PDX");
@@ -269,6 +277,7 @@ public abstract class AbstractRepositoryTests {
 
     Sample sampleD = new MongoSample();
     sampleD.setSampleId("SampleD");
+    sampleD.setName("SampleD");
     sampleD.setTissue("Breast");
     sampleD.setHistology("ductal carcinoma");
     sampleD.setSampleType("cell line");
@@ -280,6 +289,7 @@ public abstract class AbstractRepositoryTests {
 
     Sample sampleE = new MongoSample();
     sampleE.setSampleId("SampleE");
+    sampleE.setName("SampleE");
     sampleE.setTissue("Breast");
     sampleE.setHistology("ductal carcinoma");
     sampleE.setSampleType("PDX");

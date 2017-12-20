@@ -42,7 +42,7 @@ public class EntrezGeneInfoReader<T extends Gene<?>> extends StandardRecordFileR
 			throw new DataImportException(String.format("Cannot create instance of model class: %s", model.getName()), e);
 		}
 		gene.setTaxId(Integer.parseInt(bits[0]));
-		gene.setGeneId(bits[1]);
+		gene.setReferenceId(bits[1]);
 		gene.setSymbol(bits[2]);
 		for (String alias: bits[4].split("\\|")){
 			if (!alias.replaceAll("-", "").equals("")) gene.addAlias(alias);
@@ -55,6 +55,7 @@ public class EntrezGeneInfoReader<T extends Gene<?>> extends StandardRecordFileR
 		gene.setChromosomeLocation(bits[7]);
 		gene.setDescription(bits[8]);
 		gene.setGeneType(bits[9]);
+    gene.setGeneId(gene.getReferenceId() + "-" + gene.getSymbol());
 		return gene;
 	}
 

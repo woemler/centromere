@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 /**
@@ -36,8 +37,16 @@ import org.springframework.data.mongodb.core.index.Indexed;
 @Data
 public abstract class Sample<ID extends Serializable> implements Model<ID>, Attributes {
 
-  @ManagedTerm 
+  @Indexed(unique = true)
+  @NotEmpty
   private String sampleId;
+  
+  @Indexed
+  @ManagedTerm
+  private String name;
+  
+  @Indexed
+  private String subjectId;
 	
 	@ManagedTerm
 	private String sampleType;

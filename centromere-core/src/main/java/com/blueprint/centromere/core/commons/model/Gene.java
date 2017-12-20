@@ -39,7 +39,6 @@ import org.springframework.data.mongodb.core.index.Indexed;
 @Data
 public abstract class Gene<ID extends Serializable> implements Model<ID>, Attributes {
 
-	@ManagedTerm 
   @Indexed(unique = true)
   @NotEmpty
   private String geneId;
@@ -48,6 +47,11 @@ public abstract class Gene<ID extends Serializable> implements Model<ID>, Attrib
   @ManagedTerm 
   @NotEmpty
   private String symbol;
+	
+	@Indexed
+  @ManagedTerm
+  @NotEmpty
+  private String referenceId;
 	
 	@NotEmpty
 	private Integer taxId;

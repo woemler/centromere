@@ -84,7 +84,8 @@ public class GenericSampleReader<T extends Sample<?>> extends AbstractRecordFile
       throw new DataImportException(e);
     }
     //BeanUtils.copyProperties(dataImportProperties.getSample(), sample);
-    sample.setSampleId(bits[0].trim());
+    sample.setName(bits[0].trim());
+    sample.setSampleId(sample.getName());
 
     for (Map.Entry<String, Integer> entry : headerMap.entrySet()) {
       if (entry.getKey().equalsIgnoreCase("tissue")) {

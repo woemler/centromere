@@ -35,9 +35,8 @@ public interface GeneRepository<T extends Gene<ID>, ID extends Serializable>
     extends ModelRepository<T, ID>, MetadataOperations<T>, AttributeOperations<T> {
 
 	Optional<T> findByGeneId(@Param("geneId") String geneId);
-
 	List<T> findBySymbol(@Param("symbol") String symbol);
-
+  List<T> findByReferenceId(String referenceId);
 	List<T> findByAliases(@Param("alias") String alias);
 
 	default List<T> findByExternalReference(@Param("source") String source, @Param("value") String value){
@@ -50,6 +49,8 @@ public interface GeneRepository<T extends Gene<ID>, ID extends Serializable>
 		List<T> genes = new ArrayList<>();
 		QueryCriteria criteria = new QueryCriteria("geneId", keyword);
 		genes.addAll((List<T>) find(Collections.singleton(criteria)));
+    criteria = new QueryCriteria("referenceId", keyword);
+    genes.addAll((List<T>) find(Collections.singleton(criteria)));
     criteria = new QueryCriteria("symbol", keyword);
     genes.addAll((List<T>) find(Collections.singleton(criteria)));
     criteria = new QueryCriteria("aliases", keyword);
@@ -64,6 +65,12 @@ public interface GeneRepository<T extends Gene<ID>, ID extends Serializable>
     List<T> genes = new ArrayList<>();
 
     QueryCriteria criteria = new QueryCriteria("geneId", keyword);
+    genes.addAll((List<T>) find(Collections.singleton(criteria)));
+    if (!genes.isEmpty()){
+      return Optional.of(genes.get(0));
+    }
+
+    criteria = new QueryCriteria("referenceId", keyword);
     genes.addAll((List<T>) find(Collections.singleton(criteria)));
     if (!genes.isEmpty()){
       return Optional.of(genes.get(0));

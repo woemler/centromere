@@ -137,7 +137,7 @@ public class TermTests extends AbstractRepositoryTests {
   
   @Test
   public void findByFieldTest() throws Exception {
-    List<MongoTerm> terms = termRepository.findByField("sampleId");
+    List<MongoTerm> terms = termRepository.findByField("name");
     Assert.notNull(terms);
     Assert.notEmpty(terms);
     Assert.isTrue(terms.size() == sampleRepository.count());

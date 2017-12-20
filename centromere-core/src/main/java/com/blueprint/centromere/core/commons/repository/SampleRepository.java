@@ -33,6 +33,8 @@ public interface SampleRepository<T extends Sample<ID>, ID extends Serializable>
     extends ModelRepository<T, ID>, MetadataOperations<T>, AttributeOperations<T> {
 
 	Optional<T> findBySampleId(@Param("sampleId") String sampleId);
+	List<T> findByName(String name);
+	List<T> findBySubjectId(String subjectId);
 	List<T> findByAliases(@Param("alias") String alias);
 	List<T> findBySampleType(@Param("type") String sampleType);
 	List<T> findByTissue(@Param("tissue") String tissue);
@@ -44,7 +46,8 @@ public interface SampleRepository<T extends Sample<ID>, ID extends Serializable>
 		List<T> samples = new ArrayList<>();
 		Optional<T> optional = this.findBySampleId(keyword);
 		if (optional.isPresent()) samples.add(optional.get());
-		samples.addAll(this.findByAliases(keyword));
+		samples.addAll(findByName(keyword));
+		samples.addAll(findByAliases(keyword));
 		samples.addAll(findByTissue(keyword));
 		samples.addAll(findByHistology(keyword));
 		samples.addAll(findBySampleType(keyword));
@@ -55,7 +58,9 @@ public interface SampleRepository<T extends Sample<ID>, ID extends Serializable>
   default Optional<T> bestGuess(String keyword){
     Optional<T> optional = findBySampleId(keyword);
     if (optional.isPresent()) return optional;
-    List<T> samples = this.findByAliases(keyword);
+    List<T> samples = this.findByName(keyword);
+    if (!samples.isEmpty()) return Optional.of(samples.get(0));
+    samples = this.findByAliases(keyword);
     return samples.isEmpty() ? Optional.empty() : Optional.of(samples.get(0));
   }
 	
