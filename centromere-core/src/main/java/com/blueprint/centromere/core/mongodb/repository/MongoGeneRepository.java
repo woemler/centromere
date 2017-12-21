@@ -23,7 +23,7 @@ import com.blueprint.centromere.core.repository.ModelResource;
 /**
  * @author woemler
  */
-@ModelResource("genes")
+@ModelResource("gene")
 public interface MongoGeneRepository extends GeneRepository<MongoGene, String> {
 
 }

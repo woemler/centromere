@@ -53,7 +53,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 public class ModelSearchControllerTests extends AbstractRepositoryTests {
 
-  private static final String BASE_URL = "/api/genes/search";
+  private static final String BASE_URL = "/api/gene/search";
   private static final String DATA_URL = "/api/geneexpression/search";
 
   @Autowired private GeneRepository geneRepository;
@@ -105,7 +105,7 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
 
     Gene gene = (Gene) geneRepository.findBySymbol("GeneB").get(0);
     
-    mockMvc.perform(get(DATA_URL + "/genes?symbol=GeneB"))
+    mockMvc.perform(get(DATA_URL + "/gene?symbol=GeneB"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[0]", hasKey("geneId")))

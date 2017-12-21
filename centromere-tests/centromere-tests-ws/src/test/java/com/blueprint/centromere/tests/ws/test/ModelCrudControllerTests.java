@@ -64,7 +64,7 @@ import org.springframework.util.Assert;
 @AutoConfigureMockMvc
 public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
-  private static final String BASE_URL = "/api/genes";
+  private static final String BASE_URL = "/api/gene";
   private static final String EXPRESSION_URL = "/api/geneexpression";
 
   @Autowired private GeneRepository geneRepository;

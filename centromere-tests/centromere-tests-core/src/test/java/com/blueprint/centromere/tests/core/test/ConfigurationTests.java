@@ -55,7 +55,7 @@ public class ConfigurationTests {
     Assert.notNull(repositoryRegistry, "RepositoryRegistry must not be null");
     System.out.println(resourceRegistry.getRegisteredModels().toString());
     System.out.println(repositoryRegistry.getRegisteredModelRepositories().toString());
-    Assert.isTrue(resourceRegistry.isRegisteredResource("genes"));
+    Assert.isTrue(resourceRegistry.isRegisteredResource("gene"));
     Assert.isTrue(resourceRegistry.isRegisteredModel(Gene.class));
     Assert.isTrue(resourceRegistry.isRegisteredModel(MongoGene.class));
     ModelRepository repository = repositoryRegistry.getRepositoryByModel(MongoGene.class);

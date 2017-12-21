@@ -89,7 +89,7 @@ public class WebSecurityTests {
 		Assert.notNull(user);
 		Assert.isTrue("user".equals(user.getUsername()));
 		TokenDetails tokenDetails = tokenUtils.createTokenAndDetails(user);
-		mockMvc.perform(get("/api/genes")
+		mockMvc.perform(get("/api/gene")
 				.header("X-Auth-Token", tokenDetails.getToken()))
 				.andExpect(status().isOk());
 	}
@@ -135,7 +135,7 @@ public class WebSecurityTests {
 		System.out.println(json);
 		String token = JsonPath.read(json, "$.token");
 
-		mockMvc.perform(get("/api/genes")
+		mockMvc.perform(get("/api/gene")
 				.header("X-Auth-Token", token))
 				.andExpect(status().isOk());
 	}
