@@ -92,7 +92,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     Assert.isTrue(!dataFileRepository.findByFilePath(geneInfoFile.getFile().getAbsolutePath()).isPresent());
     
     String[] args = { "import", "-t", "entrez_gene", "-f", geneInfoFile.getFile().getAbsolutePath(), 
-        "-d", "DataSetA", "--skip-invalid-samples", "--skip-invalid-genes" };
+        "-d", "DataSetA", "--skip-invalid-samples", "--skip-invalid-genes", "-Dsource=Entrez Gene" };
     ApplicationArguments arguments = new DefaultApplicationArguments(args);
     Exception exception = null;
     
@@ -113,6 +113,9 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     Assert.isTrue(geneInfoFile.getFile().getAbsolutePath().equals(dataFile.getFilePath()));
     Assert.isTrue(Gene.class.isAssignableFrom(dataFile.getModelType()));
     Assert.isTrue("entrez_gene".equals(dataFile.getDataType()));
+    Assert.isTrue(!dataFile.getAttributes().isEmpty());
+    Assert.isTrue(dataFile.getAttributes().containsKey("source"));
+    Assert.isTrue("Entrez Gene".equals(dataFile.getAttribute("source")));
 
     Optional<DataSet> dataSetOptional = dataSetRepository.findById(dataFile.getDataSetId());
     Assert.isTrue(dataSetOptional.isPresent());

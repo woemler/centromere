@@ -28,7 +28,8 @@ public class ImportParameterParsingTests {
     Exception exception = null;
     JCommander jc = null;
     String[] args = { "import", "-f", exampleFile.getFile().getAbsolutePath(), "-t", "gene_info", 
-        "-d", "1234", "--skip-invalid-genes", "-o", "-X", "--spring.profiles.active=test" };
+        "-d", "1234", "--skip-invalid-genes", "-o", "-X", "--spring.profiles.active=test", 
+        "-Dsource=Entrez Gene" };
     
     try {
       jc = JCommander.newBuilder()
@@ -56,6 +57,10 @@ public class ImportParameterParsingTests {
     Assert.isTrue(!parameters.isSkipInvalidFiles(), "Skip invalid files should be false");
     Assert.isTrue(!parameters.isSkipInvalidRecords(), "Skip invalid records should be false");
     Assert.isTrue(!parameters.isSkipInvalidSamples(), "Skip invalid samples should be false");
+    Assert.isTrue(!parameters.getAttributes().isEmpty(), "Attributes should not be empty");
+    Assert.isTrue(parameters.getAttributes().containsKey("source"), "Attributes should contain key: source");
+    Assert.isTrue("Entrez Gene".equals(parameters.getAttributes().get("source")), 
+        String.format("Expected 'Entrez Gene', but was: %s", parameters.getAttributes().get("source")));
     
   }
 

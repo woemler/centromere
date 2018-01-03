@@ -16,8 +16,11 @@
 
 package com.blueprint.centromere.cli.parameters;
 
+import com.beust.jcommander.DynamicParameter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Data;
 
 /**
@@ -70,5 +73,9 @@ public class ImportCommandParameters {
   @Parameter(names = { "-h", "--help" }, description = "Displays usage information, specific to file " 
       + "import operations.")
   private boolean help = false;
+
+  @DynamicParameter(names = "-D", description = "Dynamic parameters, used to assign attributes to " 
+      + "the data file record.")
+  private Map<String, String> attributes = new HashMap<>();
   
 }

@@ -74,6 +74,7 @@ public class ImportCommandExecutor {
 	  String dataType = parameters.getDataType();
 	  String filePath = parameters.getFilePath();
 	  String dataSetId = parameters.getDataSetId();
+	  Map<String, String> attributes = parameters.getAttributes();
 	  updateDataImportProperties(parameters);
 
     // Check to make sure the target data type is supported and get the processor
@@ -149,6 +150,7 @@ public class ImportCommandExecutor {
 
         // Update the existing record
         dataFile.setDateCreated(dataFile.getDateCreated());
+        dataFile.addAttributes(attributes);
         //dataFileRepository.delete(dataFile);
         
         try {
@@ -178,6 +180,7 @@ public class ImportCommandExecutor {
       dataFile.setDataSetId(dataSet.getDataSetId());
       dataFile.setDateCreated(new Date());
       dataFile.setDateUpdated(new Date());
+      dataFile.addAttributes(attributes);
       try {
         HashCode hashCode = Files.hash(new File(filePath), Hashing.md5());
         dataFile.setChecksum(hashCode.toString());
