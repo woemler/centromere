@@ -113,19 +113,24 @@ public class CreateCommandExecutor {
    * @return
    * @throws CommandLineRunnerException
    */
+  @SuppressWarnings("unchecked")
   private <T extends Model<?>> T createObjectFromDynamicParameters(Map<String, String> fields, Class<T> model) 
       throws CommandLineRunnerException{
+    
     BeanWrapper wrapper = new BeanWrapperImpl(model);
     for (Map.Entry<String, String> entry: fields.entrySet()){
       String field = entry.getKey();
-      if (wrapper.isWritableProperty(field)){
+      if (wrapper.isWritableProperty(field) || wrapper.isWritableProperty(field.split("\\.")[0])){
         Class<?> type = wrapper.getPropertyType(field);
-        if (conversionService.canConvert(String.class, type)){
-          wrapper.setPropertyValue(field, conversionService.convert(entry.getValue(),
-              TypeDescriptor.valueOf(String.class), TypeDescriptor.valueOf(type)));
+        if (field.contains(".")){
+          String[] bits = field.split("\\.");
+          if (bits.length != 2){
+            throw new CommandLineRunnerException("Map parameter name should include period to " 
+                + "separate field name from map key name. eg 'attribute.name'");
+          }
+          wrapper.setPropertyValue(bits[0] + "[" + bits[1] + "]", entry.getValue());
         } else {
-          Printer.print(String.format("Cannot convert field %s to type %s", field, type.getName()),
-              logger, Level.WARN);
+          wrapper.setPropertyValue(field, entry.getValue());
         }
       } else {
         Printer.print(String.format("Invalid or unwritable field: %s", field), logger, Level.WARN);
@@ -133,6 +138,15 @@ public class CreateCommandExecutor {
     }
     return (T) wrapper.getWrappedInstance();
   } 
+  
+  @SuppressWarnings("unchecked")
+  private Object convertType(String s, Class<?> type) throws CommandLineRunnerException {
+    if (conversionService.canConvert(String.class, type)) {
+      return conversionService.convert(s, TypeDescriptor.valueOf(String.class), TypeDescriptor.valueOf(type));
+    } else {
+      throw new CommandLineRunnerException(String.format("Cannot convert field to type %s", type.getName()));
+    }
+  }
 
   /**
    * Returns a list of lower-case model names, which server as available arguments for creatable models.
