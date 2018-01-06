@@ -1,0 +1,6 @@
+sample,alias,tissue,histology,gender,example.attribute
+105KC_BONE,105KC,bone,chondrosarcoma,,test
+1321N1_CNS,1321N1,central_nervous_system,glioma: astrocytoma,M,test
+143B_BONE,143B,bone,osteosarcoma: NS,F,test
+200D_OVARY,200D,ovary,carcinoma: adenocarcinoma,F,test
+201T_ENDOMETRIUM,201T,lung,carcinoma: adenocarcinoma,F,test

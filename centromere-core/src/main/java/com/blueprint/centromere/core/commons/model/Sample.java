@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors
+ * Copyright 2018 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import com.blueprint.centromere.core.model.Ignored;
 import com.blueprint.centromere.core.model.Model;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,6 +94,12 @@ public abstract class Sample<ID extends Serializable> implements Model<ID>, Attr
 	
 	public void addAlias(String alias){
     if (!aliases.contains(alias)) aliases.add(alias);
+  }
+  
+  public void addAliases(Collection<String> aliases){
+	  for (String alias: aliases){
+	    if (!this.aliases.contains(alias)) this.aliases.add(alias);
+    }
   }
 
 }

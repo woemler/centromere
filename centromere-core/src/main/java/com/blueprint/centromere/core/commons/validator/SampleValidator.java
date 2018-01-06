@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors
+ * Copyright 2018 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,9 @@ public class SampleValidator implements Validator {
 	@Override 
 	public void validate(Object o, Errors errors) {
     ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "name.empty");
-	  ValidationUtils.rejectIfEmptyOrWhitespace(errors, "sampleType", "sampleType.empty");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "tissue", "tissue.empty");
-		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "histology", "histology.empty");
+    ValidationUtils.rejectIfEmptyOrWhitespace(errors, "sampleId", "sampleId.empty");
+	  //ValidationUtils.rejectIfEmptyOrWhitespace(errors, "sampleType", "sampleType.empty");
+		//ValidationUtils.rejectIfEmptyOrWhitespace(errors, "tissue", "tissue.empty");
+		//ValidationUtils.rejectIfEmptyOrWhitespace(errors, "histology", "histology.empty");
 	}
 }
