@@ -118,16 +118,20 @@ public class ImportCommandExecutor {
       else {
 
         // Check to see if the file has a different checksum before overwriting
-        try {
-          HashCode hashCode = Files.hash(new File(filePath), Hashing.md5());
-          String checksum = hashCode.toString();
-          if (dataFile.getChecksum().equalsIgnoreCase(checksum)){
-            Printer.print(String.format("File is identical to original, overwrite will be skipped: %s", 
-                filePath), logger, Level.INFO);
-            return;
+        File file = new File(filePath);
+        if (file.exists() && file.isFile()) {
+          try {
+            HashCode hashCode = Files.hash(new File(filePath), Hashing.md5());
+            String checksum = hashCode.toString();
+            if (dataFile.getChecksum().equalsIgnoreCase(checksum)) {
+              Printer.print(
+                  String.format("File is identical to original, overwrite will be skipped: %s",
+                      filePath), logger, Level.INFO);
+              return;
+            }
+          } catch (IOException e) {
+            throw new CommandLineRunnerException(e);
           }
-        } catch (IOException e){
-          throw new CommandLineRunnerException(e);
         }
 
         Printer.print(String.format("Overwriting existing data file record: %s", filePath), logger, Level.INFO);
@@ -181,12 +185,17 @@ public class ImportCommandExecutor {
       dataFile.setDateCreated(new Date());
       dataFile.setDateUpdated(new Date());
       dataFile.addAttributes(attributes);
-      try {
-        HashCode hashCode = Files.hash(new File(filePath), Hashing.md5());
-        dataFile.setChecksum(hashCode.toString());
-      } catch (IOException e){
-        throw new CommandLineRunnerException(e);
+      
+      File file = new File(filePath);
+      if (file.exists() && file.isFile()) {
+        try {
+          HashCode hashCode = Files.hash(file, Hashing.md5());
+          dataFile.setChecksum(hashCode.toString());
+        } catch (IOException e) {
+          throw new CommandLineRunnerException(e);
+        }
       }
+      
       try {
         dataFile.setDataFileId(DataFile.generateFileId(dataFile));
       } catch (Exception e){

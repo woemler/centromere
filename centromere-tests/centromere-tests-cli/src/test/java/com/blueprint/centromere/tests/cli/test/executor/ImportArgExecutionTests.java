@@ -21,7 +21,6 @@ import com.blueprint.centromere.core.dataimport.exception.InvalidSampleException
 import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
 import com.blueprint.centromere.tests.cli.CommandLineTestInitializer;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -320,45 +319,46 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
   //TODO
   
   // test import of non-existent file
-  @Test
-  public void nonexistentFileImportTest() throws Exception {
-
-    DataSet dataSet = new MongoDataSet();
-    dataSet.setDataSetId("example");
-    dataSet.setName("Example data set");
-    List<String> sampleIds = new ArrayList<>();
-    for (Sample sample: (List<Sample>) sampleRepository.findAll()){
-      sampleIds.add(sample.getSampleId());
-    }
-    dataSet.setSampleIds(sampleIds);
-    dataSetRepository.insert(dataSet);
-    Assert.notNull(dataSet.getId());
-    Assert.isTrue(dataSetRepository.findByDataSetId("example").isPresent());
-
-    String[] args = { "import", "-t", "maf_mutation", "-f", "/path/to/no/file",
-        "-d", "example", "--skip-invalid-samples", "--skip-invalid-genes" };
-    ApplicationArguments arguments = new DefaultApplicationArguments(args);
-    Exception exception = null;
-
-    try {
-      executor.run(arguments);
-    } catch (Exception e){
-      e.printStackTrace();
-      exception = e;
-    }
-
-    Assert.notNull(exception, "Exception should not be null");
-    Assert.isTrue(exception instanceof CommandLineRunnerException, "Expected CommandLineRunnerException, was "
-        + exception.getClass().getSimpleName());
-    Assert.isTrue(exception.getCause().getCause() instanceof FileNotFoundException);
-
-    Optional<DataFile> dataFileOptional = dataFileRepository
-        .findByFilePath(mafFile.getFile().getAbsolutePath());
-    Assert.isTrue(!dataFileOptional.isPresent());
-
-    Assert.isTrue(mutationRepository.count() == 0);
-
-  }
+  // TODO: What about when you aren't importing files?
+//  @Test
+//  public void nonexistentFileImportTest() throws Exception {
+//
+//    DataSet dataSet = new MongoDataSet();
+//    dataSet.setDataSetId("example");
+//    dataSet.setName("Example data set");
+//    List<String> sampleIds = new ArrayList<>();
+//    for (Sample sample: (List<Sample>) sampleRepository.findAll()){
+//      sampleIds.add(sample.getSampleId());
+//    }
+//    dataSet.setSampleIds(sampleIds);
+//    dataSetRepository.insert(dataSet);
+//    Assert.notNull(dataSet.getId());
+//    Assert.isTrue(dataSetRepository.findByDataSetId("example").isPresent());
+//
+//    String[] args = { "import", "-t", "maf_mutation", "-f", "/path/to/no/file",
+//        "-d", "example", "--skip-invalid-samples", "--skip-invalid-genes" };
+//    ApplicationArguments arguments = new DefaultApplicationArguments(args);
+//    Exception exception = null;
+//
+//    try {
+//      executor.run(arguments);
+//    } catch (Exception e){
+//      e.printStackTrace();
+//      exception = e;
+//    }
+//
+//    Assert.notNull(exception, "Exception should not be null");
+//    Assert.isTrue(exception instanceof CommandLineRunnerException, "Expected CommandLineRunnerException, was "
+//        + exception.getClass().getSimpleName());
+//    Assert.isTrue(exception.getCause().getCause() instanceof FileNotFoundException);
+//
+//    Optional<DataFile> dataFileOptional = dataFileRepository
+//        .findByFilePath(mafFile.getFile().getAbsolutePath());
+//    Assert.isTrue(!dataFileOptional.isPresent());
+//
+//    Assert.isTrue(mutationRepository.count() == 0);
+//
+//  }
   
   // test import of bad data type
   @Test
