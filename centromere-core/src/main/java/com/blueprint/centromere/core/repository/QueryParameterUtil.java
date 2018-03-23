@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors
+ * Copyright 2018 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ public class QueryParameterUtil {
 
       for (Field field : current.getDeclaredFields()) {
 
-        logger.info(String.format("Inspecting field %s for model: %s", field.getName(), model.getName()));
+        logger.debug(String.format("Inspecting field %s for model: %s", field.getName(), model.getName()));
 
         String fieldName = field.getName();
         String paramName = field.getName();
