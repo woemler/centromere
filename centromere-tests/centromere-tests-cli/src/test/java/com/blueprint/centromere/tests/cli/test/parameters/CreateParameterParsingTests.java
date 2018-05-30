@@ -3,8 +3,7 @@ package com.blueprint.centromere.tests.cli.test.parameters;
 import com.beust.jcommander.JCommander;
 import com.blueprint.centromere.cli.parameters.BaseParameters;
 import com.blueprint.centromere.cli.parameters.CreateCommandParameters;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
+import com.blueprint.centromere.core.model.impl.DataSet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import org.junit.Test;
@@ -60,7 +59,7 @@ public class CreateParameterParsingTests {
     DataSet dataSet = null;
     
     try {
-      dataSet = objectMapper.readValue(parameters.getData(), MongoDataSet.class);
+      dataSet = objectMapper.readValue(parameters.getData(), DataSet.class);
     } catch (Exception e){
       e.printStackTrace();
       exception = e;

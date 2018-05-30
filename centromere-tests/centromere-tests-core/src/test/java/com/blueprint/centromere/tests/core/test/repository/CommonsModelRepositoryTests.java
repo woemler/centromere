@@ -16,19 +16,16 @@
 
 package com.blueprint.centromere.tests.core.test.repository;
 
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.model.Gene;
-import com.blueprint.centromere.core.commons.model.Sample;
 import com.blueprint.centromere.core.config.CoreConfiguration;
+import com.blueprint.centromere.core.config.MongoConfiguration;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.mongodb.MongoConfiguration;
-import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
-import com.blueprint.centromere.core.mongodb.model.MongoGene;
-import com.blueprint.centromere.core.mongodb.model.MongoSample;
-import com.blueprint.centromere.core.mongodb.repository.MongoDataFileRepository;
-import com.blueprint.centromere.core.mongodb.repository.MongoDataSetRepository;
-import com.blueprint.centromere.core.mongodb.repository.MongoGeneRepository;
-import com.blueprint.centromere.core.mongodb.repository.MongoSampleRepository;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.Gene;
+import com.blueprint.centromere.core.model.impl.Sample;
+import com.blueprint.centromere.core.repository.impl.DataSetRepository;
+import com.blueprint.centromere.core.repository.impl.DataSourceRepository;
+import com.blueprint.centromere.core.repository.impl.GeneRepository;
+import com.blueprint.centromere.core.repository.impl.SampleRepository;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import java.util.Optional;
@@ -52,15 +49,15 @@ import org.springframework.util.Assert;
 @ActiveProfiles({ Profiles.SCHEMA_DEFAULT })
 public class CommonsModelRepositoryTests extends AbstractRepositoryTests {
 
-  @Autowired private MongoGeneRepository geneRepository;
-  @Autowired private MongoSampleRepository sampleRepository;
-  @Autowired private MongoDataSetRepository dataSetRepository;
-  @Autowired private MongoDataFileRepository dataFileRepository;
+  @Autowired private GeneRepository geneRepository;
+  @Autowired private SampleRepository sampleRepository;
+  @Autowired private DataSetRepository dataSetRepository;
+  @Autowired private DataSourceRepository dataSourceRepository;
   
   @Test
   public void findUniqueGeneTest(){
     
-    Optional<MongoGene> optional = geneRepository.findByGeneId("1");
+    Optional<Gene> optional = geneRepository.findByGeneId("1");
     Assert.notNull(optional, "Optional must not be null");
     Assert.isTrue(optional.isPresent(), "Object must be present");
     Gene gene = optional.get();
@@ -76,7 +73,7 @@ public class CommonsModelRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findUniqueDataSetTest(){
 
-    Optional<MongoDataSet> optional = dataSetRepository.findByDataSetId("DataSetA");
+    Optional<DataSet> optional = dataSetRepository.findByDataSetId("DataSetA");
     Assert.notNull(optional, "Optional must not be null");
     Assert.isTrue(optional.isPresent(), "Object must be present");
     DataSet dataSet = optional.get();
@@ -92,7 +89,7 @@ public class CommonsModelRepositoryTests extends AbstractRepositoryTests {
   @Test
   public void findUniqueSubjectTest(){
 
-    Optional<MongoSample> optional = sampleRepository.findBySampleId("SampleA");
+    Optional<Sample> optional = sampleRepository.findBySampleId("SampleA");
     Assert.notNull(optional, "Optional must not be null");
     Assert.isTrue(optional.isPresent(), "Object must be present");
     Sample sample = optional.get();

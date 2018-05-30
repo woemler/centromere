@@ -4,21 +4,20 @@ import com.blueprint.centromere.cli.CentromereCommandLineInitializer;
 import com.blueprint.centromere.cli.CommandLineRunnerException;
 import com.blueprint.centromere.cli.JCommanderInputExecutor;
 import com.blueprint.centromere.cli.parameters.ImportCommandParameters;
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.model.Gene;
-import com.blueprint.centromere.core.commons.model.GeneExpression;
-import com.blueprint.centromere.core.commons.model.Mutation;
-import com.blueprint.centromere.core.commons.model.Sample;
-import com.blueprint.centromere.core.commons.repository.DataFileRepository;
-import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
-import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.repository.MutationRepository;
-import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.dataimport.exception.InvalidSampleException;
-import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.DataSource;
+import com.blueprint.centromere.core.model.impl.Gene;
+import com.blueprint.centromere.core.model.impl.GeneExpression;
+import com.blueprint.centromere.core.model.impl.Mutation;
+import com.blueprint.centromere.core.model.impl.Sample;
+import com.blueprint.centromere.core.repository.impl.DataSetRepository;
+import com.blueprint.centromere.core.repository.impl.DataSourceRepository;
+import com.blueprint.centromere.core.repository.impl.GeneExpressionRepository;
+import com.blueprint.centromere.core.repository.impl.GeneRepository;
+import com.blueprint.centromere.core.repository.impl.MutationRepository;
+import com.blueprint.centromere.core.repository.impl.SampleRepository;
 import com.blueprint.centromere.tests.cli.CommandLineTestInitializer;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import java.util.ArrayList;
@@ -54,7 +53,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
 
   @Autowired private JCommanderInputExecutor executor;
   @Autowired private DataSetRepository dataSetRepository;
-  @Autowired private DataFileRepository dataFileRepository;
+  @Autowired private DataSourceRepository dataSourceRepository;
   @Autowired private SampleRepository sampleRepository;
   @Autowired private GeneRepository geneRepository;
   @Autowired private GeneExpressionRepository geneExpressionRepository;
@@ -87,8 +86,8 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     
     geneRepository.deleteAll();
     Assert.isTrue(geneRepository.count() == 0);
-    long dfCount = dataFileRepository.count();
-    Assert.isTrue(!dataFileRepository.findByFilePath(geneInfoFile.getFile().getAbsolutePath()).isPresent());
+    long dfCount = dataSourceRepository.count();
+    Assert.isTrue(!dataSourceRepository.findBySource(geneInfoFile.getFile().getAbsolutePath()).isPresent());
     
     String[] args = { "import", "-t", "entrez_gene", "-f", geneInfoFile.getFile().getAbsolutePath(), 
         "-d", "DataSetA", "--skip-invalid-samples", "--skip-invalid-genes", "-Dsource=Entrez Gene" };
@@ -104,23 +103,24 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     
     Assert.isTrue(exception == null, "Exception should be null");
     Assert.isTrue(geneRepository.count() > 0, "GeneRepository should not be empty");
-    Assert.isTrue(dataFileRepository.count() == dfCount+1, "DaatFile record count should have iterated by one");
+    Assert.isTrue(dataSourceRepository.count() == dfCount+1, "DaatFile record count should have iterated by one");
 
-    Optional<DataFile> dataFileOptional = dataFileRepository.findByFilePath(geneInfoFile.getFile().getAbsolutePath());
+    Optional<DataSource> dataFileOptional = dataSourceRepository
+        .findBySource(geneInfoFile.getFile().getAbsolutePath());
     Assert.isTrue(dataFileOptional.isPresent());
-    DataFile dataFile = dataFileOptional.get();
-    Assert.isTrue(geneInfoFile.getFile().getAbsolutePath().equals(dataFile.getFilePath()));
-    Assert.isTrue(Gene.class.isAssignableFrom(dataFile.getModelType()));
-    Assert.isTrue("entrez_gene".equals(dataFile.getDataType()));
-    Assert.isTrue(!dataFile.getAttributes().isEmpty());
-    Assert.isTrue(dataFile.getAttributes().containsKey("source"));
-    Assert.isTrue("Entrez Gene".equals(dataFile.getAttribute("source")));
+    DataSource dataSource = dataFileOptional.get();
+    Assert.isTrue(geneInfoFile.getFile().getAbsolutePath().equals(dataSource.getSource()));
+    Assert.isTrue(Gene.class.isAssignableFrom(dataSource.getModelType()));
+    Assert.isTrue("entrez_gene".equals(dataSource.getDataType()));
+    Assert.isTrue(!dataSource.getAttributes().isEmpty());
+    Assert.isTrue(dataSource.getAttributes().containsKey("source"));
+    Assert.isTrue("Entrez Gene".equals(dataSource.getAttribute("source")));
 
-    Optional<DataSet> dataSetOptional = dataSetRepository.findById(dataFile.getDataSetId());
+    Optional<DataSet> dataSetOptional = dataSetRepository.findById(dataSource.getDataSetId());
     Assert.isTrue(dataSetOptional.isPresent());
     DataSet dataSet = dataSetOptional.get();
     Assert.isTrue("DataSetA".equals(dataSet.getDataSetId()));
-    Assert.isTrue(dataSet.getDataFileIds().contains(dataFile.getId()));
+    Assert.isTrue(dataSet.getDataSourceIds().contains(dataSource.getId()));
     
   }
   
@@ -131,7 +131,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     geneExpressionRepository.deleteAll();
     Assert.isTrue(geneExpressionRepository.count() == 0);
     
-    DataSet dataSet = new MongoDataSet();
+    DataSet dataSet = new DataSet();
     dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
@@ -164,12 +164,12 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
 
     Assert.isTrue(exception == null, "Exception should be null");
     
-    Optional<DataFile> dataFileOptional = dataFileRepository
-        .findByFilePath(gctGeneExpressionFile.getFile().getAbsolutePath());
+    Optional<DataSource> dataFileOptional = dataSourceRepository
+        .findBySource(gctGeneExpressionFile.getFile().getAbsolutePath());
     Assert.isTrue(dataFileOptional.isPresent());
-    DataFile dataFile = dataFileOptional.get();
-    Assert.isTrue(GeneExpression.class.isAssignableFrom(dataFile.getModelType()));
-    Assert.isTrue("gct_gene_expression".equals(dataFile.getDataType()));
+    DataSource dataSource = dataFileOptional.get();
+    Assert.isTrue(GeneExpression.class.isAssignableFrom(dataSource.getModelType()));
+    Assert.isTrue("gct_gene_expression".equals(dataSource.getDataType()));
 
     Assert.isTrue(geneExpressionRepository.count() == 25, 
         String.format("Expected 25, was %d", geneExpressionRepository.count()));
@@ -177,7 +177,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     GeneExpression geneExpression = data.get(0);
     Assert.notNull(geneExpression.getValue());
     Assert.isTrue(geneExpression.getValue() > 0);
-    Assert.isTrue(dataFile.getId().equals(geneExpression.getDataFileId()));
+    Assert.isTrue(dataSource.getId().equals(geneExpression.getDataSourceId()));
     Assert.isTrue(dataSet.getId().equals(geneExpression.getDataSetId()));
     
     System.out.println(geneExpression.toString());
@@ -187,7 +187,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
   @Test
   public void mafMutationImportTest() throws Exception {
 
-    DataSet dataSet = new MongoDataSet();
+    DataSet dataSet = new DataSet();
     dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
@@ -199,7 +199,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     Assert.notNull(dataSet.getId());
     Assert.isTrue(dataSetRepository.findByDataSetId("example").isPresent());
     
-    Assert.isTrue(!dataFileRepository.findByFilePath(mafFile.getFile().getAbsolutePath()).isPresent());
+    Assert.isTrue(!dataSourceRepository.findBySource(mafFile.getFile().getAbsolutePath()).isPresent());
 
     String[] args = { "import", "-t", "maf_mutation", "-f", mafFile.getFile().getAbsolutePath(),
         "-d", "example", "--skip-invalid-samples", "--skip-invalid-genes" };
@@ -215,12 +215,12 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
 
     Assert.isTrue(exception == null, "Exception should be null");
 
-    Optional<DataFile> dataFileOptional = dataFileRepository
-        .findByFilePath(mafFile.getFile().getAbsolutePath());
+    Optional<DataSource> dataFileOptional = dataSourceRepository
+        .findBySource(mafFile.getFile().getAbsolutePath());
     Assert.isTrue(dataFileOptional.isPresent());
-    DataFile dataFile = dataFileOptional.get();
-    Assert.isTrue(Mutation.class.isAssignableFrom(dataFile.getModelType()));
-    Assert.isTrue("maf_mutation".equals(dataFile.getDataType()));
+    DataSource dataSource = dataFileOptional.get();
+    Assert.isTrue(Mutation.class.isAssignableFrom(dataSource.getModelType()));
+    Assert.isTrue("maf_mutation".equals(dataSource.getDataType()));
 
     Assert.isTrue(mutationRepository.count() == 8,
         String.format("Expected 8, was %d", mutationRepository.count()));
@@ -275,7 +275,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
   @Test
   public void invalidSampleTest() throws Exception {
 
-    DataSet dataSet = new MongoDataSet();
+    DataSet dataSet = new DataSet();
     dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
@@ -304,8 +304,8 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
         + exception.getClass().getSimpleName());
     Assert.isTrue(exception.getCause().getCause() instanceof InvalidSampleException);
 
-    Optional<DataFile> dataFileOptional = dataFileRepository
-        .findByFilePath(mafFile.getFile().getAbsolutePath());
+    Optional<DataSource> dataFileOptional = dataSourceRepository
+        .findBySource(mafFile.getFile().getAbsolutePath());
     Assert.isTrue(!dataFileOptional.isPresent());
     
     Assert.isTrue(mutationRepository.count() == 0);
@@ -364,7 +364,7 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
   @Test
   public void invalidDataTypeTest() throws Exception {
 
-    DataSet dataSet = new MongoDataSet();
+    DataSet dataSet = new DataSet();
     dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
@@ -392,8 +392,8 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     Assert.isTrue(exception instanceof CommandLineRunnerException, "Expected CommandLineRunnerException, was "
         + exception.getClass().getSimpleName());
 
-    Optional<DataFile> dataFileOptional = dataFileRepository
-        .findByFilePath(mafFile.getFile().getAbsolutePath());
+    Optional<DataSource> dataFileOptional = dataSourceRepository
+        .findBySource(mafFile.getFile().getAbsolutePath());
     Assert.isTrue(!dataFileOptional.isPresent());
 
     Assert.isTrue(mutationRepository.count() == 0);
@@ -428,8 +428,8 @@ public class ImportArgExecutionTests extends AbstractRepositoryTests {
     Assert.isTrue(exception instanceof CommandLineRunnerException, "Expected CommandLineRunnerException, was "
         + exception.getClass().getSimpleName());
 
-    Optional<DataFile> dataFileOptional = dataFileRepository
-        .findByFilePath(mafFile.getFile().getAbsolutePath());
+    Optional<DataSource> dataFileOptional = dataSourceRepository
+        .findBySource(mafFile.getFile().getAbsolutePath());
     Assert.isTrue(!dataFileOptional.isPresent());
 
     Assert.isTrue(mutationRepository.count() == 0);

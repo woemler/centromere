@@ -23,9 +23,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.blueprint.centromere.core.commons.model.User;
-import com.blueprint.centromere.core.commons.repository.UserRepository;
 import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.model.impl.User;
+import com.blueprint.centromere.core.repository.impl.UserRepository;
 import com.blueprint.centromere.tests.ws.WebTestInitializer;
 import com.blueprint.centromere.ws.security.BasicTokenUtils;
 import com.blueprint.centromere.ws.security.TokenDetails;
@@ -126,6 +126,7 @@ public class WebSecurityTests {
 	@Test
 	public void userAuthenticationTest() throws Exception {
 		MvcResult result = mockMvc.perform(post("/authenticate")
+        .header("Accept", "application/json")
 				.with(httpBasic("user", "password")))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasKey("token")))

@@ -22,11 +22,11 @@ import com.blueprint.centromere.cli.Printer.Level;
 import com.blueprint.centromere.cli.manifest.ImportManifest;
 import com.blueprint.centromere.cli.manifest.ManifestFile;
 import com.blueprint.centromere.cli.parameters.ImportCommandParameters;
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.repository.DataFileRepository;
-import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.config.DataImportProperties;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.DataSource;
+import com.blueprint.centromere.core.repository.impl.DataSetRepository;
+import com.blueprint.centromere.core.repository.impl.DataSourceRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -46,7 +46,7 @@ public class BatchCommandExecutor {
 	
 	private ImportCommandExecutor importCommandExecutor;
 	private DataSetRepository dataSetRepository;
-	private DataFileRepository dataFileRepository;
+	private DataSourceRepository dataSourceRepository;
 	private DataImportProperties dataImportProperties;
 	
 	private static final Logger logger = LoggerFactory.getLogger(BatchCommandExecutor.class);
@@ -124,13 +124,13 @@ public class BatchCommandExecutor {
 		  
 		  Printer.print(String.format("Processing manifest file: %s", mf.toString()), logger, Level.INFO);
 
-      DataFile dataFile;
+      DataSource dataSource;
       try {
-        dataFile = (DataFile) dataFileRepository.getModel().newInstance();
+        dataSource = (DataSource) dataSourceRepository.getModel().newInstance();
       } catch (Exception e){
         throw new CommandLineRunnerException(e);
       }
-      dataFile.addAttributes(mf.getAttributes());
+      dataSource.addAttributes(mf.getAttributes());
 		  String partialPath = mf.getPath();
 			File df = new File(partialPath);
 			if (!df.isAbsolute()){
@@ -146,7 +146,7 @@ public class BatchCommandExecutor {
       try {
         importCommandExecutor.run(importCommandParameters);
       } catch (Exception e){
-        if (dataImportProperties.isSkipInvalidFiles()){
+        if (dataImportProperties.isSkipInvalidDataSource()){
           logger.warn(String.format("File processing failed, skipping file: %s", 
               df.getAbsolutePath()));
           logger.error(e.toString());
@@ -200,7 +200,7 @@ public class BatchCommandExecutor {
   }
 
   @Autowired
-  public void setDataFileRepository(DataFileRepository dataFileRepository) {
-    this.dataFileRepository = dataFileRepository;
+  public void setDataSourceRepository(DataSourceRepository dataSourceRepository) {
+    this.dataSourceRepository = dataSourceRepository;
   }
 }

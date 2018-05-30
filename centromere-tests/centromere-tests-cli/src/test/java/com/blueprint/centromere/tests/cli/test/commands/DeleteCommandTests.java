@@ -2,12 +2,12 @@ package com.blueprint.centromere.tests.cli.test.commands;
 
 import com.blueprint.centromere.cli.JCommanderInputExecutor;
 import com.blueprint.centromere.cli.ModelProcessorBeanRegistry;
-import com.blueprint.centromere.core.commons.repository.DataFileRepository;
-import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
-import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.repository.impl.DataSetRepository;
+import com.blueprint.centromere.core.repository.impl.DataSourceRepository;
+import com.blueprint.centromere.core.repository.impl.GeneExpressionRepository;
+import com.blueprint.centromere.core.repository.impl.GeneRepository;
+import com.blueprint.centromere.core.repository.impl.SampleRepository;
 import com.blueprint.centromere.tests.cli.CommandLineTestInitializer;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import org.junit.Test;
@@ -30,7 +30,7 @@ public class DeleteCommandTests extends AbstractRepositoryTests {
   @Autowired private JCommanderInputExecutor executor;
   @Autowired private GeneRepository geneRepository;
   @Autowired private GeneExpressionRepository geneExpressionRepository;
-  @Autowired private DataFileRepository dataFileRepository;
+  @Autowired private DataSourceRepository dataSourceRepository;
   @Autowired private DataSetRepository dataSetRepository;
   @Autowired private SampleRepository sampleRepository;
   

@@ -20,11 +20,11 @@ import com.blueprint.centromere.cli.CommandLineRunnerException;
 import com.blueprint.centromere.cli.ModelProcessorBeanRegistry;
 import com.blueprint.centromere.cli.Printer;
 import com.blueprint.centromere.cli.Printer.Level;
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.repository.DataFileRepository;
-import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.DataSource;
+import com.blueprint.centromere.core.repository.impl.DataSetRepository;
+import com.blueprint.centromere.core.repository.impl.DataSourceRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,7 +47,7 @@ public class ListCommandExecutor implements EnvironmentAware {
 
   private ModelProcessorBeanRegistry processorRegistry;
   private DataSetRepository dataSetRepository;
-  private DataFileRepository dataFileRepository;
+  private DataSourceRepository dataSourceRepository;
   private Environment environment;
 
   @SuppressWarnings("unchecked")
@@ -114,8 +114,8 @@ public class ListCommandExecutor implements EnvironmentAware {
 
       case "datafile":
         List<String> dataFiles = new ArrayList<>();
-        for (DataFile dataFile: (List<DataFile>) dataFileRepository.findAll()){
-          dataFiles.add(showDetails ? dataFile.toString() : dataFile.getFilePath());
+        for (DataSource dataSource : (List<DataSource>) dataSourceRepository.findAll()){
+          dataFiles.add(showDetails ? dataSource.toString() : dataSource.getSource());
         }
         if (!dataFiles.isEmpty()){
           Collections.sort(dataFiles);
@@ -154,8 +154,8 @@ public class ListCommandExecutor implements EnvironmentAware {
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
-  public void setDataFileRepository(DataFileRepository dataFileRepository) {
-    this.dataFileRepository = dataFileRepository;
+  public void setDataSourceRepository(DataSourceRepository dataSourceRepository) {
+    this.dataSourceRepository = dataSourceRepository;
   }
 
   @Autowired

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors
+ * Copyright 2018 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.model.Model;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import java.io.FileWriter;
 import java.io.IOException;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -58,7 +57,7 @@ public class MongoImportTempFileWriter<T extends Model<?>> extends AbstractRecor
 
   private String convertEntityToJson(Object entity){
     MongoConverter converter = mongoOperations.getConverter();
-    DBObject dbObject = new BasicDBObject();
+    BasicDBObject dbObject = new BasicDBObject();
     converter.write(entity, dbObject);
     if (dbObject.containsField("_id") && dbObject.get("_id") == null){
       dbObject.removeField("_id");

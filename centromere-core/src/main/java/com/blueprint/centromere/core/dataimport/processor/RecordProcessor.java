@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors
+ * Copyright 2018 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,18 @@
 
 package com.blueprint.centromere.core.dataimport.processor;
 
-import com.blueprint.centromere.core.commons.support.DataFileAware;
-import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.dataimport.DataImportComponent;
 import com.blueprint.centromere.core.dataimport.Option;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.filter.Filter;
 import com.blueprint.centromere.core.dataimport.importer.RecordImporter;
 import com.blueprint.centromere.core.dataimport.reader.RecordReader;
+import com.blueprint.centromere.core.dataimport.transformer.RecordTransformer;
 import com.blueprint.centromere.core.dataimport.writer.RecordWriter;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
+import com.blueprint.centromere.core.model.impl.DataSetAware;
+import com.blueprint.centromere.core.model.impl.DataSourceAware;
 import java.util.Collection;
 import org.springframework.validation.Validator;
 
@@ -37,7 +38,7 @@ import org.springframework.validation.Validator;
  * @author woemler
  */
 public interface RecordProcessor<T extends Model<?>> 
-		extends DataImportComponent, ModelSupport<T>, DataFileAware, DataSetAware {
+		extends DataImportComponent, ModelSupport<T>, DataSourceAware, DataSetAware {
 
 	/**
 	 * Executes the pipeline and processes the input through the individual components.
@@ -76,6 +77,8 @@ public interface RecordProcessor<T extends Model<?>>
 	RecordWriter<T> getWriter();
 	void setImporter(RecordImporter importer);
 	RecordImporter getImporter();
+	void setTransformer(RecordTransformer<T> transformer);
+	RecordTransformer<T> getTransformer();
 	
 	
 }

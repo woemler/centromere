@@ -1,8 +1,7 @@
 package com.blueprint.centromere.tests.core.test.commons;
 
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.GeneExpression;
-import com.blueprint.centromere.core.mongodb.model.MongoDataFile;
+import com.blueprint.centromere.core.model.impl.DataSource;
+import com.blueprint.centromere.core.model.impl.GeneExpression;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -17,26 +16,27 @@ import org.springframework.util.Assert;
 public class DataSetTests {
 
   @Test
+  // TODO: Update this test
   public void dataFileTest() throws Exception {
-    DataFile dataFile = new MongoDataFile();
-    dataFile.setFilePath("/path/to/file.txt");
-    dataFile.setDataSetId("dataset");
-    dataFile.setModel(GeneExpression.class);
-    dataFile.setDataFileId(DataFile.generateFileId(dataFile));
-    Assert.notNull(dataFile.getId());
-    Assert.notNull(dataFile.getDataFileId());
-    String fileId1 = (String) dataFile.getId();
-    dataFile.setDataSetId("another-dataset");
-    dataFile.setDataFileId(DataFile.generateFileId(dataFile));
-    Assert.notNull(dataFile.getId());
-    Assert.notNull(dataFile.getDataFileId());
-    String fileId2 = (String) dataFile.getId();
-    Assert.isTrue(!fileId1.equals(fileId2), "DataFileIds should be different");
-    dataFile.setDataSetId("dataset");
-    dataFile.setDataFileId(DataFile.generateFileId(dataFile));
-    Assert.notNull(dataFile.getId());
-    Assert.notNull(dataFile.getDataFileId());
-    String fileId3 = (String) dataFile.getId();
+    DataSource dataSource = new DataSource();
+    dataSource.setSource("/path/to/file.txt");
+    dataSource.setDataSetId("dataset");
+    dataSource.setModel(GeneExpression.class);
+    dataSource.setDataSourceId("file-a");
+    Assert.notNull(dataSource.getId());
+    Assert.notNull(dataSource.getDataSourceId());
+    String fileId1 = (String) dataSource.getId();
+    dataSource.setDataSetId("another-dataset");
+    dataSource.setDataSourceId("file-b");
+    Assert.notNull(dataSource.getId());
+    Assert.notNull(dataSource.getDataSourceId());
+    String fileId2 = (String) dataSource.getId();
+    Assert.isTrue(!fileId1.equals(fileId2), "DataSourceIds should be different");
+    dataSource.setDataSetId("dataset");
+    dataSource.setDataSourceId("file-a");
+    Assert.notNull(dataSource.getId());
+    Assert.notNull(dataSource.getDataSourceId());
+    String fileId3 = (String) dataSource.getId();
     Assert.isTrue(fileId1.equals(fileId3), "FileIds should be the same");
   }
   

@@ -16,15 +16,12 @@
 
 package com.blueprint.centromere.tests.core.test.commons;
 
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.model.Sample;
-import com.blueprint.centromere.core.commons.reader.GenericSampleReader;
-import com.blueprint.centromere.core.commons.reader.TcgaSampleReader;
 import com.blueprint.centromere.core.config.DataImportProperties;
-import com.blueprint.centromere.core.mongodb.model.MongoDataFile;
-import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
-import com.blueprint.centromere.core.mongodb.model.MongoSample;
+import com.blueprint.centromere.core.dataimport.reader.impl.GenericSampleReader;
+import com.blueprint.centromere.core.dataimport.reader.impl.TcgaSampleReader;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.DataSource;
+import com.blueprint.centromere.core.model.impl.Sample;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
@@ -48,23 +45,23 @@ public class SampleTests {
 	@Test
 	public void tcgaSubjectReaderTest() throws Exception {
     ClassPathResource resource = new ClassPathResource("samples/tcga_sample_subjects.txt");
-	  DataSet dataSet = new MongoDataSet();
+	  DataSet dataSet = new DataSet();
 		dataSet.setDataSetId("test");
 		dataSet.setName("Test");
 		dataSet.setId("test");
-		DataFile dataFile = new MongoDataFile();
-		dataFile.setFilePath(resource.getPath());
-		dataFile.setDataSetId((String) dataSet.getId());
-		dataFile.setId("test");
-		TcgaSampleReader<MongoSample> reader = new TcgaSampleReader<>(MongoSample.class);
+		DataSource dataSource = new DataSource();
+		dataSource.setSource(resource.getPath());
+		dataSource.setDataSetId((String) dataSet.getId());
+		dataSource.setId("test");
+		TcgaSampleReader reader = new TcgaSampleReader();
 		reader.setDataSet(dataSet);
-		reader.setDataFile(dataFile);
-		Assert.isTrue(MongoSample.class.equals(reader.getModel()), String.format("Expected %s, got %s",
+		reader.setDataSource(dataSource);
+		Assert.isTrue(Sample.class.equals(reader.getModel()), String.format("Expected %s, got %s",
     Sample.class.getName(), reader.getModel().getName()));
-    List<MongoSample> samples = new ArrayList<>();
+    List<Sample> samples = new ArrayList<>();
 		try {
 			reader.doBefore();
-      MongoSample sample = reader.readRecord();
+      Sample sample = reader.readRecord();
       while (sample != null){
           samples.add(sample);
           sample = reader.readRecord();
@@ -88,25 +85,25 @@ public class SampleTests {
 	@Test
   public void genericSampleReaderTest() throws Exception {
 	  ClassPathResource resource = new ClassPathResource("samples/cell_lines.txt");
-    DataSet dataSet = new MongoDataSet();
+    DataSet dataSet = new DataSet();
     dataSet.setDataSetId("test");
     dataSet.setName("Test");
     dataSet.setId("test");
-    DataFile dataFile = new MongoDataFile();
-    dataFile.setFilePath(resource.getPath());
-    dataFile.setDataSetId((String) dataSet.getId());
-    dataFile.setId("test");
-    GenericSampleReader<MongoSample> reader = new GenericSampleReader<>(MongoSample.class, new DataImportProperties());
-    reader.setDataFile(dataFile);
+    DataSource dataSource = new DataSource();
+    dataSource.setSource(resource.getPath());
+    dataSource.setDataSetId((String) dataSet.getId());
+    dataSource.setId("test");
+    GenericSampleReader reader = new GenericSampleReader(new DataImportProperties());
+    reader.setDataSource(dataSource);
     reader.setDataSet(dataSet);
     reader.setDelimiter(",");
-    Assert.isTrue(MongoSample.class.equals(reader.getModel()), String.format("Expected %s, got %s",
+    Assert.isTrue(Sample.class.equals(reader.getModel()), String.format("Expected %s, got %s",
         Sample.class.getName(), reader.getModel().getName()));
     
-    List<MongoSample> samples = new ArrayList<>();
+    List<Sample> samples = new ArrayList<>();
     try {
       reader.doBefore();
-      MongoSample sample = reader.readRecord();
+      Sample sample = reader.readRecord();
       while (sample != null){
         samples.add(sample);
         sample = reader.readRecord();

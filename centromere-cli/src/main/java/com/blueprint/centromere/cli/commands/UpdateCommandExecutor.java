@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,11 +73,12 @@ public class UpdateCommandExecutor {
     
     // Get the existing record
     
-    T existing = repository.findOne((ID) parameters.getId());
-    if (existing == null){
+    Optional<T> existingOptional = repository.findById((ID) parameters.getId());
+    if (!existingOptional.isPresent()){
       throw new CommandLineRunnerException(String.format("Cannot find %s record for ID: %s", 
           model.getSimpleName(), parameters.getId()));
     }
+    T existing = existingOptional.get();
     
     // Convert the model
     T object = null;

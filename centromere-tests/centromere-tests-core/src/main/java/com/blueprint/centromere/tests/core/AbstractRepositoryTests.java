@@ -16,25 +16,20 @@
 
 package com.blueprint.centromere.tests.core;
 
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.model.Gene;
-import com.blueprint.centromere.core.commons.model.GeneCopyNumber;
-import com.blueprint.centromere.core.commons.model.GeneExpression;
-import com.blueprint.centromere.core.commons.model.Mutation;
-import com.blueprint.centromere.core.commons.model.Sample;
-import com.blueprint.centromere.core.commons.model.SegmentCopyNumber;
-import com.blueprint.centromere.core.commons.model.TranscriptExpression;
-import com.blueprint.centromere.core.commons.repository.DataFileRepository;
-import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
-import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.mongodb.model.MongoDataFile;
-import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
-import com.blueprint.centromere.core.mongodb.model.MongoGene;
-import com.blueprint.centromere.core.mongodb.model.MongoGeneExpression;
-import com.blueprint.centromere.core.mongodb.model.MongoSample;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.DataSource;
+import com.blueprint.centromere.core.model.impl.Gene;
+import com.blueprint.centromere.core.model.impl.GeneCopyNumber;
+import com.blueprint.centromere.core.model.impl.GeneExpression;
+import com.blueprint.centromere.core.model.impl.Mutation;
+import com.blueprint.centromere.core.model.impl.Sample;
+import com.blueprint.centromere.core.model.impl.SegmentCopyNumber;
+import com.blueprint.centromere.core.model.impl.TranscriptExpression;
+import com.blueprint.centromere.core.repository.impl.DataSetRepository;
+import com.blueprint.centromere.core.repository.impl.DataSourceRepository;
+import com.blueprint.centromere.core.repository.impl.GeneExpressionRepository;
+import com.blueprint.centromere.core.repository.impl.GeneRepository;
+import com.blueprint.centromere.core.repository.impl.SampleRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -49,7 +44,7 @@ public abstract class AbstractRepositoryTests {
 
   @Autowired private GeneRepository geneRepository;
   @Autowired private DataSetRepository dataSetRepository;
-  @Autowired private DataFileRepository dataFileRepository;
+  @Autowired private DataSourceRepository dataSourceRepository;
   @Autowired private SampleRepository sampleRepository;
   @Autowired private GeneExpressionRepository geneExpressionRepository;
 
@@ -58,7 +53,7 @@ public abstract class AbstractRepositoryTests {
       
     geneRepository.deleteAll();
     dataSetRepository.deleteAll();
-    dataFileRepository.deleteAll();
+    dataSourceRepository.deleteAll();
     sampleRepository.deleteAll();
     geneExpressionRepository.deleteAll();
     
@@ -66,7 +61,7 @@ public abstract class AbstractRepositoryTests {
 
     List<Gene> genes = new ArrayList<>();
 
-    Gene geneA = new MongoGene();
+    Gene geneA = new Gene();
     geneA.setGeneId("1");
     geneA.setReferenceId("1");
     geneA.setSymbol("GeneA");
@@ -78,7 +73,7 @@ public abstract class AbstractRepositoryTests {
     geneA.addAlias("ABC");
     genes.add(geneA);
 
-    Gene geneB = new MongoGene();
+    Gene geneB = new Gene();
     geneB.setGeneId("2");
     geneB.setReferenceId("2");
     geneB.setSymbol("GeneB");
@@ -90,7 +85,7 @@ public abstract class AbstractRepositoryTests {
     geneB.addAlias("DEF");
     genes.add(geneB);
 
-    Gene geneC = new MongoGene();
+    Gene geneC = new Gene();
     geneC.setGeneId("3");
     geneC.setReferenceId("3");
     geneC.setSymbol("GeneC");
@@ -102,7 +97,7 @@ public abstract class AbstractRepositoryTests {
     geneC.addAlias("GHI");
     genes.add(geneC);
 
-    Gene geneD = new MongoGene();
+    Gene geneD = new Gene();
     geneD.setGeneId("4");
     geneD.setReferenceId("4");
     geneD.setSymbol("GeneD");
@@ -114,7 +109,7 @@ public abstract class AbstractRepositoryTests {
     geneD.addAlias("JKL");
     genes.add(geneD);
 
-    Gene geneE = new MongoGene();
+    Gene geneE = new Gene();
     geneE.setGeneId("5");
     geneE.setReferenceId("5");
     geneE.setSymbol("GeneE");
@@ -132,7 +127,7 @@ public abstract class AbstractRepositoryTests {
 
     List<DataSet> dataSets = new ArrayList<>();
 
-    DataSet dataSetA = new MongoDataSet();
+    DataSet dataSetA = new DataSet();
     dataSetA.setDataSetId("DataSetA");
     dataSetA.setName("DataSetA");
     dataSetA.setSource("Internal");
@@ -140,7 +135,7 @@ public abstract class AbstractRepositoryTests {
     dataSetA.setDescription("This is an example data set.");
     dataSets.add(dataSetA);
 
-    DataSet dataSetB = new MongoDataSet();
+    DataSet dataSetB = new DataSet();
     dataSetB.setDataSetId("DataSetB");
     dataSetA.setName("DataSetB");
     dataSetB.setSource("External");
@@ -148,7 +143,7 @@ public abstract class AbstractRepositoryTests {
     dataSetB.setDescription("This is an example data set.");
     dataSets.add(dataSetB);
 
-    DataSet dataSetC = new MongoDataSet();
+    DataSet dataSetC = new DataSet();
     dataSetC.setDataSetId("DataSetC");
     dataSetC.setName("DataSetC");
     dataSetC.setSource("Internal");
@@ -156,7 +151,7 @@ public abstract class AbstractRepositoryTests {
     dataSetC.setDescription("This is an example data set.");
     dataSets.add(dataSetC);
 
-    DataSet dataSetD = new MongoDataSet();
+    DataSet dataSetD = new DataSet();
     dataSetD.setDataSetId("DataSetD");
     dataSetD.setName("DataSetD");
     dataSetD.setSource("External");
@@ -164,7 +159,7 @@ public abstract class AbstractRepositoryTests {
     dataSetD.setDescription("This is an example data set.");
     dataSets.add(dataSetD);
 
-    DataSet dataSetE = new MongoDataSet();
+    DataSet dataSetE = new DataSet();
     dataSetE.setDataSetId("DataSetE");
     dataSetE.setName("DataSetE");
     dataSetE.setSource("Internal");
@@ -176,62 +171,62 @@ public abstract class AbstractRepositoryTests {
     
     // Data Files
 
-    List<DataFile> dataFiles = new ArrayList<>();
+    List<DataSource> dataSources = new ArrayList<>();
 
-    DataFile dataFileA = new MongoDataFile();
-    dataFileA.setDataSetId(dataSetA.getDataSetId());
-    dataFileA.setFilePath("/path/to/fileA");
-    dataFileA.setDataType("GCT RNA-Seq gene expression");
-    dataFileA.setDateCreated(new Date());
-    dataFileA.setDateUpdated(new Date());
-    dataFileA.setModel(GeneExpression.class);
-    dataFileA.setDataFileId(DataFile.generateFileId(dataFileA));
-    dataFiles.add(dataFileA);
+    DataSource dataSourceA = new DataSource();
+    dataSourceA.setDataSetId(dataSetA.getDataSetId());
+    dataSourceA.setSource("/path/to/fileA");
+    dataSourceA.setDataType("GCT RNA-Seq gene expression");
+    dataSourceA.setDateCreated(new Date());
+    dataSourceA.setDateUpdated(new Date());
+    dataSourceA.setModel(GeneExpression.class);
+    dataSourceA.setDataSourceId("file-a");
+    dataSources.add(dataSourceA);
 
-    DataFile dataFileB = new MongoDataFile();
-    dataFileB.setDataSetId(dataSetA.getDataSetId());
-    dataFileB.setFilePath("/path/to/fileB");
-    dataFileB.setDataType("GCT RNA-Seq transcript expression");
-    dataFileB.setDateCreated(new Date());
-    dataFileB.setDateUpdated(new Date());
-    dataFileB.setModel(TranscriptExpression.class);
-    dataFileB.setDataFileId(DataFile.generateFileId(dataFileB));
-    dataFiles.add(dataFileB);
+    DataSource dataSourceB = new DataSource();
+    dataSourceB.setDataSetId(dataSetA.getDataSetId());
+    dataSourceB.setSource("/path/to/fileB");
+    dataSourceB.setDataType("GCT RNA-Seq transcript expression");
+    dataSourceB.setDateCreated(new Date());
+    dataSourceB.setDateUpdated(new Date());
+    dataSourceB.setModel(TranscriptExpression.class);
+    dataSourceB.setDataSourceId("file-b");
+    dataSources.add(dataSourceB);
 
-    DataFile dataFileC = new MongoDataFile();
-    dataFileC.setDataSetId(dataSetA.getDataSetId());
-    dataFileC.setFilePath("/path/to/fileC");
-    dataFileC.setDataType("MAF mutations");
-    dataFileC.setDateCreated(new Date());
-    dataFileC.setDateUpdated(new Date());
-    dataFileC.setModel(Mutation.class);
-    dataFileC.setDataFileId(DataFile.generateFileId(dataFileC));
-    dataFiles.add(dataFileC);
+    DataSource dataSourceC = new DataSource();
+    dataSourceC.setDataSetId(dataSetA.getDataSetId());
+    dataSourceC.setSource("/path/to/fileC");
+    dataSourceC.setDataType("MAF mutations");
+    dataSourceC.setDateCreated(new Date());
+    dataSourceC.setDateUpdated(new Date());
+    dataSourceC.setModel(Mutation.class);
+    dataSourceC.setDataSourceId("file-c");
+    dataSources.add(dataSourceC);
 
-    DataFile dataFileD = new MongoDataFile();
-    dataFileD.setDataSetId(dataSetB.getDataSetId());
-    dataFileD.setFilePath("/path/to/fileD");
-    dataFileD.setDataType("Gene copy number");
-    dataFileD.setDateCreated(new Date());
-    dataFileD.setDateUpdated(new Date());
-    dataFileD.setModel(GeneCopyNumber.class);
-    dataFileD.setDataFileId(DataFile.generateFileId(dataFileD));
-    dataFiles.add(dataFileD);
+    DataSource dataSourceD = new DataSource();
+    dataSourceD.setDataSetId(dataSetB.getDataSetId());
+    dataSourceD.setSource("/path/to/fileD");
+    dataSourceD.setDataType("Gene copy number");
+    dataSourceD.setDateCreated(new Date());
+    dataSourceD.setDateUpdated(new Date());
+    dataSourceD.setModel(GeneCopyNumber.class);
+    dataSourceD.setDataSourceId("file-d");
+    dataSources.add(dataSourceD);
 
-    DataFile dataFileE = new MongoDataFile();
-    dataFileE.setDataSetId(dataSetE.getDataSetId());
-    dataFileE.setFilePath("/path/to/fileE");
-    dataFileE.setDataType("Segment copy number");
-    dataFileE.setDateCreated(new Date());
-    dataFileE.setDateUpdated(new Date());
-    dataFileE.setModel(SegmentCopyNumber.class);
-    dataFileE.setDataFileId(DataFile.generateFileId(dataFileE));
-    dataFiles.add(dataFileE);
+    DataSource dataSourceE = new DataSource();
+    dataSourceE.setDataSetId(dataSetE.getDataSetId());
+    dataSourceE.setSource("/path/to/fileE");
+    dataSourceE.setDataType("Segment copy number");
+    dataSourceE.setDateCreated(new Date());
+    dataSourceE.setDateUpdated(new Date());
+    dataSourceE.setModel(SegmentCopyNumber.class);
+    dataSourceE.setDataSourceId("file-e");
+    dataSources.add(dataSourceE);
     
-    dataFileRepository.insert(dataFiles);
+    dataSourceRepository.insert(dataSources);
     
-    dataSetA.setDataFileIds(Arrays.asList(dataFileA.getId(), dataFileB.getId(), dataFileC.getId()));
-    dataSetB.setDataFileIds(Arrays.asList(dataFileD.getId(), dataFileE.getId()));
+    dataSetA.setDataSourceIds(Arrays.asList(dataSourceA.getId(), dataSourceB.getId(), dataSourceC.getId()));
+    dataSetB.setDataSourceIds(Arrays.asList(dataSourceD.getId(), dataSourceE.getId()));
     dataSetRepository.update(dataSetA);
     dataSetRepository.update(dataSetB);
     
@@ -239,7 +234,7 @@ public abstract class AbstractRepositoryTests {
 
     List<Sample> samples = new ArrayList<>();
 
-    Sample sampleA = new MongoSample();
+    Sample sampleA = new Sample();
     sampleA.setSampleId("SampleA");
     sampleA.setName("SampleA");
     sampleA.setTissue("Lung");
@@ -251,7 +246,7 @@ public abstract class AbstractRepositoryTests {
     sampleA.setGender("M");
     samples.add(sampleA);
 
-    Sample sampleB = new MongoSample();
+    Sample sampleB = new Sample();
     sampleB.setSampleId("SampleB");
     sampleB.setName("SampleB");
     sampleB.setTissue("Liver");
@@ -263,7 +258,7 @@ public abstract class AbstractRepositoryTests {
     sampleB.setGender("F");
     samples.add(sampleB);
 
-    Sample sampleC = new MongoSample();
+    Sample sampleC = new Sample();
     sampleC.setSampleId("SampleC");
     sampleC.setName("SampleC");
     sampleC.setTissue("Liver");
@@ -275,7 +270,7 @@ public abstract class AbstractRepositoryTests {
     sampleC.setGender("F");
     samples.add(sampleC);
 
-    Sample sampleD = new MongoSample();
+    Sample sampleD = new Sample();
     sampleD.setSampleId("SampleD");
     sampleD.setName("SampleD");
     sampleD.setTissue("Breast");
@@ -287,7 +282,7 @@ public abstract class AbstractRepositoryTests {
     sampleD.setGender("U");
     samples.add(sampleD);
 
-    Sample sampleE = new MongoSample();
+    Sample sampleE = new Sample();
     sampleE.setSampleId("SampleE");
     sampleE.setName("SampleE");
     sampleE.setTissue("Breast");
@@ -313,51 +308,51 @@ public abstract class AbstractRepositoryTests {
 
     List<GeneExpression> data = new ArrayList<>();
 
-    GeneExpression geneExpression = new MongoGeneExpression();
+    GeneExpression geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleA.getSampleId());
     geneExpression.setGeneId(geneA.getGeneId());
-    geneExpression.setDataFileId(dataFileA.getDataFileId());
-    geneExpression.setDataSetId(dataFileA.getDataSetId());
+    geneExpression.setDataSourceId(dataSourceA.getDataSourceId());
+    geneExpression.setDataSetId(dataSourceA.getDataSetId());
     geneExpression.setValue(1.23);
     data.add(geneExpression);
 
-    geneExpression = new MongoGeneExpression();
+    geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleA.getSampleId());
     geneExpression.setGeneId(geneB.getGeneId());
-    geneExpression.setDataFileId(dataFileA.getDataFileId());
-    geneExpression.setDataSetId(dataFileA.getDataSetId());
+    geneExpression.setDataSourceId(dataSourceA.getDataSourceId());
+    geneExpression.setDataSetId(dataSourceA.getDataSetId());
     geneExpression.setValue(2.34);
     data.add(geneExpression);
 
-    geneExpression = new MongoGeneExpression();
+    geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleA.getSampleId());
     geneExpression.setGeneId(geneC.getGeneId());
-    geneExpression.setDataFileId(dataFileA.getDataFileId());
-    geneExpression.setDataSetId(dataFileA.getDataSetId());
+    geneExpression.setDataSourceId(dataSourceA.getDataSourceId());
+    geneExpression.setDataSetId(dataSourceA.getDataSetId());
     geneExpression.setValue(4.56);
     data.add(geneExpression);
 
-    geneExpression = new MongoGeneExpression();
+    geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleB.getSampleId());
     geneExpression.setGeneId(geneA.getGeneId());
-    geneExpression.setDataFileId(dataFileA.getDataFileId());
-    geneExpression.setDataSetId(dataFileA.getDataSetId());
+    geneExpression.setDataSourceId(dataSourceA.getDataSourceId());
+    geneExpression.setDataSetId(dataSourceA.getDataSetId());
     geneExpression.setValue(6.78);
     data.add(geneExpression);
 
-    geneExpression = new MongoGeneExpression();
+    geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleB.getSampleId());
     geneExpression.setGeneId(geneB.getGeneId());
-    geneExpression.setDataFileId(dataFileA.getDataFileId());
-    geneExpression.setDataSetId(dataFileA.getDataSetId());
+    geneExpression.setDataSourceId(dataSourceA.getDataSourceId());
+    geneExpression.setDataSetId(dataSourceA.getDataSetId());
     geneExpression.setValue(9.10);
     data.add(geneExpression);
 
-    geneExpression = new MongoGeneExpression();
+    geneExpression = new GeneExpression();
     geneExpression.setSampleId(sampleB.getSampleId());
     geneExpression.setGeneId(geneC.getGeneId());
-    geneExpression.setDataFileId(dataFileA.getDataFileId());
-    geneExpression.setDataSetId(dataFileA.getDataSetId());
+    geneExpression.setDataSourceId(dataSourceA.getDataSourceId());
+    geneExpression.setDataSetId(dataSourceA.getDataSetId());
     geneExpression.setValue(12.34);
     data.add(geneExpression);
     

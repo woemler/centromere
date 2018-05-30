@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors
+ * Copyright 2018 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,16 +46,6 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
 		extends PagingAndSortingRepository<T, ID>, ModelSupport<T> {
   
   Logger logger = LoggerFactory.getLogger(ModelRepository.class);
-
-  /**
-   * Searches for a single record using it's primary key ID.  
-   * 
-   * @param id primary key ID
-   * @return optional {@code T} instance
-   */
-  default Optional<T> findById(ID id){
-    return Optional.ofNullable(this.findOne(id));
-  }
 
   /**
    * Searches for all records that satisfy the requested criteria.

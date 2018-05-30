@@ -16,13 +16,10 @@
 
 package com.blueprint.centromere.tests.core.test.commons;
 
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.model.Gene;
-import com.blueprint.centromere.core.commons.reader.EntrezGeneInfoReader;
-import com.blueprint.centromere.core.mongodb.model.MongoDataFile;
-import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
-import com.blueprint.centromere.core.mongodb.model.MongoGene;
+import com.blueprint.centromere.core.dataimport.reader.impl.EntrezGeneInfoReader;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.DataSource;
+import com.blueprint.centromere.core.model.impl.Gene;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,34 +36,34 @@ import org.springframework.util.Assert;
 public class EntrezGeneTests {
 
   private DataSet dataSet;
-  private DataFile dataFile;
+  private DataSource dataSource;
 
   @Before
   public void setup(){
-    dataSet = new MongoDataSet();
+    dataSet = new DataSet();
     dataSet.setDataSetId("test");
     dataSet.setName("Test");
     dataSet.setDataSetId("test");
-    dataFile = new MongoDataFile();
-    dataFile.setDataFileId("test");
-    dataFile.setDataSetId(dataSet.getDataSetId());
+    dataSource = new DataSource();
+    dataSource.setDataSourceId("test");
+    dataSource.setDataSetId(dataSet.getDataSetId());
   }
 	
 	@Test
 	public void geneInfoReaderTest() throws Exception {
 		ClassPathResource resource = new ClassPathResource("samples/Homo_sapiens.gene_info");
-		dataFile.setFilePath(resource.getPath());
-		EntrezGeneInfoReader<MongoGene> reader = new EntrezGeneInfoReader<>(MongoGene.class);
+		dataSource.setSource(resource.getPath());
+		EntrezGeneInfoReader reader = new EntrezGeneInfoReader();
 		reader.setDataSet(dataSet);
-		reader.setDataFile(dataFile);
-		Assert.isTrue(MongoGene.class.equals(reader.getModel()), String.format("Expected %s, got %s",
-				MongoGene.class.getName(), reader.getModel().getName()));
+		reader.setDataSource(dataSource);
+		Assert.isTrue(Gene.class.equals(reader.getModel()), String.format("Expected %s, got %s",
+				Gene.class.getName(), reader.getModel().getName()));
 		try {
 			reader.doBefore();
 			Gene gene = reader.readRecord();
 			Assert.notNull(gene);
 			System.out.println(gene.toString());
-			Assert.isTrue(gene instanceof MongoGene);
+			Assert.isTrue(gene instanceof Gene);
 			Assert.isTrue("A1BG".equals(gene.getSymbol()));
 		} finally {
 			reader.doAfter();

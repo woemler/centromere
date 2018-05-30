@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors
+ * Copyright 2018 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 
 package com.blueprint.centromere.core.dataimport.reader;
 
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.support.DataFileAware;
-import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
-import com.blueprint.centromere.core.dataimport.exception.InvalidDataFileException;
+import com.blueprint.centromere.core.dataimport.exception.InvalidDataSourceException;
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.DataSetAware;
+import com.blueprint.centromere.core.model.impl.DataSource;
+import com.blueprint.centromere.core.model.impl.DataSourceAware;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -38,12 +38,12 @@ import org.springframework.util.Assert;
  * @author woemler
  */
 public abstract class AbstractRecordFileReader<T extends Model<?>> 
-    implements RecordReader<T>, DataSetAware, DataFileAware {
+    implements RecordReader<T>, DataSetAware, DataSourceAware {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractRecordFileReader.class);
 
 	private BufferedReader reader;
-	private DataFile dataFile;
+	private DataSource dataSource;
 	private DataSet dataSet;
 
   /**
@@ -56,15 +56,15 @@ public abstract class AbstractRecordFileReader<T extends Model<?>>
 
     try {
       Assert.notNull(dataSet, "DataSet record is not set.");
-      Assert.notNull(dataSet.getId(), "DataSet record has not been persisted to the database.");
-      Assert.notNull(dataFile, "DataFile record is not set");
-      Assert.notNull(dataFile.getId(), "DataFile record has not been persisted to the database.");
-      Assert.notNull(dataFile.getFilePath(), "No DataFile file path has been set");
+      Assert.notNull(dataSet.getDataSetId(), "DataSet record has no dataSetId");
+      Assert.notNull(dataSource, "DataFile record is not set");
+      Assert.notNull(dataSource.getDataSourceId(), "DataSource record has no dataSourceId.");
+      Assert.notNull(dataSource.getSource(), "No DataSource record source has been set");
     } catch (Exception e){
       throw new DataImportException(e);
     }
 
-    String path = dataFile.getFilePath();
+    String path = dataSource.getSource();
 		this.open(path);
 		
 	}
@@ -89,13 +89,13 @@ public abstract class AbstractRecordFileReader<T extends Model<?>>
 			try {
 				file = new File(ClassLoader.getSystemClassLoader().getResource(inputFilePath).getPath());
 			} catch (NullPointerException e){
-				throw new InvalidDataFileException(String.format("Cannot locate file: %s", inputFilePath), e);
+				throw new InvalidDataSourceException(String.format("Cannot locate file: %s", inputFilePath), e);
 			}
 		}
 		try {
 			reader = new BufferedReader(new FileReader(file));
 		} catch (IOException e){
-			throw new InvalidDataFileException(String.format("Cannot read file: %s", inputFilePath), e);
+			throw new InvalidDataSourceException(String.format("Cannot read file: %s", inputFilePath), e);
 		}
 	}
 
@@ -116,12 +116,12 @@ public abstract class AbstractRecordFileReader<T extends Model<?>>
 		return reader;
 	}
 
-  public DataFile getDataFile() {
-    return dataFile;
+  public DataSource getDataSource() {
+    return dataSource;
   }
 
-  public void setDataFile(DataFile dataFile) {
-    this.dataFile = dataFile;
+  public void setDataSource(DataSource dataSource) {
+    this.dataSource = dataSource;
   }
 
   public DataSet getDataSet() {

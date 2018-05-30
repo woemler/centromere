@@ -21,10 +21,10 @@ import com.blueprint.centromere.core.config.WebProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -48,11 +48,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
+    @Qualifier("userRepository")
     private UserDetailsService userService;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService)
+        auth
+            .userDetailsService(userService)
             .passwordEncoder(new BCryptPasswordEncoder());
     }
 
@@ -146,13 +148,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     UsernamePasswordAuthenticationFilter.class)
                     .antMatcher(secureUrl)
                     .authorizeRequests()
-                        .antMatchers(HttpMethod.GET, secureUrl).fullyAuthenticated()
-                        .antMatchers(HttpMethod.POST, secureUrl).fullyAuthenticated()
-                        .antMatchers(HttpMethod.PUT, secureUrl).fullyAuthenticated()
-                        .antMatchers(HttpMethod.DELETE, secureUrl).fullyAuthenticated()
-                        .antMatchers(HttpMethod.PATCH, secureUrl).fullyAuthenticated()
-                        .antMatchers(HttpMethod.OPTIONS, secureUrl).fullyAuthenticated()
-                        .antMatchers(HttpMethod.HEAD, secureUrl).fullyAuthenticated()
+                      .anyRequest().fullyAuthenticated()
+//                      .antMatchers(HttpMethod.GET, secureUrl).fullyAuthenticated()
+//                      .antMatchers(HttpMethod.POST, secureUrl).fullyAuthenticated()
+//                      .antMatchers(HttpMethod.PUT, secureUrl).fullyAuthenticated()
+//                      .antMatchers(HttpMethod.DELETE, secureUrl).fullyAuthenticated()
+//                      .antMatchers(HttpMethod.PATCH, secureUrl).fullyAuthenticated()
+//                      .antMatchers(HttpMethod.OPTIONS, secureUrl).fullyAuthenticated()
+//                      .antMatchers(HttpMethod.HEAD, secureUrl).fullyAuthenticated()
                 .and().csrf()
                     .disable();
 

@@ -1,9 +1,9 @@
 package com.blueprint.centromere.ws.config;
 
-import com.blueprint.centromere.core.commons.model.User;
 import com.blueprint.centromere.core.config.ModelResourceRegistry;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.config.WebProperties;
+import com.blueprint.centromere.core.model.impl.User;
 import com.blueprint.centromere.ws.documentation.ModelApiListingPlugin;
 import com.blueprint.centromere.ws.documentation.ModelParameterBuilderPlugin;
 import com.fasterxml.classmate.ResolvedType;

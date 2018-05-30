@@ -1,20 +1,19 @@
 package com.blueprint.centromere.tests.core.test.commons;
 
-import com.blueprint.centromere.core.commons.model.GeneExpression;
-import com.blueprint.centromere.core.commons.model.Sample;
-import com.blueprint.centromere.core.commons.reader.GctGeneExpressionFileReader;
-import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
 import com.blueprint.centromere.core.config.CoreConfiguration;
 import com.blueprint.centromere.core.config.DataImportProperties;
+import com.blueprint.centromere.core.config.MongoConfiguration;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.mongodb.MongoConfiguration;
-import com.blueprint.centromere.core.mongodb.model.MongoDataFile;
-import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
-import com.blueprint.centromere.core.mongodb.model.MongoGeneExpression;
-import com.blueprint.centromere.core.mongodb.repository.MongoDataFileRepository;
-import com.blueprint.centromere.core.mongodb.repository.MongoDataSetRepository;
-import com.blueprint.centromere.core.mongodb.repository.MongoGeneRepository;
-import com.blueprint.centromere.core.mongodb.repository.MongoSampleRepository;
+import com.blueprint.centromere.core.dataimport.reader.impl.GctGeneExpressionSourceReader;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.DataSource;
+import com.blueprint.centromere.core.model.impl.GeneExpression;
+import com.blueprint.centromere.core.model.impl.Sample;
+import com.blueprint.centromere.core.repository.impl.DataSetRepository;
+import com.blueprint.centromere.core.repository.impl.DataSourceRepository;
+import com.blueprint.centromere.core.repository.impl.GeneExpressionRepository;
+import com.blueprint.centromere.core.repository.impl.GeneRepository;
+import com.blueprint.centromere.core.repository.impl.SampleRepository;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import java.util.ArrayList;
@@ -45,17 +44,17 @@ public class GeneExpressionTests extends AbstractRepositoryTests {
   private static final Resource gctGeneExpressionFile = new ClassPathResource("samples/gene_expression.gct");
 
   @Autowired(required = false) private GeneExpressionRepository geneExpressionRepository;
-  @Autowired private MongoGeneRepository geneRepository;
-  @Autowired private MongoSampleRepository sampleRepository;
-  @Autowired private MongoDataSetRepository dataSetRepository;
-  @Autowired private MongoDataFileRepository dataFileRepository;
+  @Autowired private GeneRepository geneRepository;
+  @Autowired private SampleRepository sampleRepository;
+  @Autowired private DataSetRepository dataSetRepository;
+  @Autowired private DataSourceRepository dataSourceRepository;
 
   @Before
   @Override
   public void setup() throws Exception {
     super.setup();
     dataSetRepository.deleteAll();
-    dataFileRepository.deleteAll();
+    dataSourceRepository.deleteAll();
     geneExpressionRepository.deleteAll();
   }
 
@@ -70,7 +69,7 @@ public class GeneExpressionTests extends AbstractRepositoryTests {
     geneExpressionRepository.deleteAll();
     Assert.isTrue(geneExpressionRepository.count() == 0);
 
-    MongoDataSet dataSet = new MongoDataSet();
+    DataSet dataSet = new DataSet();
     dataSet.setDataSetId("example");
     dataSet.setName("Example data set");
     List<String> sampleIds = new ArrayList<>();
@@ -82,21 +81,21 @@ public class GeneExpressionTests extends AbstractRepositoryTests {
     Assert.notNull(dataSet.getId());
     Assert.isTrue(dataSetRepository.findByDataSetId("example").isPresent());
     
-    MongoDataFile dataFile = new MongoDataFile();
-    dataFile.setFilePath(gctGeneExpressionFile.getFile().getAbsolutePath());
+    DataSource dataFile = new DataSource();
+    dataFile.setSource(gctGeneExpressionFile.getFile().getAbsolutePath());
     dataFile.setModel(GeneExpression.class);
     dataFile.setDataSetId((String) dataSet.getId());
     dataFile.setDataType("gct_expression");
-    dataFileRepository.insert(dataFile);
+    dataSourceRepository.insert(dataFile);
 
     DataImportProperties dataImportProperties = new DataImportProperties();
     dataImportProperties.setSkipInvalidGenes(true);
     dataImportProperties.setSkipInvalidSamples(true);
 
-    GctGeneExpressionFileReader<MongoGeneExpression> reader = 
-        new GctGeneExpressionFileReader<>(MongoGeneExpression.class, geneRepository, sampleRepository, dataImportProperties);
+    GctGeneExpressionSourceReader reader = 
+        new GctGeneExpressionSourceReader(geneRepository, sampleRepository, dataImportProperties);
     reader.setDataSet(dataSet);
-    reader.setDataFile(dataFile);
+    reader.setDataSource(dataFile);
     reader.doBefore();
     
     List<GeneExpression> expressionList = new ArrayList<>();

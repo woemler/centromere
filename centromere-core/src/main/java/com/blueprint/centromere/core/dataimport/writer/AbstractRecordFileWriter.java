@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors
+ * Copyright 2018 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package com.blueprint.centromere.core.dataimport.writer;
 
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.support.DataFileAware;
-import com.blueprint.centromere.core.commons.support.DataSetAware;
 import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
-import com.blueprint.centromere.core.dataimport.exception.InvalidDataFileException;
+import com.blueprint.centromere.core.dataimport.exception.InvalidDataSourceException;
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.DataSetAware;
+import com.blueprint.centromere.core.model.impl.DataSource;
+import com.blueprint.centromere.core.model.impl.DataSourceAware;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -38,14 +38,14 @@ import org.springframework.util.Assert;
  * @author woemler
  */
 public abstract class AbstractRecordFileWriter<T extends Model<?>> 
-		implements RecordWriter<T>, TempFileWriter, DataSetAware, DataFileAware {
+		implements RecordWriter<T>, TempFileWriter, DataSetAware, DataSourceAware {
   
   private static final Logger logger = LoggerFactory.getLogger(AbstractRecordFileWriter.class);
 
   private final DataImportProperties dataImportProperties;
   
 	private FileWriter writer;
-	private DataFile dataFile;
+	private DataSource dataSource;
 	private DataSet dataSet;
 
   public AbstractRecordFileWriter(DataImportProperties dataImportProperties) {
@@ -60,15 +60,15 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
 
     try {
       Assert.notNull(dataSet, "DataSet record is not set.");
-      Assert.notNull(dataSet.getId(), "DataSet record has not been persisted to the database.");
-      Assert.notNull(dataFile, "DataFile record is not set");
-      Assert.notNull(dataFile.getId(), "DataFile record has not been persisted to the database.");
-      Assert.notNull(dataFile.getFilePath(), "No DataFile file path has been set");
+      Assert.notNull(dataSet.getDataSetId(), "DataSet record has not been persisted to the database.");
+      Assert.notNull(dataSource, "DataFile record is not set");
+      Assert.notNull(dataSource.getDataSourceId(), "DataFile record has not been persisted to the database.");
+      Assert.notNull(dataSource.getSource(), "No DataFile file path has been set");
     } catch (Exception e){
       throw new DataImportException(e);
     }
 
-    String filePath = getTempFilePath(dataFile.getFilePath());
+    String filePath = getTempFilePath(dataSource.getSource()); // TODO: better temp file determination
     this.open(filePath);
 		logger.info(String.format("Writing records to file: %s", filePath));
 	}
@@ -92,7 +92,7 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
 		try {
 			writer = new FileWriter(outputFilePath);
 		} catch (IOException e){
-			throw new InvalidDataFileException(String.format("Cannot open output file: %s", outputFilePath), e);
+			throw new InvalidDataSourceException(String.format("Cannot open output file: %s", outputFilePath), e);
 		}
 	}
 
@@ -136,12 +136,12 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
 		return writer;
 	}
 
-  public DataFile getDataFile() {
-    return dataFile;
+  public DataSource getDataSource() {
+    return dataSource;
   }
 
-  public void setDataFile(DataFile dataFile) {
-    this.dataFile = dataFile;
+  public void setDataSource(DataSource dataSource) {
+    this.dataSource = dataSource;
   }
 
   public DataSet getDataSet() {

@@ -1,7 +1,7 @@
 package com.blueprint.centromere.tests.core.test.repository;
 
 import com.blueprint.centromere.core.exceptions.QueryParameterException;
-import com.blueprint.centromere.core.mongodb.model.MongoGene;
+import com.blueprint.centromere.core.model.impl.Gene;
 import com.blueprint.centromere.core.repository.Evaluation;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.core.repository.QueryParameterDescriptor;
@@ -114,14 +114,14 @@ public class QueryCriteriaTests {
   @Test
   public void modelToDescriptorTest(){
     Map<String,QueryParameterDescriptor> descriptorMap
-        = QueryParameterUtil.getAvailableQueryParameters(MongoGene.class);
+        = QueryParameterUtil.getAvailableQueryParameters(Gene.class);
     for (Map.Entry entry: descriptorMap.entrySet()){
       System.out.println(String.format("param: %s   descriptor: %s", entry.getKey(),
           (entry.getValue()).toString()));
     }
     Assert.notNull(descriptorMap);
     Assert.notEmpty(descriptorMap);
-    Assert.isTrue(descriptorMap.size() == 9, String.format("Size is actually %s", descriptorMap.size()));
+    Assert.isTrue(descriptorMap.size() == 11, String.format("Size is actually %s", descriptorMap.size()));
     Assert.isTrue(descriptorMap.containsKey("attributes.\\w+"));
     Assert.isTrue(!descriptorMap.containsKey("attributes"));
     QueryParameterDescriptor descriptor = descriptorMap.get("geneId");

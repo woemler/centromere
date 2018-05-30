@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors
+ * Copyright 2018 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import java.lang.annotation.Target;
 /**
  * Allows annotation of a single class with multiple {@link Option} instances, exposing multiple 
  *   data import parameters.
+ *   TODO: Is this still needed?
  * 
  * @author woemler
  * @since 0.5.0

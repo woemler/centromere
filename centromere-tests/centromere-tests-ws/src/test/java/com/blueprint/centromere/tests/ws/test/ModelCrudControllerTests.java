@@ -29,12 +29,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.blueprint.centromere.core.commons.model.Gene;
-import com.blueprint.centromere.core.commons.repository.GeneExpressionRepository;
-import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.config.ModelResourceRegistry;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.mongodb.model.MongoGene;
+import com.blueprint.centromere.core.model.impl.Gene;
+import com.blueprint.centromere.core.repository.impl.GeneExpressionRepository;
+import com.blueprint.centromere.core.repository.impl.GeneRepository;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.ws.WebTestInitializer;
 import com.blueprint.centromere.ws.config.ApiMediaTypes;
@@ -53,6 +52,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.util.Assert;
 
 /**
@@ -83,17 +83,18 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   @Test
   public void findById() throws Exception {
     
-    System.out.println("Gene URI: " + registry.getUriByModel(MongoGene.class));
+    System.out.println("Gene URI: " + registry.getUriByModel(Gene.class));
     System.out.println(String.format("Registered models: %s", registry.getRegisteredModels()));
 
     Gene gene = (Gene) geneRepository.findByGeneId("1").get();
 
     mockMvc.perform(get(BASE_URL + "/{id}", gene.getId())
         .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
+        .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.geneId", is("1")))
         .andExpect(jsonPath("$.symbol", is("GeneA")))
-        .andExpect(jsonPath("$.links", hasSize(1)))
+        .andExpect(jsonPath("$.links", hasSize(3)))
         .andExpect(jsonPath("$.links[0].rel", is("self")))
         .andExpect(jsonPath("$.links[0].href", endsWith(BASE_URL + "/" + gene.getId())));
   }

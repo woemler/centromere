@@ -16,8 +16,7 @@
 
 package com.blueprint.centromere.tests.core.test;
 
-import com.blueprint.centromere.core.commons.model.Gene;
-import com.blueprint.centromere.core.mongodb.model.MongoGene;
+import com.blueprint.centromere.core.model.impl.Gene;
 import com.blueprint.centromere.core.util.JsonModelConverter;
 import com.blueprint.centromere.core.util.KeyValueMapModelConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,8 +38,8 @@ public class ModelConverterTests {
 	@Test
 	public void jsonConverterTest() throws Exception {
 		String json = "{\"geneId\": 1, \"symbol\": \"ABC\", \"taxId\": 9606}";
-		JsonModelConverter converter = new JsonModelConverter(MongoGene.class);
-    MongoGene gene = (MongoGene) converter.convert(json);
+		JsonModelConverter converter = new JsonModelConverter(Gene.class);
+    Gene gene = (Gene) converter.convert(json);
 		Assert.notNull(gene);
 		Assert.isTrue("1".equals(gene.getGeneId()));
 		Assert.isTrue("ABC".equals(gene.getSymbol()));
@@ -61,8 +60,8 @@ public class ModelConverterTests {
 		map.put("geneId", "1");
 		map.put("symbol", "ABC");
 		map.put("taxId", "9606");
-		KeyValueMapModelConverter converter = new KeyValueMapModelConverter(MongoGene.class);
-    MongoGene gene = (MongoGene) converter.convert(map);
+		KeyValueMapModelConverter converter = new KeyValueMapModelConverter(Gene.class);
+    Gene gene = (Gene) converter.convert(map);
 		Assert.notNull(gene);
 		Assert.isTrue("1".equals(gene.getGeneId()));
 		Assert.isTrue("ABC".equals(gene.getSymbol()));

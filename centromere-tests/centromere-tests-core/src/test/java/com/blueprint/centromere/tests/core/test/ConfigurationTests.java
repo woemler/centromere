@@ -16,15 +16,14 @@
 
 package com.blueprint.centromere.tests.core.test;
 
-import com.blueprint.centromere.core.commons.model.Gene;
-import com.blueprint.centromere.core.commons.repository.GeneRepository;
 import com.blueprint.centromere.core.config.CoreConfiguration;
 import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.config.ModelResourceRegistry;
+import com.blueprint.centromere.core.config.MongoConfiguration;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.mongodb.MongoConfiguration;
-import com.blueprint.centromere.core.mongodb.model.MongoGene;
+import com.blueprint.centromere.core.model.impl.Gene;
 import com.blueprint.centromere.core.repository.ModelRepository;
+import com.blueprint.centromere.core.repository.impl.GeneRepository;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,8 +56,7 @@ public class ConfigurationTests {
     System.out.println(repositoryRegistry.getRegisteredModelRepositories().toString());
     Assert.isTrue(resourceRegistry.isRegisteredResource("gene"));
     Assert.isTrue(resourceRegistry.isRegisteredModel(Gene.class));
-    Assert.isTrue(resourceRegistry.isRegisteredModel(MongoGene.class));
-    ModelRepository repository = repositoryRegistry.getRepositoryByModel(MongoGene.class);
+    ModelRepository repository = repositoryRegistry.getRepositoryByModel(Gene.class);
     Assert.notNull(repository, "GeneRepository is not registered.");
     Assert.isTrue(repository instanceof GeneRepository, "Repository does not implement GeneRepository");
   }

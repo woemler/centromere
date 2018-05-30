@@ -1,15 +1,13 @@
 package com.blueprint.centromere.tests.core;
 
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.model.Gene;
-import com.blueprint.centromere.core.commons.reader.EntrezGeneInfoReader;
-import com.blueprint.centromere.core.commons.repository.DataFileRepository;
-import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.mongodb.model.MongoDataFile;
-import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
-import com.blueprint.centromere.core.mongodb.model.MongoGene;
+import com.blueprint.centromere.core.dataimport.reader.impl.EntrezGeneInfoReader;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.DataSource;
+import com.blueprint.centromere.core.model.impl.DataSource.SourceTypes;
+import com.blueprint.centromere.core.model.impl.Gene;
+import com.blueprint.centromere.core.repository.impl.DataSetRepository;
+import com.blueprint.centromere.core.repository.impl.DataSourceRepository;
+import com.blueprint.centromere.core.repository.impl.GeneRepository;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -25,24 +23,25 @@ public abstract class AbstractEntrezGeneTests {
 
   @Autowired private GeneRepository geneRepository;
   @Autowired private DataSetRepository dataSetRepository;
-  @Autowired private DataFileRepository dataFileRepository;
+  @Autowired private DataSourceRepository dataSourceRepository;
 
   @Before
   public void setup() throws Exception{
-    dataFileRepository.deleteAll();
+    dataSourceRepository.deleteAll();
     dataSetRepository.deleteAll();
     geneRepository.deleteAll();
-    EntrezGeneInfoReader<MongoGene> reader = new EntrezGeneInfoReader<>(MongoGene.class);
-    DataSet dataSet = new MongoDataSet();
+    EntrezGeneInfoReader reader = new EntrezGeneInfoReader();
+    DataSet dataSet = new DataSet();
     dataSet.setDataSetId("metadata");
     dataSet.setName("Metadata");
     dataSetRepository.insert(dataSet);
-    DataFile dataFile = new MongoDataFile();
-    dataFile.setDataSetId(dataSet.getDataSetId());
-    dataFile.setFilePath(GENE_INFO_FILE.getPath());
-    dataFileRepository.insert(dataFile);
+    DataSource dataSource = new DataSource();
+    dataSource.setDataSetId(dataSet.getDataSetId());
+    dataSource.setSource(GENE_INFO_FILE.getPath());
+    dataSource.setSourceType(SourceTypes.FILE.toString());
+    dataSourceRepository.insert(dataSource);
     reader.setDataSet(dataSet);
-    reader.setDataFile(dataFile);
+    reader.setDataSource(dataSource);
     
     try {
       reader.doBefore();

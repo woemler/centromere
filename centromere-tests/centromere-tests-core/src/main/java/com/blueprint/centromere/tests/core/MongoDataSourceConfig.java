@@ -16,7 +16,6 @@
 
 package com.blueprint.centromere.tests.core;
 
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
@@ -47,7 +46,7 @@ public class MongoDataSourceConfig extends AbstractMongoConfiguration {
 
   @Override
   @Bean
-  public Mongo mongo() throws Exception {
+  public MongoClient mongoClient() {
     ServerAddress serverAddress = new ServerAddress(env.getRequiredProperty("mongo.host"));
     List<MongoCredential> credentials = new ArrayList<>();
     credentials.add(MongoCredential.createScramSha1Credential(

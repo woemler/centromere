@@ -16,9 +16,8 @@
 
 package com.blueprint.centromere.tests.core.test.dataimport;
 
-import com.blueprint.centromere.core.commons.model.Gene;
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.mongodb.model.MongoGene;
+import com.blueprint.centromere.core.model.impl.Gene;
 import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,7 +80,7 @@ public class ColumnMappingReaderTests {
 	@Test
 	public void modelBeanWrapperTest() throws Exception {
 		ConversionService conversionService = new DefaultConversionService();
-		BeanWrapperImpl wrapper = new BeanWrapperImpl(MongoGene.class);
+		BeanWrapperImpl wrapper = new BeanWrapperImpl(Gene.class);
 		String entrezGeneId = "7";
 		String geneSymbol = "TEST";
 		String taxId = "9606";

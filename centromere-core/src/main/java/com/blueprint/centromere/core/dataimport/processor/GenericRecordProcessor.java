@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors
+ * Copyright 2018 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,6 @@
 
 package com.blueprint.centromere.core.dataimport.processor;
 
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.model.Sample;
-import com.blueprint.centromere.core.commons.repository.DataFileRepository;
-import com.blueprint.centromere.core.commons.repository.DataOperations;
-import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.commons.support.DataFileAware;
-import com.blueprint.centromere.core.commons.support.DataSetAware;
-import com.blueprint.centromere.core.commons.support.SampleAware;
 import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.dataimport.DataImportComponent;
@@ -33,17 +24,27 @@ import com.blueprint.centromere.core.dataimport.DataTypes;
 import com.blueprint.centromere.core.dataimport.Option;
 import com.blueprint.centromere.core.dataimport.Options;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
-import com.blueprint.centromere.core.dataimport.exception.InvalidDataFileException;
+import com.blueprint.centromere.core.dataimport.exception.InvalidDataSourceException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidGeneException;
 import com.blueprint.centromere.core.dataimport.exception.InvalidSampleException;
 import com.blueprint.centromere.core.dataimport.filter.Filter;
 import com.blueprint.centromere.core.dataimport.importer.RecordImporter;
 import com.blueprint.centromere.core.dataimport.reader.RecordReader;
+import com.blueprint.centromere.core.dataimport.transformer.RecordTransformer;
 import com.blueprint.centromere.core.dataimport.writer.RecordWriter;
 import com.blueprint.centromere.core.dataimport.writer.TempFileWriter;
 import com.blueprint.centromere.core.exceptions.ConfigurationException;
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.DataSetAware;
+import com.blueprint.centromere.core.model.impl.DataSource;
+import com.blueprint.centromere.core.model.impl.DataSourceAware;
+import com.blueprint.centromere.core.model.impl.Sample;
+import com.blueprint.centromere.core.model.impl.SampleAware;
 import com.blueprint.centromere.core.repository.ModelRepository;
+import com.blueprint.centromere.core.repository.impl.DataSetRepository;
+import com.blueprint.centromere.core.repository.impl.DataSourceRepository;
+import com.blueprint.centromere.core.repository.impl.MetadataOperations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -68,12 +69,12 @@ import org.springframework.validation.Validator;
  * @author woemler
  */
 public class GenericRecordProcessor<T extends Model<?>> 
-		implements RecordProcessor<T>, DataTypeSupport, DataFileAware, DataSetAware {
+		implements RecordProcessor<T>, DataTypeSupport, DataSourceAware, DataSetAware {
 
   private static final Logger logger = LoggerFactory.getLogger(GenericRecordProcessor.class);
 
   private DataSetRepository dataSetRepository;
-  private DataFileRepository dataFileRepository;
+  private DataSourceRepository dataSourceRepository;
   private ModelRepositoryRegistry registry;
   private DataImportProperties dataImportProperties;
   
@@ -82,10 +83,11 @@ public class GenericRecordProcessor<T extends Model<?>>
 	private RecordReader<T> reader;
 	private Validator validator;
 	private Filter<T> filter;
+	private RecordTransformer<T> transformer;
 	private RecordWriter<T> writer;
 	private RecordImporter importer;
 	
-	private DataFile dataFile;
+	private DataSource dataSource;
 	private DataSet dataSet;
 	
 	private List<String> supportedDataTypes = new ArrayList<>();
@@ -119,42 +121,46 @@ public class GenericRecordProcessor<T extends Model<?>>
 	  
 	  isInFailedState = false;
 	  
-	  // Checks that DataSet, DataFile, and ImportOptions are set
+	  // Checks that DataSet, DataSource, and ImportOptions are set
 	  try {
       afterPropertiesSet();
-      Assert.notNull(dataFileRepository, "DataFileRepository must not be null.");
+      Assert.notNull(dataSourceRepository, "DataSourceRepository must not be null.");
       Assert.notNull(dataSetRepository, "DataSetRepository must not be null.");
       Assert.notNull(dataSet, "DataSet record is not set.");
       Assert.notNull(dataSet.getId(), "DataSetId has not been set");
       Assert.isTrue(dataSetRepository.findById(dataSet.getId()).isPresent(), 
           "DataSet record has not been persisted to the database");
-      Assert.notNull(dataFile, "DataFile record is not set");
-      Assert.notNull(dataFile.getId(), "DataFileId has not been set.");
-      Assert.isTrue(dataFileRepository.findById(dataFile.getId()).isPresent(),
-          "DataFile record has not been persisted to the database");
-      Assert.notNull(dataFile.getFilePath(), "No DataFile file path has been set");
+      Assert.notNull(dataSource, "DataSource record is not set");
+      Assert.notNull(dataSource.getId(), "DataSourceId has not been set.");
+      Assert.isTrue(dataSourceRepository.findById(dataSource.getId()).isPresent(),
+          "DataSource record has not been persisted to the database");
+      Assert.notNull(dataSource.getSource(), "No DataSource file path has been set");
       Assert.notNull(dataImportProperties, "Import DataImportProperties has not been set.");
     } catch (Exception e){
 	    isInFailedState = true;
 	    throw new DataImportException(e);
     }
     
-    // Passes along DataSet, DataFile, and ImportOptions to components
+    // Passes along DataSet, DataSource, and ImportOptions to components
 		if (writer != null) {
     	if (writer instanceof DataSetAware) ((DataSetAware) writer).setDataSet(dataSet);
-    	if (writer instanceof DataFileAware) ((DataFileAware) writer).setDataFile(dataFile);
+    	if (writer instanceof DataSourceAware) ((DataSourceAware) writer).setDataSource(dataSource);
 		}
 		if (reader != null) {
       if (reader instanceof DataSetAware) ((DataSetAware) reader).setDataSet(dataSet);
-      if (reader instanceof DataFileAware) ((DataFileAware) reader).setDataFile(dataFile);
+      if (reader instanceof DataSourceAware) ((DataSourceAware) reader).setDataSource(dataSource);
     }
 		if (importer != null) {
       if (importer instanceof DataSetAware) ((DataSetAware) importer).setDataSet(dataSet);
-      if (importer instanceof DataFileAware) ((DataFileAware) importer).setDataFile(dataFile);
+      if (importer instanceof DataSourceAware) ((DataSourceAware) importer).setDataSource(dataSource);
     }
     if (filter != null) {
       if (filter instanceof DataSetAware) ((DataSetAware) filter).setDataSet(dataSet);
-      if (filter instanceof DataFileAware) ((DataFileAware) filter).setDataFile(dataFile);
+      if (filter instanceof DataSourceAware) ((DataSourceAware) filter).setDataSource(dataSource);
+    }
+    if (transformer != null) {
+      if (transformer instanceof DataSetAware) ((DataSetAware) transformer).setDataSet(dataSet);
+      if (transformer instanceof DataSourceAware) ((DataSourceAware) transformer).setDataSource(dataSource);
     }
 		
 		isConfigured = true;
@@ -168,7 +174,7 @@ public class GenericRecordProcessor<T extends Model<?>>
   @Override
   public void doAfter() throws DataImportException {
     
-    // If DataFile contained Sample records, associate them with the proper Subject and DataSet record
+    // If DataSource contained Sample records, associate them with the proper Subject and DataSet record
     if (reader instanceof SampleAware) {
       List<Sample> samples = ((SampleAware) reader).getSamples();
       List<String> sampleIds = dataSet.getSampleIds();
@@ -181,11 +187,11 @@ public class GenericRecordProcessor<T extends Model<?>>
       dataSetRepository.update(dataSet);
     }
     
-    // Associate the DataFile with the appropriate DataSet record
-    List<String> dataFileIds = dataSet.getDataFileIds();
-    if (!dataFileIds.contains(dataFile.getId())) {
-      dataFileIds.add(dataFile.getDataFileId());
-      dataSet.setDataFileIds(new ArrayList<>(dataFileIds));
+    // Associate the DataSource with the appropriate DataSet record
+    List<String> dataSourceIds = dataSet.getDataSourceIds();
+    if (!dataSourceIds.contains(dataSource.getId())) {
+      dataSourceIds.add(dataSource.getDataSourceId());
+      dataSet.setDataSourceIds(new ArrayList<>(dataSourceIds));
       dataSetRepository.update(dataSet);
     }
     
@@ -202,12 +208,14 @@ public class GenericRecordProcessor<T extends Model<?>>
     try {
       if (registry.isRegisteredModel(this.getModel())) {
         ModelRepository repository = registry.getRepositoryByModel(this.getModel());
-        if (repository instanceof DataOperations) {
-          DataOperations dataOperations = (DataOperations) repository;
-          if (dataFile.getId() != null) {
-            logger.warn(String
-                .format("Rolling back inserted records for data file: %s", dataFile.getFilePath()));
-            dataOperations.deleteByDataFileId(dataFile.getDataFileId());
+        if (repository instanceof MetadataOperations) {
+          MetadataOperations metadataOperations = (MetadataOperations) repository;
+          if (dataSource.getDataSourceId() != null) {
+            logger.warn(
+                String.format("Rolling back inserted records for data file: %s", 
+                    dataSource.getSource())
+            );
+            metadataOperations.deleteByDataSourceId(dataSource.getDataSourceId());
           }
         }
       }
@@ -215,10 +223,10 @@ public class GenericRecordProcessor<T extends Model<?>>
       throw new DataImportException(e);
     }
     
-    // Delete dataFile records
-    if (dataFile.getId() != null){
-      logger.warn(String.format("Rolling back DataFile record for file: %s", dataFile.getFilePath()));
-      dataFileRepository.delete(dataFile);
+    // Delete dataSource records
+    if (dataSource.getDataSourceId() != null){
+      logger.warn(String.format("Rolling back DataSource record for record: %s", dataSource.getDataSourceId()));
+      dataSourceRepository.delete(dataSource);
     }
     
   }
@@ -258,7 +266,7 @@ public class GenericRecordProcessor<T extends Model<?>>
       runComponentDoAfter();
 
       logger.info(
-          String.format("Successfully processed %d records from file: %s", recordCount, dataFile.getFilePath()));
+          String.format("Successfully processed %d records from data source: %s", recordCount, dataSource.getSource()));
 
     } catch (Exception ex){
       isInFailedState = true;
@@ -284,11 +292,14 @@ public class GenericRecordProcessor<T extends Model<?>>
       if (filter != null){
         filter.doBefore();
       }
+      if (transformer != null){
+        transformer.doBefore();
+      }
     } catch (InvalidSampleException e){
       if (dataImportProperties.isSkipInvalidSamples()) isInFailedState = true;
       else throw e;
-    } catch (InvalidDataFileException e){
-      if (dataImportProperties.isSkipInvalidFiles()) isInFailedState = true;
+    } catch (InvalidDataSourceException e){
+      if (dataImportProperties.isSkipInvalidDataSource()) isInFailedState = true;
       else throw e;
     } catch (InvalidGeneException e){
       if (dataImportProperties.isSkipInvalidGenes()) isInFailedState = true;
@@ -313,11 +324,14 @@ public class GenericRecordProcessor<T extends Model<?>>
       if (importer != null) {
         importer.doAfter();
       }
+      if (transformer != null){
+        transformer.doAfter();
+      }
     } catch (InvalidSampleException e){
       if (dataImportProperties.isSkipInvalidSamples()) isInFailedState = true;
       else throw e;
-    } catch (InvalidDataFileException e){
-      if (dataImportProperties.isSkipInvalidFiles()) isInFailedState = true;
+    } catch (InvalidDataSourceException e){
+      if (dataImportProperties.isSkipInvalidDataSource()) isInFailedState = true;
       else throw e;
     } catch (InvalidGeneException e){
       if (dataImportProperties.isSkipInvalidGenes()) isInFailedState = true;
@@ -341,6 +355,10 @@ public class GenericRecordProcessor<T extends Model<?>>
     while (record != null) {
 
       recordCount++;
+      
+      if (transformer != null){
+        record = transformer.transform(record);
+      }
       
       if (filter != null && filter.isFilterable(record)){
         logger.info(String.format("Filtering record: %s", record.toString()));
@@ -372,7 +390,7 @@ public class GenericRecordProcessor<T extends Model<?>>
     if (importer != null) {
       if (TempFileWriter.class.isAssignableFrom(writer.getClass())) {
         logger.info("Running RecordImporter file import");
-        String tempFilePath = ((TempFileWriter) writer).getTempFilePath(dataFile.getFilePath());
+        String tempFilePath = ((TempFileWriter) writer).getTempFilePath(dataSource.getSource()); //TODO: better temp file path determination
         importer.importFile(tempFilePath);
       } else {
         logger.warn(
@@ -443,8 +461,8 @@ public class GenericRecordProcessor<T extends Model<?>>
 
   @Autowired
   @SuppressWarnings("SpringJavaAutowiringInspection")
-  public void setDataFileRepository(DataFileRepository dataFileRepository) {
-    this.dataFileRepository = dataFileRepository;
+  public void setDataSourceRepository(DataSourceRepository dataSourceRepository) {
+    this.dataSourceRepository = dataSourceRepository;
   }
 
   @Autowired
@@ -469,13 +487,13 @@ public class GenericRecordProcessor<T extends Model<?>>
 		this.model = model;
 	}
 
-  public DataFile getDataFile() {
-    return dataFile;
+  public DataSource getDataSource() {
+    return dataSource;
   }
 
   @Override
-  public void setDataFile(DataFile dataFile) {
-    this.dataFile = dataFile;
+  public void setDataSource(DataSource dataSource) {
+    this.dataSource = dataSource;
   }
 
   public DataSet getDataSet() {
@@ -528,6 +546,17 @@ public class GenericRecordProcessor<T extends Model<?>>
 	public void setImporter(RecordImporter importer) {
 		this.importer = importer;
 	}
+
+	@Override
+  public RecordTransformer<T> getTransformer() {
+    return transformer;
+  }
+
+  @Override
+  public void setTransformer(
+      RecordTransformer<T> transformer) {
+    this.transformer = transformer;
+  }
 
   @Override
   public boolean isInFailedState() {

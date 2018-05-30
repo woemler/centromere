@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors
+ * Copyright 2018 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
 	    repository.update(records);
     } else {
       for (T record: records){
-        if (repository.exists(record.getId())){
+        if (record.getId() != null && repository.existsById(record.getId())){
           repository.update(record);
         } else {
           repository.insert(record);
@@ -98,7 +98,7 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
 
 	@Override
 	public void doAfter() throws DataImportException {
-			if (records.size() > 0) repository.save(records);
+			if (records.size() > 0) repository.saveAll(records);
 	}
 
   public Integer getBatchSize() {

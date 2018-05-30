@@ -37,6 +37,7 @@ import io.swagger.annotations.ApiResponses;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -129,9 +130,10 @@ public class ModelCrudController {
     }
     Set<String> fields = RequestUtils.getFilteredFieldsFromRequest(request);
     Set<String> exclude = RequestUtils.getExcludedFieldsFromRequest(request);
-    T entity = repository.findOne(convertModelIdParameter(id, model));
-    if (entity == null) throw new ResourceNotFoundException();
+    Optional<T> optional = repository.findById(convertModelIdParameter(id, model));
+    if (!optional.isPresent()) throw new ResourceNotFoundException();
     ResponseEnvelope<T> envelope = null;
+    T entity = optional.get();
     if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))){
       FilterableResource resource = assembler.toResource(entity);
       envelope = new ResponseEnvelope<>(resource, fields, exclude);
@@ -362,7 +364,7 @@ public class ModelCrudController {
     logger.info(String.format("Resolved request to model %s and repository %s",
         model.getName(), repository.getClass().getName()));
 
-    if (!repository.exists(record.getId())) {
+    if (!repository.existsById(record.getId())) {
       throw new ResourceNotFoundException();
     }
 
@@ -416,7 +418,7 @@ public class ModelCrudController {
       e.printStackTrace();
       throw new ResourceNotFoundException();
     }
-    repository.delete(convertModelIdParameter(id, model));
+    repository.deleteById(convertModelIdParameter(id, model));
     return new ResponseEntity<>(HttpStatus.OK);
   }
 

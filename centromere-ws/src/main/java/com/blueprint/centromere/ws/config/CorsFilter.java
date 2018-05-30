@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * @author woemler
  */
+@Deprecated
 public class CorsFilter implements Filter {
 
   @Override

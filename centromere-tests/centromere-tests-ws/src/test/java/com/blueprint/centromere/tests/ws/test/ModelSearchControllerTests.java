@@ -23,15 +23,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.model.Gene;
-import com.blueprint.centromere.core.commons.model.Sample;
-import com.blueprint.centromere.core.commons.repository.DataFileRepository;
-import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.commons.repository.GeneRepository;
-import com.blueprint.centromere.core.commons.repository.SampleRepository;
 import com.blueprint.centromere.core.config.Profiles;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.DataSource;
+import com.blueprint.centromere.core.model.impl.Gene;
+import com.blueprint.centromere.core.model.impl.Sample;
+import com.blueprint.centromere.core.repository.impl.DataSetRepository;
+import com.blueprint.centromere.core.repository.impl.DataSourceRepository;
+import com.blueprint.centromere.core.repository.impl.GeneRepository;
+import com.blueprint.centromere.core.repository.impl.SampleRepository;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.ws.WebTestInitializer;
 import org.junit.Test;
@@ -43,6 +43,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.Assert;
 
 /**
  * @author woemler
@@ -59,7 +60,7 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
   @Autowired private GeneRepository geneRepository;
   @Autowired private SampleRepository sampleRepository;
   @Autowired private DataSetRepository dataSetRepository;
-  @Autowired private DataFileRepository dataFileRepository;
+  @Autowired private DataSourceRepository dataSourceRepository;
   @Autowired private MockMvc mockMvc;
 
   // Distinct
@@ -125,21 +126,22 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
   }
 
   @Test
-  public void findDataByDataFileMetadata() throws Exception {
+  public void findDataByDataSourceMetadata() throws Exception {
 
-    DataFile dataFile = (DataFile) dataFileRepository.findByDataType("GCT RNA-Seq gene expression").get(0);
+    DataSource dataSource = dataSourceRepository.findByDataType("GCT RNA-Seq gene expression").get(0);
 
-    mockMvc.perform(get(DATA_URL + "/datafile?dataType=GCT RNA-Seq gene expression"))
+    mockMvc.perform(get(DATA_URL + "/datasource?dataType=GCT RNA-Seq gene expression"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(6)))
-        .andExpect(jsonPath("$[0]", hasKey("dataFileId")))
-        .andExpect(jsonPath("$[0].dataFileId", is(dataFile.getId())));
+        .andExpect(jsonPath("$[0]", hasKey("dataSourceId")))
+        .andExpect(jsonPath("$[0].dataSourceId", is(dataSource.getId())));
   }
 
   @Test
   public void findDataByDataSetMetadata() throws Exception {
 
-    DataSet dataSet = (DataSet) dataSetRepository.findByDataSetId("DataSetA").get();
+    DataSet dataSet = dataSetRepository.findByDataSetId("DataSetA").orElse(null);
+    Assert.notNull(dataSet);
 
     mockMvc.perform(get(DATA_URL + "/dataset?dataSetId=DataSetA"))
         .andExpect(status().isOk())
@@ -151,7 +153,7 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
   @Test
   public void findInvalidDataByMetadata() throws Exception {
     mockMvc.perform(get(BASE_URL + "/dataset?shortName=DataSetA"))
-        .andExpect(status().isNotFound());
+        .andExpect(status().isBadRequest());
   }
   
 }

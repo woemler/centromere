@@ -36,6 +36,11 @@ public class ImportCommandParameters {
 	
 	@Parameter(names = { "-f", "--file" }, required = true, description = "Input file path.  Required")
 	private String filePath;
+	
+	@Parameter(names = { "-i", "--id" }, description = "DataSourceId to assign to imported records. " 
+      + "If the ID already exists, the source will be skipped, unless the -o/--overwrite option is " 
+      + "used, in which case the old records associated with the dataSourceId will be replaced with the new.")
+  private String dataSourceId;
 
 	@Parameter(names = { "-t", "--type" }, required = true, 
       description = "Data type label for the target file.  Required.")
@@ -66,9 +71,9 @@ public class ImportCommandParameters {
       description = "Records with invalid sample metadata will be skipped, rather than triggering exceptions.")
   private boolean skipInvalidSamples = false;
 
-  @Parameter(names = { "--skip-invalid-files" },
+  @Parameter(names = { "--skip-invalid-source" },
       description = "Invalid data files will be skipped, rather than triggering exceptions.")
-  private boolean skipInvalidFiles = false;
+  private boolean skipInvalidSource = false;
   
   @Parameter(names = { "-h", "--help" }, description = "Displays usage information, specific to file " 
       + "import operations.")

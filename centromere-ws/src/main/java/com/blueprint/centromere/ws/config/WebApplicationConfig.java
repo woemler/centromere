@@ -27,6 +27,7 @@ import java.nio.charset.Charset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -34,14 +35,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
-import org.springframework.hateoas.config.EnableEntityLinks;
-import org.springframework.hateoas.config.EnableHypermediaSupport;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
 import org.springframework.oxm.xstream.XStreamMarshaller;
-import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * @author woemler
@@ -51,8 +49,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @SuppressWarnings("SpringJavaAutowiringInspection")
 @Configuration
 @EnableSpringDataWebSupport
-@EnableHypermediaSupport(type = { EnableHypermediaSupport.HypermediaType.HAL })
-@EnableEntityLinks
+//@EnableHypermediaSupport(type = { EnableHypermediaSupport.HypermediaType.HAL }) // Not needed in Spring boot 2
+//@EnableEntityLinks
 @Import({
 		WebSecurityConfig.class,
 		SwaggerConfig.class
@@ -62,7 +60,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
     ModelCrudController.class,
     RestExceptionHandler.class
 })
-public class WebApplicationConfig extends WebMvcConfigurerAdapter {
+public class WebApplicationConfig {
 
   private static final Logger logger = LoggerFactory.getLogger(WebApplicationConfig.class);
 
@@ -78,47 +76,82 @@ public class WebApplicationConfig extends WebMvcConfigurerAdapter {
       DefaultModelRepositoryRegistry modelRepositoryRegistry){
     return new ModelResourceAssembler(modelRepositoryRegistry);
   }
-
+  
   @Bean
-  public FilteringJackson2HttpMessageConverter filteringJackson2HttpMessageConverter(){
+  public HttpMessageConverters customConverters(){
+    
+    // JSON
     FilteringJackson2HttpMessageConverter jsonConverter
         = new FilteringJackson2HttpMessageConverter();
     jsonConverter.setSupportedMediaTypes(ApiMediaTypes.getJsonMediaTypes());
-    return jsonConverter;
-  }
 
-  @Bean
-  public MarshallingHttpMessageConverter marshallingHttpMessageConverter(){
+    // XML
     MarshallingHttpMessageConverter xmlConverter = new MarshallingHttpMessageConverter();
     xmlConverter.setSupportedMediaTypes(ApiMediaTypes.getXmlMediaTypes());
     XStreamMarshaller xStreamMarshaller = new XStreamMarshaller();
     xmlConverter.setMarshaller(xStreamMarshaller);
     xmlConverter.setUnmarshaller(xStreamMarshaller);
-    return xmlConverter;
-  }
-
-  @Bean
-  public FilteringTextMessageConverter filteringTextMessageConverter(){
-    FilteringTextMessageConverter filteringTextMessageConverter =
+    
+    // Text
+    FilteringTextMessageConverter textMessageConverter =
         new FilteringTextMessageConverter(new MediaType("text", "plain", Charset.forName("utf-8")));
-    filteringTextMessageConverter.setDelimiter("\t");
-    return filteringTextMessageConverter;
+    textMessageConverter.setDelimiter("\t");
+    
+    return new HttpMessageConverters(jsonConverter, xmlConverter, textMessageConverter);
+    
   }
-
-  @Override
-  public void configureContentNegotiation(ContentNegotiationConfigurer configurer){
-    configurer
-        //.favorPathExtension(false)
-        .useJaf(false)
-        .ignoreAcceptHeader(false)
-        .favorParameter(false)
-        .defaultContentType(MediaType.APPLICATION_JSON_UTF8);
-  }
-
+  
   @Bean
-  public CorsFilter corsFilter(){
-    return new CorsFilter();
+  public WebMvcConfigurer corsConfigurer(){
+    return new WebMvcConfigurer() {
+      @Override
+      public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/api/**");
+      }
+    };
   }
+  
+//
+//  @Bean
+//  public FilteringJackson2HttpMessageConverter filteringJackson2HttpMessageConverter(){
+//    FilteringJackson2HttpMessageConverter jsonConverter
+//        = new FilteringJackson2HttpMessageConverter();
+//    jsonConverter.setSupportedMediaTypes(ApiMediaTypes.getJsonMediaTypes());
+//    return jsonConverter;
+//  }
+//
+//  @Bean
+//  public MarshallingHttpMessageConverter marshallingHttpMessageConverter(){
+//    MarshallingHttpMessageConverter xmlConverter = new MarshallingHttpMessageConverter();
+//    xmlConverter.setSupportedMediaTypes(ApiMediaTypes.getXmlMediaTypes());
+//    XStreamMarshaller xStreamMarshaller = new XStreamMarshaller();
+//    xmlConverter.setMarshaller(xStreamMarshaller);
+//    xmlConverter.setUnmarshaller(xStreamMarshaller);
+//    return xmlConverter;
+//  }
+//
+//  @Bean
+//  public FilteringTextMessageConverter filteringTextMessageConverter(){
+//    FilteringTextMessageConverter filteringTextMessageConverter =
+//        new FilteringTextMessageConverter(new MediaType("text", "plain", Charset.forName("utf-8")));
+//    filteringTextMessageConverter.setDelimiter("\t");
+//    return filteringTextMessageConverter;
+//  }
+//
+//  @Override
+//  public void configureContentNegotiation(ContentNegotiationConfigurer configurer){
+//    configurer
+//        //.favorPathExtension(false)
+//        .useJaf(false)
+//        .ignoreAcceptHeader(false)
+//        .favorParameter(false)
+//        .defaultContentType(MediaType.APPLICATION_JSON_UTF8);
+//  }
+
+//  @Bean
+//  public CorsFilter corsFilter(){
+//    return new CorsFilter();
+//  }
 
   //TODO resolve this dependency
 //  @Bean
@@ -139,31 +172,32 @@ public class WebApplicationConfig extends WebMvcConfigurerAdapter {
 //        );
 //  }
 
-  @Override
-  public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
-    if (!registry.hasMappingForPattern("/webjars/**")){
-      registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
-    } else {
-      logger.info("[CENTROMERE] WebJar location already configured.");
-    }
-    if (webProperties.isEnableStaticContent()){
-      if (!registry.hasMappingForPattern("/static/**")){
-        registry.addResourceHandler("/static/**").addResourceLocations(
-            webProperties.getStaticContentLocation());
-        if (webProperties.getHomePage() != null && !"".equals(webProperties.getHomePage())
-            && webProperties.getHomePageLocation() != null && !"".equals(webProperties.getHomePageLocation())){
-          registry.addResourceHandler(webProperties.getHomePage())
-              .addResourceLocations(webProperties.getHomePageLocation());
-          logger.info(String.format("[CENTROMERE] Static home page configured at URL: /%s",
-              webProperties.getHomePage()));
-        } else {
-          logger.warn("[CENTROMERE] Static home page location not properly configured.");
-        }
-      } else {
-        logger.info("[CENTROMERE] Static content already configured.");
-      }
-    }
-  }
+  // TODO static resource handling
+//  @Override
+//  public void addResourceHandlers(ResourceHandlerRegistry registry) {
+//    registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
+//    if (!registry.hasMappingForPattern("/webjars/**")){
+//      registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+//    } else {
+//      logger.info("[CENTROMERE] WebJar location already configured.");
+//    }
+//    if (webProperties.isEnableStaticContent()){
+//      if (!registry.hasMappingForPattern("/static/**")){
+//        registry.addResourceHandler("/static/**").addResourceLocations(
+//            webProperties.getStaticContentLocation());
+//        if (webProperties.getHomePage() != null && !"".equals(webProperties.getHomePage())
+//            && webProperties.getHomePageLocation() != null && !"".equals(webProperties.getHomePageLocation())){
+//          registry.addResourceHandler(webProperties.getHomePage())
+//              .addResourceLocations(webProperties.getHomePageLocation());
+//          logger.info(String.format("[CENTROMERE] Static home page configured at URL: /%s",
+//              webProperties.getHomePage()));
+//        } else {
+//          logger.warn("[CENTROMERE] Static home page location not properly configured.");
+//        }
+//      } else {
+//        logger.info("[CENTROMERE] Static content already configured.");
+//      }
+//    }
+//  }
 	
 }

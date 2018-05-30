@@ -1,16 +1,14 @@
 package com.blueprint.centromere.tests.core;
 
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.model.Sample;
-import com.blueprint.centromere.core.commons.reader.TcgaSampleReader;
-import com.blueprint.centromere.core.commons.repository.DataFileRepository;
-import com.blueprint.centromere.core.commons.repository.DataSetRepository;
-import com.blueprint.centromere.core.commons.repository.SampleRepository;
-import com.blueprint.centromere.core.mongodb.model.MongoDataFile;
-import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
-import com.blueprint.centromere.core.mongodb.model.MongoGeneExpression;
-import com.blueprint.centromere.core.mongodb.model.MongoSample;
+import com.blueprint.centromere.core.dataimport.reader.impl.TcgaSampleReader;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.DataSource;
+import com.blueprint.centromere.core.model.impl.DataSource.SourceTypes;
+import com.blueprint.centromere.core.model.impl.GeneExpression;
+import com.blueprint.centromere.core.model.impl.Sample;
+import com.blueprint.centromere.core.repository.impl.DataSetRepository;
+import com.blueprint.centromere.core.repository.impl.DataSourceRepository;
+import com.blueprint.centromere.core.repository.impl.SampleRepository;
 import java.io.File;
 import java.util.Date;
 import org.junit.Before;
@@ -25,8 +23,8 @@ public class AbstractTcgaTests extends AbstractEntrezGeneTests {
 
   private static final ClassPathResource SUBJECTS_FILE = new ClassPathResource("samples/tcga_sample_subjects.txt");
 
-  @Autowired private DataFileRepository<MongoDataFile, String> dataFileRepository;
-  @Autowired private DataSetRepository<MongoDataSet, String> dataSetRepository;
+  @Autowired private DataSourceRepository dataSourceRepository;
+  @Autowired private DataSetRepository dataSetRepository;
   @Autowired private SampleRepository sampleRepository;
 
   @Override
@@ -34,12 +32,12 @@ public class AbstractTcgaTests extends AbstractEntrezGeneTests {
   public void setup() throws Exception {
     super.setup();
     sampleRepository.deleteAll();
-    TcgaSampleReader<MongoSample> reader = new TcgaSampleReader<>(MongoSample.class);
+    TcgaSampleReader reader = new TcgaSampleReader();
     try {
       DataSet dataSet = getDataSet();
-      DataFile dataFile = getDataFile(dataSet, SUBJECTS_FILE.getFile());
+      DataSource dataSource = getDataSource(dataSet, SUBJECTS_FILE.getFile());
       reader.setDataSet(dataSet);
-      reader.setDataFile(dataFile);
+      reader.setDataSource(dataSource);
       reader.doBefore();
       Sample sample = reader.readRecord();
       while (sample != null) {
@@ -55,7 +53,7 @@ public class AbstractTcgaTests extends AbstractEntrezGeneTests {
   }
 
   protected DataSet getDataSet(){
-    MongoDataSet dataSet = new MongoDataSet();
+    DataSet dataSet = new DataSet();
     dataSet.setDataSetId("TCGA-Test");
     dataSet.setName("TCGA Test Data Set");
     dataSet.setSource("TCGA");
@@ -64,20 +62,21 @@ public class AbstractTcgaTests extends AbstractEntrezGeneTests {
     return dataSet;
   }
 
-  protected DataFile getDataFile(DataSet dataSet, File file){
-    MongoDataFile dataFile = new MongoDataFile();
-    dataFile.setDataSetId(dataSet.getDataSetId());
-    dataFile.setDataType("RNA-Seq Gene Expression");
-    dataFile.setDateCreated(new Date());
-    dataFile.setDateUpdated(new Date());
-    dataFile.setModel(MongoGeneExpression.class);
-    dataFile.setFilePath(file.getAbsolutePath());
-    dataFile = dataFileRepository.insert(dataFile);
-    return dataFile;
+  protected DataSource getDataSource(DataSet dataSet, File file){
+    DataSource dataSource = new DataSource();
+    dataSource.setDataSetId(dataSet.getDataSetId());
+    dataSource.setDataType("RNA-Seq Gene Expression");
+    dataSource.setDateCreated(new Date());
+    dataSource.setDateUpdated(new Date());
+    dataSource.setModel(GeneExpression.class);
+    dataSource.setSource(file.getAbsolutePath());
+    dataSource.setSourceType(SourceTypes.FILE.toString());
+    dataSource = dataSourceRepository.insert(dataSource);
+    return dataSource;
   }
 
-  public DataFileRepository getDataFileRepository() {
-    return dataFileRepository;
+  public DataSourceRepository getDataSourceRepository() {
+    return dataSourceRepository;
   }
 
   public DataSetRepository getDataSetRepository() {

@@ -21,16 +21,16 @@ import com.blueprint.centromere.cli.CommandLineRunnerException;
 import com.blueprint.centromere.cli.Printer;
 import com.blueprint.centromere.cli.Printer.Level;
 import com.blueprint.centromere.cli.parameters.DeleteCommandParameters;
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.repository.DataFileRepository;
-import com.blueprint.centromere.core.commons.repository.DataOperations;
-import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.config.ModelResourceRegistry;
 import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.DataSource;
 import com.blueprint.centromere.core.repository.ModelRepository;
+import com.blueprint.centromere.core.repository.impl.DataSetRepository;
+import com.blueprint.centromere.core.repository.impl.DataSourceRepository;
+import com.blueprint.centromere.core.repository.impl.MetadataOperations;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class DeleteCommandExecutor {
   private static final Logger logger = LoggerFactory.getLogger(DeleteCommandExecutor.class);
   
   private DataSetRepository dataSetRepository;
-  private DataFileRepository dataFileRepository;
+  private DataSourceRepository dataSourceRepository;
   private ModelResourceRegistry resourceRegistry;
   private ModelRepositoryRegistry repositoryRegistry;
   private ConversionService conversionService;
@@ -108,20 +108,20 @@ public class DeleteCommandExecutor {
     T record = optional.get();
     
     // Delete the record(s)
-    if (DataFile.class.isAssignableFrom(model)){
+    if (DataSource.class.isAssignableFrom(model)){
       
-      DataFile dataFile = (DataFile) record;
+      DataSource dataSource = (DataSource) record;
       Printer.print(String.format("Deleting DataFile %s and all associated records",
-          dataFile.getFilePath()), logger, Level.INFO);
-      deleteDataFile(dataFile);
+          dataSource.getSource()), logger, Level.INFO);
+      deleteDataFile(dataSource);
       
     } else if (DataSet.class.isAssignableFrom(model)){
       
       DataSet dataSet = (DataSet) record;
       Printer.print(String.format("Deleting DataSet %s and all associated records and samples",
           dataSet.getDataSetId()), logger, Level.INFO);
-      for (String dataFileId: (List<String>) dataSet.getDataFileIds()){
-        Optional<DataFile> dfOptional = dataFileRepository.findByDataFileId(dataFileId);
+      for (String dataFileId: (List<String>) dataSet.getDataSourceIds()){
+        Optional<DataSource> dfOptional = dataSourceRepository.findByDataSourceId(dataFileId);
         if (dfOptional.isPresent()) {
           deleteDataFile(dfOptional.get());
         }
@@ -132,20 +132,20 @@ public class DeleteCommandExecutor {
       
       Printer.print(String.format("Deleting requested model %s record: %s", model.getName(), 
           parameters.getId()), logger, Level.INFO);
-      repository.delete(id);
+      repository.deleteById(id);
       
     }
     
   }
   
   @SuppressWarnings("unchecked")
-  private void deleteDataFile(DataFile dataFile) throws CommandLineRunnerException{
+  private void deleteDataFile(DataSource dataSource) throws CommandLineRunnerException{
     
     Class<? extends Model<?>> model;
     ModelRepository repository;
     
     try {
-      model = dataFile.getModelType();
+      model = (Class<? extends Model<?>>) dataSource.getModelType();
     } catch (ClassNotFoundException e){
       throw new CommandLineRunnerException(e);
     }
@@ -156,15 +156,15 @@ public class DeleteCommandExecutor {
       throw new CommandLineRunnerException(e);
     }
     
-    if (repository instanceof DataOperations){
-      DataOperations operations = (DataOperations) repository;
-      operations.deleteByDataFileId(dataFile.getDataFileId());
-      DataSet dataSet = (DataSet) dataSetRepository.findOne(dataFile.getDataSetId());
-      List<String> dataFileIds = dataSet.getDataFileIds();
-      dataFileIds.remove(dataFile.getDataFileId());
-      dataSet.setDataFileIds(dataFileIds);
+    if (repository instanceof MetadataOperations){
+      MetadataOperations operations = (MetadataOperations) repository;
+      operations.deleteByDataSourceId(dataSource.getDataSourceId());
+      DataSet dataSet = dataSetRepository.findByDataSourceId(dataSource.getDataSetId()).get(0);
+      List<String> dataFileIds = dataSet.getDataSourceIds();
+      dataFileIds.remove(dataSource.getDataSourceId());
+      dataSet.setDataSourceIds(dataFileIds);
       dataSetRepository.update(dataSet);
-      dataFileRepository.delete(dataFile);
+      dataSourceRepository.delete(dataSource);
     } else {
       Printer.print("The selected data type does not support record deletion: DataFile", logger, Level.WARN);
     }
@@ -186,8 +186,8 @@ public class DeleteCommandExecutor {
   }
 
   @Autowired
-  public void setDataFileRepository(DataFileRepository dataFileRepository) {
-    this.dataFileRepository = dataFileRepository;
+  public void setDataSourceRepository(DataSourceRepository dataSourceRepository) {
+    this.dataSourceRepository = dataSourceRepository;
   }
 
   @Autowired

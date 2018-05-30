@@ -4,10 +4,9 @@ import com.blueprint.centromere.cli.CentromereCommandLineInitializer;
 import com.blueprint.centromere.cli.CommandLineRunnerException;
 import com.blueprint.centromere.cli.commands.UpdateCommandExecutor;
 import com.blueprint.centromere.cli.parameters.UpdateCommandParameters;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.repository.impl.DataSetRepository;
 import com.blueprint.centromere.tests.cli.CommandLineTestInitializer;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import java.beans.PropertyDescriptor;
@@ -58,12 +57,12 @@ public class UpdateCommandTests extends AbstractRepositoryTests {
   @Test
   public void mergeTest() throws Exception {
     
-    DataSet dataSet1 = new MongoDataSet();
+    DataSet dataSet1 = new DataSet();
     dataSet1.setDataSetId("test");
     dataSet1.setName("This is a test");
     dataSet1.setSampleIds(Arrays.asList("12345"));
     
-    DataSet dataSet2 = new MongoDataSet();
+    DataSet dataSet2 = new DataSet();
     dataSet2.setDataSetId("new-name");
     dataSet2.setSource("internal");
     Map<String, String> map = new HashMap<>();

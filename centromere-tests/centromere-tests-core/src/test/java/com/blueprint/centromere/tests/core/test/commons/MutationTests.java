@@ -1,22 +1,21 @@
 package com.blueprint.centromere.tests.core.test.commons;
 
-import com.blueprint.centromere.core.commons.model.Mutation;
-import com.blueprint.centromere.core.commons.processor.MafMutationProcessor;
-import com.blueprint.centromere.core.commons.reader.MafFileReader;
 import com.blueprint.centromere.core.config.CoreConfiguration;
 import com.blueprint.centromere.core.config.DataImportProperties;
+import com.blueprint.centromere.core.config.MongoConfiguration;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.mongodb.MongoConfiguration;
-import com.blueprint.centromere.core.mongodb.model.MongoDataFile;
-import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
-import com.blueprint.centromere.core.mongodb.model.MongoGene;
-import com.blueprint.centromere.core.mongodb.model.MongoMutation;
-import com.blueprint.centromere.core.mongodb.model.MongoSample;
-import com.blueprint.centromere.core.mongodb.repository.MongoDataFileRepository;
-import com.blueprint.centromere.core.mongodb.repository.MongoDataSetRepository;
-import com.blueprint.centromere.core.mongodb.repository.MongoGeneRepository;
-import com.blueprint.centromere.core.mongodb.repository.MongoMutationRepository;
-import com.blueprint.centromere.core.mongodb.repository.MongoSampleRepository;
+import com.blueprint.centromere.core.dataimport.processor.impl.MafMutationProcessor;
+import com.blueprint.centromere.core.dataimport.reader.impl.MafSourceReader;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.DataSource;
+import com.blueprint.centromere.core.model.impl.Gene;
+import com.blueprint.centromere.core.model.impl.Mutation;
+import com.blueprint.centromere.core.model.impl.Sample;
+import com.blueprint.centromere.core.repository.impl.DataSetRepository;
+import com.blueprint.centromere.core.repository.impl.DataSourceRepository;
+import com.blueprint.centromere.core.repository.impl.GeneRepository;
+import com.blueprint.centromere.core.repository.impl.MutationRepository;
+import com.blueprint.centromere.core.repository.impl.SampleRepository;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import java.util.ArrayList;
@@ -45,11 +44,11 @@ import org.springframework.util.Assert;
 @ActiveProfiles({ Profiles.SCHEMA_DEFAULT })
 public class MutationTests extends AbstractRepositoryTests {
   
-  @Autowired private MongoSampleRepository sampleRepository;
-  @Autowired private MongoGeneRepository geneRepository;
-  @Autowired private MongoDataFileRepository dataFileRepository;
-  @Autowired private MongoDataSetRepository dataSetRepository;
-  @Autowired private MongoMutationRepository mutationRepository;
+  @Autowired private SampleRepository sampleRepository;
+  @Autowired private GeneRepository geneRepository;
+  @Autowired private DataSourceRepository dataSourceRepository;
+  @Autowired private DataSetRepository dataSetRepository;
+  @Autowired private MutationRepository mutationRepository;
   
   private static final Resource mafFile = new ClassPathResource("samples/mutations.maf");
 
@@ -65,20 +64,20 @@ public class MutationTests extends AbstractRepositoryTests {
     
     List<Mutation> mutations = new ArrayList<>();
     
-    MongoDataSet dataSet = dataSetRepository.findByDataSetId("DataSetA").get();
+    DataSet dataSet = dataSetRepository.findByDataSetId("DataSetA").get();
     Assert.notNull(dataSet);
-    MongoDataFile dataFile = new MongoDataFile();
-    dataFile.setDataSetId((String) dataSet.getId());
-    dataFile.setFilePath(mafFile.getFile().getAbsolutePath());
-    dataFile.setModel(Mutation.class);
-    dataFileRepository.insert(dataFile);
+    DataSource dataSource = new DataSource();
+    dataSource.setDataSetId((String) dataSet.getId());
+    dataSource.setSource(mafFile.getFile().getAbsolutePath());
+    dataSource.setModel(Mutation.class);
+    dataSourceRepository.insert(dataSource);
     
     DataImportProperties properties = new DataImportProperties();
     properties.setSkipInvalidSamples(true);
     properties.setSkipInvalidGenes(true);
     
-    MafFileReader<MongoMutation> reader = new MafFileReader<>(MongoMutation.class, geneRepository, sampleRepository, properties);
-    reader.setDataFile(dataFile);
+    MafSourceReader reader = new MafSourceReader(geneRepository, sampleRepository, properties);
+    reader.setDataSource(dataSource);
     reader.setDataSet(dataSet);
     reader.doBefore();
     
@@ -97,11 +96,11 @@ public class MutationTests extends AbstractRepositoryTests {
     
     Mutation record = mutations.get(0);
     Assert.notNull(record.getSampleId());
-    Optional<MongoSample> sampleOptional = sampleRepository.findById(record.getSampleId());
+    Optional<Sample> sampleOptional = sampleRepository.findById(record.getSampleId());
     Assert.isTrue(sampleOptional.isPresent());
     Assert.isTrue("SampleB".equals(sampleOptional.get().getSampleId()));
     Assert.notNull(record.getGeneId());
-    Optional<MongoGene> geneOptional = geneRepository.findById(record.getGeneId());
+    Optional<Gene> geneOptional = geneRepository.findById(record.getGeneId());
     Assert.isTrue(geneOptional.isPresent());
     Assert.isTrue("GeneA".equals(geneOptional.get().getSymbol()));
     Assert.isTrue("Missense_Mutation".equals(record.getVariantClassification()));
@@ -144,23 +143,23 @@ public class MutationTests extends AbstractRepositoryTests {
     
     Assert.isTrue(mutationRepository.count() == 0);
 
-    MongoDataSet dataSet = dataSetRepository.findByDataSetId("DataSetA").get();
+    DataSet dataSet = dataSetRepository.findByDataSetId("DataSetA").get();
     Assert.notNull(dataSet);
-    MongoDataFile dataFile = new MongoDataFile();
-    dataFile.setDataSetId(dataSet.getId());
-    dataFile.setFilePath(mafFile.getFile().getAbsolutePath());
-    dataFile.setModel(Mutation.class);
-    dataFileRepository.insert(dataFile);
+    DataSource dataSource = new DataSource();
+    dataSource.setDataSetId(dataSet.getId());
+    dataSource.setSource(mafFile.getFile().getAbsolutePath());
+    dataSource.setModel(Mutation.class);
+    dataSourceRepository.insert(dataSource);
 
     DataImportProperties properties = new DataImportProperties();
     properties.setSkipInvalidSamples(true);
     properties.setSkipInvalidGenes(true);
 
-    MafMutationProcessor<MongoMutation, String> processor = new MafMutationProcessor<>(MongoMutation.class, geneRepository, mutationRepository, sampleRepository, properties);
+    MafMutationProcessor processor = new MafMutationProcessor(geneRepository, mutationRepository, sampleRepository, properties);
     processor.setDataImportProperties(properties);
     processor.setDataSet(dataSet);
-    processor.setDataFile(dataFile);
-    processor.setDataFileRepository(dataFileRepository);
+    processor.setDataSource(dataSource);
+    processor.setDataSourceRepository(dataSourceRepository);
     processor.setDataSetRepository(dataSetRepository);
     processor.doBefore();
     processor.run();
@@ -170,17 +169,17 @@ public class MutationTests extends AbstractRepositoryTests {
     Assert.isTrue(processor.isSupportedDataType("maf_mutation"));
 
     Assert.isTrue(mutationRepository.count() > 0);
-    List<MongoMutation> mutations = (List<MongoMutation>) mutationRepository.findAll();
+    List<Mutation> mutations = (List<Mutation>) mutationRepository.findAll();
     Assert.notEmpty(mutations);
     Assert.isTrue(mutations.size() == 8);
 
     Mutation record = mutations.get(0);
     Assert.notNull(record.getSampleId());
-    Optional<MongoSample> sampleOptional = sampleRepository.findById(record.getSampleId());
+    Optional<Sample> sampleOptional = sampleRepository.findById(record.getSampleId());
     Assert.isTrue(sampleOptional.isPresent());
     Assert.isTrue("SampleB".equals(sampleOptional.get().getSampleId()));
     Assert.notNull(record.getGeneId());
-    Optional<MongoGene> geneOptional = geneRepository.findById(record.getGeneId());
+    Optional<Gene> geneOptional = geneRepository.findById(record.getGeneId());
     Assert.isTrue(geneOptional.isPresent());
     Assert.isTrue("GeneA".equals(geneOptional.get().getSymbol()));
     Assert.isTrue("Missense_Mutation".equals(record.getVariantClassification()));

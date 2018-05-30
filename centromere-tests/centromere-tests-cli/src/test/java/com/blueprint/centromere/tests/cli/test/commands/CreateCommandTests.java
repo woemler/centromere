@@ -4,12 +4,10 @@ import com.blueprint.centromere.cli.CentromereCommandLineInitializer;
 import com.blueprint.centromere.cli.CommandLineRunnerException;
 import com.blueprint.centromere.cli.commands.CreateCommandExecutor;
 import com.blueprint.centromere.cli.parameters.CreateCommandParameters;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.model.GeneExpression;
-import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.mongodb.model.MongoDataSet;
-import com.blueprint.centromere.core.mongodb.model.MongoGeneExpression;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.GeneExpression;
+import com.blueprint.centromere.core.repository.impl.DataSetRepository;
 import com.blueprint.centromere.tests.cli.CommandLineTestInitializer;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import java.util.HashMap;
@@ -83,7 +81,7 @@ public class CreateCommandTests extends AbstractRepositoryTests {
   @Test
   public void beanWrapperTest(){
     
-    BeanWrapper wrapper = new BeanWrapperImpl(MongoDataSet.class);
+    BeanWrapper wrapper = new BeanWrapperImpl(DataSet.class);
     wrapper.setPropertyValue("dataSetId", "test");
     wrapper.setPropertyValue("name", "This is a test");
     wrapper.setPropertyValue("sampleIds", "sample");
@@ -100,7 +98,7 @@ public class CreateCommandTests extends AbstractRepositoryTests {
     Assert.isTrue(dataSet.getAttributes().containsKey("flag"));
     Assert.isTrue("Y".equals(dataSet.getAttribute("flag")));
     
-    wrapper = new BeanWrapperImpl(MongoGeneExpression.class);
+    wrapper = new BeanWrapperImpl(GeneExpression.class);
     wrapper.setPropertyValue("value", "1.23");
     GeneExpression expression = (GeneExpression) wrapper.getWrappedInstance();
     Assert.notNull(expression.getValue());

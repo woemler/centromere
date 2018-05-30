@@ -18,19 +18,19 @@ package com.blueprint.centromere.ws.controller;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-import com.blueprint.centromere.core.commons.model.Data;
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.model.Gene;
-import com.blueprint.centromere.core.commons.model.Sample;
-import com.blueprint.centromere.core.commons.repository.MetadataOperations;
 import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.config.ModelResourceRegistry;
 import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.DataSource;
+import com.blueprint.centromere.core.model.impl.Gene;
+import com.blueprint.centromere.core.model.impl.Metadata;
+import com.blueprint.centromere.core.model.impl.Sample;
 import com.blueprint.centromere.core.repository.Evaluation;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import com.blueprint.centromere.core.repository.QueryCriteria;
+import com.blueprint.centromere.core.repository.impl.GuessOperations;
 import com.blueprint.centromere.ws.config.ApiMediaTypes;
 import com.blueprint.centromere.ws.exception.InvalidParameterException;
 import com.blueprint.centromere.ws.exception.ResourceNotFoundException;
@@ -208,12 +208,12 @@ public class ModelSearchController {
       throw new ResourceNotFoundException();
     }
     
-    if (!(repository instanceof MetadataOperations)){
+    if (!(repository instanceof GuessOperations)){
       throw new ResourceNotFoundException();
     }
     
-    MetadataOperations<T> metadataOperations = (MetadataOperations<T>) repository;
-    List<T> entities = metadataOperations.guess(keyword);
+    GuessOperations<T> guessOperations = (GuessOperations<T>) repository;
+    List<T> entities = guessOperations.guess(keyword);
     ResponseEnvelope<Object> envelope = null;
 
     Set<String> fields = RequestUtils.getFilteredFieldsFromRequest(request);
@@ -237,7 +237,7 @@ public class ModelSearchController {
 
   /**
    * {@code GET /{uri}/search/{linked}}
-   * Fetches all data records associated with the queried {@link com.blueprint.centromere.core.commons.model.Sample}
+   * Fetches all data records associated with the queried {@link Sample}
    *   record.
    *
    * @param pagedResourcesAssembler {@link PagedResourcesAssembler}
@@ -284,7 +284,7 @@ public class ModelSearchController {
         throw new ResourceNotFoundException();
       }
       model = (Class<T>) resourceRegistry.getModelByUri(uri);
-      if (!Data.class.isAssignableFrom(model)){
+      if (!Metadata.class.isAssignableFrom(model)){
         logger.error(String.format("URI does not map to a valid model: %s", uri));
         throw new ResourceNotFoundException();
       }
@@ -326,8 +326,8 @@ public class ModelSearchController {
       metaField = "sampleId";
     } else if (Gene.class.isAssignableFrom(metaModel)){
       metaField = "geneId";
-    } else if (DataFile.class.isAssignableFrom(metaModel)){
-      metaField = "dataFileId";
+    } else if (DataSource.class.isAssignableFrom(metaModel)){
+      metaField = "dataSourceId";
     } else if (DataSet.class.isAssignableFrom(metaModel)){
       metaField = "dataSetId";
     } else {

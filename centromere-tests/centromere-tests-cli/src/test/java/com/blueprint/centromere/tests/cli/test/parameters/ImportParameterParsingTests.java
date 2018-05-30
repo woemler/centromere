@@ -54,7 +54,7 @@ public class ImportParameterParsingTests {
     Assert.isTrue("gene_info".equals(parameters.getDataType()), "Data type should be 'gene_info'");
     Assert.isTrue(parameters.isOverwrite(), "Overwrite flag should be true");
     Assert.isTrue(parameters.isSkipInvalidGenes(), "Skip invalid genes should be true");
-    Assert.isTrue(!parameters.isSkipInvalidFiles(), "Skip invalid files should be false");
+    Assert.isTrue(!parameters.isSkipInvalidSource(), "Skip invalid files should be false");
     Assert.isTrue(!parameters.isSkipInvalidRecords(), "Skip invalid records should be false");
     Assert.isTrue(!parameters.isSkipInvalidSamples(), "Skip invalid samples should be false");
     Assert.isTrue(!parameters.getAttributes().isEmpty(), "Attributes should not be empty");
@@ -95,7 +95,7 @@ public class ImportParameterParsingTests {
     Assert.isTrue(parameters.getDataType() == null, "Data type must be null");
     Assert.isTrue(!parameters.isOverwrite(), "Overwrite flag should be false");
     Assert.isTrue(!parameters.isSkipInvalidGenes(), "Skip invalid genes should be false");
-    Assert.isTrue(!parameters.isSkipInvalidFiles(), "Skip invalid files should be false");
+    Assert.isTrue(!parameters.isSkipInvalidSource(), "Skip invalid files should be false");
     Assert.isTrue(!parameters.isSkipInvalidRecords(), "Skip invalid records should be false");
     Assert.isTrue(!parameters.isSkipInvalidSamples(), "Skip invalid samples should be false");
 
@@ -132,7 +132,7 @@ public class ImportParameterParsingTests {
     Assert.isTrue(parameters.getDataType() == null, "Data type must be null");
     Assert.isTrue(!parameters.isOverwrite(), "Overwrite flag should be false");
     Assert.isTrue(!parameters.isSkipInvalidGenes(), "Skip invalid genes should be false");
-    Assert.isTrue(!parameters.isSkipInvalidFiles(), "Skip invalid files should be false");
+    Assert.isTrue(!parameters.isSkipInvalidSource(), "Skip invalid files should be false");
     Assert.isTrue(!parameters.isSkipInvalidRecords(), "Skip invalid records should be false");
     Assert.isTrue(!parameters.isSkipInvalidSamples(), "Skip invalid samples should be false");
 

@@ -22,15 +22,16 @@ import com.blueprint.centromere.cli.ModelProcessorBeanRegistry;
 import com.blueprint.centromere.cli.Printer;
 import com.blueprint.centromere.cli.Printer.Level;
 import com.blueprint.centromere.cli.parameters.ImportCommandParameters;
-import com.blueprint.centromere.core.commons.model.DataFile;
-import com.blueprint.centromere.core.commons.model.DataSet;
-import com.blueprint.centromere.core.commons.repository.DataFileRepository;
-import com.blueprint.centromere.core.commons.repository.DataOperations;
-import com.blueprint.centromere.core.commons.repository.DataSetRepository;
 import com.blueprint.centromere.core.config.DataImportProperties;
 import com.blueprint.centromere.core.dataimport.exception.DataImportException;
 import com.blueprint.centromere.core.dataimport.processor.RecordProcessor;
+import com.blueprint.centromere.core.model.impl.DataSet;
+import com.blueprint.centromere.core.model.impl.DataSource;
+import com.blueprint.centromere.core.model.impl.DataSource.SourceTypes;
 import com.blueprint.centromere.core.repository.ModelRepository;
+import com.blueprint.centromere.core.repository.impl.DataSetRepository;
+import com.blueprint.centromere.core.repository.impl.DataSourceRepository;
+import com.blueprint.centromere.core.repository.impl.MetadataOperations;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
@@ -56,7 +57,7 @@ public class ImportCommandExecutor {
 	
 	private ModelProcessorBeanRegistry processorRegistry;
 	private DataSetRepository dataSetRepository;
-	private DataFileRepository dataFileRepository;
+	private DataSourceRepository dataSourceRepository;
 	private Repositories repositories;
 	private DataImportProperties dataImportProperties;
 	
@@ -87,7 +88,7 @@ public class ImportCommandExecutor {
 		Printer.print(String.format("Running file import: data-type=%s  file=%s", dataType, filePath), logger, Level.INFO);
 		
 	  // Get the data set
-    Optional<DataSet> dataSetOptional = Optional.ofNullable((DataSet) dataSetRepository.findOne(dataSetId));
+    Optional<DataSet> dataSetOptional = dataSetRepository.findById(dataSetId);
     if (!dataSetOptional.isPresent()){
       dataSetOptional = dataSetRepository.findByDataSetId(dataSetId);
     }
@@ -99,13 +100,13 @@ public class ImportCommandExecutor {
     Printer.print(String.format("Using DataSet record: %s", dataSet.toString()), logger, Level.INFO);
 
     // Get the data file record
-    DataFile dataFile;
-    Optional<DataFile> dfOptional = dataFileRepository.findByFilePath(filePath);
+    DataSource dataSource;
+    Optional<DataSource> dfOptional = dataSourceRepository.findBySource(filePath);
     
     // DataFile record already exists
     if (dfOptional.isPresent()){
       
-      dataFile = dfOptional.get();
+      dataSource = dfOptional.get();
       
       // No overwrite
       if (!parameters.isOverwrite()){
@@ -123,7 +124,7 @@ public class ImportCommandExecutor {
           try {
             HashCode hashCode = Files.hash(new File(filePath), Hashing.md5());
             String checksum = hashCode.toString();
-            if (dataFile.getChecksum().equalsIgnoreCase(checksum)) {
+            if (dataSource.getChecksum().equalsIgnoreCase(checksum)) {
               Printer.print(
                   String.format("File is identical to original, overwrite will be skipped: %s",
                       filePath), logger, Level.INFO);
@@ -139,33 +140,36 @@ public class ImportCommandExecutor {
         // Get the repository for the file's data type
         ModelRepository r;
         try {
-          r = (ModelRepository) repositories.getRepositoryFor(dataFile.getModelType());
+          Optional<Object> optionalRepository = repositories.getRepositoryFor(dataSource.getModelType());
+          if (optionalRepository.isPresent()){
+            r = (ModelRepository) optionalRepository.get();
+          } else {
+            throw new ClassNotFoundException(
+                String.format("No ModelRepository found for data source type: %s", 
+                    dataSource.getModelType())
+            );
+          }
         } catch (ClassNotFoundException e){
           throw new CommandLineRunnerException(e);
         }
 
         // If possible, delete the associated records for the file
-        if (r instanceof DataOperations) {
-          ((DataOperations) r).deleteByDataFileId((String) dataFile.getId());
+        if (r instanceof MetadataOperations) {
+          ((MetadataOperations) r).deleteByDataSourceId(dataSource.getId());
         } else {
           Printer.print("Data is not over-writable.  Exiting.", logger, Level.WARN);
           return;
         }
 
         // Update the existing record
-        dataFile.setDateCreated(dataFile.getDateCreated());
-        dataFile.addAttributes(attributes);
+        dataSource.setDateCreated(dataSource.getDateCreated());
+        dataSource.addAttributes(attributes);
         //dataFileRepository.delete(dataFile);
+        if (parameters.getDataSourceId() != null) dataSource.setDataSourceId(parameters.getDataSourceId());
         
-        try {
-          dataFile.setDataFileId(DataFile.generateFileId(dataFile));
-        } catch (Exception e){
-          throw new CommandLineRunnerException(e);
-        }
-
-        Printer.print(String.format("Updating existing data file record: %s", dataFile.toString()),
+        Printer.print(String.format("Updating existing data file record: %s", dataSource.toString()),
             logger, Level.INFO);
-        dataFile = (DataFile) dataFileRepository.update(dataFile);
+        dataSource = dataSourceRepository.update(dataSource);
         
       }
     } 
@@ -174,43 +178,40 @@ public class ImportCommandExecutor {
     else {
 
       try {
-        dataFile = (DataFile) dataFileRepository.getModel().newInstance();
+        dataSource = (DataSource) dataSourceRepository.getModel().newInstance();
       } catch (Exception e){
         throw new CommandLineRunnerException(e);
       }
-      dataFile.setFilePath(filePath);
-      dataFile.setDataType(dataType);
-      dataFile.setModel(processor.getModel());
-      dataFile.setDataSetId(dataSet.getDataSetId());
-      dataFile.setDateCreated(new Date());
-      dataFile.setDateUpdated(new Date());
-      dataFile.addAttributes(attributes);
+      dataSource.setSource(filePath);
+      dataSource.setSourceType(SourceTypes.FILE.toString());
+      dataSource.setDataType(dataType);
+      dataSource.setModel(processor.getModel());
+      dataSource.setDataSetId(dataSet.getDataSetId());
+      dataSource.setDateCreated(new Date());
+      dataSource.setDateUpdated(new Date());
+      dataSource.addAttributes(attributes);
       
       File file = new File(filePath);
       if (file.exists() && file.isFile()) {
         try {
           HashCode hashCode = Files.hash(file, Hashing.md5());
-          dataFile.setChecksum(hashCode.toString());
+          dataSource.setChecksum(hashCode.toString());
         } catch (IOException e) {
           throw new CommandLineRunnerException(e);
         }
       }
-      
-      try {
-        dataFile.setDataFileId(DataFile.generateFileId(dataFile));
-      } catch (Exception e){
-        throw new CommandLineRunnerException(e);
-      }
 
-      Printer.print(String.format("Registering new data file record: %s", dataFile.toString()),
+      if (parameters.getDataSourceId() != null) dataSource.setDataSourceId(parameters.getDataSourceId());
+
+      Printer.print(String.format("Registering new data file record: %s", dataSource.toString()),
           logger, Level.INFO);
-      dataFile = (DataFile) dataFileRepository.insert(dataFile);
+      dataSource = dataSourceRepository.insert(dataSource);
       
     }
 
 		// Configure the processor
 		processor.setDataSet(dataSet);
-    processor.setDataFile(dataFile);
+    processor.setDataSource(dataSource);
     runProcessor(processor);
     Printer.print("File processing complete.", logger, Level.INFO);
     
@@ -279,7 +280,7 @@ public class ImportCommandExecutor {
   }
 	
   private void updateDataImportProperties(ImportCommandParameters parameters){
-	  dataImportProperties.setSkipInvalidFiles(parameters.isSkipInvalidFiles());
+	  dataImportProperties.setSkipInvalidDataSource(parameters.isSkipInvalidSource());
     dataImportProperties.setSkipInvalidGenes(parameters.isSkipInvalidGenes());
     dataImportProperties.setSkipInvalidRecords(parameters.isSkipInvalidRecords());
     dataImportProperties.setSkipInvalidSamples(parameters.isSkipInvalidSamples());
@@ -301,8 +302,8 @@ public class ImportCommandExecutor {
   }
 
   @Autowired
-  public void setDataFileRepository(DataFileRepository dataFileRepository) {
-    this.dataFileRepository = dataFileRepository;
+  public void setDataSourceRepository(DataSourceRepository dataSourceRepository) {
+    this.dataSourceRepository = dataSourceRepository;
   }
 
   @Autowired

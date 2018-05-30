@@ -24,9 +24,10 @@ import com.blueprint.centromere.ws.config.WebSecurityConfig;
 import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 /**
  * @author woemler
@@ -40,7 +41,7 @@ public class CentromereWebInitializer extends SpringBootServletInitializer {
     SpringApplicationBuilder builder = new SpringApplicationBuilder(source);
     builder.child(WebApplicationConfig.class, WebSecurityConfig.class, SwaggerConfig.class);
     builder.profiles(getActiveProfiles(source));
-    builder.web(true);
+    builder.web(WebApplicationType.SERVLET);
     builder.run(args);
   }
   
