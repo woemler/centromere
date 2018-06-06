@@ -39,6 +39,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
 import org.springframework.oxm.xstream.XStreamMarshaller;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -49,8 +50,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @SuppressWarnings("SpringJavaAutowiringInspection")
 @Configuration
 @EnableSpringDataWebSupport
-//@EnableHypermediaSupport(type = { EnableHypermediaSupport.HypermediaType.HAL }) // Not needed in Spring boot 2
-//@EnableEntityLinks
 @Import({
 		WebSecurityConfig.class,
 		SwaggerConfig.class
@@ -102,102 +101,47 @@ public class WebApplicationConfig {
   }
   
   @Bean
-  public WebMvcConfigurer corsConfigurer(){
+  public WebMvcConfigurer webMvcConfigurer(){
     return new WebMvcConfigurer() {
+      
       @Override
       public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**");
       }
+
+      @Override
+      public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        
+        // Swagger webjars
+        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
+        if (!registry.hasMappingForPattern("/webjars/**")){
+          registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+        } else {
+          logger.info("[CENTROMERE] WebJar location already configured.");
+        }
+        
+        // Static content
+        // TODO: make static content default
+        if (webProperties.isEnableStaticContent()){
+          if (!registry.hasMappingForPattern("/static/**")){
+            registry.addResourceHandler("/static/**").addResourceLocations(
+                webProperties.getStaticContentLocation());
+            if (webProperties.getHomePage() != null && !"".equals(webProperties.getHomePage())
+                && webProperties.getHomePageLocation() != null && !"".equals(webProperties.getHomePageLocation())){
+              registry.addResourceHandler(webProperties.getHomePage())
+                  .addResourceLocations(webProperties.getHomePageLocation());
+              logger.info(String.format("[CENTROMERE] Static home page configured at URL: /%s",
+                  webProperties.getHomePage()));
+            } else {
+              logger.warn("[CENTROMERE] Static home page location not properly configured.");
+            }
+          } else {
+            logger.info("[CENTROMERE] Static content already configured.");
+          }
+        }
+        
+      }
     };
   }
   
-//
-//  @Bean
-//  public FilteringJackson2HttpMessageConverter filteringJackson2HttpMessageConverter(){
-//    FilteringJackson2HttpMessageConverter jsonConverter
-//        = new FilteringJackson2HttpMessageConverter();
-//    jsonConverter.setSupportedMediaTypes(ApiMediaTypes.getJsonMediaTypes());
-//    return jsonConverter;
-//  }
-//
-//  @Bean
-//  public MarshallingHttpMessageConverter marshallingHttpMessageConverter(){
-//    MarshallingHttpMessageConverter xmlConverter = new MarshallingHttpMessageConverter();
-//    xmlConverter.setSupportedMediaTypes(ApiMediaTypes.getXmlMediaTypes());
-//    XStreamMarshaller xStreamMarshaller = new XStreamMarshaller();
-//    xmlConverter.setMarshaller(xStreamMarshaller);
-//    xmlConverter.setUnmarshaller(xStreamMarshaller);
-//    return xmlConverter;
-//  }
-//
-//  @Bean
-//  public FilteringTextMessageConverter filteringTextMessageConverter(){
-//    FilteringTextMessageConverter filteringTextMessageConverter =
-//        new FilteringTextMessageConverter(new MediaType("text", "plain", Charset.forName("utf-8")));
-//    filteringTextMessageConverter.setDelimiter("\t");
-//    return filteringTextMessageConverter;
-//  }
-//
-//  @Override
-//  public void configureContentNegotiation(ContentNegotiationConfigurer configurer){
-//    configurer
-//        //.favorPathExtension(false)
-//        .useJaf(false)
-//        .ignoreAcceptHeader(false)
-//        .favorParameter(false)
-//        .defaultContentType(MediaType.APPLICATION_JSON_UTF8);
-//  }
-
-//  @Bean
-//  public CorsFilter corsFilter(){
-//    return new CorsFilter();
-//  }
-
-  //TODO resolve this dependency
-//  @Bean
-//  public EmbeddedServletContainerCustomizer servletContainerCustomizer(){
-//    return configurableEmbeddedServletContainer ->
-//        ((TomcatEmbeddedServletContainerFactory) configurableEmbeddedServletContainer).addConnectorCustomizers(
-//            new TomcatConnectorCustomizer() {
-//              @Override
-//              public void customize(Connector connector) {
-//                AbstractHttp11Protocol httpProtocol = (AbstractHttp11Protocol) connector.getProtocolHandler();
-//                httpProtocol.setCompression("on");
-//                httpProtocol.setCompressionMinSize(256);
-//                String mimeTypes = httpProtocol.getCompressableMimeType();
-//                String mimeTypesWithJson = mimeTypes + "," + MediaType.APPLICATION_JSON_VALUE;
-//                httpProtocol.setCompressableMimeType(mimeTypesWithJson);
-//              }
-//            }
-//        );
-//  }
-
-  // TODO static resource handling
-//  @Override
-//  public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//    registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
-//    if (!registry.hasMappingForPattern("/webjars/**")){
-//      registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
-//    } else {
-//      logger.info("[CENTROMERE] WebJar location already configured.");
-//    }
-//    if (webProperties.isEnableStaticContent()){
-//      if (!registry.hasMappingForPattern("/static/**")){
-//        registry.addResourceHandler("/static/**").addResourceLocations(
-//            webProperties.getStaticContentLocation());
-//        if (webProperties.getHomePage() != null && !"".equals(webProperties.getHomePage())
-//            && webProperties.getHomePageLocation() != null && !"".equals(webProperties.getHomePageLocation())){
-//          registry.addResourceHandler(webProperties.getHomePage())
-//              .addResourceLocations(webProperties.getHomePageLocation());
-//          logger.info(String.format("[CENTROMERE] Static home page configured at URL: /%s",
-//              webProperties.getHomePage()));
-//        } else {
-//          logger.warn("[CENTROMERE] Static home page location not properly configured.");
-//        }
-//      } else {
-//        logger.info("[CENTROMERE] Static content already configured.");
-//      }
-//    }
-//  }
-	
 }

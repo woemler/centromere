@@ -48,6 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -61,7 +62,7 @@ import org.springframework.util.Assert;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = WebTestInitializer.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(value = { Profiles.SCHEMA_DEFAULT, Profiles.WEB_PROFILE, Profiles.NO_SECURITY, Profiles.API_DOCUMENTATION_DISABLED_PROFILE })
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(secure = false)
 public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   private static final String BASE_URL = "/api/gene";
@@ -71,6 +72,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   @Autowired private GeneExpressionRepository geneExpressionRepository;
   @Autowired private MockMvc mockMvc;
   @Autowired private ModelResourceRegistry registry;
+  @Autowired private Environment environment;
 
   @Test
   public void headTest() throws Exception {
@@ -559,6 +561,8 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .andExpect(status().isNotFound());
 
   }
+  
+  // Options
 
 //	@Test
 //	public void optionsTest() throws Exception {
@@ -600,6 +604,38 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .andExpect(jsonPath("$.code", is(400)))
         .andExpect(jsonPath("$", hasKey("message")));
   }
-
+  
+  
+  // Compression
+  
+  // TODO: How to get this to pass? Do we need more data to get the compression to trigger?
+//  @Test
+//  public void defaultCompressionTest() throws Exception {
+//
+//    Assert.isTrue(environment.getProperty("server.compression.enabled").equals("true"));
+//
+//    mockMvc.perform(get(BASE_URL + "?size=1000").header("Accept-Encoding", "gzip, deflate"))
+//        .andExpect(status().isOk())
+//        .andDo(MockMvcResultHandlers.print())
+//        .andExpect(MockMvcResultMatchers.header().string("Content-Encoding", "gzip"));
+//  }
+  
+  // CORS
+  
+  @Test
+  public void corsTest() throws Exception {
+    mockMvc.perform(get(BASE_URL + "?size=10").header("Origin", "http://www.someurl.com"))
+        .andExpect(status().isOk());
+  }
+  
+  // Home page
+  @Test
+  public void homePageTest() throws Exception {
+    
+    Assert.isTrue(environment.getProperty("centromere.web.enable-static-content").equals("true"), "centromere.web.enable-static-content property should be set to true");
+    
+    mockMvc.perform(get("/index.html").accept(MediaType.TEXT_HTML))
+        .andExpect(status().isOk());
+  }
 
 }

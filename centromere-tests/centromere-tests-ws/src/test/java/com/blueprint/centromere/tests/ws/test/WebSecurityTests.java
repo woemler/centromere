@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ActiveProfiles;
@@ -51,10 +52,10 @@ import org.springframework.web.context.WebApplicationContext;
  * @author woemler
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = { WebTestInitializer.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = WebTestInitializer.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(value = {Profiles.SCHEMA_DEFAULT, Profiles.WEB_PROFILE, Profiles.SECURE_READ_WRITE_PROFILE, Profiles.API_DOCUMENTATION_DISABLED_PROFILE})
-@AutoConfigureMockMvc
-@SuppressWarnings("SpringJavaAutowiringInspection")
+@AutoConfigureMockMvc(secure = false)
+@SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
 public class WebSecurityTests {
 	
 	@Autowired private WebApplicationContext context;
@@ -62,13 +63,14 @@ public class WebSecurityTests {
 	@Autowired private FilterChainProxy springSecurityFilterChain;
 	@Autowired private BasicTokenUtils tokenUtils;
 	@Autowired private MockMvc mockMvc;
+	@Autowired(required = false) private UserDetailsService userDetailsService;
 	private static boolean isConfigured = false;
 	
 	@Before
 	public void setup() throws Exception {
 		if (!isConfigured){
 			userRepository.deleteAll();
-			User user = (User) userRepository.getModel().newInstance();
+			User user = userRepository.getModel().newInstance();
 			user.setUsername("user");
 			user.setPassword(new BCryptPasswordEncoder().encode("password"));
 			user.setEnabled(true);
@@ -76,6 +78,13 @@ public class WebSecurityTests {
 			isConfigured = true;
 		}
 	}
+	
+	@Test
+  public void configurationTest() throws Exception {
+	  Assert.notNull(userDetailsService);
+	  Assert.notNull(userRepository);
+	  Assert.isTrue(userDetailsService.equals(userRepository));
+  }
 
 	@Test
 	public void nonAuthenticatedGetRequestTest() throws Exception {
@@ -106,6 +115,8 @@ public class WebSecurityTests {
 		mockMvc.perform(post("/authenticate")
 				.with(httpBasic("not", "correct")))
 				.andExpect(status().isUnauthorized());
+    mockMvc.perform(get("/api/genes"))
+        .andExpect(status().isForbidden());
 	}
 
 	@Test
@@ -113,6 +124,8 @@ public class WebSecurityTests {
 		mockMvc.perform(post("/authenticate")
 				.with(httpBasic("user", "notpassword")))
 				.andExpect(status().isUnauthorized());
+    mockMvc.perform(get("/api/genes"))
+        .andExpect(status().isForbidden());
 	}
 
 	@Test
@@ -125,7 +138,11 @@ public class WebSecurityTests {
 
 	@Test
 	public void userAuthenticationTest() throws Exception {
-		MvcResult result = mockMvc.perform(post("/authenticate")
+
+    mockMvc.perform(get("/api/genes"))
+        .andExpect(status().isForbidden());
+	  
+	  MvcResult result = mockMvc.perform(post("/authenticate")
         .header("Accept", "application/json")
 				.with(httpBasic("user", "password")))
 				.andExpect(status().isOk())

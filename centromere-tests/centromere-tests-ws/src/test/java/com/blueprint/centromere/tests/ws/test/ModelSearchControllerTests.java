@@ -51,7 +51,7 @@ import org.springframework.util.Assert;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = WebTestInitializer.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(value = { Profiles.SCHEMA_DEFAULT, Profiles.WEB_PROFILE, Profiles.NO_SECURITY, Profiles.API_DOCUMENTATION_DISABLED_PROFILE })
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(secure = false)
 public class ModelSearchControllerTests extends AbstractRepositoryTests {
 
   private static final String BASE_URL = "/api/gene/search";

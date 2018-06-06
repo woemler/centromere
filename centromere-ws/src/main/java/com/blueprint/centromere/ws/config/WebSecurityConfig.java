@@ -21,7 +21,6 @@ import com.blueprint.centromere.core.config.WebProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
@@ -46,9 +45,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     
     private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
 
-    @SuppressWarnings("SpringJavaAutowiringInspection")
+    @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
     @Autowired
-    @Qualifier("userRepository")
     private UserDetailsService userService;
 
     @Autowired
@@ -63,7 +61,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Profile({ Profiles.NO_SECURITY })
     public static class OpenReadWriteTokenSecurityConfig extends TokenSecurityConfiguration {
         
-        @Autowired private WebProperties webProperties;
+        @Autowired
+        @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
+        private WebProperties webProperties;
         
         @Override
         protected void configure(HttpSecurity http) throws Exception {
@@ -80,59 +80,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatcher(secureUrl)
                     .authorizeRequests()
                         .anyRequest().permitAll()
-//                        .antMatchers(HttpMethod.GET, secureUrl).permitAll()
-//                        .antMatchers(HttpMethod.POST, secureUrl).permitAll()
-//                        .antMatchers(HttpMethod.PUT, secureUrl).permitAll()
-//                        .antMatchers(HttpMethod.DELETE, secureUrl).permitAll()
-//                        .antMatchers(HttpMethod.PATCH, secureUrl).permitAll()
-//                        .antMatchers(HttpMethod.OPTIONS, secureUrl).permitAll()
-//                        .antMatchers(HttpMethod.HEAD, secureUrl).permitAll()
                 .and().csrf()
                     .disable();
 
         }
     }
 
-//    @Configuration
-//    @Order(1)
-//    @Profile({Profiles.SECURE_WRITE_PROFILE})
-//    public static class SecuredWriteTokenSecurityConfig extends TokenSecurityConfiguration {
-//
-//        @Autowired private Environment env;
-//
-//        @Override
-//        protected void configure(HttpSecurity http) throws Exception {
-//
-//            String secureUrl = env.getRequiredProperty("centromere.security.secure-url");
-//            logger.info(String.format("Configuring web security with OPEN READ and RESTRICTED WRITE "
-//                + "for API root %s", secureUrl));
-//
-//            http
-//                .sessionManagement()
-//                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and().addFilterBefore(authenticationTokenProcessingFilter(),
-//                    UsernamePasswordAuthenticationFilter.class)
-//                    .antMatcher(secureUrl)
-//                    .authorizeRequests()
-//                        .antMatchers(HttpMethod.GET, secureUrl).permitAll()
-//                        .antMatchers(HttpMethod.POST, secureUrl).fullyAuthenticated()
-//                        .antMatchers(HttpMethod.PUT, secureUrl).fullyAuthenticated()
-//                        .antMatchers(HttpMethod.DELETE, secureUrl).fullyAuthenticated()
-//                        .antMatchers(HttpMethod.PATCH, secureUrl).fullyAuthenticated()
-//                        .antMatchers(HttpMethod.OPTIONS, secureUrl).permitAll()
-//                        .antMatchers(HttpMethod.HEAD, secureUrl).permitAll()
-//                .and().csrf()
-//                    .disable();
-//
-//        }
-//    }
-
     @Configuration
     @Order(1)
     @Profile({Profiles.SECURE_READ_WRITE_PROFILE})
     public static class SecuredReadWriteTokenSecurityConfig extends TokenSecurityConfiguration {
 
-        @Autowired private WebProperties webProperties;
+        @Autowired
+        @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
+        private WebProperties webProperties;
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
@@ -149,13 +110,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatcher(secureUrl)
                     .authorizeRequests()
                       .anyRequest().fullyAuthenticated()
-//                      .antMatchers(HttpMethod.GET, secureUrl).fullyAuthenticated()
-//                      .antMatchers(HttpMethod.POST, secureUrl).fullyAuthenticated()
-//                      .antMatchers(HttpMethod.PUT, secureUrl).fullyAuthenticated()
-//                      .antMatchers(HttpMethod.DELETE, secureUrl).fullyAuthenticated()
-//                      .antMatchers(HttpMethod.PATCH, secureUrl).fullyAuthenticated()
-//                      .antMatchers(HttpMethod.OPTIONS, secureUrl).fullyAuthenticated()
-//                      .antMatchers(HttpMethod.HEAD, secureUrl).fullyAuthenticated()
                 .and().csrf()
                     .disable();
 

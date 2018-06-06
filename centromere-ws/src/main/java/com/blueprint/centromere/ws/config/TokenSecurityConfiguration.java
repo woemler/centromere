@@ -22,7 +22,6 @@ import com.blueprint.centromere.ws.security.BasicTokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -34,12 +33,13 @@ public abstract class TokenSecurityConfiguration extends WebSecurityConfigurerAd
 	
 	private static final Logger logger = LoggerFactory.getLogger(TokenSecurityConfiguration.class);
 
-	@SuppressWarnings("SpringJavaAutowiringInspection") 
+  @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"}) 
 	@Autowired
-  @Qualifier("userRepository")
 	private UserDetailsService userService;
 
-	@Autowired private WebProperties webProperties;
+	@Autowired
+  @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
+  private WebProperties webProperties;
 
 	@Bean
 	public BasicTokenUtils tokenUtils() {
