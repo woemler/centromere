@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors
+ * Copyright 2018 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.BeanWrapper;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 
 /**
  * Utility methods used for data import classes that depend upon {@link com.blueprint.centromere.core.model.Model}
@@ -32,8 +31,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 public class ModelReflectionUtils {
 
   /**
-   * Tests whether a given field is persistable, but is not a related {@link org.springframework.data.mongodb.core.mapping.Document}
-   *   object.  Allows supplying a list of extra fields to be ignored.
+   * Tests whether a given field is persistable.  Allows supplying a list of extra fields to be ignored.
    *
    * @param field reflected field.
    * @param ignoredFields list of field names to ignore.
@@ -41,13 +39,11 @@ public class ModelReflectionUtils {
    */
   public static boolean isPersistableNonEntityField(Field field, List<String> ignoredFields){
     return field.isSynthetic()
-        || ignoredFields.contains(field.getName())
-        || field.isAnnotationPresent(DBRef.class);
+        || ignoredFields.contains(field.getName());
   }
 
   /**
-   * Tests whether a given field is persistable, but is not a related {@link org.springframework.data.mongodb.core.mapping.Document}
-   *   object.
+   * Tests whether a given field is persistable, but is not a related object.
    *
    * @param field reflected field.
    * @return true is field is persistable, but not an entity.

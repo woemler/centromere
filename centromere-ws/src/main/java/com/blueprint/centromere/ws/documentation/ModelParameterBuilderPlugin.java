@@ -1,9 +1,9 @@
 package com.blueprint.centromere.ws.documentation;
 
-import com.blueprint.centromere.core.config.ModelResourceRegistry;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.QueryParameterDescriptor;
 import com.blueprint.centromere.core.repository.QueryParameterUtil;
+import com.blueprint.centromere.ws.config.ModelResourceRegistry;
 import com.fasterxml.classmate.TypeResolver;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,0 +1,44 @@
+/*
+ * Copyright 2018 the original author or authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.blueprint.centromere.cli.dataimport.reader.impl;
+
+import com.blueprint.centromere.cli.dataimport.reader.ColumnRecordFileReader;
+import com.blueprint.centromere.core.model.impl.Sample;
+
+/**
+ * 
+ * 
+ * @author woemler
+ */
+public class TcgaSampleReader extends ColumnRecordFileReader<Sample> {
+
+  public TcgaSampleReader() {
+    super(Sample.class);
+  }
+
+  @Override
+  protected void setModelAttribute(Sample record, String attribute, String value) {
+    if (attribute.equalsIgnoreCase("hybridization ref")){
+      record.setSampleId(value.toLowerCase());
+    } else if (attribute.equalsIgnoreCase("gender")){
+      record.setGender(value);
+    } else {
+      record.addAttribute(attribute, value);
+    }
+    if (record.getSpecies() == null) record.setSpecies("Homo sapiens");
+  }
+}

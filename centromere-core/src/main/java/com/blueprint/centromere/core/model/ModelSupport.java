@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 William Oemler, Blueprint Medicines
+ * Copyright 2018 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,15 +27,8 @@ public interface ModelSupport<T extends Model<?>> {
 	/**
 	 * Returns the model class reference.
 	 * 
-	 * @return
+	 * @return model class
 	 */
 	Class<T> getModel();
 
-	/**
-	 * Assigns the given model to target object.
-	 * 
-	 * @param model
-	 */
-	void setModel(Class<T> model);
-	
 }

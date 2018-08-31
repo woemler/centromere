@@ -16,8 +16,6 @@
 
 package com.blueprint.centromere.ws.config;
 
-import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.config.WebProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,12 +35,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 /**
  * @author woemler
  */
-@Configuration
-@EnableWebSecurity
-@EnableGlobalMethodSecurity
-@Profile({ Profiles.WEB_PROFILE })
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    
+public class WebSecurityConfig  {
+  
+  public static final String NO_SECURITY_PROFILE = "web_security_none";
+  public static final String SECURE_READ_WRITE_PROFILE = "web_security_none";
+
+  @Configuration
+  @EnableWebSecurity
+  @EnableGlobalMethodSecurity
+  public static class DefaultWebSecurityConfig extends WebSecurityConfigurerAdapter {
+
     private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
 
     @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
@@ -51,86 +53,88 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-            .userDetailsService(userService)
-            .passwordEncoder(new BCryptPasswordEncoder());
+      auth
+          .userDetailsService(userService)
+          .passwordEncoder(new BCryptPasswordEncoder());
     }
 
     @Configuration
     @Order(1)
-    @Profile({ Profiles.NO_SECURITY })
+    @Profile({NO_SECURITY_PROFILE})
     public static class OpenReadWriteTokenSecurityConfig extends TokenSecurityConfiguration {
-        
-        @Autowired
-        @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
-        private WebProperties webProperties;
-        
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
 
-            String secureUrl = webProperties.getSecurity().getSecureUrl();
-            logger.info(String.format("Configuring web security with OPEN READ and OPEN WRITE for " 
-                + "API root %s", secureUrl));
+      @Autowired
+      @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
+      private WebProperties webProperties;
 
-            http
-                .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().addFilterBefore(authenticationTokenProcessingFilter(),
-                    UsernamePasswordAuthenticationFilter.class)
-                    .antMatcher(secureUrl)
-                    .authorizeRequests()
-                        .anyRequest().permitAll()
-                .and().csrf()
-                    .disable();
+      @Override
+      protected void configure(HttpSecurity http) throws Exception {
 
-        }
+        String secureUrl = webProperties.getSecurity().getSecureUrl();
+        logger.info(String.format("Configuring web security with OPEN READ and OPEN WRITE for "
+            + "API root %s", secureUrl));
+
+        http
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and().addFilterBefore(authenticationTokenProcessingFilter(),
+            UsernamePasswordAuthenticationFilter.class)
+            .antMatcher(secureUrl)
+            .authorizeRequests()
+            .anyRequest().permitAll()
+            .and().csrf()
+            .disable();
+
+      }
     }
 
     @Configuration
     @Order(1)
-    @Profile({Profiles.SECURE_READ_WRITE_PROFILE})
+    @Profile({SECURE_READ_WRITE_PROFILE})
     public static class SecuredReadWriteTokenSecurityConfig extends TokenSecurityConfiguration {
 
-        @Autowired
-        @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
-        private WebProperties webProperties;
+      @Autowired
+      @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
+      private WebProperties webProperties;
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
+      @Override
+      protected void configure(HttpSecurity http) throws Exception {
 
-            String secureUrl = webProperties.getSecurity().getSecureUrl();
-            logger.info(String.format("Configuring web security with RESTRICTED READ and RESTRICTED " 
-                + "WRITE for API root: %s", secureUrl));
+        String secureUrl = webProperties.getSecurity().getSecureUrl();
+        logger.info(String.format("Configuring web security with RESTRICTED READ and RESTRICTED "
+            + "WRITE for API root: %s", secureUrl));
 
-            http
-                .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().addFilterBefore(authenticationTokenProcessingFilter(),
-                    UsernamePasswordAuthenticationFilter.class)
-                    .antMatcher(secureUrl)
-                    .authorizeRequests()
-                      .anyRequest().fullyAuthenticated()
-                .and().csrf()
-                    .disable();
+        http
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and().addFilterBefore(authenticationTokenProcessingFilter(),
+            UsernamePasswordAuthenticationFilter.class)
+            .antMatcher(secureUrl)
+            .authorizeRequests()
+            .anyRequest().fullyAuthenticated()
+            .and().csrf()
+            .disable();
 
-        }
+      }
     }
 
     @Configuration
     @Order(2)
     public static class BasicWebSecurtiyConfig extends WebSecurityConfigurerAdapter {
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            http
-                .authorizeRequests()
-                    .anyRequest().permitAll()
-                .and().sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().httpBasic()
-                .and().csrf()
-                    .disable();
-        }
+      @Override
+      protected void configure(HttpSecurity http) throws Exception {
+        http
+            .authorizeRequests()
+            .anyRequest().permitAll()
+            .and().sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and().httpBasic()
+            .and().csrf()
+            .disable();
+      }
     }
+
+  }
 
 }

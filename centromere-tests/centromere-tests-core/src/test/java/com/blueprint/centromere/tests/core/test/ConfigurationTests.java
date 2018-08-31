@@ -17,12 +17,12 @@
 package com.blueprint.centromere.tests.core.test;
 
 import com.blueprint.centromere.core.config.CoreConfiguration;
-import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.config.ModelResourceRegistry;
 import com.blueprint.centromere.core.config.MongoConfiguration;
 import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.core.model.impl.Gene;
 import com.blueprint.centromere.core.repository.ModelRepository;
+import com.blueprint.centromere.core.repository.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.repository.impl.GeneRepository;
 import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
 import org.junit.Test;

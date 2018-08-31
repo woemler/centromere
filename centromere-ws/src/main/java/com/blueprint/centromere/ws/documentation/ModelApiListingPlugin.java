@@ -1,9 +1,9 @@
 package com.blueprint.centromere.ws.documentation;
 
-import com.blueprint.centromere.core.config.ModelResourceRegistry;
-import com.blueprint.centromere.core.config.WebProperties;
 import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.ws.config.ModelResourceRegistry;
+import com.blueprint.centromere.ws.config.WebProperties;
 import com.fasterxml.classmate.TypeResolver;
 import java.util.ArrayList;
 import java.util.List;

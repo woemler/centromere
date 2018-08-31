@@ -16,13 +16,13 @@
 
 package com.blueprint.centromere.ws.controller;
 
-import com.blueprint.centromere.core.model.impl.User;
 import com.blueprint.centromere.ws.security.BasicTokenUtils;
 import com.blueprint.centromere.ws.security.TokenDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,7 +39,7 @@ public class UserAuthenticationController {
 	private static final Logger logger = LoggerFactory.getLogger(UserAuthenticationController.class);
 
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-	public TokenDetails createToken(@AuthenticationPrincipal User user){
+	public TokenDetails createToken(@AuthenticationPrincipal UserDetails user){
 		Assert.notNull(user, "Unable to authenticate user!");
 		TokenDetails tokenDetails = tokenUtils.createTokenAndDetails(user);
 		logger.info(String.format("Successfully generated authentication token for user: %s", user.getUsername()));

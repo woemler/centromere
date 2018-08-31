@@ -16,9 +16,8 @@
 
 package com.blueprint.centromere.ws;
 
-import com.blueprint.centromere.core.config.AutoConfigureCentromere;
-import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.ws.config.SwaggerConfig;
+import com.blueprint.centromere.ws.config.ApiDocumentationConfig;
+import com.blueprint.centromere.ws.config.AutoConfigureCentromere;
 import com.blueprint.centromere.ws.config.WebApplicationConfig;
 import com.blueprint.centromere.ws.config.WebSecurityConfig;
 import java.util.Arrays;
@@ -40,7 +39,7 @@ public class CentromereWebInitializer extends SpringBootServletInitializer {
 
   public static void run(Class<?> source, String[] args){
     SpringApplicationBuilder builder = new SpringApplicationBuilder(source);
-    builder.child(WebApplicationConfig.class, WebSecurityConfig.class, SwaggerConfig.class);
+    builder.child(WebApplicationConfig.class, WebSecurityConfig.class, ApiDocumentationConfig.class);
     builder.profiles(getActiveProfiles(source));
     builder.web(WebApplicationType.SERVLET);
     builder.run(args);
@@ -51,12 +50,10 @@ public class CentromereWebInitializer extends SpringBootServletInitializer {
     if (source.isAnnotationPresent(AutoConfigureCentromere.class)){
       AutoConfigureCentromere annotation = source.getAnnotation(AutoConfigureCentromere.class);
       String securityProfile = annotation.enableWebSecurity()
-          ? Profiles.SECURE_READ_WRITE_PROFILE : Profiles.NO_SECURITY;
+          ? WebSecurityConfig.SECURE_READ_WRITE_PROFILE : WebSecurityConfig.NO_SECURITY_PROFILE;
       String apiDocumentationProfile = annotation.enableApiDocumentation()
-          ? Profiles.API_DOCUMENTATION_ENABLED_PROFILE : Profiles.API_DOCUMENTATION_DISABLED_PROFILE;
-      profiles = annotation.useCustomSchema() ? 
-          new String[] { Profiles.WEB_PROFILE, securityProfile, apiDocumentationProfile, Profiles.SCHEMA_CUSTOM } : 
-          new String[] { Profiles.WEB_PROFILE, securityProfile, apiDocumentationProfile, Profiles.SCHEMA_DEFAULT };
+          ? ApiDocumentationConfig.SWAGGER_PROFILE : ApiDocumentationConfig.NO_DOCUMENTATION_PROFILE;
+      profiles = new String[] { securityProfile, apiDocumentationProfile };
       logger.info(String.format("Running Centromere with profiles: %s", Arrays.asList(profiles)));
     } else {
       logger.info("Running Centromere with default profiles.");

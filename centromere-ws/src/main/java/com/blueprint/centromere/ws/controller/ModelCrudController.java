@@ -16,13 +16,13 @@
 
 package com.blueprint.centromere.ws.controller;
 
-import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
-import com.blueprint.centromere.core.config.ModelResourceRegistry;
 import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.ModelRepository;
+import com.blueprint.centromere.core.repository.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.ws.config.ApiMediaTypes;
+import com.blueprint.centromere.ws.config.ModelResourceRegistry;
 import com.blueprint.centromere.ws.exception.InvalidParameterException;
 import com.blueprint.centromere.ws.exception.MalformedEntityException;
 import com.blueprint.centromere.ws.exception.RequestFailureException;

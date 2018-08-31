@@ -4,10 +4,10 @@ package com.blueprint.centromere.ws.controller;
  * @author woemler
  */
 
-import com.blueprint.centromere.core.config.ModelResourceRegistry;
 import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Linked;
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.ws.config.ModelResourceRegistry;
 import com.blueprint.centromere.ws.exception.RequestFailureException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;

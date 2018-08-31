@@ -1,6 +1,6 @@
 package com.blueprint.centromere.ws.documentation;
 
-import com.blueprint.centromere.core.config.ModelResourceRegistry;
+import com.blueprint.centromere.ws.config.ModelResourceRegistry;
 import com.fasterxml.classmate.TypeResolver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.BeanWrapperImpl;

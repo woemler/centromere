@@ -18,9 +18,9 @@ package com.blueprint.centromere.tests.cli.test;
 
 import com.blueprint.centromere.cli.JCommanderInputExecutor;
 import com.blueprint.centromere.cli.ModelProcessorBeanRegistry;
+import com.blueprint.centromere.cli.dataimport.processor.impl.EntrezGeneInfoProcessor;
+import com.blueprint.centromere.cli.dataimport.processor.impl.GenericSampleProcessor;
 import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.dataimport.processor.impl.EntrezGeneInfoProcessor;
-import com.blueprint.centromere.core.dataimport.processor.impl.GenericSampleProcessor;
 import com.blueprint.centromere.core.model.impl.Gene;
 import com.blueprint.centromere.core.model.impl.Sample;
 import com.blueprint.centromere.core.repository.impl.DataSourceRepository;

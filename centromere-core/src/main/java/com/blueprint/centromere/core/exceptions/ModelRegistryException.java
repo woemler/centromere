@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors
+ * Copyright 2018 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 
 package com.blueprint.centromere.core.exceptions;
 
+import com.blueprint.centromere.core.repository.ModelRepositoryRegistry;
+
 /**
- * Exception thrown when {@link com.blueprint.centromere.core.config.ModelRepositoryRegistry} or
- *   {@link com.blueprint.centromere.core.config.ModelResourceRegistry} throws an exception.
+ * Exception thrown when {@link ModelRepositoryRegistry} or other registry throws an exception.
  *
  * @author woemler
  */

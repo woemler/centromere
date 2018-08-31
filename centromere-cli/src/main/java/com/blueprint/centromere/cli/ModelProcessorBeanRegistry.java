@@ -16,8 +16,8 @@
 
 package com.blueprint.centromere.cli;
 
-import com.blueprint.centromere.core.dataimport.DataTypes;
-import com.blueprint.centromere.core.dataimport.processor.RecordProcessor;
+import com.blueprint.centromere.cli.dataimport.DataTypes;
+import com.blueprint.centromere.cli.dataimport.processor.RecordProcessor;
 import com.blueprint.centromere.core.model.Model;
 import java.util.ArrayList;
 import java.util.HashMap;

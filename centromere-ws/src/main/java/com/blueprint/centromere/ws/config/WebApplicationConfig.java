@@ -16,9 +16,8 @@
 
 package com.blueprint.centromere.ws.config;
 
-import com.blueprint.centromere.core.config.DefaultModelRepositoryRegistry;
-import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.config.WebProperties;
+import com.blueprint.centromere.core.repository.DefaultModelRepositoryRegistry;
+import com.blueprint.centromere.core.repository.ModelRepositoryRegistry;
 import com.blueprint.centromere.ws.controller.ModelCrudController;
 import com.blueprint.centromere.ws.controller.ModelResourceAssembler;
 import com.blueprint.centromere.ws.controller.UserAuthenticationController;
@@ -28,11 +27,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.MediaType;
@@ -46,102 +46,119 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author woemler
  */
 
-@Profile({Profiles.WEB_PROFILE})
-@SuppressWarnings("SpringJavaAutowiringInspection")
-@Configuration
-@EnableSpringDataWebSupport
-@Import({
-		WebSecurityConfig.class,
-		SwaggerConfig.class
-})
-@ComponentScan(basePackageClasses = {
-    UserAuthenticationController.class,
-    ModelCrudController.class,
-    RestExceptionHandler.class
-})
 public class WebApplicationConfig {
 
-  private static final Logger logger = LoggerFactory.getLogger(WebApplicationConfig.class);
+  @SuppressWarnings("SpringJavaAutowiringInspection")
+  @Configuration
+  @EnableSpringDataWebSupport
+  @Import({
+      WebProperties.class
+  })
+  @ComponentScan(basePackageClasses = {
+      UserAuthenticationController.class,
+      ModelCrudController.class,
+      RestExceptionHandler.class
+  })
+  @PropertySource(value = { "classpath:web-defaults.properties" })
+  public static class DefaultWebApplicationConfig {
 
-  @Autowired private WebProperties webProperties;
+    private static final Logger logger = LoggerFactory.getLogger(WebApplicationConfig.class);
 
-  @Bean
-  public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer(){
-    return new PropertySourcesPlaceholderConfigurer();
-  }
-
-  @Bean
-  public ModelResourceAssembler mappingModelResourceAssembler(
-      DefaultModelRepositoryRegistry modelRepositoryRegistry){
-    return new ModelResourceAssembler(modelRepositoryRegistry);
-  }
-  
-  @Bean
-  public HttpMessageConverters customConverters(){
+    @Autowired
+    private WebProperties webProperties;
     
-    // JSON
-    FilteringJackson2HttpMessageConverter jsonConverter
-        = new FilteringJackson2HttpMessageConverter();
-    jsonConverter.setSupportedMediaTypes(ApiMediaTypes.getJsonMediaTypes());
+    @Bean
+    public ModelRepositoryRegistry modelRepositoryRegistry(ApplicationContext context){
+      return new DefaultModelRepositoryRegistry(context);
+    }
+    
+    @Bean
+    public ModelResourceRegistry modelResourceRegistry(ApplicationContext context){
+      return new DefaultModelResourceRegistry(context);
+    }
 
-    // XML
-    MarshallingHttpMessageConverter xmlConverter = new MarshallingHttpMessageConverter();
-    xmlConverter.setSupportedMediaTypes(ApiMediaTypes.getXmlMediaTypes());
-    XStreamMarshaller xStreamMarshaller = new XStreamMarshaller();
-    xmlConverter.setMarshaller(xStreamMarshaller);
-    xmlConverter.setUnmarshaller(xStreamMarshaller);
-    
-    // Text
-    FilteringTextMessageConverter textMessageConverter =
-        new FilteringTextMessageConverter(new MediaType("text", "plain", Charset.forName("utf-8")));
-    textMessageConverter.setDelimiter("\t");
-    
-    return new HttpMessageConverters(jsonConverter, xmlConverter, textMessageConverter);
-    
-  }
-  
-  @Bean
-  public WebMvcConfigurer webMvcConfigurer(){
-    return new WebMvcConfigurer() {
-      
-      @Override
-      public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**");
-      }
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+      return new PropertySourcesPlaceholderConfigurer();
+    }
 
-      @Override
-      public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        
-        // Swagger webjars
-        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
-        if (!registry.hasMappingForPattern("/webjars/**")){
-          registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
-        } else {
-          logger.info("[CENTROMERE] WebJar location already configured.");
+    @Bean
+    public ModelResourceAssembler mappingModelResourceAssembler(ModelResourceRegistry modelResourceRegistry) {
+      return new ModelResourceAssembler(modelResourceRegistry);
+    }
+
+    @Bean
+    public HttpMessageConverters customConverters() {
+
+      // JSON
+      FilteringJackson2HttpMessageConverter jsonConverter
+          = new FilteringJackson2HttpMessageConverter();
+      jsonConverter.setSupportedMediaTypes(ApiMediaTypes.getJsonMediaTypes());
+
+      // XML
+      MarshallingHttpMessageConverter xmlConverter = new MarshallingHttpMessageConverter();
+      xmlConverter.setSupportedMediaTypes(ApiMediaTypes.getXmlMediaTypes());
+      XStreamMarshaller xStreamMarshaller = new XStreamMarshaller();
+      xmlConverter.setMarshaller(xStreamMarshaller);
+      xmlConverter.setUnmarshaller(xStreamMarshaller);
+
+      // Text
+      FilteringTextMessageConverter textMessageConverter =
+          new FilteringTextMessageConverter(
+              new MediaType("text", "plain", Charset.forName("utf-8")));
+      textMessageConverter.setDelimiter("\t");
+
+      return new HttpMessageConverters(jsonConverter, xmlConverter, textMessageConverter);
+
+    }
+
+    @Bean
+    public WebMvcConfigurer webMvcConfigurer() {
+      return new WebMvcConfigurer() {
+
+        @Override
+        public void addCorsMappings(CorsRegistry registry) {
+          registry.addMapping("/api/**");
         }
-        
-        // Static content
-        // TODO: make static content default
-        if (webProperties.isEnableStaticContent()){
-          if (!registry.hasMappingForPattern("/static/**")){
-            registry.addResourceHandler("/static/**").addResourceLocations(
-                webProperties.getStaticContentLocation());
-            if (webProperties.getHomePage() != null && !"".equals(webProperties.getHomePage())
-                && webProperties.getHomePageLocation() != null && !"".equals(webProperties.getHomePageLocation())){
-              registry.addResourceHandler(webProperties.getHomePage())
-                  .addResourceLocations(webProperties.getHomePageLocation());
-              logger.info(String.format("[CENTROMERE] Static home page configured at URL: /%s",
-                  webProperties.getHomePage()));
-            } else {
-              logger.warn("[CENTROMERE] Static home page location not properly configured.");
-            }
+
+        @Override
+        public void addResourceHandlers(ResourceHandlerRegistry registry) {
+
+          // Swagger webjars
+          registry.addResourceHandler("swagger-ui.html")
+              .addResourceLocations("classpath:/META-INF/resources/");
+          if (!registry.hasMappingForPattern("/webjars/**")) {
+            registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
           } else {
-            logger.info("[CENTROMERE] Static content already configured.");
+            logger.info("[CENTROMERE] WebJar location already configured.");
           }
+
+          // Static content
+          // TODO: make static content default
+          if (webProperties.isEnableStaticContent()) {
+            if (!registry.hasMappingForPattern("/static/**")) {
+              registry.addResourceHandler("/static/**").addResourceLocations(
+                  webProperties.getStaticContentLocation());
+              if (webProperties.getHomePage() != null && !"".equals(webProperties.getHomePage())
+                  && webProperties.getHomePageLocation() != null && !""
+                  .equals(webProperties.getHomePageLocation())) {
+                registry.addResourceHandler(webProperties.getHomePage())
+                    .addResourceLocations(webProperties.getHomePageLocation());
+                logger.info(String.format("[CENTROMERE] Static home page configured at URL: /%s",
+                    webProperties.getHomePage()));
+              } else {
+                logger.warn("[CENTROMERE] Static home page location not properly configured.");
+              }
+            } else {
+              logger.info("[CENTROMERE] Static content already configured.");
+            }
+          }
+
         }
-        
-      }
-    };
+      };
+    }
+
   }
   
 }

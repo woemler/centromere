@@ -18,20 +18,15 @@ package com.blueprint.centromere.ws.controller;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-import com.blueprint.centromere.core.config.ModelRepositoryRegistry;
-import com.blueprint.centromere.core.config.ModelResourceRegistry;
 import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.model.impl.DataSet;
-import com.blueprint.centromere.core.model.impl.DataSource;
-import com.blueprint.centromere.core.model.impl.Gene;
-import com.blueprint.centromere.core.model.impl.Metadata;
-import com.blueprint.centromere.core.model.impl.Sample;
 import com.blueprint.centromere.core.repository.Evaluation;
 import com.blueprint.centromere.core.repository.ModelRepository;
+import com.blueprint.centromere.core.repository.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.core.repository.impl.GuessOperations;
 import com.blueprint.centromere.ws.config.ApiMediaTypes;
+import com.blueprint.centromere.ws.config.ModelResourceRegistry;
 import com.blueprint.centromere.ws.exception.InvalidParameterException;
 import com.blueprint.centromere.ws.exception.ResourceNotFoundException;
 import com.blueprint.centromere.ws.exception.RestError;
@@ -237,8 +232,7 @@ public class ModelSearchController {
 
   /**
    * {@code GET /{uri}/search/{linked}}
-   * Fetches all data records associated with the queried {@link Sample}
-   *   record.
+   * Fetches all data records associated with the queried {@link Model} record.
    *
    * @param pagedResourcesAssembler {@link PagedResourcesAssembler}
    * @param request {@link HttpServletRequest}
@@ -284,10 +278,10 @@ public class ModelSearchController {
         throw new ResourceNotFoundException();
       }
       model = (Class<T>) resourceRegistry.getModelByUri(uri);
-      if (!Metadata.class.isAssignableFrom(model)){
-        logger.error(String.format("URI does not map to a valid model: %s", uri));
-        throw new ResourceNotFoundException();
-      }
+//      if (!Metadata.class.isAssignableFrom(model)){
+//        logger.error(String.format("URI does not map to a valid model: %s", uri));
+//        throw new ResourceNotFoundException();
+//      }
       repository = (ModelRepository<T, ID>) repositoryRegistry.getRepositoryByModel(model);
     } catch (ModelRegistryException e){
       e.printStackTrace();
@@ -322,18 +316,19 @@ public class ModelSearchController {
     }
     
     //TODO: more programatic way of assigning metaField from model
-    if (Sample.class.isAssignableFrom(metaModel)){
-      metaField = "sampleId";
-    } else if (Gene.class.isAssignableFrom(metaModel)){
-      metaField = "geneId";
-    } else if (DataSource.class.isAssignableFrom(metaModel)){
-      metaField = "dataSourceId";
-    } else if (DataSet.class.isAssignableFrom(metaModel)){
-      metaField = "dataSetId";
-    } else {
-      logger.error(String.format("URI does not map to a linked metadata model: %s", meta));
-      throw new ResourceNotFoundException();
-    }
+    metaField = "";
+//    if (Sample.class.isAssignableFrom(metaModel)){
+//      metaField = "sampleId";
+//    } else if (Gene.class.isAssignableFrom(metaModel)){
+//      metaField = "geneId";
+//    } else if (DataSource.class.isAssignableFrom(metaModel)){
+//      metaField = "dataSourceId";
+//    } else if (DataSet.class.isAssignableFrom(metaModel)){
+//      metaField = "dataSetId";
+//    } else {
+//      logger.error(String.format("URI does not map to a linked metadata model: %s", meta));
+//      throw new ResourceNotFoundException();
+//    }
 
     logger.info(String.format("Resolved linked metadata model to %s and repository to %s", 
         metaModel.getName(), metaRepository.getClass().getName()));

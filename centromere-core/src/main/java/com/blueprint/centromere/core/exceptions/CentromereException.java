@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors
+ * Copyright 2018 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,10 @@
 
 package com.blueprint.centromere.core.exceptions;
 
-import org.springframework.boot.ExitCodeGenerator;
-
 /**
  * @author woemler
  */
-public class CentromereException extends Exception implements ExitCodeGenerator {
+public class CentromereException extends Exception {
 
   public CentromereException() {
   }
@@ -41,11 +39,6 @@ public class CentromereException extends Exception implements ExitCodeGenerator 
   public CentromereException(String message, Throwable cause, boolean enableSuppression,
       boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
-  }
-
-  @Override
-  public int getExitCode() {
-    return 1;
   }
 
 }

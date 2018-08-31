@@ -16,7 +16,6 @@
 
 package com.blueprint.centromere.ws.config;
 
-import com.blueprint.centromere.core.config.WebProperties;
 import com.blueprint.centromere.ws.security.AuthenticationTokenProcessingFilter;
 import com.blueprint.centromere.ws.security.BasicTokenUtils;
 import org.slf4j.Logger;
