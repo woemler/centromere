@@ -19,9 +19,13 @@ package com.blueprint.centromere.ws.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -30,6 +34,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -38,7 +43,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig  {
   
   public static final String NO_SECURITY_PROFILE = "web_security_none";
-  public static final String SECURE_READ_WRITE_PROFILE = "web_security_none";
+  public static final String SECURE_READ_WRITE_PROFILE = "web_security_read_write";
 
   @Configuration
   @EnableWebSecurity
@@ -50,70 +55,84 @@ public class WebSecurityConfig  {
     @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
     @Autowired
     private UserDetailsService userService;
+    
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+      return new BCryptPasswordEncoder();
+    }
+    
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider(){
+      DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+      authenticationProvider.setPasswordEncoder(passwordEncoder());
+      authenticationProvider.setUserDetailsService(userService);
+      return authenticationProvider;
+    }
+    
+    
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-      auth
-          .userDetailsService(userService)
-          .passwordEncoder(new BCryptPasswordEncoder());
+      auth.authenticationProvider(authenticationProvider());
+//          .userDetailsService(userService)
+//          .passwordEncoder(passwordEncoder());
     }
 
     @Configuration
+    @PropertySource(value = { "classpath:web-defaults.properties" })
     @Order(1)
-    @Profile({NO_SECURITY_PROFILE})
+    @Profile(NO_SECURITY_PROFILE)
     public static class OpenReadWriteTokenSecurityConfig extends TokenSecurityConfiguration {
 
-      @Autowired
-      @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
-      private WebProperties webProperties;
+      @Autowired private Environment env;
 
       @Override
       protected void configure(HttpSecurity http) throws Exception {
 
-        String secureUrl = webProperties.getSecurity().getSecureUrl();
+        String secureUrl = env.getRequiredProperty("centromere.web.security.secure-url");
         logger.info(String.format("Configuring web security with OPEN READ and OPEN WRITE for "
             + "API root %s", secureUrl));
 
         http
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and().addFilterBefore(authenticationTokenProcessingFilter(),
-            UsernamePasswordAuthenticationFilter.class)
+          .and()
+            .addFilterBefore(authenticationTokenProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
             .antMatcher(secureUrl)
             .authorizeRequests()
             .anyRequest().permitAll()
-            .and().csrf()
-            .disable();
+          .and()
+            .csrf().disable();
 
       }
     }
 
     @Configuration
+    @PropertySource(value = { "classpath:web-defaults.properties" })
     @Order(1)
-    @Profile({SECURE_READ_WRITE_PROFILE})
+    @Profile(SECURE_READ_WRITE_PROFILE)
     public static class SecuredReadWriteTokenSecurityConfig extends TokenSecurityConfiguration {
 
-      @Autowired
-      @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
-      private WebProperties webProperties;
+      @Autowired private Environment env;
 
       @Override
       protected void configure(HttpSecurity http) throws Exception {
 
-        String secureUrl = webProperties.getSecurity().getSecureUrl();
+        String secureUrl = env.getRequiredProperty("centromere.web.security.secure-url");
         logger.info(String.format("Configuring web security with RESTRICTED READ and RESTRICTED "
             + "WRITE for API root: %s", secureUrl));
 
         http
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and().addFilterBefore(authenticationTokenProcessingFilter(),
-            UsernamePasswordAuthenticationFilter.class)
+          .and()
+            .addFilterBefore(authenticationTokenProcessingFilter(),
+              UsernamePasswordAuthenticationFilter.class)
             .antMatcher(secureUrl)
             .authorizeRequests()
             .anyRequest().fullyAuthenticated()
-            .and().csrf()
-            .disable();
+          .and()
+            .csrf().disable();
 
       }
     }
@@ -127,11 +146,13 @@ public class WebSecurityConfig  {
         http
             .authorizeRequests()
             .anyRequest().permitAll()
-            .and().sessionManagement()
+          .and()
+            .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and().httpBasic()
-            .and().csrf()
-            .disable();
+          .and()
+            .httpBasic()
+          .and()
+            .csrf().disable();
       }
     }
 

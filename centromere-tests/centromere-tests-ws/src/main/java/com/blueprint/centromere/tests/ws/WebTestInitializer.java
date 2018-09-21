@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.tests.ws;
 
-import com.blueprint.centromere.tests.core.MongoDataSourceConfig;
+import com.blueprint.centromere.tests.mongodb.MongoDataSourceConfig;
 import com.blueprint.centromere.ws.CentromereWebInitializer;
 import com.blueprint.centromere.ws.config.AutoConfigureCentromere;
 import org.springframework.context.annotation.Configuration;

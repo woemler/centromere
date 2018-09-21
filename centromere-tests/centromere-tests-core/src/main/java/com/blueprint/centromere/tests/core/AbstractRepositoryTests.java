@@ -16,20 +16,17 @@
 
 package com.blueprint.centromere.tests.core;
 
-import com.blueprint.centromere.core.model.impl.DataSet;
-import com.blueprint.centromere.core.model.impl.DataSource;
-import com.blueprint.centromere.core.model.impl.Gene;
-import com.blueprint.centromere.core.model.impl.GeneCopyNumber;
-import com.blueprint.centromere.core.model.impl.GeneExpression;
-import com.blueprint.centromere.core.model.impl.Mutation;
-import com.blueprint.centromere.core.model.impl.Sample;
-import com.blueprint.centromere.core.model.impl.SegmentCopyNumber;
-import com.blueprint.centromere.core.model.impl.TranscriptExpression;
-import com.blueprint.centromere.core.repository.impl.DataSetRepository;
-import com.blueprint.centromere.core.repository.impl.DataSourceRepository;
-import com.blueprint.centromere.core.repository.impl.GeneExpressionRepository;
-import com.blueprint.centromere.core.repository.impl.GeneRepository;
-import com.blueprint.centromere.core.repository.impl.SampleRepository;
+import com.blueprint.centromere.tests.core.models.DataFile;
+import com.blueprint.centromere.tests.core.models.DataSet;
+import com.blueprint.centromere.tests.core.models.Gene;
+import com.blueprint.centromere.tests.core.models.GeneExpression;
+import com.blueprint.centromere.tests.core.models.Sample;
+import com.blueprint.centromere.tests.core.repositories.DataFileRepository;
+import com.blueprint.centromere.tests.core.repositories.DataSetRepository;
+import com.blueprint.centromere.tests.core.repositories.GeneExpressionRepository;
+import com.blueprint.centromere.tests.core.repositories.GeneRepository;
+import com.blueprint.centromere.tests.core.repositories.SampleRepository;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -44,7 +41,7 @@ public abstract class AbstractRepositoryTests {
 
   @Autowired private GeneRepository geneRepository;
   @Autowired private DataSetRepository dataSetRepository;
-  @Autowired private DataSourceRepository dataSourceRepository;
+  @Autowired private DataFileRepository dataFileRepository;
   @Autowired private SampleRepository sampleRepository;
   @Autowired private GeneExpressionRepository geneExpressionRepository;
 
@@ -53,7 +50,7 @@ public abstract class AbstractRepositoryTests {
       
     geneRepository.deleteAll();
     dataSetRepository.deleteAll();
-    dataSourceRepository.deleteAll();
+    dataFileRepository.deleteAll();
     sampleRepository.deleteAll();
     geneExpressionRepository.deleteAll();
     
@@ -61,9 +58,8 @@ public abstract class AbstractRepositoryTests {
 
     List<Gene> genes = new ArrayList<>();
 
-    Gene geneA = new Gene();
-    geneA.setGeneId("1");
-    geneA.setReferenceId("1");
+    Gene geneA = (Gene) geneRepository.getModel().newInstance();
+    geneA.setEntrezGeneId(1);
     geneA.setSymbol("GeneA");
     geneA.setTaxId(9606);
     geneA.setChromosome("1");
@@ -73,9 +69,8 @@ public abstract class AbstractRepositoryTests {
     geneA.addAlias("ABC");
     genes.add(geneA);
 
-    Gene geneB = new Gene();
-    geneB.setGeneId("2");
-    geneB.setReferenceId("2");
+    Gene geneB = (Gene) geneRepository.getModel().newInstance();
+    geneB.setEntrezGeneId(2);
     geneB.setSymbol("GeneB");
     geneB.setTaxId(9606);
     geneB.setChromosome("5");
@@ -85,9 +80,8 @@ public abstract class AbstractRepositoryTests {
     geneB.addAlias("DEF");
     genes.add(geneB);
 
-    Gene geneC = new Gene();
-    geneC.setGeneId("3");
-    geneC.setReferenceId("3");
+    Gene geneC = (Gene) geneRepository.getModel().newInstance();
+    geneC.setEntrezGeneId(3);
     geneC.setSymbol("GeneC");
     geneC.setTaxId(9606);
     geneC.setChromosome("9");
@@ -97,9 +91,8 @@ public abstract class AbstractRepositoryTests {
     geneC.addAlias("GHI");
     genes.add(geneC);
 
-    Gene geneD = new Gene();
-    geneD.setGeneId("4");
-    geneD.setReferenceId("4");
+    Gene geneD = (Gene) geneRepository.getModel().newInstance();
+    geneD.setEntrezGeneId(4);
     geneD.setSymbol("GeneD");
     geneD.setTaxId(9606);
     geneD.setChromosome("X");
@@ -109,9 +102,8 @@ public abstract class AbstractRepositoryTests {
     geneD.addAlias("JKL");
     genes.add(geneD);
 
-    Gene geneE = new Gene();
-    geneE.setGeneId("5");
-    geneE.setReferenceId("5");
+    Gene geneE = (Gene) geneRepository.getModel().newInstance();
+    geneE.setEntrezGeneId(5);
     geneE.setSymbol("GeneE");
     geneE.setTaxId(9606);
     geneE.setChromosome("13");
@@ -127,40 +119,35 @@ public abstract class AbstractRepositoryTests {
 
     List<DataSet> dataSets = new ArrayList<>();
 
-    DataSet dataSetA = new DataSet();
-    dataSetA.setDataSetId("DataSetA");
+    DataSet dataSetA = (DataSet) dataSetRepository.getModel().newInstance();
     dataSetA.setName("DataSetA");
     dataSetA.setSource("Internal");
     dataSetA.setVersion("1.0");
     dataSetA.setDescription("This is an example data set.");
     dataSets.add(dataSetA);
 
-    DataSet dataSetB = new DataSet();
-    dataSetB.setDataSetId("DataSetB");
-    dataSetA.setName("DataSetB");
+    DataSet dataSetB = (DataSet) dataSetRepository.getModel().newInstance();
+    dataSetB.setName("DataSetB");
     dataSetB.setSource("External");
     dataSetB.setVersion("1.0");
     dataSetB.setDescription("This is an example data set.");
     dataSets.add(dataSetB);
 
-    DataSet dataSetC = new DataSet();
-    dataSetC.setDataSetId("DataSetC");
+    DataSet dataSetC = (DataSet) dataSetRepository.getModel().newInstance();
     dataSetC.setName("DataSetC");
     dataSetC.setSource("Internal");
     dataSetC.setVersion("2.0");
     dataSetC.setDescription("This is an example data set.");
     dataSets.add(dataSetC);
 
-    DataSet dataSetD = new DataSet();
-    dataSetD.setDataSetId("DataSetD");
+    DataSet dataSetD = (DataSet) dataSetRepository.getModel().newInstance();
     dataSetD.setName("DataSetD");
     dataSetD.setSource("External");
     dataSetD.setVersion("1.0");
     dataSetD.setDescription("This is an example data set.");
     dataSets.add(dataSetD);
 
-    DataSet dataSetE = new DataSet();
-    dataSetE.setDataSetId("DataSetE");
+    DataSet dataSetE = (DataSet) dataSetRepository.getModel().newInstance();
     dataSetE.setName("DataSetE");
     dataSetE.setSource("Internal");
     dataSetE.setVersion("1.0");
@@ -171,62 +158,57 @@ public abstract class AbstractRepositoryTests {
     
     // Data Files
 
-    List<DataSource> dataSources = new ArrayList<>();
+    List<DataFile> dataFiles = new ArrayList<>();
 
-    DataSource dataSourceA = new DataSource();
-    dataSourceA.setDataSetId(dataSetA.getDataSetId());
-    dataSourceA.setSource("/path/to/fileA");
-    dataSourceA.setDataType("GCT RNA-Seq gene expression");
-    dataSourceA.setDateCreated(new Date());
-    dataSourceA.setDateUpdated(new Date());
-    dataSourceA.setModel(GeneExpression.class);
-    dataSourceA.setDataSourceId("file-a");
-    dataSources.add(dataSourceA);
+    DataFile dataFileA = (DataFile) dataFileRepository.getModel().newInstance();
+    dataFileA.setDataSetId(dataSetA.getId());
+    dataFileA.setFilePath("/path/to/fileA");
+    dataFileA.setDataType("GCT RNA-Seq gene expression");
+    dataFileA.setDateCreated(new Date());
+    dataFileA.setDateUpdated(new Date());
+    dataFileA.setModel(GeneExpression.class);
+    dataFiles.add(dataFileA);
 
-    DataSource dataSourceB = new DataSource();
-    dataSourceB.setDataSetId(dataSetA.getDataSetId());
-    dataSourceB.setSource("/path/to/fileB");
-    dataSourceB.setDataType("GCT RNA-Seq transcript expression");
-    dataSourceB.setDateCreated(new Date());
-    dataSourceB.setDateUpdated(new Date());
-    dataSourceB.setModel(TranscriptExpression.class);
-    dataSourceB.setDataSourceId("file-b");
-    dataSources.add(dataSourceB);
+    DataFile dataFileB = (DataFile) dataFileRepository.getModel().newInstance();
+    dataFileB.setDataSetId(dataSetA.getId());
+    dataFileB.setFilePath("/path/to/fileB");
+    dataFileB.setDataType("GCT RNA-Seq gene expression");
+    dataFileB.setDateCreated(new Date());
+    dataFileB.setDateUpdated(new Date());
+    dataFileB.setModel(GeneExpression.class);
+    dataFiles.add(dataFileB);
 
-    DataSource dataSourceC = new DataSource();
-    dataSourceC.setDataSetId(dataSetA.getDataSetId());
-    dataSourceC.setSource("/path/to/fileC");
-    dataSourceC.setDataType("MAF mutations");
-    dataSourceC.setDateCreated(new Date());
-    dataSourceC.setDateUpdated(new Date());
-    dataSourceC.setModel(Mutation.class);
-    dataSourceC.setDataSourceId("file-c");
-    dataSources.add(dataSourceC);
+    DataFile dataFileC = (DataFile) dataFileRepository.getModel().newInstance();
+    dataFileC.setDataSetId(dataSetA.getId());
+    dataFileC.setFilePath("/path/to/fileC");
+    dataFileC.setDataType("MAF mutations");
+    dataFileC.setDateCreated(new Date());
+    dataFileC.setDateUpdated(new Date());
+    dataFileC.setModel(GeneExpression.class);
+    dataFiles.add(dataFileC);
 
-    DataSource dataSourceD = new DataSource();
-    dataSourceD.setDataSetId(dataSetB.getDataSetId());
-    dataSourceD.setSource("/path/to/fileD");
-    dataSourceD.setDataType("Gene copy number");
-    dataSourceD.setDateCreated(new Date());
-    dataSourceD.setDateUpdated(new Date());
-    dataSourceD.setModel(GeneCopyNumber.class);
-    dataSourceD.setDataSourceId("file-d");
-    dataSources.add(dataSourceD);
+    DataFile dataFileD = (DataFile) dataFileRepository.getModel().newInstance();
+    dataFileD.setDataSetId(dataSetB.getId());
+    dataFileD.setFilePath("/path/to/fileD");
+    dataFileD.setDataType("Gene copy number");
+    dataFileD.setDateCreated(new Date());
+    dataFileD.setDateUpdated(new Date());
+    dataFileD.setModel(GeneExpression.class);
+    dataFiles.add(dataFileD);
 
-    DataSource dataSourceE = new DataSource();
-    dataSourceE.setDataSetId(dataSetE.getDataSetId());
-    dataSourceE.setSource("/path/to/fileE");
-    dataSourceE.setDataType("Segment copy number");
-    dataSourceE.setDateCreated(new Date());
-    dataSourceE.setDateUpdated(new Date());
-    dataSourceE.setModel(SegmentCopyNumber.class);
-    dataSourceE.setDataSourceId("file-e");
-    dataSources.add(dataSourceE);
+    DataFile dataFileE = (DataFile) dataFileRepository.getModel().newInstance();
+    dataFileE.setDataSetId(dataSetE.getId());
+    dataFileE.setFilePath("/path/to/fileE");
+    dataFileE.setDataType("Segment copy number");
+    dataFileE.setDateCreated(new Date());
+    dataFileE.setDateUpdated(new Date());
+    dataFileE.setModel(GeneExpression.class);
+    dataFiles.add(dataFileE);
     
-    dataSourceRepository.insert(dataSources);
+    dataFileRepository.insert(dataFiles);
     
-    dataSetA.setDataSourceIds(Arrays.asList(dataSourceA.getId(), dataSourceB.getId(), dataSourceC.getId()));
-    dataSetB.setDataSourceIds(Arrays.asList(dataSourceD.getId(), dataSourceE.getId()));
+    dataSetA.setDataFileIds(Arrays.asList(dataFileA.getId(), dataFileB.getId(), dataFileC.getId()));
+    dataSetB.setDataFileIds(Arrays.asList(dataFileD.getId(), dataFileE.getId()));
     dataSetRepository.update(dataSetA);
     dataSetRepository.update(dataSetB);
     
@@ -234,8 +216,7 @@ public abstract class AbstractRepositoryTests {
 
     List<Sample> samples = new ArrayList<>();
 
-    Sample sampleA = new Sample();
-    sampleA.setSampleId("SampleA");
+    Sample sampleA = (Sample) sampleRepository.getModel().newInstance();
     sampleA.setName("SampleA");
     sampleA.setTissue("Lung");
     sampleA.setHistology("carcinoma");
@@ -246,8 +227,7 @@ public abstract class AbstractRepositoryTests {
     sampleA.setGender("M");
     samples.add(sampleA);
 
-    Sample sampleB = new Sample();
-    sampleB.setSampleId("SampleB");
+    Sample sampleB = (Sample) sampleRepository.getModel().newInstance();
     sampleB.setName("SampleB");
     sampleB.setTissue("Liver");
     sampleB.setHistology("carcinoma");
@@ -258,8 +238,7 @@ public abstract class AbstractRepositoryTests {
     sampleB.setGender("F");
     samples.add(sampleB);
 
-    Sample sampleC = new Sample();
-    sampleC.setSampleId("SampleC");
+    Sample sampleC = (Sample) sampleRepository.getModel().newInstance();
     sampleC.setName("SampleC");
     sampleC.setTissue("Liver");
     sampleC.setHistology("carcinoma: HCC");
@@ -270,8 +249,7 @@ public abstract class AbstractRepositoryTests {
     sampleC.setGender("F");
     samples.add(sampleC);
 
-    Sample sampleD = new Sample();
-    sampleD.setSampleId("SampleD");
+    Sample sampleD = (Sample) sampleRepository.getModel().newInstance();
     sampleD.setName("SampleD");
     sampleD.setTissue("Breast");
     sampleD.setHistology("ductal carcinoma");
@@ -282,8 +260,7 @@ public abstract class AbstractRepositoryTests {
     sampleD.setGender("U");
     samples.add(sampleD);
 
-    Sample sampleE = new Sample();
-    sampleE.setSampleId("SampleE");
+    Sample sampleE = (Sample) sampleRepository.getModel().newInstance();
     sampleE.setName("SampleE");
     sampleE.setTissue("Breast");
     sampleE.setHistology("ductal carcinoma");
@@ -296,9 +273,9 @@ public abstract class AbstractRepositoryTests {
     
     sampleRepository.insert(samples);
     
-    List<String> sampleIds = new ArrayList<>();
+    List<Serializable> sampleIds = new ArrayList<>();
     for (Sample sample: samples){
-      sampleIds.add(sample.getSampleId());
+      sampleIds.add(sample.getId());
     }
     
     dataSetA.setSampleIds(sampleIds);
@@ -308,51 +285,51 @@ public abstract class AbstractRepositoryTests {
 
     List<GeneExpression> data = new ArrayList<>();
 
-    GeneExpression geneExpression = new GeneExpression();
-    geneExpression.setSampleId(sampleA.getSampleId());
-    geneExpression.setGeneId(geneA.getGeneId());
-    geneExpression.setDataSourceId(dataSourceA.getDataSourceId());
-    geneExpression.setDataSetId(dataSourceA.getDataSetId());
+    GeneExpression geneExpression = (GeneExpression) geneExpressionRepository.getModel().newInstance();
+    geneExpression.setSampleId(sampleA.getId());
+    geneExpression.setGeneId(geneA.getId());
+    geneExpression.setDataFileId(dataFileA.getId());
+    geneExpression.setDataSetId(dataFileA.getDataSetId());
     geneExpression.setValue(1.23);
     data.add(geneExpression);
 
-    geneExpression = new GeneExpression();
-    geneExpression.setSampleId(sampleA.getSampleId());
-    geneExpression.setGeneId(geneB.getGeneId());
-    geneExpression.setDataSourceId(dataSourceA.getDataSourceId());
-    geneExpression.setDataSetId(dataSourceA.getDataSetId());
+    geneExpression = (GeneExpression) geneExpressionRepository.getModel().newInstance();
+    geneExpression.setSampleId(sampleA.getId());
+    geneExpression.setGeneId(geneB.getId());
+    geneExpression.setDataFileId(dataFileA.getId());
+    geneExpression.setDataSetId(dataFileA.getDataSetId());
     geneExpression.setValue(2.34);
     data.add(geneExpression);
 
-    geneExpression = new GeneExpression();
-    geneExpression.setSampleId(sampleA.getSampleId());
-    geneExpression.setGeneId(geneC.getGeneId());
-    geneExpression.setDataSourceId(dataSourceA.getDataSourceId());
-    geneExpression.setDataSetId(dataSourceA.getDataSetId());
+    geneExpression = (GeneExpression) geneExpressionRepository.getModel().newInstance();
+    geneExpression.setSampleId(sampleA.getId());
+    geneExpression.setGeneId(geneC.getId());
+    geneExpression.setDataFileId(dataFileA.getId());
+    geneExpression.setDataSetId(dataFileA.getDataSetId());
     geneExpression.setValue(4.56);
     data.add(geneExpression);
 
-    geneExpression = new GeneExpression();
-    geneExpression.setSampleId(sampleB.getSampleId());
-    geneExpression.setGeneId(geneA.getGeneId());
-    geneExpression.setDataSourceId(dataSourceA.getDataSourceId());
-    geneExpression.setDataSetId(dataSourceA.getDataSetId());
+    geneExpression = (GeneExpression) geneExpressionRepository.getModel().newInstance();
+    geneExpression.setSampleId(sampleB.getId());
+    geneExpression.setGeneId(geneA.getId());
+    geneExpression.setDataFileId(dataFileA.getId());
+    geneExpression.setDataSetId(dataFileA.getDataSetId());
     geneExpression.setValue(6.78);
     data.add(geneExpression);
 
-    geneExpression = new GeneExpression();
-    geneExpression.setSampleId(sampleB.getSampleId());
-    geneExpression.setGeneId(geneB.getGeneId());
-    geneExpression.setDataSourceId(dataSourceA.getDataSourceId());
-    geneExpression.setDataSetId(dataSourceA.getDataSetId());
+    geneExpression = (GeneExpression) geneExpressionRepository.getModel().newInstance();
+    geneExpression.setSampleId(sampleB.getId());
+    geneExpression.setGeneId(geneB.getId());
+    geneExpression.setDataFileId(dataFileA.getId());
+    geneExpression.setDataSetId(dataFileA.getDataSetId());
     geneExpression.setValue(9.10);
     data.add(geneExpression);
 
-    geneExpression = new GeneExpression();
-    geneExpression.setSampleId(sampleB.getSampleId());
-    geneExpression.setGeneId(geneC.getGeneId());
-    geneExpression.setDataSourceId(dataSourceA.getDataSourceId());
-    geneExpression.setDataSetId(dataSourceA.getDataSetId());
+    geneExpression = (GeneExpression) geneExpressionRepository.getModel().newInstance();
+    geneExpression.setSampleId(sampleB.getId());
+    geneExpression.setGeneId(geneC.getId());
+    geneExpression.setDataFileId(dataFileA.getId());
+    geneExpression.setDataSetId(dataFileA.getDataSetId());
     geneExpression.setValue(12.34);
     data.add(geneExpression);
     

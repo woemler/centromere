@@ -18,7 +18,6 @@
     <modules>
         <module>../centromere-core</module>
         <module>../centromere-mongodb</module>
-        <module>../centromere-etl</module>
         <module>../centromere-ws</module>
         <module>../centromere-tests</module>
     </modules>

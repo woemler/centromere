@@ -83,4 +83,23 @@ public class ModelReflectionUtils {
     return getPersistableNonEntityFieldNames(model, new ArrayList<>());
   }
 
+  /**
+   * Returns a collection of {@link Field} objects for all attributes of the requested type that 
+   *   are annotated with {@link Linked}, representing relationships between multiple {@link Model}.
+   * 
+   * @param model
+   * @return
+   */
+  public static List<Field> getLinkedModelFields(Class<?> model){
+    List<Field> fields = new ArrayList<>();
+    Class<?> currentClass = model;
+    while (currentClass.getSuperclass() != null){
+      for (Field field: currentClass.getDeclaredFields()){
+        if (field.isAnnotationPresent(Linked.class)) fields.add(field);
+      }
+      currentClass = currentClass.getSuperclass();
+    }
+    return fields;
+  }
+
 }

@@ -1,9 +1,8 @@
 package com.blueprint.centromere.tests.ws.test;
 
-import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.model.impl.Gene;
-import com.blueprint.centromere.core.repository.impl.GeneRepository;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
+import com.blueprint.centromere.tests.core.models.Gene;
+import com.blueprint.centromere.tests.core.repositories.GeneRepository;
 import com.blueprint.centromere.tests.ws.WebTestInitializer;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +12,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.env.Environment;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -22,7 +20,6 @@ import org.springframework.test.web.servlet.MockMvc;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = WebTestInitializer.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(value = { Profiles.SCHEMA_DEFAULT, Profiles.WEB_PROFILE, Profiles.NO_SECURITY, Profiles.API_DOCUMENTATION_DISABLED_PROFILE })
 @AutoConfigureMockMvc(secure = false)
 public class ApiCompressionTests extends AbstractRepositoryTests {
 
@@ -34,13 +31,12 @@ public class ApiCompressionTests extends AbstractRepositoryTests {
   @Autowired private Environment environment;
 
   @Before
-  public void doBefore(){
+  public void doBefore() throws Exception {
     geneRepository.deleteAll();
     for (Integer i = 0; i < 20000; i++){
-      Gene gene = new Gene();
+      Gene gene = (Gene) geneRepository.getModel().newInstance();
       gene.setSymbol("Gene"+i.toString());
-      gene.setReferenceId(i.toString());
-      gene.setGeneId(i.toString());
+      gene.setEntrezGeneId(i);
       gene.addAlias("gene"+i.toString());
       gene.setChromosome("X");
       gene.setChromosomeLocation("xq1");

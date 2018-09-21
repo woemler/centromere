@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
@@ -32,7 +33,10 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 /**
  * @author woemler
  */
-@SpringBootApplication(exclude = { UserDetailsServiceAutoConfiguration.class })
+@SpringBootApplication(exclude = { 
+    SecurityAutoConfiguration.class,
+    UserDetailsServiceAutoConfiguration.class
+})
 public class CentromereWebInitializer extends SpringBootServletInitializer {
 
   private static final Logger logger = LoggerFactory.getLogger(CentromereWebInitializer.class);

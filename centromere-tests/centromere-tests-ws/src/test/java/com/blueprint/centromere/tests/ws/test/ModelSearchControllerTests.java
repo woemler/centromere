@@ -23,16 +23,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.model.impl.DataSet;
-import com.blueprint.centromere.core.model.impl.DataSource;
-import com.blueprint.centromere.core.model.impl.Gene;
-import com.blueprint.centromere.core.model.impl.Sample;
-import com.blueprint.centromere.core.repository.impl.DataSetRepository;
-import com.blueprint.centromere.core.repository.impl.DataSourceRepository;
-import com.blueprint.centromere.core.repository.impl.GeneRepository;
-import com.blueprint.centromere.core.repository.impl.SampleRepository;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
+import com.blueprint.centromere.tests.core.models.DataFile;
+import com.blueprint.centromere.tests.core.models.DataSet;
+import com.blueprint.centromere.tests.core.models.Gene;
+import com.blueprint.centromere.tests.core.models.Sample;
+import com.blueprint.centromere.tests.core.repositories.DataFileRepository;
+import com.blueprint.centromere.tests.core.repositories.DataSetRepository;
+import com.blueprint.centromere.tests.core.repositories.GeneRepository;
+import com.blueprint.centromere.tests.core.repositories.SampleRepository;
 import com.blueprint.centromere.tests.ws.WebTestInitializer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.Assert;
@@ -50,7 +48,6 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = WebTestInitializer.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(value = { Profiles.SCHEMA_DEFAULT, Profiles.WEB_PROFILE, Profiles.NO_SECURITY, Profiles.API_DOCUMENTATION_DISABLED_PROFILE })
 @AutoConfigureMockMvc(secure = false)
 public class ModelSearchControllerTests extends AbstractRepositoryTests {
 
@@ -60,7 +57,7 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
   @Autowired private GeneRepository geneRepository;
   @Autowired private SampleRepository sampleRepository;
   @Autowired private DataSetRepository dataSetRepository;
-  @Autowired private DataSourceRepository dataSourceRepository;
+  @Autowired private DataFileRepository dataFileRepository;
   @Autowired private MockMvc mockMvc;
 
   // Distinct
@@ -109,50 +106,50 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
     mockMvc.perform(get(DATA_URL + "/gene?symbol=GeneB"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)))
-        .andExpect(jsonPath("$[0]", hasKey("geneId")))
-        .andExpect(jsonPath("$[0].geneId", is(gene.getId())));
+        .andExpect(jsonPath("$[0]", hasKey("id")))
+        .andExpect(jsonPath("$[0].id", is(gene.getId())));
   }
 
   @Test
   public void findDataBySampleMetadata() throws Exception {
 
-    Sample sample = (Sample) sampleRepository.findBySampleId("SampleA").get();
+    Sample sample = (Sample) sampleRepository.findByName("SampleA").get(0);
 
-    mockMvc.perform(get(DATA_URL + "/sample?sampleId=SampleA"))
+    mockMvc.perform(get(DATA_URL + "/sample?name=SampleA"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(3)))
-        .andExpect(jsonPath("$[0]", hasKey("sampleId")))
-        .andExpect(jsonPath("$[0].sampleId", is(sample.getId())));
+        .andExpect(jsonPath("$[0]", hasKey("id")))
+        .andExpect(jsonPath("$[0].id", is(sample.getId())));
   }
 
   @Test
   public void findDataByDataSourceMetadata() throws Exception {
 
-    DataSource dataSource = dataSourceRepository.findByDataType("GCT RNA-Seq gene expression").get(0);
+    DataFile dataSource = (DataFile) dataFileRepository.findByDataType("GCT RNA-Seq gene expression").get(0);
 
-    mockMvc.perform(get(DATA_URL + "/datasource?dataType=GCT RNA-Seq gene expression"))
+    mockMvc.perform(get(DATA_URL + "/datafile?dataType=GCT RNA-Seq gene expression"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(6)))
-        .andExpect(jsonPath("$[0]", hasKey("dataSourceId")))
-        .andExpect(jsonPath("$[0].dataSourceId", is(dataSource.getId())));
+        .andExpect(jsonPath("$[0]", hasKey("id")))
+        .andExpect(jsonPath("$[0].id", is(dataSource.getId())));
   }
 
   @Test
   public void findDataByDataSetMetadata() throws Exception {
 
-    DataSet dataSet = dataSetRepository.findByDataSetId("DataSetA").orElse(null);
+    DataSet dataSet = (DataSet) dataSetRepository.findByName("DataSetA").orElse(null);
     Assert.notNull(dataSet);
 
-    mockMvc.perform(get(DATA_URL + "/dataset?dataSetId=DataSetA"))
+    mockMvc.perform(get(DATA_URL + "/dataset?name=DataSetA"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(6)))
-        .andExpect(jsonPath("$[0]", hasKey("dataSetId")))
-        .andExpect(jsonPath("$[0].dataSetId", is(dataSet.getId())));
+        .andExpect(jsonPath("$[0]", hasKey("id")))
+        .andExpect(jsonPath("$[0].id", is(dataSet.getId())));
   }
   
   @Test
   public void findInvalidDataByMetadata() throws Exception {
-    mockMvc.perform(get(BASE_URL + "/dataset?shortName=DataSetA"))
+    mockMvc.perform(get(BASE_URL + "/dataset?name=DataSetA"))
         .andExpect(status().isBadRequest());
   }
   

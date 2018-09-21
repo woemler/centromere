@@ -270,6 +270,7 @@ public class ModelSearchController {
       HttpServletRequest request
   ) {
 
+    // Get the requested model and its repository instance.
     Class<T> model;
     ModelRepository<T, ID> repository;
     try {
@@ -278,10 +279,6 @@ public class ModelSearchController {
         throw new ResourceNotFoundException();
       }
       model = (Class<T>) resourceRegistry.getModelByUri(uri);
-//      if (!Metadata.class.isAssignableFrom(model)){
-//        logger.error(String.format("URI does not map to a valid model: %s", uri));
-//        throw new ResourceNotFoundException();
-//      }
       repository = (ModelRepository<T, ID>) repositoryRegistry.getRepositoryByModel(model);
     } catch (ModelRegistryException e){
       e.printStackTrace();
@@ -290,6 +287,7 @@ public class ModelSearchController {
     logger.info(String.format("Resolved request to model %s and repository %s",
         model.getName(), repository.getClass().getName()));
 
+    // Get the include/exclude fields
     Set<String> fields = RequestUtils.getFilteredFieldsFromRequest(request);
     Set<String> exclude = RequestUtils.getExcludedFieldsFromRequest(request);
     if (!fields.isEmpty()) logger.info(String.format("Selected fields: %s", fields.toString()));
@@ -299,10 +297,10 @@ public class ModelSearchController {
     Map<String,String[]> parameterMap = request.getParameterMap();
     String mediaType = request.getHeader("Accept");
 
+    // Get the model and repository instance for the linked model.
     Class<? extends Model<?>> metaModel;
     ModelRepository<?,?> metaRepository;
     String metaField;
-    
     try {
       metaModel = resourceRegistry.getModelByUri(meta);
       metaRepository = repositoryRegistry.getRepositoryByModel(metaModel);

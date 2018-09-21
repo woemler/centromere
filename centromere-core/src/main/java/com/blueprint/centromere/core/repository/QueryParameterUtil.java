@@ -71,7 +71,7 @@ public class QueryParameterUtil {
         if (Collection.class.isAssignableFrom(type)) {
 
           ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
-          type = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+          type = parameterizedType.getActualTypeArguments()[0].getClass();
 
         } else if (Map.class.isAssignableFrom(type)){
 

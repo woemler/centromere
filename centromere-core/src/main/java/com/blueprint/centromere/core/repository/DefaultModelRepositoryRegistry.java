@@ -58,20 +58,17 @@ public class DefaultModelRepositoryRegistry implements ModelRepositoryRegistry {
           "Duplicate model registered for repository %s.  Does more than one repository have the "
               + "same model?", model.getName()));
       repositoryTypeMap.put(model, repository);
-      logger.info(String.format("Registered repository %s for model %s",
+      logger.debug(String.format("Registered repository %s for model %s",
           type.getName(), model.getName()));
     }
   }
 
   @Override
-  public boolean isRegisteredModel(Class<?> model) throws ModelRegistryException {
-    int i = 0;
+  public boolean isRegisteredModel(Class<?> model) {
     for (Class<?> type: repositoryTypeMap.keySet()){
-      if (model.isAssignableFrom(type)) i++;
+      if (model.isAssignableFrom(type)) return true;
     }
-    if (i > 1) throw new ModelRegistryException(String.format("Type %s matches more than one "
-        + "registered model. Is this a superclass with multiple model subclasses?", model.getName()));
-    return i == 1;
+    return false;
   }
 
   @Override

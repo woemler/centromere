@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -37,12 +38,11 @@ public abstract class TokenSecurityConfiguration extends WebSecurityConfigurerAd
 	private UserDetailsService userService;
 
 	@Autowired
-  @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
-  private WebProperties webProperties;
+  private Environment env;
 
 	@Bean
 	public BasicTokenUtils tokenUtils() {
-		BasicTokenUtils tokenUtils = new BasicTokenUtils(webProperties.getSecurity().getToken());
+		BasicTokenUtils tokenUtils = new BasicTokenUtils(env.getRequiredProperty("centromere.web.security.token"));
 		tokenUtils.setTokenLifespan(getTokenLifespan());
 		return tokenUtils;
 	}
@@ -55,13 +55,11 @@ public abstract class TokenSecurityConfiguration extends WebSecurityConfigurerAd
 	protected Long getTokenLifespan(){
 		long hour = 1000L * 60 * 60;
 		Long lifespan = hour * 24; // one day
-		if (webProperties.getSecurity().getTokenLifespanHours() != null){
-			lifespan = hour * webProperties.getSecurity().getTokenLifespanHours();
-		} else if (webProperties.getSecurity().getTokenLifespanDays() != null) {
-      lifespan = hour * 24 * webProperties.getSecurity().getTokenLifespanDays();
-		} else {
-		  lifespan = hour;
-    }
+		if (!env.getProperty("centromere.web.security.token-lifespan-hours").equals("")){
+			lifespan = hour * env.getRequiredProperty("centromere.web.security.token-lifespan-hours", Long.class);
+		} else if (!env.getProperty("centromere.web.security.token-lifespan-days").equals("")) {
+      lifespan = hour * 24 * env.getRequiredProperty("centromere.web.security.token-lifespan-days", Long.class);
+		} 
 		return lifespan;
 	}
 	

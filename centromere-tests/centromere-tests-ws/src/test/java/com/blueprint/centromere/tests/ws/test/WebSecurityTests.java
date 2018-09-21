@@ -23,10 +23,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.model.impl.User;
-import com.blueprint.centromere.core.repository.impl.UserRepository;
+import com.blueprint.centromere.tests.core.models.User;
+import com.blueprint.centromere.tests.core.repositories.UserRepository;
 import com.blueprint.centromere.tests.ws.WebTestInitializer;
+import com.blueprint.centromere.ws.config.WebSecurityConfig;
 import com.blueprint.centromere.ws.security.BasicTokenUtils;
 import com.blueprint.centromere.ws.security.TokenDetails;
 import com.jayway.jsonpath.JsonPath;
@@ -38,7 +38,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -53,30 +53,29 @@ import org.springframework.web.context.WebApplicationContext;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = WebTestInitializer.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(value = {Profiles.SCHEMA_DEFAULT, Profiles.WEB_PROFILE, Profiles.SECURE_READ_WRITE_PROFILE, Profiles.API_DOCUMENTATION_DISABLED_PROFILE})
 @AutoConfigureMockMvc(secure = false)
+@ActiveProfiles({WebSecurityConfig.SECURE_READ_WRITE_PROFILE})
 @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
 public class WebSecurityTests {
 	
 	@Autowired private WebApplicationContext context;
+	@Autowired private PasswordEncoder passwordEncoder;
 	@Autowired private UserRepository userRepository;
 	@Autowired private FilterChainProxy springSecurityFilterChain;
 	@Autowired private BasicTokenUtils tokenUtils;
 	@Autowired private MockMvc mockMvc;
 	@Autowired(required = false) private UserDetailsService userDetailsService;
-	private static boolean isConfigured = false;
 	
 	@Before
 	public void setup() throws Exception {
-		if (!isConfigured){
-			userRepository.deleteAll();
-			User user = userRepository.getModel().newInstance();
-			user.setUsername("user");
-			user.setPassword(new BCryptPasswordEncoder().encode("password"));
-			user.setEnabled(true);
-			userRepository.save(user);
-			isConfigured = true;
-		}
+		userRepository.deleteAll();
+    User user = (User) userRepository.getModel().newInstance();
+    user.setUsername("user");
+    user.setPassword(passwordEncoder.encode("password"));
+    user.setEnabled(true);
+    user.setAccountNonExpired(true);
+    user.setCredentialsNonExpired(true);
+    userRepository.save(user);
 	}
 	
 	@Test
@@ -94,7 +93,7 @@ public class WebSecurityTests {
 
 	@Test
 	public void validTokenRequestTest() throws Exception {
-		User user = userRepository.loadUserByUsername("user");
+		User user = (User) userRepository.loadUserByUsername("user");
 		Assert.notNull(user);
 		Assert.isTrue("user".equals(user.getUsername()));
 		TokenDetails tokenDetails = tokenUtils.createTokenAndDetails(user);
@@ -138,6 +137,12 @@ public class WebSecurityTests {
 
 	@Test
 	public void userAuthenticationTest() throws Exception {
+	  
+//	  Optional<User> userOptional = userRepository.findByUsername("user");
+//	  Assert.isTrue(userOptional.isPresent());
+//	  User user = userOptional.get();
+//	  Assert.isTrue("user".equals(user.getUsername()));
+//	  Assert.isTrue(passwordEncoder.matches(user.getPassword(), "password"));
 
     mockMvc.perform(get("/api/genes"))
         .andExpect(status().isForbidden());

@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -37,8 +38,9 @@ public class ApiDocumentationConfig {
   @Import({ BeanValidatorPluginsConfiguration.class })
   public static class SwaggerConfig {
 
-    @Autowired
-    private WebProperties webProperties;
+    @Autowired 
+    private Environment env;
+    
     @Autowired
     private TypeResolver typeResolver;
     @Autowired
@@ -57,24 +59,24 @@ public class ApiDocumentationConfig {
     }
 
     private ApiInfo apiInfo() {
-      WebProperties.Api api = webProperties.getApi();
+      //WebProperties.Api api = webProperties.getApi();
       return new ApiInfo(
-          api.getName(),
-          api.getDescription(),
-          api.getVersion(),
-          api.getTermsOfService(),
+          env.getRequiredProperty("centromere.web.api.name"),
+          env.getRequiredProperty("centromere.web.api.description"),
+          env.getRequiredProperty("centromere.web.api.version"),
+          env.getRequiredProperty("centromere.web.api.tos"),
           new Contact(
-              api.getContactName(),
-              api.getContactUrl(),
-              api.getContactEmail()
+              env.getRequiredProperty("centromere.web.api.contact-name"),
+              env.getRequiredProperty("centromere.web.api.contact-url"),
+              env.getRequiredProperty("centromere.web.api.contact-email")
           ),
-          api.getLicense(),
-          api.getLicenseUrl()
+          env.getRequiredProperty("centromere.web.api.license"),
+          env.getRequiredProperty("centromere.web.api.license-url")
       );
     }
 
     private Predicate<String> apiPaths() {
-      return PathSelectors.regex(webProperties.getApi().getRegexUrl());
+      return PathSelectors.regex(env.getRequiredProperty("centromere.web.api.regex-url"));
     }
 
     private ResolvedType[] getModelTypes() {

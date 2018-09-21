@@ -31,9 +31,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.env.Environment;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
@@ -51,9 +51,6 @@ public class WebApplicationConfig {
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Configuration
   @EnableSpringDataWebSupport
-  @Import({
-      WebProperties.class
-  })
   @ComponentScan(basePackageClasses = {
       UserAuthenticationController.class,
       ModelCrudController.class,
@@ -65,7 +62,7 @@ public class WebApplicationConfig {
     private static final Logger logger = LoggerFactory.getLogger(WebApplicationConfig.class);
 
     @Autowired
-    private WebProperties webProperties;
+    private Environment env;
     
     @Bean
     public ModelRepositoryRegistry modelRepositoryRegistry(ApplicationContext context){
@@ -132,27 +129,6 @@ public class WebApplicationConfig {
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
           } else {
             logger.info("[CENTROMERE] WebJar location already configured.");
-          }
-
-          // Static content
-          // TODO: make static content default
-          if (webProperties.isEnableStaticContent()) {
-            if (!registry.hasMappingForPattern("/static/**")) {
-              registry.addResourceHandler("/static/**").addResourceLocations(
-                  webProperties.getStaticContentLocation());
-              if (webProperties.getHomePage() != null && !"".equals(webProperties.getHomePage())
-                  && webProperties.getHomePageLocation() != null && !""
-                  .equals(webProperties.getHomePageLocation())) {
-                registry.addResourceHandler(webProperties.getHomePage())
-                    .addResourceLocations(webProperties.getHomePageLocation());
-                logger.info(String.format("[CENTROMERE] Static home page configured at URL: /%s",
-                    webProperties.getHomePage()));
-              } else {
-                logger.warn("[CENTROMERE] Static home page location not properly configured.");
-              }
-            } else {
-              logger.info("[CENTROMERE] Static content already configured.");
-            }
           }
 
         }

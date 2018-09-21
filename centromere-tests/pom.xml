@@ -15,7 +15,7 @@
 
   <modules>
     <module>centromere-tests-core</module>
-    <module>centromere-tests-cli</module>
+    <module>centromere-tests-mongodb</module>
     <module>centromere-tests-ws</module>
   </modules>
 

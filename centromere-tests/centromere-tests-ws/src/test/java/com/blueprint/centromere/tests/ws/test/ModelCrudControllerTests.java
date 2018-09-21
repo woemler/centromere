@@ -21,17 +21,18 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.blueprint.centromere.core.config.Profiles;
-import com.blueprint.centromere.core.model.impl.Gene;
-import com.blueprint.centromere.core.repository.impl.GeneExpressionRepository;
-import com.blueprint.centromere.core.repository.impl.GeneRepository;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
+import com.blueprint.centromere.tests.core.models.Gene;
+import com.blueprint.centromere.tests.core.repositories.GeneExpressionRepository;
+import com.blueprint.centromere.tests.core.repositories.GeneRepository;
 import com.blueprint.centromere.tests.ws.WebTestInitializer;
 import com.blueprint.centromere.ws.config.ApiMediaTypes;
 import com.blueprint.centromere.ws.config.ModelResourceRegistry;
@@ -48,7 +49,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -59,7 +59,6 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = WebTestInitializer.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(value = { Profiles.SCHEMA_DEFAULT, Profiles.WEB_PROFILE, Profiles.NO_SECURITY, Profiles.API_DOCUMENTATION_DISABLED_PROFILE })
 @AutoConfigureMockMvc(secure = false)
 public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
@@ -83,18 +82,18 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   @Test
   public void findById() throws Exception {
     
-    System.out.println("Gene URI: " + registry.getUriByModel(Gene.class));
+    System.out.println("Gene URI: " + registry.getUriByModel(geneRepository.getModel()));
     System.out.println(String.format("Registered models: %s", registry.getRegisteredModels()));
 
-    Gene gene = (Gene) geneRepository.findByGeneId("1").get();
+    Gene gene = (Gene) geneRepository.findByEntrezGeneId(1).get();
 
     mockMvc.perform(get(BASE_URL + "/{id}", gene.getId())
         .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.geneId", is("1")))
+        .andExpect(jsonPath("$.entrezGeneId", is(1)))
         .andExpect(jsonPath("$.symbol", is("GeneA")))
-        .andExpect(jsonPath("$.links", hasSize(3)))
+        .andExpect(jsonPath("$.links", hasSize(1)))
         .andExpect(jsonPath("$.links[0].rel", is("self")))
         .andExpect(jsonPath("$.links[0].href", endsWith(BASE_URL + "/" + gene.getId())));
   }
@@ -102,11 +101,11 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   @Test
   public void findByIdNoHal() throws Exception {
 
-    Gene gene = (Gene) geneRepository.findByGeneId("1").get();
+    Gene gene = (Gene) geneRepository.findByEntrezGeneId(1).get();
 
     mockMvc.perform(get(BASE_URL + "/{id}", gene.getId()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.geneId", is("1")))
+        .andExpect(jsonPath("$.entrezGeneId", is(1)))
         .andExpect(jsonPath("$.symbol", is("GeneA")))
         .andExpect(jsonPath("$", not(hasKey("links"))));
   }
@@ -120,11 +119,11 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   @Test
   public void findByIdFiltered() throws Exception {
 
-    Gene gene = (Gene) geneRepository.findByGeneId("1").get();
+    Gene gene = (Gene) geneRepository.findByEntrezGeneId(1).get();
 
     mockMvc.perform(get(BASE_URL + "/{id}?exclude=links,symbol", gene.getId()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.geneId", is("1")))
+        .andExpect(jsonPath("$.entrezGeneId", is(1)))
         .andExpect(jsonPath("$", not(hasKey("symbol"))))
         .andExpect(jsonPath("$", not(hasKey("links"))));
   }
@@ -132,11 +131,11 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   @Test
   public void findByIdWithoutLinks() throws Exception {
 
-    Gene gene = (Gene) geneRepository.findByGeneId("1").get();
+    Gene gene = (Gene) geneRepository.findByEntrezGeneId(1).get();
 
     mockMvc.perform(get(BASE_URL + "/{id}", gene.getId()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.geneId", is("1")))
+        .andExpect(jsonPath("$.entrezGeneId", is(1)))
         .andExpect(jsonPath("$.symbol", is("GeneA")))
         .andExpect(jsonPath("$", not(hasKey("links"))));
   }
@@ -147,8 +146,8 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$.content", hasSize(5)))
-        .andExpect(jsonPath("$.content[0]", hasKey("geneId")))
-        .andExpect(jsonPath("$.content[0].geneId", is("1")))
+        .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
+        .andExpect(jsonPath("$.content[0].entrezGeneId", is(1)))
         .andExpect(jsonPath("$", hasKey("links")))
         .andExpect(jsonPath("$.links", hasSize(1)))
         .andExpect(jsonPath("$.links[0].rel", is("self")))
@@ -161,8 +160,8 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
     mockMvc.perform(get(BASE_URL))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(5)))
-        .andExpect(jsonPath("$[0]", hasKey("geneId")))
-        .andExpect(jsonPath("$[0].geneId", is("1")))
+        .andExpect(jsonPath("$[0]", hasKey("entrezGeneId")))
+        .andExpect(jsonPath("$[0].entrezGeneId", is(1)))
         .andExpect(jsonPath("$[0]", not(hasKey("links"))))
         .andExpect(jsonPath("$", not(hasKey("pageMetadata"))));
   }
@@ -174,8 +173,8 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$.content", hasSize(5)))
-        .andExpect(jsonPath("$.content[0]", hasKey("geneId")))
-        .andExpect(jsonPath("$.content[0].geneId", is("1")))
+        .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
+        .andExpect(jsonPath("$.content[0].entrezGeneId", is(1)))
         .andExpect(jsonPath("$.content[0]", not(hasKey("symbol"))))
         .andExpect(jsonPath("$.content[0]", not(hasKey("links"))));
   }
@@ -198,8 +197,8 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$.content", hasSize(2)))
-        .andExpect(jsonPath("$.content[0]", hasKey("geneId")))
-        .andExpect(jsonPath("$.content[0].geneId", is("3")))
+        .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
+        .andExpect(jsonPath("$.content[0].entrezGeneId", is(3)))
         .andExpect(jsonPath("$", hasKey("links")))
         .andExpect(jsonPath("$.links", hasSize(1)))
         .andExpect(jsonPath("$.links[0].rel", is("self")))
@@ -212,8 +211,8 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
     mockMvc.perform(get(BASE_URL + "?aliases=MNO").accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0]", hasKey("geneId")))
-        .andExpect(jsonPath("$[0].geneId", is("5")))
+        .andExpect(jsonPath("$[0]", hasKey("entrezGeneId")))
+        .andExpect(jsonPath("$[0].entrezGeneId", is(5)))
         .andExpect(jsonPath("$[0]", not(hasKey("links"))));
   }
 
@@ -222,8 +221,8 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
     mockMvc.perform(get(BASE_URL + "?attributes.isKinase=Y").accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)))
-        .andExpect(jsonPath("$[0]", hasKey("geneId")))
-        .andExpect(jsonPath("$[0].geneId", is("1")))
+        .andExpect(jsonPath("$[0]", hasKey("entrezGeneId")))
+        .andExpect(jsonPath("$[0].entrezGeneId", is(1)))
         .andExpect(jsonPath("$[0]", not(hasKey("links"))));
   }
 
@@ -233,8 +232,8 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$.content", hasSize(2)))
-        .andExpect(jsonPath("$.content[0]", hasKey("geneId")))
-        .andExpect(jsonPath("$.content[0].geneId", is("4")))
+        .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
+        .andExpect(jsonPath("$.content[0].entrezGeneId", is(4)))
         .andExpect(jsonPath("$", hasKey("links")))
         .andExpect(jsonPath("$.links", hasSize(4)))
         .andExpect(jsonPath("$.links[0].rel", is("first")))
@@ -251,8 +250,8 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$.content", hasSize(2)))
-        .andExpect(jsonPath("$.content[0]", hasKey("geneId")))
-        .andExpect(jsonPath("$.content[0].geneId", is("4")))
+        .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
+        .andExpect(jsonPath("$.content[0].entrezGeneId", is(4)))
         .andExpect(jsonPath("$.content[0]", not(hasKey("links"))))
         .andExpect(jsonPath("$", not(hasKey("links"))));
   }
@@ -264,8 +263,8 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$.content", hasSize(5)))
-        .andExpect(jsonPath("$.content[0]", hasKey("geneId")))
-        .andExpect(jsonPath("$.content[0].geneId", is("5")));
+        .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
+        .andExpect(jsonPath("$.content[0].entrezGeneId", is(5)));
   }
   
   // Dynamic Find Params
@@ -472,7 +471,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   public void createTest() throws Exception {
 
     Gene gene = (Gene) geneRepository.getModel().newInstance();
-    gene.setGeneId("6");
+    gene.setEntrezGeneId(6);
     gene.setSymbol("GeneF");
     gene.setTaxId(9606);
     gene.setChromosome("10");
@@ -486,14 +485,14 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(gene)))
         .andExpect(status().isCreated())
-        .andExpect(jsonPath("$", hasKey("geneId")))
-        .andExpect(jsonPath("$.geneId", is("6")));
+        .andExpect(jsonPath("$", hasKey("entrezGeneId")))
+        .andExpect(jsonPath("$.entrezGeneId", is(6)));
 
-    Gene newGene = (Gene) geneRepository.findByGeneId("6").get();
+    Gene newGene = (Gene) geneRepository.findByEntrezGeneId(6).get();
 
     mockMvc.perform(get(BASE_URL + "/{id}", newGene.getId()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.geneId", is("6")));
+        .andExpect(jsonPath("$.entrezGeneId", is(6)));
 
     geneRepository.delete(newGene);
 
@@ -545,7 +544,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   public void deleteTest() throws Exception {
 
     Gene gene = (Gene) geneRepository.getModel().newInstance();
-    gene.setGeneId("7");
+    gene.setEntrezGeneId(7);
     gene.setSymbol("GeneG");
     gene.setTaxId(9606);
     gene.setChromosome("10");
@@ -627,13 +626,13 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   }
   
   // Home page
-  @Test
-  public void homePageTest() throws Exception {
-    
-    Assert.isTrue(environment.getProperty("centromere.web.enable-static-content").equals("true"), "centromere.web.enable-static-content property should be set to true");
-    
-    mockMvc.perform(get("/index.html").accept(MediaType.TEXT_HTML))
-        .andExpect(status().isOk());
-  }
+//  @Test
+//  public void homePageTest() throws Exception {
+//    
+//    Assert.isTrue(environment.getProperty("centromere.web.enable-static-content").equals("true"), "centromere.web.enable-static-content property should be set to true");
+//    
+//    mockMvc.perform(get("/index.html").accept(MediaType.TEXT_HTML))
+//        .andExpect(status().isOk());
+//  }
 
 }

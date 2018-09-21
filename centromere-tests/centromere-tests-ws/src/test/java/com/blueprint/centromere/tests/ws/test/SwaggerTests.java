@@ -16,8 +16,8 @@
 
 package com.blueprint.centromere.tests.ws.test;
 
-import com.blueprint.centromere.core.config.Profiles;
 import com.blueprint.centromere.tests.ws.WebTestInitializer;
+import com.blueprint.centromere.ws.config.ApiDocumentationConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +36,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { WebTestInitializer.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles({ApiDocumentationConfig.SWAGGER_PROFILE})
 @AutoConfigureMockMvc(secure = false)
-@ActiveProfiles(value = {Profiles.SCHEMA_DEFAULT, Profiles.WEB_PROFILE, Profiles.NO_SECURITY, Profiles.API_DOCUMENTATION_ENABLED_PROFILE})
 public class SwaggerTests {
 
   @Autowired private MockMvc mockMvc;

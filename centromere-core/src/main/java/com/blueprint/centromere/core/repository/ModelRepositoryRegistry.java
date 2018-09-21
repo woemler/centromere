@@ -33,9 +33,8 @@ public interface ModelRepositoryRegistry {
    * 
    * @param type model type
    * @return true if model is registered
-   * @throws ModelRegistryException throws if problem with checking registry
    */
-  boolean isRegisteredModel(Class<?> type) throws ModelRegistryException;
+  boolean isRegisteredModel(Class<?> type);
 
   /**
    * Retrieves the {@link ModelRepository} instance associated with the registered {@link Model} class.

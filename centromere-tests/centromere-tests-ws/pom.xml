@@ -17,7 +17,7 @@
 
     <dependency>
       <groupId>com.blueprint</groupId>
-      <artifactId>centromere-tests-core</artifactId>
+      <artifactId>centromere-tests-mongodb</artifactId>
       <version>${project.version}</version>
     </dependency>
 
