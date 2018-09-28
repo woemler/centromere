@@ -30,6 +30,7 @@ import com.blueprint.centromere.ws.config.WebSecurityConfig;
 import com.blueprint.centromere.ws.security.BasicTokenUtils;
 import com.blueprint.centromere.ws.security.TokenDetails;
 import com.jayway.jsonpath.JsonPath;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -138,11 +139,11 @@ public class WebSecurityTests {
 	@Test
 	public void userAuthenticationTest() throws Exception {
 	  
-//	  Optional<User> userOptional = userRepository.findByUsername("user");
-//	  Assert.isTrue(userOptional.isPresent());
-//	  User user = userOptional.get();
-//	  Assert.isTrue("user".equals(user.getUsername()));
-//	  Assert.isTrue(passwordEncoder.matches(user.getPassword(), "password"));
+	  Optional<User> userOptional = userRepository.findByUsername("user");
+	  Assert.isTrue(userOptional.isPresent());
+	  User user = userOptional.get();
+	  Assert.isTrue("user".equals(user.getUsername()));
+	  Assert.isTrue(passwordEncoder.matches("password", user.getPassword()));
 
     mockMvc.perform(get("/api/genes"))
         .andExpect(status().isForbidden());

@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -60,22 +59,22 @@ public class WebSecurityConfig  {
     public PasswordEncoder passwordEncoder(){
       return new BCryptPasswordEncoder();
     }
-    
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider(){
-      DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-      authenticationProvider.setPasswordEncoder(passwordEncoder());
-      authenticationProvider.setUserDetailsService(userService);
-      return authenticationProvider;
-    }
-    
+//    
+//    @Bean
+//    public DaoAuthenticationProvider authenticationProvider(){
+//      DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+//      authenticationProvider.setPasswordEncoder(passwordEncoder());
+//      authenticationProvider.setUserDetailsService(userService);
+//      return authenticationProvider;
+//    }
+//    
     
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-      auth.authenticationProvider(authenticationProvider());
-//          .userDetailsService(userService)
-//          .passwordEncoder(passwordEncoder());
+      auth
+          .userDetailsService(userService)
+          .passwordEncoder(passwordEncoder());
     }
 
     @Configuration
@@ -99,8 +98,8 @@ public class WebSecurityConfig  {
           .and()
             .addFilterBefore(authenticationTokenProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
             .antMatcher(secureUrl)
-            .authorizeRequests()
-            .anyRequest().permitAll()
+              .authorizeRequests()
+                .anyRequest().permitAll()
           .and()
             .csrf().disable();
 
@@ -129,8 +128,8 @@ public class WebSecurityConfig  {
             .addFilterBefore(authenticationTokenProcessingFilter(),
               UsernamePasswordAuthenticationFilter.class)
             .antMatcher(secureUrl)
-            .authorizeRequests()
-            .anyRequest().fullyAuthenticated()
+              .authorizeRequests()
+                .anyRequest().fullyAuthenticated()
           .and()
             .csrf().disable();
 
