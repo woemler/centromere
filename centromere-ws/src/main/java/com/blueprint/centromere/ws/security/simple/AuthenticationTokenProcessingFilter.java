@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.ws.security;
+package com.blueprint.centromere.ws.security.simple;
 
+import com.blueprint.centromere.ws.security.TokenDetails;
+import com.blueprint.centromere.ws.security.TokenOperations;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

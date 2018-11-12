@@ -33,14 +33,13 @@ public interface TokenOperations {
 	 */
 	String createToken(UserDetails userDetails);
 
-	/**
-	 * Creates the hash of user credentials and token expiration timestamp.
-	 * 
-	 * @param userDetails {@link UserDetails}
-	 * @param expires timestamp (in milliseconds) when the token expires.
-	 * @return string representation of the hash
-	 */
-	String computeSignature(UserDetails userDetails, long expires);
+  /**
+   * Generates a user authentication token and user-visible token details.
+   * 
+   * @param userDetails
+   * @return token details object
+   */
+	TokenDetails createTokenAndDetails(UserDetails userDetails);
 
 	/**
 	 * Returns the username portion of a submitted authentication token

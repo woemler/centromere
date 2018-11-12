@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -35,7 +36,8 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
  */
 @SpringBootApplication(exclude = { 
     SecurityAutoConfiguration.class,
-    UserDetailsServiceAutoConfiguration.class
+    UserDetailsServiceAutoConfiguration.class,
+    DataSourceAutoConfiguration.class
 })
 public class CentromereWebInitializer extends SpringBootServletInitializer {
 
@@ -53,10 +55,8 @@ public class CentromereWebInitializer extends SpringBootServletInitializer {
     String[] profiles;
     if (source.isAnnotationPresent(AutoConfigureCentromere.class)){
       AutoConfigureCentromere annotation = source.getAnnotation(AutoConfigureCentromere.class);
-      String securityProfile = annotation.enableWebSecurity()
-          ? WebSecurityConfig.SECURE_READ_WRITE_PROFILE : WebSecurityConfig.NO_SECURITY_PROFILE;
-      String apiDocumentationProfile = annotation.enableApiDocumentation()
-          ? ApiDocumentationConfig.SWAGGER_PROFILE : ApiDocumentationConfig.NO_DOCUMENTATION_PROFILE;
+      String securityProfile = annotation.webSecurity();
+      String apiDocumentationProfile = annotation.apiDocumentation();
       profiles = new String[] { securityProfile, apiDocumentationProfile };
       logger.info(String.format("Running Centromere with profiles: %s", Arrays.asList(profiles)));
     } else {

@@ -46,13 +46,13 @@ public @interface AutoConfigureCentromere {
    *
    * @return
    */
-  boolean enableWebSecurity() default false;
+  String webSecurity() default WebSecurityConfig.NO_SECURITY_PROFILE;
 
   /**
    * If true, web services will include automatic API documentation.
    *
    * @return
    */
-  boolean enableApiDocumentation() default false;
+  String apiDocumentation() default ApiDocumentationConfig.NO_DOCUMENTATION_PROFILE;
 	
 }

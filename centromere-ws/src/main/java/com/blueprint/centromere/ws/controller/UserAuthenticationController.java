@@ -17,8 +17,8 @@
 package com.blueprint.centromere.ws.controller;
 
 import com.blueprint.centromere.ws.exception.ResourceNotFoundException;
-import com.blueprint.centromere.ws.security.BasicTokenUtils;
 import com.blueprint.centromere.ws.security.TokenDetails;
+import com.blueprint.centromere.ws.security.TokenOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,15 +35,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserAuthenticationController {
 
-	@Autowired(required = false) private BasicTokenUtils tokenUtils;
+	@Autowired(required = false) private TokenOperations tokenOperations;
 
 	private static final Logger logger = LoggerFactory.getLogger(UserAuthenticationController.class);
 
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
 	public TokenDetails createToken(@AuthenticationPrincipal UserDetails user){
-	  if (tokenUtils == null) throw new ResourceNotFoundException();
+	  if (tokenOperations == null) throw new ResourceNotFoundException();
 		Assert.notNull(user, "Unable to authenticate user!");
-		TokenDetails tokenDetails = tokenUtils.createTokenAndDetails(user);
+		TokenDetails tokenDetails = tokenOperations.createTokenAndDetails(user);
 		logger.info(String.format("Successfully generated authentication token for user: %s", user.getUsername()));
 		return tokenDetails;
 	}

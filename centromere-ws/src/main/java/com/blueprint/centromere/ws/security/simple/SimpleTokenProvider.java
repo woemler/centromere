@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.ws.security;
+package com.blueprint.centromere.ws.security.simple;
 
+import com.blueprint.centromere.ws.security.TokenDetails;
+import com.blueprint.centromere.ws.security.TokenOperations;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
@@ -30,18 +32,19 @@ import org.springframework.util.Assert;
  * 
  * @author woemler
  */
-public class BasicTokenUtils implements TokenOperations {
+public class SimpleTokenProvider implements TokenOperations {
 	
 	private final String key;
 	private Long tokenLifespan = 1000L * 60 * 60 * 24; // expires in one day
 
-	public BasicTokenUtils(String key) {
+	public SimpleTokenProvider(String key) {
 		this.key = key;
 	}
 
 	/**
 	 * {@link TokenOperations#createToken(UserDetails)}
 	 */
+	@Override
 	public String createToken(UserDetails userDetails){
 		
 		long expires = System.currentTimeMillis() + tokenLifespan;
@@ -56,10 +59,14 @@ public class BasicTokenUtils implements TokenOperations {
 		
 	}
 
-	/**
-	 * {@link TokenOperations#computeSignature(UserDetails, long)}
-	 */
-	public String computeSignature(UserDetails userDetails, long expires){
+  /**
+   * Creates the hash of user credentials and token expiration timestamp.
+   *
+   * @param userDetails {@link UserDetails}
+   * @param expires timestamp (in milliseconds) when the token expires.
+   * @return string representation of the hash
+   */
+	private String computeSignature(UserDetails userDetails, long expires){
 		
 		StringBuilder signatureBuilder = new StringBuilder();
 		signatureBuilder.append(userDetails.getUsername());
@@ -84,6 +91,7 @@ public class BasicTokenUtils implements TokenOperations {
 	/**
 	 * {@link TokenOperations#getUserNameFromToken(String)}
 	 */
+	@Override
 	public String getUserNameFromToken(String authToken){
 		
 		if (null == authToken){

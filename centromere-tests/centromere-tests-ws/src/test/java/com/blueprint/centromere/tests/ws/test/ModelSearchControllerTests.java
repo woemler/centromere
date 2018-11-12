@@ -51,9 +51,6 @@ import org.springframework.util.Assert;
 @AutoConfigureMockMvc(secure = false)
 public class ModelSearchControllerTests extends AbstractRepositoryTests {
 
-  private static final String BASE_URL = "/api/gene/search";
-  private static final String DATA_URL = "/api/geneexpression/search";
-
   @Autowired private GeneRepository geneRepository;
   @Autowired private SampleRepository sampleRepository;
   @Autowired private DataSetRepository dataSetRepository;
@@ -64,20 +61,20 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findDistinct() throws Exception {
-    mockMvc.perform(get(BASE_URL + "/distinct/geneType"))
+    mockMvc.perform(get("/api/gene/search/distinct/geneType"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)));
   }
 
   @Test
   public void invalidFindDistinct() throws Exception {
-    mockMvc.perform(get(BASE_URL + "/distinct/badField"))
+    mockMvc.perform(get("/api/gene/search/distinct/badField"))
         .andExpect(status().isBadRequest());
   }
 
   @Test
   public void findDistinctFiltered() throws Exception {
-    mockMvc.perform(get(BASE_URL + "/distinct/symbol?geneType=protein-coding"))
+    mockMvc.perform(get("/api/gene/search/distinct/symbol?geneType=protein-coding"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[2]", is("GeneD")));
@@ -85,7 +82,7 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
   
   @Test
   public void guessTest() throws Exception {
-    mockMvc.perform(get(BASE_URL + "/guess?keyword=DEF"))
+    mockMvc.perform(get("/api/gene/search/guess?keyword=DEF"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0]", hasKey("symbol")))
@@ -94,7 +91,7 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
   
   @Test
   public void invalidGuessTest() throws Exception {
-    mockMvc.perform(get(DATA_URL + "/guess?keyword=DEF"))
+    mockMvc.perform(get("/api/geneexpression/search/guess?keyword=DEF"))
         .andExpect(status().isNotFound());
   }
 
@@ -103,7 +100,7 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
 
     Gene gene = (Gene) geneRepository.findBySymbol("GeneB").get(0);
     
-    mockMvc.perform(get(DATA_URL + "/gene?symbol=GeneB"))
+    mockMvc.perform(get("/api/geneexpression/search/gene?symbol=GeneB"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[0]", hasKey("id")))
@@ -115,7 +112,7 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
 
     Sample sample = (Sample) sampleRepository.findByName("SampleA").get(0);
 
-    mockMvc.perform(get(DATA_URL + "/sample?name=SampleA"))
+    mockMvc.perform(get("/api/geneexpression/search/sample?name=SampleA"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[0]", hasKey("id")))
@@ -127,7 +124,7 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
 
     DataFile dataSource = (DataFile) dataFileRepository.findByDataType("GCT RNA-Seq gene expression").get(0);
 
-    mockMvc.perform(get(DATA_URL + "/datafile?dataType=GCT RNA-Seq gene expression"))
+    mockMvc.perform(get("/api/geneexpression/search/datafile?dataType=GCT RNA-Seq gene expression"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(6)))
         .andExpect(jsonPath("$[0]", hasKey("id")))
@@ -140,7 +137,7 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
     DataSet dataSet = (DataSet) dataSetRepository.findByName("DataSetA").orElse(null);
     Assert.notNull(dataSet);
 
-    mockMvc.perform(get(DATA_URL + "/dataset?name=DataSetA"))
+    mockMvc.perform(get("/api/geneexpression/search/dataset?name=DataSetA"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(6)))
         .andExpect(jsonPath("$[0]", hasKey("id")))
@@ -149,7 +146,7 @@ public class ModelSearchControllerTests extends AbstractRepositoryTests {
   
   @Test
   public void findInvalidDataByMetadata() throws Exception {
-    mockMvc.perform(get(BASE_URL + "/dataset?name=DataSetA"))
+    mockMvc.perform(get("/api/gene/search/dataset?name=DataSetA"))
         .andExpect(status().isBadRequest());
   }
   

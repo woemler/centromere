@@ -27,8 +27,8 @@ import com.blueprint.centromere.tests.core.models.User;
 import com.blueprint.centromere.tests.core.repositories.UserRepository;
 import com.blueprint.centromere.tests.ws.WebTestInitializer;
 import com.blueprint.centromere.ws.config.WebSecurityConfig;
-import com.blueprint.centromere.ws.security.BasicTokenUtils;
 import com.blueprint.centromere.ws.security.TokenDetails;
+import com.blueprint.centromere.ws.security.simple.SimpleTokenProvider;
 import com.jayway.jsonpath.JsonPath;
 import java.util.Optional;
 import org.junit.Before;
@@ -40,14 +40,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.util.Assert;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * @author woemler
@@ -55,15 +53,13 @@ import org.springframework.web.context.WebApplicationContext;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = WebTestInitializer.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc(secure = false)
-@ActiveProfiles({WebSecurityConfig.SECURE_READ_WRITE_PROFILE})
+@ActiveProfiles({WebSecurityConfig.SIMPLE_TOKEN_SECURITY_PROFILE})
 @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
-public class WebSecurityTests {
+public class SimpleTokenSecurityTests {
 	
-	@Autowired private WebApplicationContext context;
-	@Autowired private PasswordEncoder passwordEncoder;
+	@Autowired(required = false) private PasswordEncoder passwordEncoder;
 	@Autowired private UserRepository userRepository;
-	@Autowired private FilterChainProxy springSecurityFilterChain;
-	@Autowired private BasicTokenUtils tokenUtils;
+	@Autowired(required = false) private SimpleTokenProvider tokenUtils;
 	@Autowired private MockMvc mockMvc;
 	@Autowired(required = false) private UserDetailsService userDetailsService;
 	
@@ -76,6 +72,7 @@ public class WebSecurityTests {
     user.setEnabled(true);
     user.setAccountNonExpired(true);
     user.setCredentialsNonExpired(true);
+    user.setAccountNonLocked(true);
     userRepository.save(user);
 	}
 	
@@ -84,12 +81,14 @@ public class WebSecurityTests {
 	  Assert.notNull(userDetailsService);
 	  Assert.notNull(userRepository);
 	  Assert.isTrue(userDetailsService.equals(userRepository));
+	  Assert.notNull(passwordEncoder);
+	  Assert.notNull(tokenUtils);
   }
 
 	@Test
 	public void nonAuthenticatedGetRequestTest() throws Exception {
-		mockMvc.perform(get("/api/genes"))
-				.andExpect(status().isForbidden());
+		mockMvc.perform(get("/api/gene"))
+				.andExpect(status().isUnauthorized());
 	}
 
 	@Test
@@ -105,9 +104,9 @@ public class WebSecurityTests {
 
 	@Test
 	public void badTokenTest() throws Exception {
-		mockMvc.perform(get("/api/genes")
+		mockMvc.perform(get("/api/gene")
 				.header("X-Auth-Token", "user:23459837145:gwerhg97wr9tgwg"))
-				.andExpect(status().isForbidden());
+				.andExpect(status().isUnauthorized());
 	}
 	
 	@Test
@@ -116,7 +115,7 @@ public class WebSecurityTests {
 				.with(httpBasic("not", "correct")))
 				.andExpect(status().isUnauthorized());
     mockMvc.perform(get("/api/genes"))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
 	}
 
 	@Test
@@ -125,7 +124,7 @@ public class WebSecurityTests {
 				.with(httpBasic("user", "notpassword")))
 				.andExpect(status().isUnauthorized());
     mockMvc.perform(get("/api/genes"))
-        .andExpect(status().isForbidden());
+        .andExpect(status().isUnauthorized());
 	}
 
 	@Test
@@ -144,9 +143,10 @@ public class WebSecurityTests {
 	  User user = userOptional.get();
 	  Assert.isTrue("user".equals(user.getUsername()));
 	  Assert.isTrue(passwordEncoder.matches("password", user.getPassword()));
+	  System.out.println(user.getUsername() + ": " + user.getPassword());
 
-    mockMvc.perform(get("/api/genes"))
-        .andExpect(status().isForbidden());
+    mockMvc.perform(get("/api/gene"))
+        .andExpect(status().isUnauthorized());
 	  
 	  MvcResult result = mockMvc.perform(post("/authenticate")
         .header("Accept", "application/json")

@@ -16,8 +16,8 @@
 
 package com.blueprint.centromere.ws.config;
 
-import com.blueprint.centromere.ws.security.AuthenticationTokenProcessingFilter;
-import com.blueprint.centromere.ws.security.BasicTokenUtils;
+import com.blueprint.centromere.ws.security.simple.AuthenticationTokenProcessingFilter;
+import com.blueprint.centromere.ws.security.simple.SimpleTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +41,8 @@ public abstract class TokenSecurityConfiguration extends WebSecurityConfigurerAd
   private Environment env;
 
 	@Bean
-	public BasicTokenUtils tokenUtils() {
-		BasicTokenUtils tokenUtils = new BasicTokenUtils(env.getRequiredProperty("centromere.web.security.token"));
+	public SimpleTokenProvider tokenUtils() {
+		SimpleTokenProvider tokenUtils = new SimpleTokenProvider(env.getRequiredProperty("centromere.web.security.token"));
 		tokenUtils.setTokenLifespan(getTokenLifespan());
 		return tokenUtils;
 	}

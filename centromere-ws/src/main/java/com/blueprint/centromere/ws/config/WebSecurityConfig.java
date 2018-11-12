@@ -16,9 +16,14 @@
 
 package com.blueprint.centromere.ws.config;
 
+import com.blueprint.centromere.ws.security.RestAuthenticationEntryPoint;
+import com.blueprint.centromere.ws.security.TokenOperations;
+import com.blueprint.centromere.ws.security.simple.AuthenticationTokenProcessingFilter;
+import com.blueprint.centromere.ws.security.simple.SimpleTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -26,7 +31,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -34,6 +38,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -42,14 +47,20 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig  {
   
   public static final String NO_SECURITY_PROFILE = "web_security_none";
-  public static final String SECURE_READ_WRITE_PROFILE = "web_security_read_write";
+  public static final String SIMPLE_TOKEN_SECURITY_PROFILE = "web_security_simple_token";
 
   @Configuration
   @EnableWebSecurity
-  @EnableGlobalMethodSecurity
+  //@EnableGlobalMethodSecurity
+  @PropertySource(value = { "classpath:web-defaults.properties" })
+  @Profile(SIMPLE_TOKEN_SECURITY_PROFILE )
+  @Order(SecurityProperties.BASIC_AUTH_ORDER)
   public static class DefaultWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
+    
+    @Autowired 
+    private Environment env;
 
     @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
     @Autowired
@@ -59,102 +70,78 @@ public class WebSecurityConfig  {
     public PasswordEncoder passwordEncoder(){
       return new BCryptPasswordEncoder();
     }
-//    
-//    @Bean
-//    public DaoAuthenticationProvider authenticationProvider(){
-//      DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-//      authenticationProvider.setPasswordEncoder(passwordEncoder());
-//      authenticationProvider.setUserDetailsService(userService);
-//      return authenticationProvider;
-//    }
-//    
-    
 
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    @Bean
+    public AuthenticationEntryPoint unauthorizedHandler(){
+      return new RestAuthenticationEntryPoint();
+    }
+
+    @Bean
+    public TokenOperations tokenOperations() {
+      SimpleTokenProvider tokenUtils = new SimpleTokenProvider(env.getRequiredProperty("centromere.web.security.token"));
+      tokenUtils.setTokenLifespan(getTokenLifespan());
+      return tokenUtils;
+    }
+
+    @Bean
+    public AuthenticationTokenProcessingFilter authenticationTokenProcessingFilter() {
+      return new AuthenticationTokenProcessingFilter(tokenOperations(), userService);
+    }
+    
+    @Override
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+
       auth
           .userDetailsService(userService)
           .passwordEncoder(passwordEncoder());
     }
 
-    @Configuration
-    @PropertySource(value = { "classpath:web-defaults.properties" })
-    @Order(1)
-    @Profile(NO_SECURITY_PROFILE)
-    public static class OpenReadWriteTokenSecurityConfig extends TokenSecurityConfiguration {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
 
-      @Autowired private Environment env;
+      String secureUrl = env.getRequiredProperty("centromere.web.security.secure-url");
+      logger.info(String.format("Configuring web security with RESTRICTED READ and RESTRICTED "
+          + "WRITE with simple token authentication for API root: %s", secureUrl));
 
-      @Override
-      protected void configure(HttpSecurity http) throws Exception {
-
-        String secureUrl = env.getRequiredProperty("centromere.web.security.secure-url");
-        logger.info(String.format("Configuring web security with OPEN READ and OPEN WRITE for "
-            + "API root %s", secureUrl));
-
-        http
-            .sessionManagement()
+      http
+          .cors()
+            .and()
+          .csrf()
+            .disable()
+          .httpBasic()
+            .and()
+          .formLogin()
+            .disable()
+          .exceptionHandling()
+            .authenticationEntryPoint(unauthorizedHandler())
+            .and()
+          .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-          .and()
-            .addFilterBefore(authenticationTokenProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
-            .antMatcher(secureUrl)
-              .authorizeRequests()
-                .anyRequest().permitAll()
-          .and()
-            .csrf().disable();
+            .and()
+          .authorizeRequests()
+            .antMatchers("/authenticate")
+              .permitAll()
+            .anyRequest()
+              .fullyAuthenticated()
+            ;
+      
+      http
+          .addFilterBefore(authenticationTokenProcessingFilter(),
+          UsernamePasswordAuthenticationFilter.class);
 
-      }
     }
 
-    @Configuration
-    @PropertySource(value = { "classpath:web-defaults.properties" })
-    @Order(1)
-    @Profile(SECURE_READ_WRITE_PROFILE)
-    public static class SecuredReadWriteTokenSecurityConfig extends TokenSecurityConfiguration {
-
-      @Autowired private Environment env;
-
-      @Override
-      protected void configure(HttpSecurity http) throws Exception {
-
-        String secureUrl = env.getRequiredProperty("centromere.web.security.secure-url");
-        logger.info(String.format("Configuring web security with RESTRICTED READ and RESTRICTED "
-            + "WRITE for API root: %s", secureUrl));
-
-        http
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-          .and()
-            .addFilterBefore(authenticationTokenProcessingFilter(),
-              UsernamePasswordAuthenticationFilter.class)
-            .antMatcher(secureUrl)
-              .authorizeRequests()
-                .anyRequest().fullyAuthenticated()
-          .and()
-            .csrf().disable();
-
+    protected Long getTokenLifespan(){
+      long hour = 1000L * 60 * 60;
+      Long lifespan = hour * 24; // one day
+      if (!env.getProperty("centromere.web.security.token-lifespan-hours").equals("")){
+        lifespan = hour * env.getRequiredProperty("centromere.web.security.token-lifespan-hours", Long.class);
+      } else if (!env.getProperty("centromere.web.security.token-lifespan-days").equals("")) {
+        lifespan = hour * 24 * env.getRequiredProperty("centromere.web.security.token-lifespan-days", Long.class);
       }
+      return lifespan;
     }
-
-    @Configuration
-    @Order(2)
-    public static class BasicWebSecurtiyConfig extends WebSecurityConfigurerAdapter {
-
-      @Override
-      protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-            .anyRequest().permitAll()
-          .and()
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-          .and()
-            .httpBasic()
-          .and()
-            .csrf().disable();
-      }
-    }
-
+    
   }
 
 }
