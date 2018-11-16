@@ -87,8 +87,8 @@ public class ModelReflectionUtils {
    * Returns a collection of {@link Field} objects for all attributes of the requested type that 
    *   are annotated with {@link Linked}, representing relationships between multiple {@link Model}.
    * 
-   * @param model
-   * @return
+   * @param model model to inspect
+   * @return list of fields with annotations
    */
   public static List<Field> getLinkedModelFields(Class<?> model){
     List<Field> fields = new ArrayList<>();
@@ -101,5 +101,28 @@ public class ModelReflectionUtils {
     }
     return fields;
   }
+
+  /**
+   * Returns a list of {@link Field} objects with {@link Linked} annotations found present with 
+   *   matching relationship names.
+   * 
+   * @param model model to inspect
+   * @param rel relationship name
+   * @return list of annotation instances
+   */
+  public static List<Field> getLinkedAnnotationsFromRelName(Class<?> model, String rel){
+    List<Field> list = new ArrayList<>();
+    for (Field field: getLinkedModelFields(model)){
+      if (field.isAnnotationPresent(Linked.class)){
+        Linked linked = field.getAnnotation(Linked.class);
+        if (rel.toLowerCase().equals(linked.rel().toLowerCase())){
+          list.add(field);  
+        }
+      }
+    }
+    return list;
+  }
+  
+  
 
 }

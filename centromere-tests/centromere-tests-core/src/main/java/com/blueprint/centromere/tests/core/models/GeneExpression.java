@@ -27,16 +27,16 @@ import lombok.Data;
 @Data
 public abstract class GeneExpression<ID extends Serializable> implements Model<ID> {
   
-  @Linked(model = DataFile.class, rel = "dataFile", field = "dataFileId")
+  @Linked(model = DataFile.class, rel = "dataFile", field = "id")
   private ID dataFileId;
 
-  @Linked(model = DataSet.class, rel = "dataSet", field = "dataSetId")
+  @Linked(model = DataSet.class, rel = "dataSet", field = "id")
   private ID dataSetId;
 
-  @Linked(model = Sample.class, rel = "sample", field = "sampleId")
+  @Linked(model = Sample.class, rel = "sample", field = "id")
   private ID sampleId;
 
-  @Linked(model = Gene.class, rel = "gene", field = "geneId")
+  @Linked(model = Gene.class, rel = "gene", field = "id")
   private ID geneId;
   
   private Double value;

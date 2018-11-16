@@ -97,7 +97,7 @@ public class SimpleTokenSecurityTests {
 		Assert.notNull(user);
 		Assert.isTrue("user".equals(user.getUsername()));
 		TokenDetails tokenDetails = tokenUtils.createTokenAndDetails(user);
-		mockMvc.perform(get("/api/gene")
+		mockMvc.perform(get("/api/search/gene")
 				.header("X-Auth-Token", tokenDetails.getToken()))
 				.andExpect(status().isOk());
 	}
@@ -159,7 +159,7 @@ public class SimpleTokenSecurityTests {
 		System.out.println(json);
 		String token = JsonPath.read(json, "$.token");
 
-		mockMvc.perform(get("/api/gene")
+		mockMvc.perform(get("/api/search/gene")
 				.header("X-Auth-Token", token))
 				.andExpect(status().isOk());
 	}

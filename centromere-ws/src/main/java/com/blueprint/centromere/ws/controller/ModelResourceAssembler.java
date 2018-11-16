@@ -42,7 +42,7 @@ public class ModelResourceAssembler
 
   private String getModelUri(Class<? extends Model<?>> model) {
     try {
-      return rootUrl + "/" + registry.getUriByModel(model);
+      return rootUrl + "/search/" + registry.getUriByModel(model);
     } catch (ModelRegistryException e){
       throw new RequestFailureException(String.format("Model cannot be mapped to valid resource: %s", model.getName()));
     }

@@ -35,10 +35,10 @@ public abstract class DataSet<ID extends Serializable> implements Model<ID>, Att
 	@Ignored private String version;
 	@Ignored private String description;
 	
-	@Linked(model = DataFile.class, rel = "dataFiles", field = "dataFileId") 
+	@Linked(model = DataFile.class, rel = "dataFiles", field = "id") 
   private List<ID> dataFileIds = new ArrayList<>();
   
-	@Linked(model = Sample.class, rel = "samples", field = "sampleId") 
+	@Linked(model = Sample.class, rel = "samples", field = "id") 
   private List<ID> sampleIds = new ArrayList<>();
 	
   private Map<String, String> attributes = new HashMap<>();

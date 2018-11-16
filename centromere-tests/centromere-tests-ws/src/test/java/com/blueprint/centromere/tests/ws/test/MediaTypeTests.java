@@ -26,7 +26,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @AutoConfigureMockMvc(secure = false)
 public class MediaTypeTests extends AbstractRepositoryTests {
 
-  private static final String BASE_URL = "/api/gene";
+  private static final String BASE_URL = "/api/search/gene";
 
   @Autowired
   private MockMvc mockMvc;

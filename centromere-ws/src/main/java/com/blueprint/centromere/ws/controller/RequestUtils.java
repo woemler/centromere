@@ -17,6 +17,7 @@
 package com.blueprint.centromere.ws.controller;
 
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.repository.Evaluation;
 import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.core.repository.QueryParameterDescriptor;
 import com.blueprint.centromere.core.repository.QueryParameterUtil;
@@ -114,6 +115,27 @@ public class RequestUtils {
     Map<String, QueryParameterDescriptor> paramMap = QueryParameterUtil.getAvailableQueryParameters(model);
     List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(paramMap, defaultParameters, request.getParameterMap());
     logger.info(String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
+    return criteriaList;
+  }
+
+  public static List<QueryCriteria> getQueryCriteriaFromFindLinkedRequest(
+      Class<? extends Model<?>> model,
+      String relField,
+      Collection<Object> relFieldValues,
+      HttpServletRequest request
+  ){
+
+    logger.info(String.format("Generating QueryCriteria for 'find' request parameters: model=%s params=%s",
+        model.getName(), request.getQueryString()));
+
+    List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(
+        QueryParameterUtil.getAvailableQueryParameters(model),
+        findAllParameters(),
+        request.getParameterMap());
+    criteriaList.add(new QueryCriteria(relField, relFieldValues, Evaluation.IN));
+
+    logger.info(String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
+
     return criteriaList;
   }
 

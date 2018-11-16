@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.head;
@@ -30,7 +31,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
+import com.blueprint.centromere.tests.core.models.DataSet;
 import com.blueprint.centromere.tests.core.models.Gene;
+import com.blueprint.centromere.tests.core.models.GeneExpression;
+import com.blueprint.centromere.tests.core.repositories.DataSetRepository;
 import com.blueprint.centromere.tests.core.repositories.GeneExpressionRepository;
 import com.blueprint.centromere.tests.core.repositories.GeneRepository;
 import com.blueprint.centromere.tests.ws.WebTestInitializer;
@@ -41,6 +45,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,10 +67,11 @@ import org.springframework.util.Assert;
 @AutoConfigureMockMvc(secure = false)
 public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
-  private static final String BASE_URL = "/api/gene";
-  private static final String EXPRESSION_URL = "/api/geneexpression";
+  private static final String BASE_URL = "/api/search/gene";
+  private static final String EXPRESSION_URL = "/api/search/geneexpression";
 
   @Autowired private GeneRepository geneRepository;
+  @Autowired private DataSetRepository dataSetRepository;
   @Autowired private GeneExpressionRepository geneExpressionRepository;
   @Autowired private MockMvc mockMvc;
   @Autowired private ModelResourceRegistry registry;
@@ -556,6 +562,109 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
     mockMvc.perform(get(BASE_URL + "/{id}", gene.getId()))
         .andExpect(status().isNotFound());
+
+  }
+  
+  // Linked resources
+  @Test
+  public void oneToManyLinkedTest() throws Exception {
+
+    DataSet dataSet = ((List<DataSet>) dataSetRepository.findAll()).get(0);
+    Assert.notNull(dataSet);
+    Assert.notNull(dataSet.getSampleIds());
+    Assert.isTrue(!dataSet.getSampleIds().isEmpty());
+    System.out.println(dataSet.getSampleIds().toString());
+    
+    mockMvc.perform(get("/api/search/dataset/" + dataSet.getId() + "/samples"))
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", not(hasKey("links"))))
+        .andExpect(jsonPath("$", hasSize(5)))
+        .andExpect(jsonPath("$[0]", hasKey("sampleType")));
+    
+  }
+
+  @Test
+  public void oneToManyLinkedTestWithHal() throws Exception {
+
+    DataSet dataSet = ((List<DataSet>) dataSetRepository.findAll()).get(0);
+    Assert.notNull(dataSet);
+    Assert.notNull(dataSet.getSampleIds());
+    Assert.isTrue(!dataSet.getSampleIds().isEmpty());
+    System.out.println(dataSet.getSampleIds().toString());
+
+    mockMvc.perform(get("/api/search/dataset/" + dataSet.getId() + "/samples")
+        .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasKey("links")))
+        .andExpect(jsonPath("$.links", hasSize(1)))
+        .andExpect(jsonPath("$.links[0]", hasKey("rel")))
+        .andExpect(jsonPath("$.links[0].rel", is("self")))
+        .andExpect(jsonPath("$.links[0]", hasKey("href")))
+        .andExpect(jsonPath("$.links[0].href", is("/api/search/dataset/" + dataSet.getId() + "/samples")))
+        .andExpect(jsonPath("$", hasKey("content")))
+        .andExpect(jsonPath("$.content", hasSize(5)))
+        .andExpect(jsonPath("$.content[0]", hasKey("sampleType")))
+        .andExpect(jsonPath("$.content[0]", hasKey("links")))
+        .andExpect(jsonPath("$.content[0].links", hasSize(1)))
+        .andExpect(jsonPath("$.content[0].links[0]", hasKey("rel")))
+        .andExpect(jsonPath("$.content[0].links[0].rel", is("self")))
+        .andExpect(jsonPath("$.content[0].links[0]", hasKey("href")))
+        .andExpect(jsonPath("$.content[0].links[0].href", startsWith("/api/search/sample/")));
+
+  }
+  
+  @Test
+  public void manyToOneLinkedTest() throws Exception {
+
+    GeneExpression geneExpression = ((List<GeneExpression>) geneExpressionRepository.findAll()).get(0);
+    Assert.notNull(geneExpression);
+    
+    Optional<Gene> geneOptional = geneRepository.findById(geneExpression.getGeneId());
+    Assert.isTrue(geneOptional.isPresent());
+    Gene gene = geneOptional.get();
+    
+    mockMvc.perform(get("/api/search/geneexpression/" + geneExpression.getId() + "/gene"))
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", not(hasKey("links"))))
+        .andExpect(jsonPath("$", hasSize(1)))
+        .andExpect(jsonPath("$[0]", hasKey("symbol")))
+        .andExpect(jsonPath("$[0].symbol", is(gene.getSymbol())));
+    
+  }
+
+  @Test
+  public void manyToOneLinkedTestWithHal() throws Exception {
+
+    GeneExpression geneExpression = ((List<GeneExpression>) geneExpressionRepository.findAll()).get(0);
+    Assert.notNull(geneExpression);
+
+    Optional<Gene> geneOptional = geneRepository.findById(geneExpression.getGeneId());
+    Assert.isTrue(geneOptional.isPresent());
+    Gene gene = geneOptional.get();
+
+    mockMvc.perform(get("/api/search/geneexpression/" + geneExpression.getId() + "/gene")
+        .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasKey("links")))
+        .andExpect(jsonPath("$.links", hasSize(1)))
+        .andExpect(jsonPath("$.links[0]", hasKey("rel")))
+        .andExpect(jsonPath("$.links[0].rel", is("self")))
+        .andExpect(jsonPath("$.links[0]", hasKey("href")))
+        .andExpect(jsonPath("$.links[0].href", is("/api/search/geneexpression/" + geneExpression.getId() + "/gene")))
+        .andExpect(jsonPath("$", hasKey("content")))
+        .andExpect(jsonPath("$.content", hasSize(1)))
+        .andExpect(jsonPath("$.content[0]", hasKey("symbol")))
+        .andExpect(jsonPath("$.content[0].symbol", is(gene.getSymbol())))
+        .andExpect(jsonPath("$.content[0]", hasKey("links")))
+        .andExpect(jsonPath("$.content[0].links", hasSize(1)))
+        .andExpect(jsonPath("$.content[0].links[0]", hasKey("rel")))
+        .andExpect(jsonPath("$.content[0].links[0].rel", is("self")))
+        .andExpect(jsonPath("$.content[0].links[0]", hasKey("href")))
+        .andExpect(jsonPath("$.content[0].links[0].href", is("/api/search/gene/" + gene.getId())));
 
   }
   

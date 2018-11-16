@@ -17,7 +17,9 @@
 package com.blueprint.centromere.ws.controller;
 
 import com.blueprint.centromere.core.exceptions.ModelRegistryException;
+import com.blueprint.centromere.core.model.Linked;
 import com.blueprint.centromere.core.model.Model;
+import com.blueprint.centromere.core.model.ModelReflectionUtils;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import com.blueprint.centromere.core.repository.ModelRepositoryRegistry;
 import com.blueprint.centromere.core.repository.QueryCriteria;
@@ -25,6 +27,7 @@ import com.blueprint.centromere.ws.config.ApiMediaTypes;
 import com.blueprint.centromere.ws.config.ModelResourceRegistry;
 import com.blueprint.centromere.ws.exception.InvalidParameterException;
 import com.blueprint.centromere.ws.exception.MalformedEntityException;
+import com.blueprint.centromere.ws.exception.ModelDefinitionException;
 import com.blueprint.centromere.ws.exception.RequestFailureException;
 import com.blueprint.centromere.ws.exception.ResourceNotFoundException;
 import com.blueprint.centromere.ws.exception.RestError;
@@ -35,6 +38,10 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -42,6 +49,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
@@ -67,7 +76,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @author woemler
  */
 @Controller
-@RequestMapping("${centromere.web.api.root-url}")
+@RequestMapping("${centromere.web.api.root-url}/search")
 @SuppressWarnings({"unchecked", "SpringJavaAutowiringInspection"})
 public class ModelCrudController {
 
@@ -210,7 +219,7 @@ public class ModelCrudController {
     
     List<QueryCriteria> criterias = RequestUtils.getQueryCriteriaFromFindRequest(model, request);
     
-    Link selfLink = new Link(rootUrl + "/" + uri +
+    Link selfLink = new Link(rootUrl + "/search/" + uri +
         (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
     
     if (parameterMap.containsKey("page") || parameterMap.containsKey("size")){
@@ -422,54 +431,214 @@ public class ModelCrudController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  /**
-   * {@code HEAD /**}
-   * Performs a test on the resource endpoints availability.
-   *
-   * @return headers only.
-   */
-  @ApiResponses({
-      @ApiResponse(code = 200, message = "OK"),
-      @ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
-  })
-  @RequestMapping(value = { "/{uri}", "/{uri}/**" }, method = RequestMethod.HEAD)
-  public ResponseEntity<?> head(HttpServletRequest request, @PathVariable String uri){
-    try {
-      if (!resourceRegistry.isRegisteredResource(uri)) {
-        logger.error(String.format("URI does not map to a registered model: %s", uri));
-        throw new ResourceNotFoundException();
-      }
-    } catch (ModelRegistryException e){
-      e.printStackTrace();
-      throw new ResourceNotFoundException();
-    }
-    return new ResponseEntity<>(HttpStatus.OK);
-  }
 
   /**
-   * {@code OPTIONS /}
-   * Returns an information about the endpoint and available parameters.
-   * TODO
+   * {@code GET /{uri}/{id}/{linked}}
+   * Fetches all data records associated with the queried {@link Model} record.
    *
-   * @return TBD
+   * @param pagedResourcesAssembler {@link PagedResourcesAssembler}
+   * @param request {@link HttpServletRequest}
+   * @return a {@link List} of {@link Model} objects.
    */
+  @ApiImplicitParams({
+      @ApiImplicitParam(name = "page", value = "Page number.", defaultValue = "0", dataType = "int",
+          paramType = "query"),
+      @ApiImplicitParam(name = "size", value = "Number of records per page.", defaultValue = "1000",
+          dataType = "int", paramType = "query"),
+      @ApiImplicitParam(name = "sort", value = "Sort order field and direction.", dataType = "string",
+          paramType = "query", example = "name,asc"),
+      @ApiImplicitParam(name = "fields", value = "List of fields to be included in response objects",
+          dataType = "string", paramType = "query"),
+      @ApiImplicitParam(name = "exclude", value = "List of fields to be excluded from response objects",
+          dataType = "string", paramType = "query")
+  })
   @ApiResponses({
       @ApiResponse(code = 200, message = "OK"),
-      @ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
+      @ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
+      @ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
+      @ApiResponse(code = 404, message = "Record not found.", response = RestError.class)
   })
-  @RequestMapping(value = { "/{uri}", "/{uri}/**" }, method = RequestMethod.OPTIONS)
-  public ResponseEntity<?> options(HttpServletRequest request, @PathVariable String uri) {
+  @RequestMapping(
+      value = "/{uri}/{id}/{meta}",
+      method = RequestMethod.GET,
+      produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
+          ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
+          MediaType.TEXT_PLAIN_VALUE})
+  public <T extends Model<ID>, ID extends Serializable> ResponseEntity<ResponseEnvelope<T>> findLinked(
+      @PageableDefault(size = 1000) Pageable pageable,
+      @PathVariable("uri") String uri,
+      @PathVariable("id") ID id,
+      @PathVariable("meta") String meta,
+      PagedResourcesAssembler pagedResourcesAssembler,
+      HttpServletRequest request
+  ) {
+
+    // Get the requested model and its repository instance.
+    Class<T> model;
+    ModelRepository<T, ID> repository;
+
     try {
-      if (!resourceRegistry.isRegisteredResource(uri)) {
+      if (!resourceRegistry.isRegisteredResource(uri)){
         logger.error(String.format("URI does not map to a registered model: %s", uri));
         throw new ResourceNotFoundException();
       }
+      model = (Class<T>) resourceRegistry.getModelByUri(uri);
+      repository = (ModelRepository<T, ID>) repositoryRegistry.getRepositoryByModel(model);
     } catch (ModelRegistryException e){
       e.printStackTrace();
       throw new ResourceNotFoundException();
     }
-    return new ResponseEntity<>(HttpStatus.OK);
+    logger.info(String.format("Resolved request to model %s and repository %s",
+        model.getName(), repository.getClass().getName()));
+    
+    // Get the requested model record instance
+    Optional<T> recordOptional = repository.findById(id);
+    if (!recordOptional.isPresent()){
+      throw new ResourceNotFoundException();
+    }
+    T record = recordOptional.get();
+    
+    // Check that the requested relationship is valid
+    List<Field> annotatedFields = ModelReflectionUtils.getLinkedAnnotationsFromRelName(model, meta);
+    if (annotatedFields.isEmpty()){
+      throw new InvalidParameterException(String.format("Requested model relationship is not found: %s", meta));
+    } else if (annotatedFields.size() > 1){
+      throw new ModelDefinitionException("The requested model has more than one relationship defined withthe same 'rel' name: " + meta);
+    }
+
+    // Get the model and repository instance for the linked model.
+    Field foreignKeyField = annotatedFields.get(0);
+    Linked linked = foreignKeyField.getAnnotation(Linked.class);
+    Class<? extends Model<?>> relModel = (Class<? extends Model<?>>) linked.model();
+    String relFieldName = linked.field();
+    ModelRepository<?,?> metaRepository;
+    
+    try {
+      metaRepository = repositoryRegistry.getRepositoryByModel(relModel);
+    } catch (ModelRegistryException e){
+      e.printStackTrace();
+      throw new ResourceNotFoundException();
+    }
+    logger.info(String.format("Resolved requested relModel %s and repository %s",
+        relModel.getName(), metaRepository.getClass().getName()));
+
+    // Get the include/exclude fields
+    Set<String> fields = RequestUtils.getFilteredFieldsFromRequest(request);
+    Set<String> exclude = RequestUtils.getExcludedFieldsFromRequest(request);
+    if (!fields.isEmpty()) logger.info(String.format("Selected fields: %s", fields.toString()));
+    if (!exclude.isEmpty()) logger.info(String.format("Excluded fields: %s", exclude.toString()));
+
+    ResponseEnvelope<T> envelope;
+    Map<String,String[]> parameterMap = request.getParameterMap();
+    String mediaType = request.getHeader("Accept");
+    
+    // Get the foreign key field values to be used in the query
+    List<Object> foreignKeyValues;
+    BeanWrapper wrapper = new BeanWrapperImpl(record);
+    if (Collection.class.isAssignableFrom(foreignKeyField.getType())){
+      foreignKeyValues = new ArrayList<>((Collection<?>) wrapper.getPropertyValue(foreignKeyField.getName()));
+    } else {
+      foreignKeyValues = Collections.singletonList(wrapper.getPropertyValue(foreignKeyField.getName()));
+    }
+
+    // Generate the query
+    List<QueryCriteria> criterias 
+        = RequestUtils.getQueryCriteriaFromFindLinkedRequest(relModel, relFieldName, foreignKeyValues, request);
+
+    // Query and package the response
+    Link selfLink = new Link(rootUrl + "/search/" + uri + "/" + id + "/" + meta +
+        (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
+
+    if (parameterMap.containsKey("page") || parameterMap.containsKey("size")){
+
+      Page<?> page = metaRepository.find(criterias, pageable);
+
+      if (ApiMediaTypes.isHalMediaType(mediaType)){
+
+        PagedResources<FilterableResource> pagedResources
+            = pagedResourcesAssembler.toResource(page, assembler, selfLink);
+        envelope = new ResponseEnvelope<>(pagedResources, fields, exclude);
+
+      } else {
+
+        envelope = new ResponseEnvelope<>(page, fields, exclude);
+
+      }
+
+    } else {
+
+      Sort sort = pageable.getSort();
+      List<? extends Model<?>> entities;
+
+      if (sort != null){
+        entities = (List<? extends Model<?>>) metaRepository.find(criterias, sort);
+      } else {
+        entities = (List<? extends Model<?>>) metaRepository.find(criterias);
+      }
+
+      if (ApiMediaTypes.isHalMediaType(mediaType)){
+        List<FilterableResource> resourceList = assembler.toResources(entities);
+        Resources<FilterableResource> resources = new Resources<>(resourceList);
+        resources.add(selfLink);
+        envelope = new ResponseEnvelope<>(resources, fields, exclude);
+      } else {
+        envelope = new ResponseEnvelope<>(entities, fields, exclude);
+      }
+
+    }
+
+    return new ResponseEntity<>(envelope, HttpStatus.OK);
+
   }
+//
+//  /**
+//   * {@code HEAD /**}
+//   * Performs a test on the resource endpoints availability.
+//   *
+//   * @return headers only.
+//   */
+//  @ApiResponses({
+//      @ApiResponse(code = 200, message = "OK"),
+//      @ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
+//  })
+//  @RequestMapping(value = { "/search/{uri}", "/search/{uri}/**" }, method = RequestMethod.HEAD)
+//  public ResponseEntity<?> head(HttpServletRequest request, @PathVariable String uri){
+//    try {
+//      if (!resourceRegistry.isRegisteredResource(uri)) {
+//        logger.error(String.format("URI does not map to a registered model: %s", uri));
+//        throw new ResourceNotFoundException();
+//      }
+//    } catch (ModelRegistryException e){
+//      e.printStackTrace();
+//      throw new ResourceNotFoundException();
+//    }
+//    return new ResponseEntity<>(HttpStatus.OK);
+//  }
+//
+//  /**
+//   * {@code OPTIONS /}
+//   * Returns an information about the endpoint and available parameters.
+//   * TODO
+//   *
+//   * @return TBD
+//   */
+//  @ApiResponses({
+//      @ApiResponse(code = 200, message = "OK"),
+//      @ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
+//  })
+//  @RequestMapping(value = { "/{uri}", "/{uri}/**" }, method = RequestMethod.OPTIONS)
+//  public ResponseEntity<?> options(HttpServletRequest request, @PathVariable String uri) {
+//    try {
+//      if (!resourceRegistry.isRegisteredResource(uri)) {
+//        logger.error(String.format("URI does not map to a registered model: %s", uri));
+//        throw new ResourceNotFoundException();
+//      }
+//    } catch (ModelRegistryException e){
+//      e.printStackTrace();
+//      throw new ResourceNotFoundException();
+//    }
+//    return new ResponseEntity<>(HttpStatus.OK);
+//  }
 
   /**
    * Converts a String query parameter to the appropriate model ID type.

@@ -36,7 +36,7 @@ public abstract class DataFile<ID extends Serializable> implements Model<ID>, At
 	private Date dateCreated;
 	private Date dateUpdated;
 	
-	@Linked(model = DataSet.class, rel = "dataSet", field = "dataSetId") 
+	@Linked(model = DataSet.class, rel = "dataSet", field = "id") 
   private ID dataSetId;
 	
 	private Map<String, String> attributes = new HashMap<>();
