@@ -35,23 +35,36 @@
 
 ## About
 
-Centromere is a set of tools for developing scalable data warehouses and RESTful web services for processed genomic data.  It is designed to be modular and flexible, allowing you to mold it to fit your data model and business needs. Centromere is developed using the open-source, enterprise-grade Spring Framework, and supports integration with multiple database technologies.  You can use Centromere to create a new data warehouse from scratch, or bootstrap one or more existing databases, and make your data available via a customizable REST API.
+Centromere is a set of tools for developing scalable data warehouses and RESTful web services.  It is designed to tackle the problems inherent in developing data warehouses for genomic data, where data structures can vary greatly and scale fast, and where use-cases must be flexible to acoomodate shifting business needs.  Centromere is developed in Java using the open-source, enterprise-grade Spring Framework, and supports integration with multiple database technologies.  You can use Centromere to create a new data warehouse from scratch, or bootstrap one or more existing databases, and make your data available via a customizable REST API.
 
-Centromere aims to help solve some common problems inherent in monolithic bioinformatics app development:
-- Fragmentation of data across large organizations.
-- Inconsistent annotation.
-- Horizontal and vertical scalability.
-- Repetition of work in software development.
+Here are a few ways Centromere can help make your data warehouse and REST API better:
+- Support classes for quickly creating data models and data access objects (DAOs).
+- Components for reading standard column- and row-based data files, and rapidly developing extract-transform-load (ETL) pipelines.
+- Spring Boot initializer for exposing your data repository as a REST web service with:
+  - A flexible and easy-to-use query API
+  - Simple token-based security
+  - Automatic API documentation with [Swagger](https://swagger.io/)
+  - Support for exporting data in JSON, XML and tab-delimited-table formats.
 
-What Centromere is _**not**_:
-- A LIMS system.
-- A repository for raw genomic data.
-- An analysis platform.
-- An end-user GUI application.
+Centromere does _**not**_ contain a pre-defined data model, but rather provides you the tools to quickly generate your own model and expose your data through scalable repositories and web services.
 
-## Demo
+## Requirements
 
-A demo implementation of a Centromere data warehouse and web API is available as a [GitHub repository](https://github.com/oncoblocks/centromere-demo).  This demo utilizes a small data set of cancer genomic data from the TCGA to showcase the features of Centromere's web service and data import utilities.  A hosted instance of this demo is coming soon.
+These are the current requirements for developing data warehouses with Centromere:
+
+- Java JDK 8+
+- Maven 3
+- MongoDB*
+
+\* Support for additional database technologies is coming soon. 
+
+## Maven Artifacts
+
+Artifacts for Centromere release builds are available from the Maven Central Repository:
+
+```xml
+COMING SOON
+```
 
 ## License
 
@@ -70,38 +83,6 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
-## Requirements
-
-- Linux or OS X
-- Java JDK 8+
-- Maven 3
-- MongoDB or SQL Database
-
-
-## Maven Artifacts
-
-Artifacts for Centromere release builds are available from the Maven Central Repository:
-
-```xml
-<dependency>
-    <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-core</artifactId>
-    <version>0.5.0</version>
-</dependency>
-
-<dependency>
-    <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-cli</artifactId>
-    <version>0.5.0</version>
-</dependency>
-
-<dependency>
-    <groupId>org.oncoblocks.centromere</groupId>
-    <artifactId>centromere-web</artifactId>
-    <version>0.5.0</version>
-</dependency>
-```
 
 # Getting Started
 
