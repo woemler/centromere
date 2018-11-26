@@ -392,7 +392,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findByNumberNotInTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?valueNotIn=2.34,4.56"))
+    mockMvc.perform(get("/api/search/geneexpression?valueNotIn=2.34,4.56"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(4)))
         .andExpect(jsonPath("$[0]", hasKey("value")))
@@ -401,7 +401,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   
   @Test
   public void findByNumberGreaterThanTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?valueGreaterThan=5.0"))
+    mockMvc.perform(get("/api/search/geneexpression?valueGreaterThan=5.0"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[0]", hasKey("value")))
@@ -410,7 +410,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findByNumberGreaterThanOrEqualsTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?valueGreaterThanOrEquals=9.1"))
+    mockMvc.perform(get("/api/search/geneexpression?valueGreaterThanOrEquals=9.1"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[0]", hasKey("value")))
@@ -419,7 +419,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findByNumberLessThanTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?valueLessThan=5.0"))
+    mockMvc.perform(get("/api/search/geneexpression?valueLessThan=5.0"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[0]", hasKey("value")))
@@ -428,7 +428,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findByNumberLessThanOrEqualsTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?valueLessThanOrEquals=2.34"))
+    mockMvc.perform(get("/api/search/geneexpression?valueLessThanOrEquals=2.34"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[0]", hasKey("value")))
@@ -437,7 +437,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void invalidGreaterThanNumberTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?primaryReferenceIdGreaterThan=100"))
+    mockMvc.perform(get("/api/search/gene?symbolGreaterThan=100"))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is(400)));
@@ -445,7 +445,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void invalidGreaterThanOrEqualsNumberTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?primaryReferenceIdGreaterThanOrEquals=100"))
+    mockMvc.perform(get("/api/search/gene?symbolGreaterThanOrEquals=100"))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is(400)));
@@ -453,7 +453,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void invalidLessThanNumberTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?primaryReferenceIdLessThan=100"))
+    mockMvc.perform(get("/api/search/gene?symbolLessThan=100"))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is(400)));
@@ -461,7 +461,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void invalidLessThanOrEqualsNumberTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?primaryReferenceIdLessThanOrEquals=100"))
+    mockMvc.perform(get("/api/search/gene?symbolLessThanOrEquals=100"))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is(400)));
@@ -469,7 +469,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   
   @Test
   public void findByNumberBetweenTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?valueBetween=3.0,7.0"))
+    mockMvc.perform(get("/api/search/geneexpression?valueBetween=3.0,7.0"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)))
         .andExpect(jsonPath("$[0]", hasKey("value")))
@@ -478,7 +478,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findByNumberOutsideTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?valueOutside=3.0,7.0"))
+    mockMvc.perform(get("/api/search/geneexpression?valueOutside=3.0,7.0"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(4)))
         .andExpect(jsonPath("$[0]", hasKey("value")))
@@ -487,7 +487,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void invalidOutsideNumberTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?primaryReferenceIdOutside=100,10000"))
+    mockMvc.perform(get("/api/search/gene?symbolOutside=100,10000"))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is(400)));
@@ -495,7 +495,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void invalidBetweenNumberTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?primaryReferenceIdBetween=100,10000"))
+    mockMvc.perform(get("/api/search/gene?symbolBetween=100,10000"))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$", hasKey("code")))
         .andExpect(jsonPath("$.code", is(400)));
