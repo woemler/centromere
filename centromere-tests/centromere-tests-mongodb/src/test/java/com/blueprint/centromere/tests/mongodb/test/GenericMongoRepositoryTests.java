@@ -21,8 +21,10 @@ import com.blueprint.centromere.core.repository.QueryCriteria;
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.core.models.Gene;
 import com.blueprint.centromere.tests.core.models.GeneExpression;
+import com.blueprint.centromere.tests.core.models.User;
 import com.blueprint.centromere.tests.core.repositories.GeneExpressionRepository;
 import com.blueprint.centromere.tests.core.repositories.GeneRepository;
+import com.blueprint.centromere.tests.core.repositories.UserRepository;
 import com.blueprint.centromere.tests.mongodb.MongoDataSourceConfig;
 import com.blueprint.centromere.tests.mongodb.models.MongoGene;
 import java.util.ArrayList;
@@ -52,6 +54,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
   @Autowired private GeneRepository geneRepository;
   @Autowired private GeneExpressionRepository expressionRepository;
+  @Autowired private UserRepository userRepository;
 
   @Test
   public void findByIdByBadIdTest(){
@@ -427,6 +430,43 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
     List<Gene> records = (List<Gene>) geneRepository.find(Collections.singletonList(criteria));
     Assert.notNull(records, "Result set must not be null");
     Assert.isTrue(records.size() == 0, "Result set must be empty");
+  }
+  
+  @Test
+  public void findByAttributeNullTest(){
+    QueryCriteria criteria = new QueryCriteria("chromosomeLocation", true, Evaluation.IS_NULL);
+    List<Gene> records = (List<Gene>) geneRepository.find(Collections.singletonList(criteria));
+    Assert.notEmpty(records);
+    Assert.isTrue(records.size() == 5);
+    Gene gene = records.get(0);
+    Assert.isTrue(gene.getChromosomeLocation() == null);
+  }
+
+  @Test
+  public void findByAttributeNotNullTest(){
+    QueryCriteria criteria = new QueryCriteria("geneType", true, Evaluation.NOT_NULL);
+    List<Gene> records = (List<Gene>) geneRepository.find(Collections.singletonList(criteria));
+    Assert.notEmpty(records);
+    Assert.isTrue(records.size() == 5);
+    Gene gene = records.get(0);
+    Assert.notNull(gene.getGeneType());
+  }
+
+  @Test
+  public void findByBooleanTrueTest(){
+    QueryCriteria criteria = new QueryCriteria("enabled", true, Evaluation.IS_TRUE);
+    List<User> records = (List<User>) userRepository.find(Collections.singletonList(criteria));
+    Assert.notEmpty(records);
+    Assert.isTrue(records.size() == 1);
+    User user = records.get(0);
+    Assert.isTrue(user.isEnabled());
+  }
+
+  @Test
+  public void findByBooleanFalseTest(){
+    QueryCriteria criteria = new QueryCriteria("enabled", true, Evaluation.IS_FALSE);
+    List<User> records = (List<User>) userRepository.find(Collections.singletonList(criteria));
+    Assert.isTrue(records.isEmpty());
   }
 
   @Test

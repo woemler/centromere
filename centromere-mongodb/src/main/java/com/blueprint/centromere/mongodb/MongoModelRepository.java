@@ -174,6 +174,12 @@ public class MongoModelRepository<T extends Model<ID>, ID extends Serializable>
           case NOT_NULL:
             criteria = new Criteria(queryCriteria.getKey()).ne(null);
             break;
+          case IS_TRUE:
+            criteria = new Criteria(queryCriteria.getKey()).is(true);
+            break;
+          case IS_FALSE:
+            criteria = new Criteria(queryCriteria.getKey()).is(false);
+            break;
           case GREATER_THAN:
             criteria = new Criteria(queryCriteria.getKey()).gt(queryCriteria.getValue());
             break;

@@ -194,7 +194,7 @@ public class QueryParameterUtil {
    * @return true if evaluation can be applied to type
    */
   public static boolean dynamicParamEvalutationMatchesType(Evaluation evaluation, Class<?> type){
-    if (String.class.isAssignableFrom(type)){
+    if (String.class.isAssignableFrom(type) || char.class.isAssignableFrom(type)){
       return Arrays.asList(
           Evaluation.EQUALS, 
           Evaluation.NOT_EQUALS,
@@ -203,9 +203,13 @@ public class QueryParameterUtil {
           Evaluation.LIKE,
           Evaluation.NOT_LIKE,
           Evaluation.STARTS_WITH,
-          Evaluation.ENDS_WITH
+          Evaluation.ENDS_WITH,
+          Evaluation.IS_NULL,
+          Evaluation.NOT_NULL
       ).contains(evaluation);
-    } else if (Number.class.isAssignableFrom(type)){
+    } else if (Number.class.isAssignableFrom(type) || int.class.isAssignableFrom(type) 
+        || long.class.isAssignableFrom(type) || double.class.isAssignableFrom(type) 
+        || float.class.isAssignableFrom(type)){
       return Arrays.asList(
           Evaluation.EQUALS,
           Evaluation.NOT_EQUALS,
@@ -218,9 +222,11 @@ public class QueryParameterUtil {
           Evaluation.OUTSIDE,
           Evaluation.OUTSIDE_INCLUSIVE,
           Evaluation.BETWEEN,
-          Evaluation.BETWEEN_INCLUSIVE
+          Evaluation.BETWEEN_INCLUSIVE,
+          Evaluation.IS_NULL,
+          Evaluation.NOT_NULL
       ).contains(evaluation);
-    } else if (Boolean.class.isAssignableFrom(type)){
+    } else if (Boolean.class.isAssignableFrom(type) || boolean.class.isAssignableFrom(type)){
       return Arrays.asList(
           Evaluation.EQUALS,
           Evaluation.NOT_EQUALS,
@@ -234,7 +240,9 @@ public class QueryParameterUtil {
           Evaluation.EQUALS,
           Evaluation.NOT_EQUALS,
           Evaluation.IN,
-          Evaluation.NOT_IN
+          Evaluation.NOT_IN,
+          Evaluation.IS_NULL,
+          Evaluation.NOT_NULL
       ).contains(evaluation);
     }
   }

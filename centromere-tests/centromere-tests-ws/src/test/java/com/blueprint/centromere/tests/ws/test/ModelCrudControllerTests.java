@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -46,6 +47,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Test;
@@ -501,7 +503,58 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .andExpect(jsonPath("$.code", is(400)));
   }
   
-  // TODO IsNull, IsNotNull, IsTrue, and IsFalse tests
+  @Test
+  public void isNullTest() throws Exception {
+    
+    Gene gene = ((List<Gene>) geneRepository.findAll()).get(0);
+    gene.setGeneType(null);
+    Serializable id = gene.getId();
+    geneRepository.update(gene);
+    
+    mockMvc.perform(get("/api/search/gene?geneTypeIsNull"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(1)))
+        .andExpect(jsonPath("$[0]", hasKey("geneType")))
+        .andExpect(jsonPath("$[0].geneType", nullValue()))
+        .andExpect(jsonPath("$[0].id", is(id)));
+  }
+
+  @Test
+  public void isNotNullTest() throws Exception {
+    mockMvc.perform(get("/api/search/gene?symbolIsNotNull"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(5)))
+        .andExpect(jsonPath("$[0]", hasKey("symbol")))
+        .andExpect(jsonPath("$[0].symbol", not(nullValue())));
+  }
+  
+  @Test
+  public void isTrueTest() throws Exception {
+    mockMvc.perform(get("/api/search/user?enabledIsTrue"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(1)))
+        .andExpect(jsonPath("$[0]", hasKey("enabled")))
+        .andExpect(jsonPath("$[0].enabled", is(true)));
+  }
+
+  @Test
+  public void isFalseTest() throws Exception {
+    mockMvc.perform(get("/api/search/user?enabledIsFalse"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(0)));
+  }
+  
+  // Ignored parameters
+  
+  @Test
+  public void ignoredParameterTest() throws Exception {
+    mockMvc.perform(get("/api/search/gene?chromosomeLocation=xxx"))
+        .andExpect(status().isBadRequest());
+    mockMvc.perform(get("/api/search/gene"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasSize(5)))
+        .andExpect(jsonPath("$[0]", hasKey("chromosomeLocation")));
+  }
   
   // Create
 
