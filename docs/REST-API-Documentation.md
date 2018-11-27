@@ -99,11 +99,37 @@ GET /api/search/samples?sort=name,desc
 
 ### Supported Media Types
 
-xxx
+Centromere by default supports three output formats: JSON, XML, and tab-delimited text. You can specify the desired content type by using either the `Accept` header or the `format` query string parameter in your request.
+
+```
+# JSON
+curl -H "Accept: application/json" http://mycentromere/api/search/data
+curl http://mycentromere/api/search/data?format=json
+
+# XML
+curl -H "Accept: application/xml" http://mycentromere/api/search/data
+curl http://mycentromere/api/search/data?format=xml
+
+# Text
+curl -H "Accept: text/plain" http://mycentromere/api/search/data
+curl http://mycentromere/api/search/data?format=text
+```  
+  
+Both JSON and XML also support the inclusion of HAL-formatted hypermedia, which is described in the next section in more detail.
+
+```
+# HAL+JSON
+curl -H "Accept: application/hal+json" http://mycentromere/api/search/data
+curl http://mycentromere/api/search/data?format=haljson
+
+# HAL+XML
+curl -H "Accept: application/hal+xml" http://mycentromere/api/search/data
+curl http://mycentromere/api/search/data?format=halxml
+```  
 
 ### Hypermedia
 
-Centromere aims to enable the creation of level 3 REST APIs, and as such, supports hypermedia as the engine of application state (HATEOAS).  When using the media types `application/hal+json` or `application/hal+xml`, the response will be wrapped and annotated with HAL-formatted links:
+Centromere aims to enable the creation of level 3 REST APIs, and as such, supports hypermedia as the engine of application state (HATEOAS).  When using the media types `application/hal+json` or `application/hal+xml` (or the query string parameters `format=haljson` or `format=halxml`), the response will be wrapped and annotated with HAL-formatted links:
 
 ```
 curl -H "Accept: application/hal+json" http//mycentromere/api/search/datafiles

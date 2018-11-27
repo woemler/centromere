@@ -41,7 +41,7 @@ public class RequestUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(RequestUtils.class);
   private static final List<String> FIELD_FILTER_PARAMETERS = Arrays.asList("fields", "exclude");
-  private static final List<String> DISTINCT_PARAMETERS = new ArrayList<>();
+  private static final List<String> OTHER_PARAMETERS = Arrays.asList("format");
   private static final List<String> PAGINATION_PARAMETERS = Arrays.asList("page", "size", "sort");
 
   /**
@@ -53,19 +53,21 @@ public class RequestUtils {
     List<String> params = new ArrayList<>();
     params.addAll(FIELD_FILTER_PARAMETERS);
     params.addAll(PAGINATION_PARAMETERS);
+    params.addAll(OTHER_PARAMETERS);
     return params;
   }
 
   public static List<String> findOneParameters(){
     List<String> params = new ArrayList<>();
     params.addAll(FIELD_FILTER_PARAMETERS);
+    params.addAll(OTHER_PARAMETERS);
     return params;
   }
 
   public static List<String> findDistinctParameters(){
     List<String> params = new ArrayList<>();
     params.addAll(FIELD_FILTER_PARAMETERS);
-    params.addAll(DISTINCT_PARAMETERS);
+    params.addAll(OTHER_PARAMETERS);
     return params;
   }
 

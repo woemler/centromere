@@ -35,7 +35,7 @@
 
 ## About
 
-Centromere is a set of tools for developing scalable data warehouses and RESTful web services.  It is designed to tackle the problems inherent in developing data warehouses for genomic data, where data structures can vary greatly and scale fast, and where use-cases must be flexible to acoomodate shifting business needs.  Centromere is developed in Java using the open-source, enterprise-grade Spring Framework, and supports integration with multiple database technologies.  You can use Centromere to create a new data warehouse from scratch, or bootstrap one or more existing databases, and make your data available via a customizable REST API.
+Centromere is a set of tools for developing scalable data warehouses and RESTful web services.  It is designed to tackle the problems inherent in developing data warehouses for genomic data, where data structures can vary greatly and scale fast, and where use-cases must be flexible to accommodate shifting business needs.  Centromere is developed in Java using the open-source, enterprise-grade Spring Framework, and supports integration with multiple database technologies.  You can use Centromere to create a new data warehouse from scratch, or bootstrap one or more existing databases, and make your data available via a customizable REST API.
 
 Here are a few ways Centromere can help make your data warehouse and REST API better:
 - Support classes for quickly creating data models and data access objects (DAOs).
@@ -54,7 +54,7 @@ These are the current requirements for developing data warehouses with Centromer
 
 - Java JDK 8+
 - Maven 3
-- MongoDB*
+- MongoDB 3+
 
 \* Support for additional database technologies is coming soon. 
 
@@ -70,7 +70,7 @@ COMING SOON
 
 Centromere is licensed under the Apache License, version 2.0:
 
-> Copyright 2016 William Oemler, Blueprint Medicines
+> Copyright 2018 William Oemler, Blueprint Medicines
 
 > Licensed under the Apache License, Version 2.0 (the "License");
 > you may not use this file except in compliance with the License.

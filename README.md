@@ -3,55 +3,36 @@
 ### Genomic data warehousing, file parsing, and RESTful web services made easy.
 
 ## About
+Centromere is a set of tools for developing scalable data warehouses and RESTful web services.  It is designed to tackle the problems inherent in developing data warehouses for genomic data, where data structures can vary greatly and scale fast, and where use-cases must be flexible to accommodate shifting business needs.  Centromere is developed in Java using the open-source, enterprise-grade Spring Framework, and supports integration with multiple database technologies.  You can use Centromere to create a new data warehouse from scratch, or bootstrap one or more existing databases, and make your data available via a customizable REST API.
 
-Centromere aims to make the task of storing and working with processed 
-genomic data easier, by provided a comprehensive tool-set for file parsing, 
-database integration, and data access via REST web services.  Centromere 
-includes a built-in data model for managing sample and experimental metadata,
-gene expression, copy-number variation, mutation data, and more.  You can even 
-extend or replace the core data model to suit your needs.  Centromere 
-includes all of the required dependencies for running a full-featured data 
-warehouse, and provides several starter projects to help you get up and 
-running even faster.  Key features include:
- 
-- File processors for common bioinformatics data types and data sets (such as The Cancer Genome Atlas and Cancer Cell Line Encyclopedia).
-- High-performance queries and flexible data-modeling, using MongoDB databases.
-- A Command line utility for reading and writing data to the warehouse.
-- REST web services, with a number of useful features:
-    - Dynamic, user-defined queries.
-    - Automatic [Swagger](http://swagger.io/) API documentation with.
-    - Basic security and user-authentication.
-    - Response object field filtering and formatting.
-    
-Centromere is built using the [Spring IO Platform](https://spring.io/platform), 
-and leverages tools such as Spring Data, Spring Data REST, and Spring Security 
-to deliver enterprise-grade data management solutions.    
+Here are a few ways Centromere can help make your data warehouse and REST API better:
+- Support classes for quickly creating data models and data access objects (DAOs).
+- Components for reading standard column- and row-based data files, and rapidly developing extract-transform-load (ETL) pipelines.
+- Spring Boot initializer for exposing your data repository as a REST web service with:
+  - A flexible and easy-to-use query API
+  - Simple token-based security
+  - Automatic API documentation with [Swagger](https://swagger.io/)
+  - Support for exporting data in JSON, XML and tab-delimited-table formats.
 
-## Important Note
+Centromere does _**not**_ contain a pre-defined data model, but rather provides you the tools to quickly generate your own model and expose your data through scalable repositories and web services.
 
-The current development build of Centromere (0.5.0-SNAPSHOT) significantly 
-overhauls the codebase, eliminating excess dependencies and streamlining the 
-process to deployment.  If you are new to Centromere, I highly recommend 
-waiting for the 0.5.0 release before getting started.  This is expected to 
-be complete Q1 2017.  For a brief description of the current development 
-road map, please see the `roadmap.md` document.
+## Requirements
 
-## Quick Start
+These are the current requirements for developing data warehouses with Centromere:
 
-#### Requirements
+- Java JDK 8+
+- Maven 3
+- MongoDB 3+
 
-Centromere has the following requirements:
+\* Support for additional database technologies is coming soon. 
 
-- JDK 1.8+
-- Maven 2+
-- MongoDB 3.0+ 
+## Maven Artifacts
 
-#### Create a new project with Maven and Spring Boot
+Artifacts for Centromere release builds are available from the Maven Central Repository:
 
-*Instructions for using the starter project will go here*
-
-## Documentation
-*Link to updated docs will go here.*  
+```xml
+COMING SOON
+```
 
 ## Contact
 

@@ -15,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 /**
@@ -26,48 +25,85 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @AutoConfigureMockMvc(secure = false)
 public class MediaTypeTests extends AbstractRepositoryTests {
 
-  private static final String BASE_URL = "/api/search/gene";
+  private static final String TEST_URL = "/api/search/gene?size=10";
 
   @Autowired
   private MockMvc mockMvc;
 
   @Test
   public void defaultMediaTypeTest() throws Exception {
-    mockMvc.perform(get(BASE_URL + "?size=10"))
+    mockMvc.perform(get(TEST_URL))
         .andExpect(status().isOk())
-        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+  }
+  
+  @Test
+  public void jsonAcceptHeaderTest() throws Exception {
+    mockMvc.perform(get(TEST_URL).accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
         .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
   }
 
   @Test
-  public void halJsonTypeTest() throws Exception {
-    mockMvc.perform(get(BASE_URL + "?size=10").accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
+  public void jsonQueryParameterTest() throws Exception {
+    mockMvc.perform(get(TEST_URL + "&format=json"))
         .andExpect(status().isOk())
-        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+  }
+
+  @Test
+  public void halJsonAcceptHeaderTest() throws Exception {
+    mockMvc.perform(get(TEST_URL).accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
+        .andExpect(status().isOk())
         .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith("application/hal+json"));
   }
 
   @Test
-  public void xmlMediaTypeTest() throws Exception {
-    mockMvc.perform(get(BASE_URL + "?size=10").accept(MediaType.APPLICATION_XML))
+  public void halJsonQueryParameterTest() throws Exception {
+    mockMvc.perform(get(TEST_URL + "&format=haljson"))
         .andExpect(status().isOk())
-        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith("application/hal+json"));
+  }
+
+  @Test
+  public void xmlAcceptHeaderTest() throws Exception {
+    mockMvc.perform(get(TEST_URL).accept(MediaType.APPLICATION_XML))
+        .andExpect(status().isOk())
         .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_XML));
   }
 
   @Test
-  public void halXmlMediaTypeTest() throws Exception {
-    mockMvc.perform(get(BASE_URL + "?size=10").accept(ApiMediaTypes.APPLICATION_HAL_XML_VALUE))
+  public void xmlQueryParameterTest() throws Exception {
+    mockMvc.perform(get(TEST_URL + "&format=xml"))
         .andExpect(status().isOk())
-        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_XML));
+  }
+
+  @Test
+  public void halXmlAcceptHeaderTest() throws Exception {
+    mockMvc.perform(get(TEST_URL).accept(ApiMediaTypes.APPLICATION_HAL_XML_VALUE))
+        .andExpect(status().isOk())
         .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(ApiMediaTypes.APPLICATION_HAL_XML_VALUE));
   }
 
   @Test
-  public void textTableMediaTypeTest() throws Exception {
-    mockMvc.perform(get(BASE_URL + "?size=10").accept(MediaType.TEXT_PLAIN))
+  public void halXmlQueryParameterTest() throws Exception {
+    mockMvc.perform(get(TEST_URL + "&format=halxml"))
         .andExpect(status().isOk())
-        .andDo(MockMvcResultHandlers.print())
+        .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(ApiMediaTypes.APPLICATION_HAL_XML_VALUE));
+  }
+
+  @Test
+  public void textTableAcceptHeaderTest() throws Exception {
+    mockMvc.perform(get(TEST_URL).accept(MediaType.TEXT_PLAIN))
+        .andExpect(status().isOk())
+        .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN));
+  }
+
+  @Test
+  public void textTableQueryParameterTest() throws Exception {
+    mockMvc.perform(get(TEST_URL + "&format=text"))
+        .andExpect(status().isOk())
         .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN));
   }
 

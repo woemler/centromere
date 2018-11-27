@@ -94,6 +94,7 @@ public class FilteringTextMessageConverter extends AbstractHttpMessageConverter<
 		Set<String> includedFields = new HashSet<>();
 		Set<String> excludedFields = new HashSet<>();
 		
+		// If object is a ResponseEnvelope, get the wrapped object
 		if (o.getClass().equals(ResponseEnvelope.class)){
 			includedFields = ((ResponseEnvelope) o).getFieldSet();
 			excludedFields = ((ResponseEnvelope) o).getExclude();
@@ -103,51 +104,85 @@ public class FilteringTextMessageConverter extends AbstractHttpMessageConverter<
 			o = ((Page) o).getContent();
 		}
 		
+		// If the object is not a collection, add it to one for easy iteration
 		if (!(o instanceof Collection<?>)) {
 			o = Arrays.asList(o);
 		}
+		
+		// Iterate through the object collection
 		for (Object entity: (Collection<?>) o){
+		  
 			String entityString;
+      Class<?> currentClass;
+			
 			try {
+			  
 				StringBuilder buffer = new StringBuilder();
+				
+				// Header line
 				if (showHeader){
-					for (Field field: entity.getClass().getDeclaredFields()){
-						if (includedFields != null && !includedFields.isEmpty()){
-							if (includedFields.contains(field.getName())){
-								buffer.append(field.getName()).append(delimiter);
-							}
-						} else if (excludedFields != null && !excludedFields.isEmpty()){
-							if (!excludedFields.contains(field.getName())){
-								buffer.append(field.getName()).append(delimiter);
-							}
-						} else {
-							buffer.append(field.getName()).append(delimiter);
-						}
-					}
-					buffer.append("\n");
+				  
+				  currentClass = entity.getClass();
+				  
+				  while (currentClass != null) {
+				    
+            for (Field field : currentClass.getDeclaredFields()) {
+              if (includedFields != null && !includedFields.isEmpty()) {
+                if (includedFields.contains(field.getName())) {
+                  buffer.append(field.getName()).append(delimiter);
+                }
+              } else if (excludedFields != null && !excludedFields.isEmpty()) {
+                if (!excludedFields.contains(field.getName())) {
+                  buffer.append(field.getName()).append(delimiter);
+                }
+              } else {
+                buffer.append(field.getName()).append(delimiter);
+              }
+            }
+            
+            currentClass = currentClass.getSuperclass();
+            
+          }
+				  
+          buffer.append("\n");
+				  
 				}
-				for (Field field: entity.getClass().getDeclaredFields()){
-					field.setAccessible(true);
-					if (includedFields != null && !includedFields.isEmpty()){
-						if (includedFields.contains(field.getName())){
-							buffer.append(field.get(entity)).append(delimiter);
-						}
-					} else if (excludedFields != null && !excludedFields.isEmpty()){
-						if (!excludedFields.contains(field.getName())){
-							buffer.append(field.get(entity)).append(delimiter);
-						}
-					} else {
-						buffer.append(field.get(entity)).append(delimiter);
-					}
-				}
+				
+				// Write the object data row
+        currentClass = entity.getClass();
+
+        while (currentClass != null) {
+          
+          for (Field field : currentClass.getDeclaredFields()) {
+            field.setAccessible(true);
+            if (includedFields != null && !includedFields.isEmpty()) {
+              if (includedFields.contains(field.getName())) {
+                buffer.append(field.get(entity)).append(delimiter);
+              }
+            } else if (excludedFields != null && !excludedFields.isEmpty()) {
+              if (!excludedFields.contains(field.getName())) {
+                buffer.append(field.get(entity)).append(delimiter);
+              }
+            } else {
+              buffer.append(field.get(entity)).append(delimiter);
+            }
+          }
+          
+          currentClass = currentClass.getSuperclass();
+          
+        }
+				
 				buffer.append("\n");
 				entityString = buffer.toString();
+				
 			} catch (IllegalAccessException e){
 				e.printStackTrace();
 				entityString = "# Invalid record.";
 			}
+			
 			writer.write(entityString);
 			showHeader = false;
+			
 		}
 		
 		
