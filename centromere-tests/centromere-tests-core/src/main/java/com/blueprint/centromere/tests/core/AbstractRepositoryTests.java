@@ -21,11 +21,13 @@ import com.blueprint.centromere.tests.core.models.DataSet;
 import com.blueprint.centromere.tests.core.models.Gene;
 import com.blueprint.centromere.tests.core.models.GeneExpression;
 import com.blueprint.centromere.tests.core.models.Sample;
+import com.blueprint.centromere.tests.core.models.User;
 import com.blueprint.centromere.tests.core.repositories.DataFileRepository;
 import com.blueprint.centromere.tests.core.repositories.DataSetRepository;
 import com.blueprint.centromere.tests.core.repositories.GeneExpressionRepository;
 import com.blueprint.centromere.tests.core.repositories.GeneRepository;
 import com.blueprint.centromere.tests.core.repositories.SampleRepository;
+import com.blueprint.centromere.tests.core.repositories.UserRepository;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +35,7 @@ import java.util.Date;
 import java.util.List;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
  * @author woemler
@@ -44,6 +47,7 @@ public abstract class AbstractRepositoryTests {
   @Autowired private DataFileRepository dataFileRepository;
   @Autowired private SampleRepository sampleRepository;
   @Autowired private GeneExpressionRepository geneExpressionRepository;
+  @Autowired private UserRepository userRepository;
 
   @Before
   public void setup() throws Exception {
@@ -53,6 +57,7 @@ public abstract class AbstractRepositoryTests {
     dataFileRepository.deleteAll();
     sampleRepository.deleteAll();
     geneExpressionRepository.deleteAll();
+    userRepository.deleteAll();
     
     // Genes
 
@@ -334,6 +339,17 @@ public abstract class AbstractRepositoryTests {
     data.add(geneExpression);
     
     geneExpressionRepository.insert(data);
+    
+    // Users
+
+    User user = (User) userRepository.getModel().newInstance();
+    user.setUsername("user");
+    user.setPassword(new BCryptPasswordEncoder().encode("password"));
+    user.setEnabled(true);
+    user.setAccountNonExpired(true);
+    user.setCredentialsNonExpired(true);
+    user.setAccountNonLocked(true);
+    userRepository.insert(user);
     
   }
 
