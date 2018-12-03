@@ -143,7 +143,6 @@ public class SimpleTokenSecurityTests {
 	  User user = userOptional.get();
 	  Assert.isTrue("user".equals(user.getUsername()));
 	  Assert.isTrue(passwordEncoder.matches("password", user.getPassword()));
-	  System.out.println(user.getUsername() + ": " + user.getPassword());
 
     mockMvc.perform(get("/api/gene"))
         .andExpect(status().isUnauthorized());
@@ -156,12 +155,33 @@ public class SimpleTokenSecurityTests {
 				.andReturn();
 
 		String json = result.getResponse().getContentAsString();
-		System.out.println(json);
 		String token = JsonPath.read(json, "$.token");
 
 		mockMvc.perform(get("/api/search/gene")
 				.header("X-Auth-Token", token))
 				.andExpect(status().isOk());
 	}
+	
+	@Test
+  public void actuatorSecurityTest() throws Exception {
+	  
+	  mockMvc.perform(get("/actuator"))
+        .andExpect(status().isUnauthorized());
+
+    MvcResult result = mockMvc.perform(post("/authenticate")
+        .header("Accept", "application/json")
+        .with(httpBasic("user", "password")))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$", hasKey("token")))
+        .andReturn();
+
+    String json = result.getResponse().getContentAsString();
+    String token = JsonPath.read(json, "$.token");
+
+    mockMvc.perform(get("/actuator")
+        .header("X-Auth-Token", token))
+        .andExpect(status().isOk());
+	  
+  }
 	
 }

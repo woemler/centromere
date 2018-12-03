@@ -254,6 +254,10 @@ curl -H 'X-Auth-Token: user:1542220218016:beed30c0e27b2059ac36e798ce09c224' http
 
 Requests made to protected API endpoints without giving a valid security token will result is a `401 Unauthorized` error.
 
+## Monitoring
+
+Centromere uses [Spring Boot Actuator](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#production-ready) to expose several additional REST endpoints that provide information about the health and configuration of the web services. The Actuator root can be found at the URL: `/actuator`. Database and application health information cane be found at `/actuator/health`.  General application information can be found at `/actuator/info`.
+
 ## Endpoint Reference
 
 ### API Root Endpoints
@@ -281,6 +285,17 @@ Method | URI | Description
 `GET` | `/api/aggregation/{model}/count` | Returns a count of the number of `model` records that satisfy the query.  Supports `QueryCriteria` filtering.
 `GET` | `/api/aggregation/{model}/distinct/{field}` | Returns a list of unique values of the requested `model` attribute, `field`.  Supports `QueryCriteria` filtering.
 `GET` | `/api/aggregation/{model}/group/{field}` | Returns a key-value collection of unique `field` values for the requested `model` and all records that have that value forthe requested attribute.  Supports `QueryCriteria` filtering.
+
+### Actuator
+
+Method | URI | Description
+`GET` | `/actuator` | The root URL for Actuator monitoring services.
+`GET` | `/actuator/health` | Health information for the web application, database, and file system.
+`GET` | `/actuator/info` | Basic information about the web application and dependencies.
+
+### Authentication
+Method | URI | Description
+`POST` | `/authenticate` | Authentication entry point. Generates a token that can be used for subsequent requests.
 
 ## HTTP Status Codes 
 

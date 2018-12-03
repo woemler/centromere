@@ -51,6 +51,7 @@
   </distributionManagement>
 
   <properties>
+    <centromere.version>${project.version}</centromere.version>
     <springfox.version>2.6.1</springfox.version>
   </properties>
 
@@ -143,8 +144,21 @@
   </dependencies>
 
   <build>
+    
     <finalName>${project.artifactId}-${project.version}</finalName>
+    
+    <resources>
+      
+      <!-- Allows Maven properties in Spring properties files -->
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+      
+    </resources>
+    
     <plugins>
+      
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.3</version>
@@ -153,6 +167,7 @@
           <target>1.8</target>
         </configuration>
       </plugin>
+      
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.18.1</version>
@@ -162,6 +177,7 @@
           </includes>
         </configuration>
       </plugin>
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -175,6 +191,7 @@
           </execution>
         </executions>
       </plugin>
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -188,6 +205,7 @@
           </execution>
         </executions>
       </plugin>
+      
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
@@ -207,8 +225,9 @@
           </execution>
         </executions>
       </plugin>
+      
     </plugins>
+    
   </build>
-
 
 </project>

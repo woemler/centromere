@@ -37,7 +37,8 @@ import org.springframework.context.annotation.Import;
 @Import({ 
     WebApplicationConfig.DefaultWebApplicationConfig.class,
     WebSecurityConfig.class,
-    ApiDocumentationConfig.class
+    ApiDocumentationConfig.class,
+    ActuatorConfig.class
 })
 public @interface AutoConfigureCentromere {
 
