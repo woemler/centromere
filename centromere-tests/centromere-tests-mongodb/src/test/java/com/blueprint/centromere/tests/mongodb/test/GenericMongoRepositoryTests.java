@@ -454,6 +454,7 @@ public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 
   @Test
   public void findByBooleanTrueTest(){
+    System.out.println(userRepository.findAll().toString());
     QueryCriteria criteria = new QueryCriteria("enabled", true, Evaluation.IS_TRUE);
     List<User> records = (List<User>) userRepository.find(Collections.singletonList(criteria));
     Assert.notEmpty(records);

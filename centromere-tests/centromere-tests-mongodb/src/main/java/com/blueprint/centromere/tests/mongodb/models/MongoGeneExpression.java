@@ -18,12 +18,14 @@ package com.blueprint.centromere.tests.mongodb.models;
 
 import com.blueprint.centromere.tests.core.models.GeneExpression;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
 @Document
 @Data
+@ToString(callSuper = true)
 public class MongoGeneExpression extends GeneExpression<String> {
   
   @Id private String id;
