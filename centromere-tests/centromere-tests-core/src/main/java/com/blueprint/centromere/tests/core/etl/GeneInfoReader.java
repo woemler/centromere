@@ -1,7 +1,7 @@
 package com.blueprint.centromere.tests.core.etl;
 
-import com.blueprint.centromere.core.etl.DataImportException;
 import com.blueprint.centromere.core.etl.reader.StandardRecordFileReader;
+import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import com.blueprint.centromere.tests.core.models.Gene;
 
 /**
@@ -13,7 +13,7 @@ public class GeneInfoReader<T extends Gene<?>> extends StandardRecordFileReader<
     super(model);
   }
 
-  protected T getRecordFromLine(String line) throws DataImportException {
+  protected T getRecordFromLine(String line) throws DataProcessingException {
     
     String[] bits = line.split("\\t");
     T gene;
@@ -21,7 +21,7 @@ public class GeneInfoReader<T extends Gene<?>> extends StandardRecordFileReader<
     try {
       gene = this.getModel().newInstance();
     } catch (Exception e){
-      throw new DataImportException(e);
+      throw new DataProcessingException(e);
     }
     
     gene.setTaxId(Integer.parseInt(bits[0]));

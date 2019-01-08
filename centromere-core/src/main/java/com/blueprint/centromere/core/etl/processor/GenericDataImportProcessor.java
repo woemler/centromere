@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package com.blueprint.centromere.core.etl.processor;
 
-import com.blueprint.centromere.core.etl.DataImportException;
 import com.blueprint.centromere.core.etl.PipelineComponent;
 import com.blueprint.centromere.core.etl.reader.RecordReader;
 import com.blueprint.centromere.core.etl.writer.RecordWriter;
+import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.File;
@@ -74,7 +74,7 @@ public class GenericDataImportProcessor<T extends Model<?>>
    */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void doBefore(File file, Map<String, String> args) throws DataImportException {
+	public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
 	  isInFailedState = false;
 		isConfigured = true;
     recordCount = 0;
@@ -85,7 +85,7 @@ public class GenericDataImportProcessor<T extends Model<?>>
    *   and association of metadata records.
    */
   @Override
-  public void doOnSuccess(File file, Map<String, String> args) throws DataImportException {
+  public void doOnSuccess(File file, Map<String, String> args) throws DataProcessingException {
     
   }
 
@@ -94,7 +94,7 @@ public class GenericDataImportProcessor<T extends Model<?>>
    * {@link #doOnSuccess(File, Map)} method.
    */
   @Override
-  public void doOnFailure(File file, Map<String, String> args) throws DataImportException {
+  public void doOnFailure(File file, Map<String, String> args) throws DataProcessingException {
     
   }
 
@@ -102,17 +102,17 @@ public class GenericDataImportProcessor<T extends Model<?>>
 	 * {@link DataProcessor#processFile(File, Map)}
 	 */
   @Override
-	public void processFile(File file, Map<String, String> args) throws DataImportException {
+	public void processFile(File file, Map<String, String> args) throws DataProcessingException {
     
     try {
 
       recordCount = 0;
       
       if (!isConfigured)
-        throw new DataImportException("Processor configuration method has not run!"); 
+        throw new DataProcessingException("Processor configuration method has not run!"); 
 
       if (isInFailedState) {
-        throw new DataImportException("Record processor is in failed state and is aborting run.");
+        throw new DataProcessingException("Record processor is in failed state and is aborting run.");
       }
 
       runComponentDoBefore(file, args);
@@ -146,9 +146,9 @@ public class GenericDataImportProcessor<T extends Model<?>>
    * Runs all of the {@link PipelineComponent#doBefore(File, Map)} methods, 
    *   and throws appropriate exceptions if problems are encountered.
    * 
-   * @throws DataImportException
+   * @throws DataProcessingException
    */
-	protected void runComponentDoBefore(File file, Map<String, String> args) throws DataImportException {
+	protected void runComponentDoBefore(File file, Map<String, String> args) throws DataProcessingException {
     logger.debug("Running doBefore method for processor components.");
     reader.doBefore(file, args);
     writer.doBefore(file, args);
@@ -158,9 +158,9 @@ public class GenericDataImportProcessor<T extends Model<?>>
    * Runs all of the {@link PipelineComponent#doOnSuccess(File, Map)} 
    *   methods, and throws appropriate exceptions if problems are encountered.
    *
-   * @throws DataImportException
+   * @throws DataProcessingException
    */
-  protected void runComponentDoOnSuccess(File file, Map<String,String> args) throws DataImportException {
+  protected void runComponentDoOnSuccess(File file, Map<String,String> args) throws DataProcessingException {
     logger.debug("Running doOnSuccess methods for processor components.");
     writer.doOnSuccess(file, args);
     reader.doOnSuccess(file, args);
@@ -172,9 +172,9 @@ public class GenericDataImportProcessor<T extends Model<?>>
    * 
    * @param file
    * @param args
-   * @throws DataImportException
+   * @throws DataProcessingException
    */
-  protected void runComponentDoOnFailure(File file, Map<String,String> args) throws DataImportException {
+  protected void runComponentDoOnFailure(File file, Map<String,String> args) throws DataProcessingException {
     logger.info("Running doAfter methods for processor components.");
     writer.doOnFailure(file, args);
     reader.doOnFailure(file, args);
@@ -184,9 +184,9 @@ public class GenericDataImportProcessor<T extends Model<?>>
    * Processes all of the incoming records.  Filters and validates records, if the appropriate
    *   components are set.
    * 
-   * @throws DataImportException
+   * @throws DataProcessingException
    */
-  protected void processRecords(File file, Map<String, String> args) throws DataImportException {
+  protected void processRecords(File file, Map<String, String> args) throws DataProcessingException {
     
     logger.debug("Processing records.");
     
@@ -209,7 +209,7 @@ public class GenericDataImportProcessor<T extends Model<?>>
             continue;
           } else {
             isInFailedState = true;
-            throw new DataImportException(bindingResult.toString());
+            throw new DataProcessingException(bindingResult.toString());
           }
         }
       }

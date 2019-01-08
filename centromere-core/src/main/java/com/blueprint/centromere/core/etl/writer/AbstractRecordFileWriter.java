@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package com.blueprint.centromere.core.etl.writer;
 
-import com.blueprint.centromere.core.etl.DataImportException;
 import com.blueprint.centromere.core.etl.reader.InvalidDataSourceException;
+import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import com.blueprint.centromere.core.model.Model;
 import java.io.File;
 import java.io.FileWriter;
@@ -43,7 +43,7 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
 	 * Opens a new output file for writing.
 	 */
 	@Override
-	public void doBefore(File file, Map<String, String> args) throws DataImportException {
+	public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
     File tempFile = this.getTempFile(file); 
     this.open(tempFile);
 		logger.info(String.format("Writing records to file: %s", tempFile.getAbsolutePath()));
@@ -53,12 +53,12 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
 	 * Closes the open file writer.
 	 */
 	@Override
-	public void doOnSuccess(File file, Map<String, String> args) throws DataImportException  {
+	public void doOnSuccess(File file, Map<String, String> args) throws DataProcessingException {
 		this.close();
 	}
 
   @Override
-  public void doOnFailure(File file, Map<String, String> args) throws DataImportException {
+  public void doOnFailure(File file, Map<String, String> args) throws DataProcessingException {
     this.close();
   }
 
@@ -67,7 +67,7 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
 	 * 
 	 * @param tempFile
 	 */
-	protected void open(File tempFile) throws DataImportException {
+	protected void open(File tempFile) throws DataProcessingException {
 		this.close();
 		try {
 			writer = new FileWriter(tempFile);
@@ -96,10 +96,10 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
    * @return
    */
   @Override
-  public File getTempFile(File inputFile) throws DataImportException {
+  public File getTempFile(File inputFile) throws DataProcessingException {
     File tempDir = new File(System.getProperty("java.io.tmpdir"));
     if (!tempDir.isDirectory() || !tempDir.canWrite()){
-      throw new DataImportException(String.format("Unable to read or write to temp directory: %s",
+      throw new DataProcessingException(String.format("Unable to read or write to temp directory: %s",
           tempDir.getAbsolutePath()));
     }
     String fileName = "centromere.import.tmp";

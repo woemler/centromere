@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.etl.reader;
 
-import com.blueprint.centromere.core.etl.DataImportException;
+import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.File;
@@ -65,7 +65,7 @@ public class BasicColumnMappingRecordReader<T extends Model<?>>
   }
 
   @Override
-  public void doBefore(File file, Map<String, String> args) throws DataImportException {
+  public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
     super.doBefore(file, args);
     headerFlag = true;
   }
@@ -76,7 +76,7 @@ public class BasicColumnMappingRecordReader<T extends Model<?>>
    * @return model record
    */
 	@Override 
-	public T readRecord() throws DataImportException {
+	public T readRecord() throws DataProcessingException {
 		try {
 			String line = this.getReader().readLine();
 			while (line != null){
@@ -94,7 +94,7 @@ public class BasicColumnMappingRecordReader<T extends Model<?>>
 				line = this.getReader().readLine();
 			}
 		} catch (IOException e){
-			throw new DataImportException(e);
+			throw new DataProcessingException(e);
 		}
 		return null;
 	}
@@ -166,7 +166,7 @@ public class BasicColumnMappingRecordReader<T extends Model<?>>
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	protected T getRecordFromLine(String line) throws DataImportException {
+	protected T getRecordFromLine(String line) throws DataProcessingException {
 		
 	  BeanWrapperImpl wrapper = new BeanWrapperImpl(model);
 		String[] bits = line.split(delimiter);
@@ -197,12 +197,12 @@ public class BasicColumnMappingRecordReader<T extends Model<?>>
 	 * @param type type to convert to
 	 * @return converted object
 	 */
-	private Object convertFieldValue(String s, Class<?> type) throws DataImportException {
+	private Object convertFieldValue(String s, Class<?> type) throws DataProcessingException {
 		if (type.equals(String.class)) return s;
 		if (conversionService.canConvert(String.class, type)){
 			return conversionService.convert(s, type);
 		} else {
-			throw new DataImportException(String.format("Cannot convert String type to %s.", type.getName()));
+			throw new DataProcessingException(String.format("Cannot convert String type to %s.", type.getName()));
 		}
 	}
 

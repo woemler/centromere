@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.etl.writer;
 
-import com.blueprint.centromere.core.etl.DataImportException;
+import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import java.io.File;
 
 /**
@@ -31,7 +31,7 @@ public interface TempFileWriter {
    * @param inputFile
    * @return
    */
-  default File getTempFile(File inputFile) throws DataImportException {
+  default File getTempFile(File inputFile) throws DataProcessingException {
     File tempDir = new File(System.getProperty("java.io.tmpdir"));
     File tempFile = new File(tempDir, inputFile.getAbsolutePath() + ".tmp");
     return tempFile;

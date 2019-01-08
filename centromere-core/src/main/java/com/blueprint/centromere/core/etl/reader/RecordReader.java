@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package com.blueprint.centromere.core.etl.reader;
 
-import com.blueprint.centromere.core.etl.DataImportException;
 import com.blueprint.centromere.core.etl.PipelineComponent;
+import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import com.blueprint.centromere.core.model.Model;
 
 /**
@@ -32,6 +32,6 @@ public interface RecordReader<T extends Model<?>> extends PipelineComponent {
 	 * 
 	 * @return a single {@link Model} record.
 	 */
-	T readRecord() throws DataImportException;
+	T readRecord() throws DataProcessingException;
 
 }

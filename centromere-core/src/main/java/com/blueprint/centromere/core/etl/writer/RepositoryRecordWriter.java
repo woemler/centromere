@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.etl.writer;
 
-import com.blueprint.centromere.core.etl.DataImportException;
+import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import java.io.File;
@@ -61,7 +61,7 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
   }
 
   @Override
-	public void doBefore(File file, Map<String, String> args) throws DataImportException {
+	public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
 		records = new ArrayList<>();
 	}
 
@@ -71,7 +71,7 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
 	 * @param entity
 	 */ 
 	@SuppressWarnings("unchecked")
-	public void writeRecord(T entity) throws DataImportException {
+	public void writeRecord(T entity) throws DataProcessingException {
     if (batchSize > 1){
       records.add(entity);
       if (records.size() >= batchSize) {
@@ -83,7 +83,7 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
     }
 	}
 	
-	protected void writeRecords(Collection<T> records) throws DataImportException {
+	protected void writeRecords(Collection<T> records) throws DataProcessingException {
 	  if (writeMode.equals(WriteMode.INSERT)){
 	    repository.insert(records);
     } else if (writeMode.equals(WriteMode.UPDATE)){
@@ -100,12 +100,12 @@ public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable
   }
 
 	@Override
-	public void doOnSuccess(File file, Map<String, String> args) throws DataImportException {
+	public void doOnSuccess(File file, Map<String, String> args) throws DataProcessingException {
 			if (records.size() > 0) writeRecords(records);
 	}
 
   @Override
-  public void doOnFailure(File file, Map<String, String> args) throws DataImportException {
+  public void doOnFailure(File file, Map<String, String> args) throws DataProcessingException {
     
   }
 

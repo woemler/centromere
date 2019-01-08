@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * TODO: Might have to change how link processor handles linking, so that it links to resource whose class extends the model.
+ * Marks the annotated field in a {@link Model} class as representing a foreign-key relationship 
+ *   within the source database. The {@link #model()} value indicates the linked model class, the
+ *   {@link #field()} value indicates the field in the linked model class that is represented by
+ *   this annotated field, and {@link #rel()} provides a name for this relationship.
  * 
  * @author woemler
  */
@@ -35,7 +38,7 @@ public @interface Linked {
   /**
    * The {@link Model} class type that the annotated field references.
    *
-   * @return
+   * @return linked model class
    */
   Class<?> model();
 
@@ -43,10 +46,15 @@ public @interface Linked {
    * Field name in the source {@link Model} type that the annotated field references.  Used to
    *   construct the query string parameters in the assembled link.
    *
-   * @return
+   * @return the linked field in the origin class
    */
   String field() default "id";
 
+  /**
+   * Relationship name to be used in documentation and link creation.
+   * 
+   * @return relationship name
+   */
   String rel() default "";
   
 }

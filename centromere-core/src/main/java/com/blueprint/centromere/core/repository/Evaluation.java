@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,11 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * List of evaluations that all {@link ModelRepository} implementations should be able to support
+ *   via {@link QueryCriteria} queries. Some evaluations are naturally restricted to certain data
+ *   types. The evaluation suffixes are used to create dynamic query parameters by merging the 
+ *   model field name and the appropriate evaluation suffix.
+ * 
  * @author woemler
  * @since 0.5.0
  */

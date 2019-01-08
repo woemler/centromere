@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.etl.reader;
 
-import com.blueprint.centromere.core.etl.DataImportException;
+import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.File;
@@ -53,7 +53,7 @@ public abstract class MultiRecordFileReader<T extends Model<?>>
 	 * Initializes the header and record list objects.
 	 */
 	@Override 
-	public void doBefore(File file, Map<String, String> args) throws DataImportException {
+	public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
 		super.doBefore(file, args);
 		recordList = new ArrayList<>();
 		headers = new ArrayList<>();
@@ -64,7 +64,7 @@ public abstract class MultiRecordFileReader<T extends Model<?>>
 	 * {@link RecordReader#readRecord()}
 	 */
 	@Override 
-	public T readRecord() throws DataImportException {
+	public T readRecord() throws DataProcessingException {
 		if (recordList.size() > 0){
 			return recordList.remove(0);
 		} else {
@@ -83,7 +83,7 @@ public abstract class MultiRecordFileReader<T extends Model<?>>
 					line = this.getReader().readLine();
 				}
 			} catch (Exception e){
-				throw new DataImportException(e);
+				throw new DataProcessingException(e);
 			}
 		}
 		return null;
@@ -94,7 +94,7 @@ public abstract class MultiRecordFileReader<T extends Model<?>>
 	 * 
 	 * @param line
 	 */
-	protected void parseHeader(String line) throws DataImportException {
+	protected void parseHeader(String line) throws DataProcessingException {
 		headers = Arrays.asList(line.trim().split(delimiter));
 	}
 
@@ -115,7 +115,7 @@ public abstract class MultiRecordFileReader<T extends Model<?>>
 	 * @param line
 	 * @return
 	 */
-	abstract protected List<T> getRecordsFromLine(String line) throws DataImportException ;
+	abstract protected List<T> getRecordsFromLine(String line) throws DataProcessingException;
 
 	/**
 	 * Tests whether a given line should be skipped.

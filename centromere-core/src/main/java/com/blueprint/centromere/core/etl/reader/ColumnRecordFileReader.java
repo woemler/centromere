@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.etl.reader;
 
-import com.blueprint.centromere.core.etl.DataImportException;
+import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.File;
@@ -45,7 +45,7 @@ public abstract class ColumnRecordFileReader<T extends Model<?>>
   }
 
   @Override
-  public void doBefore(File file, Map<String, String> args) throws DataImportException {
+  public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
 
     super.doBefore(file, args);
     
@@ -67,7 +67,7 @@ public abstract class ColumnRecordFileReader<T extends Model<?>>
         line = this.getReader().readLine();
       }
     } catch (Exception e){
-      throw new DataImportException(e);
+      throw new DataProcessingException(e);
     }
 
     records = new ArrayList<>(recordMap.values());
@@ -77,7 +77,7 @@ public abstract class ColumnRecordFileReader<T extends Model<?>>
   protected abstract void setModelAttribute(T record, String attribute, String value);
 
   @Override
-  public T readRecord() throws DataImportException {
+  public T readRecord() throws DataProcessingException {
     if (records.size() == 0){
       return null;
     } else {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.etl.writer;
 
-import com.blueprint.centromere.core.etl.DataImportException;
+import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelReflectionUtils;
 import com.blueprint.centromere.core.model.ModelSupport;
@@ -56,14 +56,14 @@ public class DelimtedTextFileWriter<T extends Model<?>>
   }
 
   @Override
-  public void doBefore(File file, Map<String, String> args) throws DataImportException {
+  public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
     super.doBefore(file, args);
     columns = ModelReflectionUtils.getPersistableNonEntityFieldNames(this.getModel(), ignoredFields);
     fields = columns;
   }
 
   @Override
-  public void writeRecord(T record) throws DataImportException {
+  public void writeRecord(T record) throws DataProcessingException {
     
     FileWriter writer = this.getWriter();
     StringBuilder stringBuilder = new StringBuilder();
@@ -82,7 +82,7 @@ public class DelimtedTextFileWriter<T extends Model<?>>
         writer.write(stringBuilder.toString());
         writer.write(terminatedBy);
       } catch (IOException e){
-        throw new DataImportException(e);
+        throw new DataProcessingException(e);
       }
       headerFlag = false;
     }
@@ -108,7 +108,7 @@ public class DelimtedTextFileWriter<T extends Model<?>>
       writer.write(stringBuilder.toString());
       writer.write(terminatedBy);
     } catch (IOException e){
-      throw new DataImportException(e);
+      throw new DataProcessingException(e);
     }
     
   }

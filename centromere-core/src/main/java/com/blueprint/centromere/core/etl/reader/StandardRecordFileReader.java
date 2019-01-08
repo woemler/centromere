@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.etl.reader;
 
-import com.blueprint.centromere.core.etl.DataImportException;
+import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.IOException;
@@ -56,7 +56,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 	 * {@link RecordReader#readRecord()}
 	 */
 	@Override
-	public T readRecord() throws DataImportException {
+	public T readRecord() throws DataProcessingException {
     String line = null;
     Integer count = 0;
 	  try {
@@ -77,7 +77,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 			}
 		} catch (IOException e) {
 	    logger.error(String.format("Failed on line %d: %s", count, line));
-			throw new DataImportException(e);
+			throw new DataProcessingException(e);
 		}
 		return null;
 	}
@@ -103,9 +103,9 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
    * @param clazz
    * @param <S>
    * @return
-   * @throws DataImportException
+   * @throws DataProcessingException
    */
-  protected <S> S getColumnValue(String line, String header, Class<S> clazz) throws DataImportException {
+  protected <S> S getColumnValue(String line, String header, Class<S> clazz) throws DataProcessingException {
 	  return getColumnValue(line, header, clazz, false);
   }
 
@@ -117,18 +117,18 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
    * @param caseSensitive
    * @param <S>
    * @return
-   * @throws DataImportException
+   * @throws DataProcessingException
    */
-  protected <S> S getColumnValue(String line, String header, Class<S> clazz, boolean caseSensitive) throws DataImportException {
+  protected <S> S getColumnValue(String line, String header, Class<S> clazz, boolean caseSensitive) throws DataProcessingException {
     Integer index = getColumnIndex(header, caseSensitive);
-    if (index == -1) throw new DataImportException(String.format("Given header does not exist in this file: %s", header));
+    if (index == -1) throw new DataProcessingException(String.format("Given header does not exist in this file: %s", header));
     String[] bits = line.split(this.getDelimiter());
     if (bits.length <= index){
-      throw new DataImportException(String.format("Header index is outside bounds of current line.  "
+      throw new DataProcessingException(String.format("Header index is outside bounds of current line.  "
           + "Index = %d, line length = %d", index, bits.length));
     }
     if (!conversionService.canConvert(String.class, clazz)){
-      throw new DataImportException(String.format("Cannot convert string value to %s", clazz.getName()));
+      throw new DataProcessingException(String.format("Cannot convert string value to %s", clazz.getName()));
     }
     return conversionService.convert(bits[index].trim(), clazz);
   }
@@ -138,9 +138,9 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
    * @param line
    * @param header
    * @return
-   * @throws DataImportException
+   * @throws DataProcessingException
    */
-  protected String getColumnValue(String line, String header) throws DataImportException {
+  protected String getColumnValue(String line, String header) throws DataProcessingException {
     return getColumnValue(line, header, String.class);
   }
 
@@ -212,7 +212,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 	 * @param line
 	 * @return
 	 */
-	abstract protected T getRecordFromLine(String line) throws DataImportException ;
+	abstract protected T getRecordFromLine(String line) throws DataProcessingException;
 
 	/**
 	 * Performs a test to see if the line should be skipped.

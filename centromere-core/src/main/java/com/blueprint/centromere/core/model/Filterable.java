@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 William Oemler, Blueprint Medicines
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Allows field filtering during JSON serialization, XML marshalling, etc.
+ * Marks the annotated {@link Model} class as being eligible for field-filtering in REST web 
+ *   services via JSON/XML serialization tools.
  * 
  * @author woemler
  */
@@ -33,7 +34,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @JacksonAnnotationsInside
-@JsonFilter("fieldFilter") //TODO JsonFIlter handling for standard SDR endpoints
+@JsonFilter("fieldFilter") 
 @Inherited
 public @interface Filterable {
 }

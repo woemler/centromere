@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,13 +47,17 @@ public class DefaultModelRepositoryRegistry implements ModelRepositoryRegistry {
     this.context = context;
   }
 
+  /**
+   * Populates the registry with {@link ModelRepository} beans and their associated {@link Model} types.
+   * 
+   * @throws ConfigurationException
+   */
   @PostConstruct
   public void afterPropertiesSet() throws ConfigurationException{
     for (Map.Entry<String, Object> entry: context.getBeansWithAnnotation(ModelResource.class).entrySet()){
       Class<?> type = entry.getValue().getClass();
       ModelRepository repository = (ModelRepository) entry.getValue();
       Class<? extends Model<?>> model = repository.getModel();
-      String name = model.getSimpleName().toLowerCase();
       if (repositoryTypeMap.containsKey(model)) throw new ModelRegistryException(String.format(
           "Duplicate model registered for repository %s.  Does more than one repository have the "
               + "same model?", model.getName()));

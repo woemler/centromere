@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,7 @@ import com.blueprint.centromere.core.exceptions.QueryParameterException;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +33,10 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**
+ * The base {@link Model} repository interface, as an extension of Spring Data's core 
+ *   {@link PagingAndSortingRepository} interface. This interface should be implemented for each
+ *   database technology to be used with Centromere.
+ * 
  * @author woemler
  * @since 0.5.0
  */
@@ -158,19 +157,5 @@ public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
    * @return updated instances of the entity objects.
    */
   <S extends T> Iterable<S> update(Iterable<S> entities);
-  
-  static List<Object> getCollection(Object val){
-    if (val instanceof Collection){
-      return new ArrayList<Object>((Collection) val);
-    } else if (val.getClass().isArray()){
-      return Arrays.asList(val);
-    } else {
-      return Collections.singletonList(val);
-    }
-  }
-
-  static boolean isMultiValue(Object val){
-    return val.getClass().isArray() || val instanceof Collection;
-  }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,33 +14,31 @@
  * limitations under the License.
  */
 
-package com.blueprint.centromere.core.etl;
-
-import com.blueprint.centromere.core.exceptions.CentromereException;
+package com.blueprint.centromere.core.exceptions;
 
 /**
- * Generic exception thrown when a data import component encounters a problem.
+ * Generic exception thrown when a data processing component encounters a problem.
  * 
  * @author woemler
  */
-public class DataImportException extends CentromereException {
+public class DataProcessingException extends CentromereException {
 
-	public DataImportException() {
+	public DataProcessingException() {
 	}
 
-	public DataImportException(String message) {
+	public DataProcessingException(String message) {
 		super(message);
 	}
 
-	public DataImportException(String message, Throwable cause) {
+	public DataProcessingException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public DataImportException(Throwable cause) {
+	public DataProcessingException(Throwable cause) {
 		super(cause);
 	}
 
-	public DataImportException(String message, Throwable cause, boolean enableSuppression,
+	public DataProcessingException(String message, Throwable cause, boolean enableSuppression,
 			boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}

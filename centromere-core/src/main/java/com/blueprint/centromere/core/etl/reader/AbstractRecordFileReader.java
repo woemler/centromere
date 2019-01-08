@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.blueprint.centromere.core.etl.reader;
 
-import com.blueprint.centromere.core.etl.DataImportException;
+import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import com.blueprint.centromere.core.model.Model;
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,7 +42,7 @@ public abstract class AbstractRecordFileReader<T extends Model<?>> implements Re
 	 * Closes any open reader and opens the new target file.  Assigns local variables, if available.
 	 */
 	@Override
-	public void doBefore(File file, Map<String, String> args) throws DataImportException {
+	public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
 	  this.close();
 		this.open(file);
 	}
@@ -51,12 +51,12 @@ public abstract class AbstractRecordFileReader<T extends Model<?>> implements Re
 	 * Calls the close method on the reader.
 	 */
 	@Override
-	public void doOnSuccess(File file, Map<String, String> args) throws DataImportException {
+	public void doOnSuccess(File file, Map<String, String> args) throws DataProcessingException {
 		this.close();
 	}
 
   @Override
-  public void doOnFailure(File file, Map<String, String> args) throws DataImportException {
+  public void doOnFailure(File file, Map<String, String> args) throws DataProcessingException {
     this.close();
   }
 
@@ -66,7 +66,7 @@ public abstract class AbstractRecordFileReader<T extends Model<?>> implements Re
 	 * 
 	 * @param file
 	 */
-	protected void open(File file) throws DataImportException {
+	protected void open(File file) throws DataProcessingException {
 		try {
 			reader = new BufferedReader(new FileReader(file));
 		} catch (IOException e){
