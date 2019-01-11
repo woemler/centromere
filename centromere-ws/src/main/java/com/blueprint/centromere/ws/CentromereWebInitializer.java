@@ -32,6 +32,9 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 /**
+ * Convenience class for initializing a Spring Boot-based Centromere instance.  This class should be
+ *   subclassed and annotated with {@link AutoConfigureCentromere} for the simplest configuration.
+ * 
  * @author woemler
  */
 @SpringBootApplication(exclude = { 
@@ -50,7 +53,14 @@ public class CentromereWebInitializer extends SpringBootServletInitializer {
     builder.web(WebApplicationType.SERVLET);
     builder.run(args);
   }
-  
+
+  /**
+   * Checks the {@link AutoConfigureCentromere} annotation, if present, and determines what profiles
+   *   the application should run with, and therefore what configuration classes to initialize.
+   * 
+   * @param source
+   * @return
+   */
   private static String[] getActiveProfiles(Class<?> source){
     String[] profiles;
     if (source.isAnnotationPresent(AutoConfigureCentromere.class)){

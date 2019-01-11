@@ -10,6 +10,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 /**
+ * Handles requests in qhich the user fails to properly authenticate.
+ * 
  * @author woemler
  */
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {

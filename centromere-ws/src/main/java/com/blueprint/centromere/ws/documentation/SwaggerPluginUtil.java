@@ -57,8 +57,17 @@ public class SwaggerPluginUtil {
 	
 	/* API Operations */
 
+  /**
+   * Collects all of the {@link Operation} objects for each single-record API endpoint.
+   * 
+   * @param model
+   * @param typeResolver
+   * @return
+   */
   private static List<Operation> getFindSingleModelOperations(
-      Class<? extends Model> model, TypeResolver typeResolver){
+      Class<? extends Model> model, 
+      TypeResolver typeResolver
+  ){
     List<Operation> operations = new ArrayList<>();
     operations.add(getFindByIdOperation(model, typeResolver));
     operations.add(getPutOperation(model, typeResolver));
@@ -68,8 +77,17 @@ public class SwaggerPluginUtil {
     return operations;
   }
 
+  /**
+   * Collects all of the {@link Operation} objects for all of the multiple-record API endpoints.
+   * 
+   * @param model
+   * @param typeResolver
+   * @return
+   */
   private static List<Operation> getFindCollectionModelOperations(
-      Class<? extends Model<?>> model, TypeResolver typeResolver){
+      Class<? extends Model<?>> model, 
+      TypeResolver typeResolver
+  ){
     List<Operation> operations = new ArrayList<>();
     operations.add(getFindAllOperation(model, typeResolver));
     operations.add(getPostOperation(model, typeResolver));

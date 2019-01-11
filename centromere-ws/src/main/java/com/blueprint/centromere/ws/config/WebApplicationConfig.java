@@ -43,6 +43,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
+ * Default web application configurations.
+ * 
  * @author woemler
  */
 

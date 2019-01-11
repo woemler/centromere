@@ -42,6 +42,8 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
+ * Default web security configurations.
+ * 
  * @author woemler
  */
 public class WebSecurityConfig  {

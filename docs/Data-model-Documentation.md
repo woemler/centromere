@@ -76,17 +76,16 @@ xxx
 
 ## Repositories
 
-All Centromere repository classes implement the base `ModelRepository` interface, which defines all of the basic CRUD operations that all Centromere repositories should dataSetSupport.  This interface is based on Spring Data's `PagingAndSortingRepository`, but with some additional method definitions for dynamic query operations.  The database-specific implementations also include several methods specific to those data stores.  A MongoDB repository implementation for the above `Gene` model class might look like this:
+All Centromere repository classes implement the base `ModelRepository` interface, which defines all of the basic CRUD operations that all Centromere repositories should support.  This interface is based on Spring Data's `PagingAndSortingRepository`, but with some additional method definitions for dynamic query operations.  The database-specific implementations also include several methods specific to those data stores.  For a standard repository implementation, all you need to do is define an interface that extends `ModelRepository` and add a `ModelResource` annotation:
 
 ```java
-@ModelRepository(Gene.class)
-public class GeneRepository extends GenericMongoRepository<Gene, String> {
-	@Autowired
-	public GeneRepository(MongoTemplate mongoTemplate){
-		super(mongoTemplate);
-	}
-}
+@ModelResource("genes")
+public interface GeneRepository extends ModelRepository<Gene, Long> { }
 ```
+
+The resulting bean will have all of the methods defined in the repository API, as well as any additional methods that may be defined in the database-specific repository implementation.  The repository beans are not created by themselves, of course, so using a database-specific configuration is required to generate the appropriate beans that implement your repository interfaces (see below).
+
+### `QueryCriteria` Queries
 
 Dynamic repository queries in Centromere are created by chaining a series of query operations, represented by the `QueryCriteria` class.  These operations are defined by the field to be queried, the value of the field, and the operator to be used to make the evaluation.  For example:
 
@@ -101,3 +100,5 @@ Will be translated based upon the database implementation to:
 */
 
 ```
+
+### MongoDB Repositories

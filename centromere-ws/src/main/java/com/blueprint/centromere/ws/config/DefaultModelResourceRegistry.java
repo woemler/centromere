@@ -33,6 +33,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
+ * Default implementation for the {@link ModelResourceRegistry}, which uses {@link com.blueprint.centromere.core.repository.ModelResource} annotated {@link com.blueprint.centromere.core.repository.ModelRepository} instances 
+ *   to define relationships between URIs and resources.  In this implementation, there is assumed 
+ *   to be a 1:1 relationship between URIs, model definitions, and repositories.
+ * 
  * @author woemler
  */
 public class DefaultModelResourceRegistry implements ModelResourceRegistry {
@@ -96,7 +100,7 @@ public class DefaultModelResourceRegistry implements ModelResourceRegistry {
   }
 
   @Override
-  public boolean isRegisteredModel(Class<?> type) throws ModelRegistryException {
+  public boolean isRegisteredModel(Class<?> type){
     return uriMap.containsValue(type);
   }
 

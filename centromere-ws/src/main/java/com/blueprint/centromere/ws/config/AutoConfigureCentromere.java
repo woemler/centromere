@@ -25,7 +25,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
- * Performs configuration of core components of Centromere.
+ * Performs automatic configuration of core components of Centromere. This annotation is not 
+ *   required for running Centromere web service applications, but it does make configuration much
+ *   easier. This is intended to be used in conjunction with the {@link com.blueprint.centromere.ws.CentromereWebInitializer}
+ *   Spring Boot initializer implementation.
  * 
  * @author woemler
  * @since 0.4.3

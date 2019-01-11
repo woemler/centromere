@@ -31,15 +31,24 @@ public class ModelApiListingPlugin implements ApiListingBuilderPlugin {
 
   }
 
+  /**
+   * Iterates through each {@link Model} registered with a {@link ModelResourceRegistry} instance 
+   *   and generates a collection of {@link ApiDescription} objects, which describe the available
+   *   resource endpoints.
+   * 
+   * @return
+   */
   protected List<ApiDescription> getApiDescriptions(){
     Assert.notNull(registry, "ModelRegistry must not be null.");
     List<ApiDescription> descriptions = new ArrayList<>();
     for (Class<? extends Model<?>> model: registry.getRegisteredModels()){
-      try {
-        String path = env.getRequiredProperty("centromere.web.api.root-url") + "/" + registry.getUriByModel(model);
-        descriptions.addAll(SwaggerPluginUtil.getModelApiDescriptions(model, typeResolver, path));
-      } catch (ModelRegistryException e){
-        throw new RuntimeException(e); //TODO better exception handling
+      if (registry.isRegisteredModel(model)){
+        try {
+          String path = env.getRequiredProperty("centromere.web.api.root-url") + "/" + registry.getUriByModel(model);
+          descriptions.addAll(SwaggerPluginUtil.getModelApiDescriptions(model, typeResolver, path));
+        } catch (ModelRegistryException e){
+          e.printStackTrace();
+        }
       }
     }
     return descriptions;

@@ -22,7 +22,8 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 
 /**
- * Allows filtering of the 'links' attribute using {@link FilteringJackson2HttpMessageConverter}
+ * Extention of base Spring Data HATOAS {@link Resource} class, which sllows filtering of the 
+ *   'links' attribute using {@link FilteringJackson2HttpMessageConverter}.
  * 
  * @author woemler
  */

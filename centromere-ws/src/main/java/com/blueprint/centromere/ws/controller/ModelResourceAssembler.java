@@ -1,9 +1,5 @@
 package com.blueprint.centromere.ws.controller;
 
-/**
- * @author woemler
- */
-
 import com.blueprint.centromere.core.exceptions.ModelRegistryException;
 import com.blueprint.centromere.core.model.Linked;
 import com.blueprint.centromere.core.model.Model;
@@ -40,6 +36,12 @@ public class ModelResourceAssembler
     this.registry = registry;
   }
 
+  /**
+   * Determines the URI to use for the requested model.
+   * 
+   * @param model
+   * @return
+   */
   private String getModelUri(Class<? extends Model<?>> model) {
     try {
       return rootUrl + "/search/" + registry.getUriByModel(model);
@@ -108,6 +110,14 @@ public class ModelResourceAssembler
     return links;
   }
 
+  /**
+   * Inspects a {@link Model} class for a relationship to another model, as defined by a 
+   *   {@link Linked} annotation, and returns the field name for the primary key ID.
+   * 
+   * @param source parent model
+   * @param relation linked model
+   * @return PKID field name
+   */
   private String getRelatedModelForeignKeyId(Class<?> source, Class<?> relation){
     Class<?> current = relation;
     while (current.getSuperclass() != null) {
@@ -123,6 +133,12 @@ public class ModelResourceAssembler
     return null;
   }
 
+  /**
+   * Converts a collection of objects into a comma-separated string.
+   * 
+   * @param object
+   * @return
+   */
   private String collectionToString(Object object){
     Collection<Object> collection;
     if (Collection.class.isAssignableFrom(object.getClass())){

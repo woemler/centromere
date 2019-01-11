@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,9 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation;
 import org.springframework.data.mongodb.repository.support.SimpleMongoRepository;
 
 /**
+ * Base implementation of {@link ModelRepository} for MongoDB databases. Extends the Spring Data
+ *   MongoDB {@link SimpleMongoRepository} class.
+ * 
  * @author woemler
  * @since 0.5.0
  */
@@ -87,7 +90,7 @@ public class MongoModelRepository<T extends Model<ID>, ID extends Serializable>
   }
 
   /**
-   * Returns a count of all records that satify the requested criteria.
+   * Returns a count of all records that satisfy the requested criteria.
    *
    * @param queryCriterias {@link QueryCriteria}
    * @return a count of {@code T} records.

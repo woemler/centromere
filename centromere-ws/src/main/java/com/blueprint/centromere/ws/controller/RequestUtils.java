@@ -79,7 +79,8 @@ public class RequestUtils {
    * @param request
    * @return
    */
-  public static List<QueryCriteria> getQueryCriteriaFromFindRequest(Class<? extends Model<?>> model,
+  public static List<QueryCriteria> getQueryCriteriaFromFindRequest(
+      Class<? extends Model<?>> model,
       HttpServletRequest request
   ){
     
@@ -96,19 +97,16 @@ public class RequestUtils {
     return criteriaList;
   }
 
-  public static List<QueryCriteria> getQueryCriteriaFromFindOneRequest(Class<? extends Model<?>> model,
-      HttpServletRequest request
-  ){
-    logger.info(String.format("Generating QueryCriteria for 'findOne' request parameters: model=%s params=%s",
-        model.getName(), request.getQueryString()));
-    List<String> defaultParameters = findOneParameters();
-    Map<String, QueryParameterDescriptor> paramMap = QueryParameterUtil.getAvailableQueryParameters(model);
-    List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(paramMap, defaultParameters, request.getParameterMap());
-    logger.info(String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
-    return criteriaList;
-  }
-
-  public static List<QueryCriteria> getQueryCriteriaFromFindDistinctRequest(Class<? extends Model<?>> model,
+  /**
+   * Converts query string parameters in a {@link HttpServletRequest} to a list of {@link QueryCriteria},
+   *   based upon the available model query parameters and the distinct operation endpoint parameters.
+   *
+   * @param model
+   * @param request
+   * @return
+   */
+  public static List<QueryCriteria> getQueryCriteriaFromFindDistinctRequest(
+      Class<? extends Model<?>> model,
       HttpServletRequest request
   ){
     logger.info(String.format("Generating QueryCriteria for 'findDistinct' request parameters: model=%s params=%s",
@@ -120,6 +118,16 @@ public class RequestUtils {
     return criteriaList;
   }
 
+  /**
+   * Generates the {@link QueryCriteria} required to query a linked {@link Model} based upon it's 
+   *   relationship to the parent resource.
+   * 
+   * @param model
+   * @param relField
+   * @param relFieldValues
+   * @param request
+   * @return
+   */
   public static List<QueryCriteria> getQueryCriteriaFromFindLinkedRequest(
       Class<? extends Model<?>> model,
       String relField,
@@ -141,6 +149,13 @@ public class RequestUtils {
     return criteriaList;
   }
 
+  /**
+   * Checks to see if the request contains invalid query string parameters.
+   * 
+   * @param defaultParameters
+   * @param requestParams
+   * @return
+   */
   public static boolean requestContainsNonDefaultParameters(Collection<String> defaultParameters,
       Map<String, String[]> requestParams){
     for (String param: requestParams.keySet()){
@@ -202,15 +217,11 @@ public class RequestUtils {
       }
       
       if (criteria != null){
-        
         criteriaList.add(criteria);
-        
       } else {
-        
         logger.warn(String.format("Unable to map request parameter to available model parameters: "
             + "%s", paramName));
         throw new InvalidParameterException("Invalid request parameter: " + paramName);
-        
       }
       
     }
@@ -218,8 +229,6 @@ public class RequestUtils {
     return criteriaList;
     
   }
-
-
 
   /**
    * Extracts the requested filtered fields parameter from a request.
@@ -256,25 +265,5 @@ public class RequestUtils {
     }
     return exclude;
   }
-
-//  /**
-//   * Uses annotated {@link Model} class definitions to remap any request attribute names in a
-//   *   {@link Pageable} so that they match repository attribute names.
-//   *
-//   * @param pageable {@link Pageable}
-//   * @return
-//   */
-//  public static Pageable remapPageable(Pageable pageable, Class<? extends Model<?>> model){
-//    logger.debug("Attempting to remap Pageable parameter names.");
-//    Sort sort = null;
-//    if (pageable.getSort() != null){
-//      List<Sort.Order> orders = new ArrayList<>();
-//      for (Sort.Order order: pageable.getSort()){
-//        orders.add(new Sort.Order(order.getDirection(), order.getProperty()));
-//      }
-//      sort = new Sort(orders);
-//    }
-//    return new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort);
-//  }
 
 }

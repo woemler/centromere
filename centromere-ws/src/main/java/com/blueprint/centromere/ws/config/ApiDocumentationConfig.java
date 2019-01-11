@@ -2,11 +2,8 @@ package com.blueprint.centromere.ws.config;
 
 import com.blueprint.centromere.ws.documentation.ModelApiListingPlugin;
 import com.blueprint.centromere.ws.documentation.ModelParameterBuilderPlugin;
-import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.TypeResolver;
 import com.google.common.base.Predicate;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +22,8 @@ import springfox.documentation.swagger.common.SwaggerPluginSupport;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
+ * Standardized configurations for REST API documentation tools.
+ * 
  * @author woemler
  */
 public class ApiDocumentationConfig {
@@ -32,6 +31,9 @@ public class ApiDocumentationConfig {
   public static final String SWAGGER_PROFILE = "api_doc_swagger";
   public static final String NO_DOCUMENTATION_PROFILE = "api_doc_none";
 
+  /**
+   * Configuration for Swagger v2 API documentation, using SpringFox. 
+   */
   @Configuration
   @Profile({ SWAGGER_PROFILE })
   @EnableSwagger2
@@ -54,7 +56,6 @@ public class ApiDocumentationConfig {
           .paths(apiPaths())
           .build()
           .apiInfo(apiInfo())
-          //.additionalModels(typeResolver.resolve(User.class), getModelTypes())
           .enableUrlTemplating(true);
     }
 
@@ -77,15 +78,6 @@ public class ApiDocumentationConfig {
 
     private Predicate<String> apiPaths() {
       return PathSelectors.regex(env.getRequiredProperty("centromere.web.api.regex-url"));
-    }
-
-    private ResolvedType[] getModelTypes() {
-      List<Class<?>> models = new ArrayList<>(registry.getRegisteredModels());
-      ResolvedType[] types = new ResolvedType[models.size()];
-      for (int i = 0; i < models.size(); i++) {
-        types[i] = typeResolver.resolve(models.get(i));
-      }
-      return types;
     }
 
     @Bean

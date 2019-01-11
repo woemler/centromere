@@ -73,6 +73,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
+ * Base model resource controller for standard CRUD operations and queries.
+ * 
  * @author woemler
  */
 @Controller
@@ -83,7 +85,7 @@ public class ModelCrudController {
   @Autowired private ModelRepositoryRegistry repositoryRegistry;
   @Autowired private ModelResourceRegistry resourceRegistry;
   @Autowired private ModelResourceAssembler assembler;
-  @Autowired /*@Qualifier("defaultConversionService")*/ private ConversionService conversionService;
+  @Autowired private ConversionService conversionService;
   @Autowired private ObjectMapper objectMapper;
 
   @Value("${centromere.web.api.root-url}")
@@ -141,7 +143,7 @@ public class ModelCrudController {
     Set<String> exclude = RequestUtils.getExcludedFieldsFromRequest(request);
     Optional<T> optional = repository.findById(convertModelIdParameter(id, model));
     if (!optional.isPresent()) throw new ResourceNotFoundException();
-    ResponseEnvelope<T> envelope = null;
+    ResponseEnvelope<T> envelope;
     T entity = optional.get();
     if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))){
       FilterableResource resource = assembler.toResource(entity);

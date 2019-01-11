@@ -7,6 +7,8 @@ import java.util.List;
 import org.springframework.http.MediaType;
 
 /**
+ * HTTP Mime types for REST web services.
+ * 
  * @author woemler
  */
 public class ApiMediaTypes {
