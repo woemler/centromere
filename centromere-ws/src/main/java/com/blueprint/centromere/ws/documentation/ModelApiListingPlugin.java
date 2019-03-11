@@ -6,8 +6,7 @@ import com.blueprint.centromere.ws.config.ModelResourceRegistry;
 import com.fasterxml.classmate.TypeResolver;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
 import springfox.documentation.service.ApiDescription;
 import springfox.documentation.spi.DocumentationType;
@@ -21,9 +20,16 @@ import springfox.documentation.swagger.common.SwaggerPluginSupport;
  */
 public class ModelApiListingPlugin implements ApiListingBuilderPlugin {
 
-  @Autowired private ModelResourceRegistry registry;
-  @Autowired private Environment env;
-  @Autowired private TypeResolver typeResolver;
+  private final ModelResourceRegistry registry;
+  private final TypeResolver typeResolver;
+  
+  @Value("${centromere.web.api.root-url}")
+  private String rootUrl;
+
+  public ModelApiListingPlugin(ModelResourceRegistry registry, TypeResolver typeResolver) {
+    this.registry = registry;
+    this.typeResolver = typeResolver;
+  }
 
   @Override
   public void apply(ApiListingContext apiListingContext) {
@@ -44,7 +50,7 @@ public class ModelApiListingPlugin implements ApiListingBuilderPlugin {
     for (Class<? extends Model<?>> model: registry.getRegisteredModels()){
       if (registry.isRegisteredModel(model)){
         try {
-          String path = env.getRequiredProperty("centromere.web.api.root-url") + "/" + registry.getUriByModel(model);
+          String path = rootUrl + "/" + registry.getUriByModel(model);
           descriptions.addAll(SwaggerPluginUtil.getModelApiDescriptions(model, typeResolver, path));
         } catch (ModelRegistryException e){
           e.printStackTrace();

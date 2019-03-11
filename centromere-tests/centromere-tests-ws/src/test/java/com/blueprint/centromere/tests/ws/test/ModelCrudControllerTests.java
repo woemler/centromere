@@ -544,7 +544,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .andExpect(jsonPath("$", hasSize(0)));
   }
   
-  // Ignored parameters
+  // Ignored options
   
   @Test
   public void ignoredParameterTest() throws Exception {

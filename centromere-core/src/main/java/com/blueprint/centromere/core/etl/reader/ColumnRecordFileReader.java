@@ -18,7 +18,6 @@ package com.blueprint.centromere.core.etl.reader;
 
 import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -32,16 +31,16 @@ import java.util.Map;
  * @author woemler
  */
 public abstract class ColumnRecordFileReader<T extends Model<?>> 
-    extends AbstractRecordFileReader<T>
-    implements ModelSupport<T> {
+    extends DelimitedTextFileRecordReader<T> {
 
-  private final Class<T> model;
-  
   private List<T> records = new ArrayList<>();
-  private String delimiter = "\\t";
+
+  public ColumnRecordFileReader(Class<T> model, String delimiter) {
+    super(model, delimiter);
+  }
 
   public ColumnRecordFileReader(Class<T> model) {
-    this.model = model;
+    super(model);
   }
 
   @Override
@@ -53,18 +52,17 @@ public abstract class ColumnRecordFileReader<T extends Model<?>>
     records = new ArrayList<>();
 
     try {
-      String line = this.getReader().readLine();
-      while (line != null){
-        String[] bits = line.trim().split(delimiter);
-        if (bits.length > 1){
-          String field = bits[0];
-          for (int i = 1; i < bits.length; i++){
-            T record = recordMap.containsKey(i) ? recordMap.get(i) : model.newInstance();
-            setModelAttribute(record, field, bits[i]);
+      List<String> bits = this.getNextLine();
+      while (bits != null){
+        if (bits.size() > 1){
+          String field = bits.get(0);
+          for (int i = 1; i < bits.size(); i++){
+            T record = recordMap.containsKey(i) ? recordMap.get(i) : this.getModel().newInstance();
+            setModelAttribute(record, field, bits.get(i));
             recordMap.put(i, record);
           }
         }
-        line = this.getReader().readLine();
+        bits = this.getNextLine();
       }
     } catch (Exception e){
       throw new DataProcessingException(e);
@@ -91,19 +89,6 @@ public abstract class ColumnRecordFileReader<T extends Model<?>>
 
   protected void setRecords(List<T> records) {
       this.records = records;
-  }
-
-  public String getDelimiter() {
-      return delimiter;
-  }
-
-  public void setDelimiter(String delimiter) {
-      this.delimiter = delimiter;
-  }
-
-  @Override
-  public Class<T> getModel() {
-    return model;
   }
 
 }

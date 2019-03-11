@@ -54,6 +54,7 @@ public class DefaultModelRepositoryRegistry implements ModelRepositoryRegistry {
    */
   @PostConstruct
   public void afterPropertiesSet() throws ConfigurationException{
+    //TODO: try this to get rid of warnings: https://stackoverflow.com/questions/14236424/how-can-i-find-all-beans-with-the-custom-annotation-foo
     for (Map.Entry<String, Object> entry: context.getBeansWithAnnotation(ModelResource.class).entrySet()){
       Class<?> type = entry.getValue().getClass();
       ModelRepository repository = (ModelRepository) entry.getValue();

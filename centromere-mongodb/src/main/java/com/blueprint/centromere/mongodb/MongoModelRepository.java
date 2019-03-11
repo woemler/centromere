@@ -149,7 +149,7 @@ public class MongoModelRepository<T extends Model<ID>, ID extends Serializable>
    *  objects into Spring Data MongoDB {@link Criteria}
    *  objects, used to build a {@link Query}.
    *
-   * @param queryCriterias list of query parameters to be converted.
+   * @param queryCriterias list of query options to be converted.
    * @return {@link Criteria} representation of the dataimport.
    */
   private Criteria getQueryFromQueryCriteria(Iterable<QueryCriteria> queryCriterias){

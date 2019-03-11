@@ -45,7 +45,7 @@ public class RequestUtils {
   private static final List<String> PAGINATION_PARAMETERS = Arrays.asList("page", "size", "sort");
 
   /**
-   * Returns a list of the default query string parameters used by {@link }.
+   * Returns a list of the default query string options used by {@link }.
    *
    * @return
    */
@@ -72,8 +72,8 @@ public class RequestUtils {
   }
 
   /**
-   * Converts query string parameters in a {@link HttpServletRequest} to a list of {@link QueryCriteria},
-   *   based upon the available model query parameters and the default {@code GET} method parameters.
+   * Converts query string options in a {@link HttpServletRequest} to a list of {@link QueryCriteria},
+   *   based upon the available model query options and the default {@code GET} method options.
    *
    * @param model
    * @param request
@@ -84,7 +84,7 @@ public class RequestUtils {
       HttpServletRequest request
   ){
     
-    logger.info(String.format("Generating QueryCriteria for 'find' request parameters: model=%s params=%s",
+    logger.info(String.format("Generating QueryCriteria for 'find' request options: model=%s params=%s",
         model.getName(), request.getQueryString()));
     
     List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(
@@ -98,8 +98,8 @@ public class RequestUtils {
   }
 
   /**
-   * Converts query string parameters in a {@link HttpServletRequest} to a list of {@link QueryCriteria},
-   *   based upon the available model query parameters and the distinct operation endpoint parameters.
+   * Converts query string options in a {@link HttpServletRequest} to a list of {@link QueryCriteria},
+   *   based upon the available model query options and the distinct operation endpoint options.
    *
    * @param model
    * @param request
@@ -109,7 +109,7 @@ public class RequestUtils {
       Class<? extends Model<?>> model,
       HttpServletRequest request
   ){
-    logger.info(String.format("Generating QueryCriteria for 'findDistinct' request parameters: model=%s params=%s",
+    logger.info(String.format("Generating QueryCriteria for 'findDistinct' request options: model=%s params=%s",
         model.getName(), request.getQueryString()));
     List<String> defaultParameters = findDistinctParameters();
     Map<String, QueryParameterDescriptor> paramMap = QueryParameterUtil.getAvailableQueryParameters(model);
@@ -135,7 +135,7 @@ public class RequestUtils {
       HttpServletRequest request
   ){
 
-    logger.info(String.format("Generating QueryCriteria for 'find' request parameters: model=%s params=%s",
+    logger.info(String.format("Generating QueryCriteria for 'find' request options: model=%s params=%s",
         model.getName(), request.getQueryString()));
 
     List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(
@@ -150,7 +150,7 @@ public class RequestUtils {
   }
 
   /**
-   * Checks to see if the request contains invalid query string parameters.
+   * Checks to see if the request contains invalid query string options.
    * 
    * @param defaultParameters
    * @param requestParams
@@ -167,12 +167,12 @@ public class RequestUtils {
   }
 
   /**
-   * Extracts valid repository query parameters from a map of submitted request parameters, and
+   * Extracts valid repository query options from a map of submitted request options, and
    *   generates a list of {@link QueryCriteria} for querying the database.
    *
-   * @param validParams map of valid query parameters for the target {@link Model}
-   * @param defaultParameters default query parameters for the given controller method
-   * @param paramMap map of parameters in the HTTP request
+   * @param validParams map of valid query options for the target {@link Model}
+   * @param defaultParameters default query options for the given controller method
+   * @param paramMap map of options in the HTTP request
    * @return list of query criteria
    */
   public static List<QueryCriteria> getQueryCriteriaFromRequest(
@@ -219,7 +219,7 @@ public class RequestUtils {
       if (criteria != null){
         criteriaList.add(criteria);
       } else {
-        logger.warn(String.format("Unable to map request parameter to available model parameters: "
+        logger.warn(String.format("Unable to map request parameter to available model options: "
             + "%s", paramName));
         throw new InvalidParameterException("Invalid request parameter: " + paramName);
       }

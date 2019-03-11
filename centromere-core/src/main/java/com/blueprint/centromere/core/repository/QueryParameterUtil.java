@@ -53,7 +53,7 @@ public class QueryParameterUtil {
       Class<? extends Model<?>> model, boolean recursive)
   {
 
-    logger.debug(String.format("Determining available query parameters for model: %s", model.getName()));
+    logger.debug(String.format("Determining available query options for model: %s", model.getName()));
     Class<?> current = model;
     Map<String,QueryParameterDescriptor> paramMap = new HashMap<>();
 
@@ -99,7 +99,7 @@ public class QueryParameterUtil {
       }
       current = current.getSuperclass();
     }
-    logger.debug(String.format("Found %d query parameters for model: %s", paramMap.size(), model.getName()));
+    logger.debug(String.format("Found %d query options for model: %s", paramMap.size(), model.getName()));
     return paramMap;
   }
 

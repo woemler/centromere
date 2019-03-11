@@ -45,6 +45,7 @@ public class ApiDocumentationConfig {
     
     @Autowired
     private TypeResolver typeResolver;
+    
     @Autowired
     private ModelResourceRegistry registry;
 
@@ -89,7 +90,7 @@ public class ApiDocumentationConfig {
     @Bean
     @Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER)
     public ModelApiListingPlugin mappedModelApiListingPlugin() {
-      return new ModelApiListingPlugin();
+      return new ModelApiListingPlugin(registry, typeResolver);
     }
 
   }

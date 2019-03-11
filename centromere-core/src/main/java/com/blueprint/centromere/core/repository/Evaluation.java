@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * List of evaluations that all {@link ModelRepository} implementations should be able to support
  *   via {@link QueryCriteria} queries. Some evaluations are naturally restricted to certain data
- *   types. The evaluation suffixes are used to create dynamic query parameters by merging the 
+ *   types. The evaluation suffixes are used to create dynamic query options by merging the 
  *   model field name and the appropriate evaluation suffix.
  * 
  * @author woemler

@@ -3,7 +3,7 @@ package com.blueprint.centromere.ws.exception;
 import org.springframework.http.HttpStatus;
 
 /**
- * Exception thrown by invalid query string parameters for GET request queries.
+ * Exception thrown by invalid query string options for GET request queries.
  *
  * @author woemler
  */

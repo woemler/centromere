@@ -332,7 +332,7 @@ public class SwaggerPluginUtil {
     List<ResponseMessage> messages = new ArrayList<>();
     messages.add(new ResponseMessage(200, "OK", new ModelRef(responseModel.getSimpleName()),
         Collections.emptyMap(), new ArrayList<>()));
-    messages.add(new ResponseMessage(400, "Invalid parameters",
+    messages.add(new ResponseMessage(400, "Invalid options",
         new ModelRef(RestError.class.getSimpleName()), Collections.emptyMap(), new ArrayList<>()));
     messages.add(new ResponseMessage(401, "Unauthorized",
         new ModelRef(RestError.class.getSimpleName()), Collections.emptyMap(), new ArrayList<>()));

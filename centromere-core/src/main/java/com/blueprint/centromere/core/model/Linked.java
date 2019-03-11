@@ -44,7 +44,7 @@ public @interface Linked {
 
   /**
    * Field name in the source {@link Model} type that the annotated field references.  Used to
-   *   construct the query string parameters in the assembled link.
+   *   construct the query string options in the assembled link.
    *
    * @return the linked field in the origin class
    */

@@ -18,10 +18,8 @@ package com.blueprint.centromere.core.etl.reader;
 
 import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -35,18 +33,18 @@ import java.util.Map;
  * @since 0.4.3
  */
 public abstract class MultiRecordFileReader<T extends Model<?>> 
-		extends AbstractRecordFileReader<T>
-    implements ModelSupport<T> {
-	
-  private final Class<T> model;
+		extends DelimitedTextFileRecordReader<T> {
   
 	private List<T> recordList = new ArrayList<>();
 	private List<String> headers = new ArrayList<>();
 	private boolean headerFlag = true;
-	private String delimiter = "\\t";
+
+  public MultiRecordFileReader(Class<T> model, String delimiter) {
+    super(model, delimiter);
+  }
 
   public MultiRecordFileReader(Class<T> model) {
-    this.model = model;
+    super(model);
   }
 
   /**
@@ -69,7 +67,7 @@ public abstract class MultiRecordFileReader<T extends Model<?>>
 			return recordList.remove(0);
 		} else {
 			try {
-				String line = this.getReader().readLine();
+				List<String> line = this.getNextLine();
 				while (line != null){
 					if (!isSkippableLine(line)) {
 						if (isHeaderLine(line)){
@@ -80,7 +78,7 @@ public abstract class MultiRecordFileReader<T extends Model<?>>
 							if (recordList.size() > 0) return recordList.remove(0);
 						}
 					} 
-					line = this.getReader().readLine();
+					line = this.getNextLine();
 				}
 			} catch (Exception e){
 				throw new DataProcessingException(e);
@@ -94,8 +92,8 @@ public abstract class MultiRecordFileReader<T extends Model<?>>
 	 * 
 	 * @param line
 	 */
-	protected void parseHeader(String line) throws DataProcessingException {
-		headers = Arrays.asList(line.trim().split(delimiter));
+	protected void parseHeader(List<String> line) throws DataProcessingException {
+		headers = line;
 	}
 
   /**
@@ -104,7 +102,7 @@ public abstract class MultiRecordFileReader<T extends Model<?>>
    * @param line
    * @return
    */
-	protected boolean isHeaderLine(String line){
+	protected boolean isHeaderLine(List<String> line){
 	  return headerFlag;
   }
 
@@ -115,30 +113,10 @@ public abstract class MultiRecordFileReader<T extends Model<?>>
 	 * @param line
 	 * @return
 	 */
-	abstract protected List<T> getRecordsFromLine(String line) throws DataProcessingException;
+	abstract protected List<T> getRecordsFromLine(List<String> line) throws DataProcessingException;
 
-	/**
-	 * Tests whether a given line should be skipped.
-	 * 
-	 * @param line
-	 * @return
-	 */
-	abstract protected boolean isSkippableLine(String line);
-
-	public void setDelimiter(String delimiter) {
-		this.delimiter = delimiter;
-	}
-
-	protected String getDelimiter() {
-		return delimiter;
-	}
-	
 	protected List<String> getHeaders(){
 		return headers;
 	}
 
-  @Override
-  public Class<T> getModel() {
-    return model;
-  }
 }

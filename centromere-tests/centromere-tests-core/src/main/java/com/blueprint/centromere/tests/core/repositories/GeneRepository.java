@@ -38,8 +38,10 @@ public interface GeneRepository<T extends Gene<ID>, ID extends Serializable>
   Optional<T> findByEntrezGeneId(Integer entrezGeneId);
 	List<T> findByAliases(@Param("alias") String alias);
 
-	default List<T> findByExternalReference(@Param("source") String source,
-      @Param("value") String value){
+	default List<T> findByExternalReference(
+	    @Param("source") String source,
+      @Param("value") String value
+  ){
     QueryCriteria criteria = new QueryCriteria("externalReferences."+source, value);
 	  return (List<T>) this.find(Collections.singleton(criteria));
 	}

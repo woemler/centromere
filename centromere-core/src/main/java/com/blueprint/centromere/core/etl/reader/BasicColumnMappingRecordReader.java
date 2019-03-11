@@ -18,11 +18,11 @@ package com.blueprint.centromere.core.etl.reader;
 
 import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.model.ModelSupport;
+import com.google.common.base.Joiner;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,29 +39,35 @@ import org.springframework.core.convert.support.DefaultConversionService;
  * @since 0.4.3
  */
 public class BasicColumnMappingRecordReader<T extends Model<?>> 
-    extends AbstractRecordFileReader<T> 
-    implements ModelSupport<T> {
+    extends DelimitedTextFileRecordReader<T> {
 
 	private static final Logger logger = LoggerFactory.getLogger(BasicColumnMappingRecordReader.class);
 	
-	private final Class<T> model;
-
-  private ConversionService conversionService = new DefaultConversionService();
+	private ConversionService conversionService = new DefaultConversionService();
 	private Map<String, Class<?>> fieldTypeMap = new HashMap<>(); // map of actual field name and types
 	private Map<String, String> fieldNameMap = new HashMap<>(); // map of aliases and actual field names
 	private Map<Integer, String> columnIndexMap = new HashMap<>(); // map of column indexes to mapped model field names
 	private Map<String, String> columnMappings = new HashMap<>();
 	private boolean headerFlag = true;
-	private String delimiter = "\\t";
 
-  public BasicColumnMappingRecordReader(Class<T> model) {
-    this.model = model;
+  public BasicColumnMappingRecordReader(Class<T> model, String delimiter,
+      ConversionService conversionService) {
+    super(model, delimiter);
+    this.conversionService = conversionService;
   }
 
   public BasicColumnMappingRecordReader(Class<T> model,
       ConversionService conversionService) {
-    this.model = model;
+    super(model);
     this.conversionService = conversionService;
+  }
+
+  public BasicColumnMappingRecordReader(Class<T> model, String delimiter) {
+    super(model, delimiter);
+  }
+
+  public BasicColumnMappingRecordReader(Class<T> model) {
+    super(model);
   }
 
   @Override
@@ -71,16 +77,16 @@ public class BasicColumnMappingRecordReader<T extends Model<?>>
   }
 
   /**
-   * {@link AbstractRecordFileReader#readRecord()}
+   * {@link DelimitedTextFileRecordReader#readRecord()}
    * 
    * @return model record
    */
 	@Override 
 	public T readRecord() throws DataProcessingException {
 		try {
-			String line = this.getReader().readLine();
+			List<String> line = this.getNextLine();
 			while (line != null){
-				if (!line.trim().equals("") && !line.startsWith("#")){
+				if (!isSkippableLine(line)){
 					if (headerFlag){
 						parseHeader(line);
 						headerFlag = false;
@@ -91,9 +97,9 @@ public class BasicColumnMappingRecordReader<T extends Model<?>>
 						}
 					}
 				}
-				line = this.getReader().readLine();
+				line = this.getNextLine();
 			}
-		} catch (IOException e){
+		} catch (Exception e){
 			throw new DataProcessingException(e);
 		}
 		return null;
@@ -108,7 +114,7 @@ public class BasicColumnMappingRecordReader<T extends Model<?>>
 	private void determineMappableModelFields()  {
 		fieldNameMap = new HashMap<>();
 		fieldTypeMap = new HashMap<>();
-		Class<?> current = model;
+		Class<?> current = this.getModel();
 		while (current.getSuperclass() != null){
 			for (Field field: current.getDeclaredFields()){
 				String fieldName = field.getName();
@@ -126,11 +132,10 @@ public class BasicColumnMappingRecordReader<T extends Model<?>>
 	 *
 	 * @param line header line from file
 	 */
-	protected void parseHeader(String line)  {
+	protected void parseHeader(List<String> line)  {
 		determineMappableModelFields();
-		String[] bits = line.split(delimiter);
-		for (int i = 0; i < bits.length; i++){
-			String name = getMatchedHeaderFieldName(bits[i]);
+		for (int i = 0; i < line.size(); i++){
+			String name = getMatchedHeaderFieldName(line.get(i));
 			if (name != null){
 				columnIndexMap.put(i, name);
 			}
@@ -166,22 +171,21 @@ public class BasicColumnMappingRecordReader<T extends Model<?>>
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	protected T getRecordFromLine(String line) throws DataProcessingException {
+	protected T getRecordFromLine(List<String> line) throws DataProcessingException {
 		
-	  BeanWrapperImpl wrapper = new BeanWrapperImpl(model);
-		String[] bits = line.split(delimiter);
+	  BeanWrapperImpl wrapper = new BeanWrapperImpl(this.getModel());
 		
-		for (int i = 0; i < bits.length; i++){
+		for (int i = 0; i < line.size(); i++){
 			
 		  if (!columnIndexMap.containsKey(i)) continue;
 			
 		  String fieldName = columnIndexMap.get(i);
 			Class<?> type = fieldTypeMap.get(fieldName);
 			
-			if (bits[i].trim().equals("")){
+			if (line.get(i).equals("")){
 				wrapper.setPropertyValue(fieldName, null);
 			} else {
-				wrapper.setPropertyValue(fieldName, convertFieldValue(bits[i].trim(), type));
+				wrapper.setPropertyValue(fieldName, convertFieldValue(line.get(i), type));
 			}
 			
 		}
@@ -206,15 +210,15 @@ public class BasicColumnMappingRecordReader<T extends Model<?>>
 		}
 	}
 
-	public String getDelimiter() {
-		return delimiter;
-	}
+  /**
+   * {@link DelimitedTextFileRecordReader#isSkippableLine(List)}
+   */
+  @Override
+  protected boolean isSkippableLine(List<String> line) {
+    return Joiner.on("").join(line).trim().equals("") || !line.get(0).startsWith("#");
+  }
 
-	public void setDelimiter(String delimiter) {
-		this.delimiter = delimiter;
-	}
-
-	public ConversionService getConversionService() {
+  public ConversionService getConversionService() {
 		return conversionService;
 	}
 
@@ -225,11 +229,6 @@ public class BasicColumnMappingRecordReader<T extends Model<?>>
 
   public void setColumnMappings(Map<String, String> columnMappings) {
     this.columnMappings = columnMappings;
-  }
-
-  @Override
-  public Class<T> getModel() {
-    return model;
   }
 
 }

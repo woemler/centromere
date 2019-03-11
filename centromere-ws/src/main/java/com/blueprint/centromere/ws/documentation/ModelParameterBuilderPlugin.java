@@ -20,7 +20,7 @@ import springfox.documentation.spi.service.contexts.OperationContext;
 import springfox.documentation.swagger.common.SwaggerPluginSupport;
 
 /**
- * Springfox plugin for adding {@link Model} query parameters to the auto-generated Swagger
+ * Springfox plugin for adding {@link Model} query options to the auto-generated Swagger
  *   documentation.
  *
  * @author woemler

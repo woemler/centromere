@@ -1,21 +1,22 @@
 package com.blueprint.centromere.tests.core.etl;
 
-import com.blueprint.centromere.core.etl.reader.StandardRecordFileReader;
+import com.blueprint.centromere.core.etl.reader.StandardFileRecordReader;
 import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import com.blueprint.centromere.tests.core.models.Gene;
+import com.google.common.base.Joiner;
+import java.util.List;
 
 /**
  * @author woemler
  */
-public class GeneInfoReader<T extends Gene<?>> extends StandardRecordFileReader<T> {
+public class GeneInfoReader<T extends Gene<?>> extends StandardFileRecordReader<T> {
 
   public GeneInfoReader(Class<T> model) {
     super(model);
   }
 
-  protected T getRecordFromLine(String line) throws DataProcessingException {
+  protected T getRecordFromLine(List<String> line) throws DataProcessingException {
     
-    String[] bits = line.split("\\t");
     T gene;
     
     try {
@@ -24,32 +25,32 @@ public class GeneInfoReader<T extends Gene<?>> extends StandardRecordFileReader<
       throw new DataProcessingException(e);
     }
     
-    gene.setTaxId(Integer.parseInt(bits[0]));
-    gene.setEntrezGeneId(Integer.parseInt(bits[1]));
-    gene.setSymbol(bits[2]);
-    for (String alias: bits[4].split("\\|")){
+    gene.setTaxId(Integer.parseInt(line.get(0)));
+    gene.setEntrezGeneId(Integer.parseInt(line.get(1)));
+    gene.setSymbol(line.get(2));
+    for (String alias: line.get(4).split("\\|")){
       if (!alias.replaceAll("-", "").equals("")) gene.addAlias(alias);
     }
-    for (String ref : bits[5].split("\\|")) {
+    for (String ref : line.get(5).split("\\|")) {
       String[] r = ref.split(":");
       if (!r[0].replaceAll("-", "").equals("")) gene.addExternalReference(r[0], r[r.length - 1]);
     }
-    gene.setChromosome(bits[6]);
-    gene.setChromosomeLocation(bits[7]);
-    gene.setDescription(bits[8]);
-    gene.setGeneType(bits[9]);
+    gene.setChromosome(line.get(6));
+    gene.setChromosomeLocation(line.get(7));
+    gene.setDescription(line.get(8));
+    gene.setGeneType(line.get(9));
     
     return gene;
     
   }
 
   @Override
-  protected boolean isSkippableLine(String line) {
-    return line.trim().equals("") || line.startsWith("#");
+  protected boolean isSkippableLine(List<String> line) {
+    return Joiner.on("").join(line).trim().equals("") || line.get(0).startsWith("#");
   }
 
   @Override
-  protected boolean isHeaderLine(String line) {
+  protected boolean isHeaderLine(List<String> line) {
     return false;
   }
 

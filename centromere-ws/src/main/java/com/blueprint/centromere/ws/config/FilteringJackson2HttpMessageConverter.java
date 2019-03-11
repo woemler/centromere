@@ -35,7 +35,7 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 
 /**
  * Uses {@link ResponseEnvelope} to identify filterable entities and
- *   filters or includes fields based upon request parameters.
+ *   filters or includes fields based upon request options.
  * 
  * @author woemler 
  */

@@ -43,6 +43,7 @@ public class ReaderTests {
       reader.doOnSuccess(file, new HashMap<>());
     } catch (Exception e){
       exception = e;
+      e.printStackTrace();
       reader.doOnFailure(file, new HashMap<>());
     }
     

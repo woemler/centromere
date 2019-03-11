@@ -108,7 +108,7 @@ public class ModelCrudController {
   })
   @ApiResponses({
       @ApiResponse(code = 200, message = "OK"),
-      @ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
+      @ApiResponse(code = 400, message = "Invalid options", response = RestError.class),
       @ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
       @ApiResponse(code = 404, message = "Record not found.", response = RestError.class)
   })
@@ -137,7 +137,7 @@ public class ModelCrudController {
       throw new ResourceNotFoundException();
     }
     if (RequestUtils.requestContainsNonDefaultParameters(RequestUtils.findOneParameters(), request.getParameterMap())){
-      throw new InvalidParameterException("Request contains invalid query string parameters.");
+      throw new InvalidParameterException("Request contains invalid query string options.");
     }
     Set<String> fields = RequestUtils.getFilteredFieldsFromRequest(request);
     Set<String> exclude = RequestUtils.getExcludedFieldsFromRequest(request);
@@ -178,7 +178,7 @@ public class ModelCrudController {
   })
   @ApiResponses({
       @ApiResponse(code = 200, message = "OK"),
-      @ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
+      @ApiResponse(code = 400, message = "Invalid options", response = RestError.class),
       @ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
       @ApiResponse(code = 404, message = "Record not found.", response = RestError.class)
   })
@@ -456,7 +456,7 @@ public class ModelCrudController {
   })
   @ApiResponses({
       @ApiResponse(code = 200, message = "OK"),
-      @ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
+      @ApiResponse(code = 400, message = "Invalid options", response = RestError.class),
       @ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
       @ApiResponse(code = 404, message = "Record not found.", response = RestError.class)
   })
@@ -619,7 +619,7 @@ public class ModelCrudController {
 //
 //  /**
 //   * {@code OPTIONS /}
-//   * Returns an information about the endpoint and available parameters.
+//   * Returns an information about the endpoint and available options.
 //   * TODO
 //   *
 //   * @return TBD

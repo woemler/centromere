@@ -18,9 +18,8 @@ package com.blueprint.centromere.core.etl.reader;
 
 import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import com.blueprint.centromere.core.model.Model;
-import com.blueprint.centromere.core.model.ModelSupport;
-import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,20 +35,20 @@ import org.springframework.core.convert.support.DefaultConversionService;
  * @author woemler
  * @since 0.4.3
  */
-public abstract class StandardRecordFileReader<T extends Model<?>> 
-		extends AbstractRecordFileReader<T>
-    implements ModelSupport<T> {
+public abstract class StandardFileRecordReader<T extends Model<?>> 
+		extends DelimitedTextFileRecordReader<T> {
   
-  private static final Logger logger = LoggerFactory.getLogger(StandardRecordFileReader.class);
-  
-  private final Class<T> model;
+  private static final Logger logger = LoggerFactory.getLogger(StandardFileRecordReader.class);
   
   private LinkedHashMap<String, Integer> headerMap = new LinkedHashMap<>();
-  private String delimiter = "\t";
   private ConversionService conversionService = new DefaultConversionService();
 
-  public StandardRecordFileReader(Class<T> model) {
-    this.model = model;
+  public StandardFileRecordReader(Class<T> model, String delimiter) {
+    super(model, delimiter);
+  }
+
+  public StandardFileRecordReader(Class<T> model) {
+    super(model);
   }
 
   /**
@@ -57,10 +56,10 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 	 */
 	@Override
 	public T readRecord() throws DataProcessingException {
-    String line = null;
+    List<String> line = null;
     Integer count = 0;
 	  try {
-			line = this.getReader().readLine();
+			line = getNextLine();
 			while (line != null) {
 			  count++;
 				if (!isSkippableLine(line)) {
@@ -73,9 +72,9 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
             }
           }
 				}
-				line = this.getReader().readLine();
+				line = getNextLine();
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 	    logger.error(String.format("Failed on line %d: %s", count, line));
 			throw new DataProcessingException(e);
 		}
@@ -87,11 +86,10 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
    * 
    * @param line
    */
-	protected void parseHeader(String line){
+	protected void parseHeader(List<String> line){
     headerMap = new LinkedHashMap<>();
-    String[] bits = line.split(delimiter);
-    for (int i = 0; i < bits.length; i++){
-      headerMap.put(bits[i], i);
+    for (int i = 0; i < line.size(); i++){
+      headerMap.put(line.get(i), i);
     }
   }
 
@@ -105,7 +103,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
    * @return
    * @throws DataProcessingException
    */
-  protected <S> S getColumnValue(String line, String header, Class<S> clazz) throws DataProcessingException {
+  protected <S> S getColumnValue(List<String> line, String header, Class<S> clazz) throws DataProcessingException {
 	  return getColumnValue(line, header, clazz, false);
   }
 
@@ -119,18 +117,17 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
    * @return
    * @throws DataProcessingException
    */
-  protected <S> S getColumnValue(String line, String header, Class<S> clazz, boolean caseSensitive) throws DataProcessingException {
+  protected <S> S getColumnValue(List<String> line, String header, Class<S> clazz, boolean caseSensitive) throws DataProcessingException {
     Integer index = getColumnIndex(header, caseSensitive);
     if (index == -1) throw new DataProcessingException(String.format("Given header does not exist in this file: %s", header));
-    String[] bits = line.split(this.getDelimiter());
-    if (bits.length <= index){
+    if (line.size() <= index){
       throw new DataProcessingException(String.format("Header index is outside bounds of current line.  "
-          + "Index = %d, line length = %d", index, bits.length));
+          + "Index = %d, line length = %d", index, line.size()));
     }
     if (!conversionService.canConvert(String.class, clazz)){
       throw new DataProcessingException(String.format("Cannot convert string value to %s", clazz.getName()));
     }
-    return conversionService.convert(bits[index].trim(), clazz);
+    return conversionService.convert(line.get(index).trim(), clazz);
   }
 
   /**
@@ -140,7 +137,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
    * @return
    * @throws DataProcessingException
    */
-  protected String getColumnValue(String line, String header) throws DataProcessingException {
+  protected String getColumnValue(List<String> line, String header) throws DataProcessingException {
     return getColumnValue(line, header, String.class);
   }
 
@@ -212,7 +209,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 	 * @param line
 	 * @return
 	 */
-	abstract protected T getRecordFromLine(String line) throws DataProcessingException;
+	abstract protected T getRecordFromLine(List<String> line) throws DataProcessingException;
 
 	/**
 	 * Performs a test to see if the line should be skipped.
@@ -220,7 +217,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
 	 * @param line
 	 * @return
 	 */
-	abstract protected boolean isSkippableLine(String line);
+	abstract protected boolean isSkippableLine(List<String> line);
 
   /**
    * Tests whether the supplied line is a header.
@@ -228,15 +225,7 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
    * @param line
    * @return
    */
-	abstract protected boolean isHeaderLine(String line);
-
-  public String getDelimiter() {
-    return delimiter;
-  }
-
-  public void setDelimiter(String delimiter) {
-    this.delimiter = delimiter;
-  }
+	abstract protected boolean isHeaderLine(List<String> line);
 
   public ConversionService getConversionService() {
     return conversionService;
@@ -253,9 +242,5 @@ public abstract class StandardRecordFileReader<T extends Model<?>>
   public void setHeaderMap(LinkedHashMap<String, Integer> headerMap) {
     this.headerMap = headerMap;
   }
-
-  @Override
-  public Class<T> getModel() {
-    return model;
-  }
+  
 }

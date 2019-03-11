@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,7 +105,7 @@ public class QueryParameterDescriptor {
 
   /**
    * Tests whether the submitted parameter name matches that described by the object.  If regex is
-   *   enabled, evaluation is performed by a regex match test.  If dynamic parameters is enabled,
+   *   enabled, evaluation is performed by a regex match test.  If dynamic options is enabled,
    *   the test will try to match the submitted string against all combinations of the defined
    *   parameter name plus valid {@link Evaluation} suffixes.
    *
@@ -144,7 +144,7 @@ public class QueryParameterDescriptor {
   }
 
   /**
-   * Determines which {@link Evaluation} value should be returned.  If dynamic parameters are not
+   * Determines which {@link Evaluation} value should be returned.  If dynamic options are not
    *   enabled or the submitted parameter name matches the default, the default evaluation value
    *   is returned.  Otherwise, the submitted parameter string is matched to the appropriate
    *   evaluation suffix to determine which should be returned.  If no match is made, an
@@ -155,7 +155,7 @@ public class QueryParameterDescriptor {
    * @throws QueryParameterException
    */
   public Evaluation getDynamicEvaluation(String parameterName) throws QueryParameterException {
-    if (regexMatch || !dynaimicParameters) return evaluation; // dynamic parameters is not enabled
+    if (regexMatch || !dynaimicParameters) return evaluation; // dynamic options is not enabled
     if (paramName.equals(parameterName)) return evaluation; // submitted parameter is default
     Evaluation eval = null;
     if (parameterNameMatches(parameterName)){

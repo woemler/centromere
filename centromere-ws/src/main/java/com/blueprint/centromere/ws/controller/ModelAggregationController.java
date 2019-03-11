@@ -80,7 +80,7 @@ public class ModelAggregationController {
   /**
    * {@code GET /api/aggregation/{model}/distinct/{field}}
    * Fetches the distinct values of the model attribute, {@code field}, which fulfill the given
-   *   query parameters.
+   *   query options.
    *
    * @param field Name of the model attribute to retrieve unique values of.
    * @param request {@link HttpServletRequest}
@@ -88,7 +88,7 @@ public class ModelAggregationController {
    */
   @ApiResponses({
       @ApiResponse(code = 200, message = "OK"),
-      @ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
+      @ApiResponse(code = 400, message = "Invalid options", response = RestError.class),
       @ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
       @ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
   })
@@ -153,14 +153,14 @@ public class ModelAggregationController {
   /**
    * {@code GET /api/aggregation/{model}/count}
    * Fetches the count of records for the requested model, which fulfill the given
-   *   query parameters.
+   *   query options.
    *
    * @param request {@link HttpServletRequest}
    * @return The count of records that satisfy the query.
    */
   @ApiResponses({
       @ApiResponse(code = 200, message = "OK"),
-      @ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
+      @ApiResponse(code = 400, message = "Invalid options", response = RestError.class),
       @ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
       @ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
   })
@@ -225,7 +225,7 @@ public class ModelAggregationController {
    */
   @ApiResponses({
       @ApiResponse(code = 200, message = "OK"),
-      @ApiResponse(code = 400, message = "Invalid parameters", response = RestError.class),
+      @ApiResponse(code = 400, message = "Invalid options", response = RestError.class),
       @ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
       @ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
   })
