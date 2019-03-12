@@ -11,6 +11,10 @@ import java.util.List;
  */
 public class GeneInfoReader<T extends Gene<?>> extends StandardFileRecordReader<T> {
 
+  public GeneInfoReader(Class<T> model, String delimiter) {
+    super(model, delimiter);
+  }
+
   public GeneInfoReader(Class<T> model) {
     super(model);
   }

@@ -120,7 +120,9 @@ public abstract class DelimitedTextFileRecordReader<T extends Model<?>>
     List<String> bits = new ArrayList<>();
     
     if (",".equals(delimiter)){
-      for (String bit : ((CSVReader) reader).readNext()){
+      String[] line = ((CSVReader) reader).readNext();
+      if (line == null) return null;
+      for (String bit: line){
         bits.add(bit.trim());
       }
     } else {
