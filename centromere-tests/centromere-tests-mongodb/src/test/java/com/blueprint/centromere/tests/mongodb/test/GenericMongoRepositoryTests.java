@@ -25,7 +25,8 @@ import com.blueprint.centromere.tests.core.models.User;
 import com.blueprint.centromere.tests.core.repositories.GeneExpressionRepository;
 import com.blueprint.centromere.tests.core.repositories.GeneRepository;
 import com.blueprint.centromere.tests.core.repositories.UserRepository;
-import com.blueprint.centromere.tests.mongodb.MongoDataSourceConfig;
+import com.blueprint.centromere.tests.mongodb.EmbeddedMongoDataSourceConfig;
+import com.blueprint.centromere.tests.mongodb.MongoRepositoryConfig;
 import com.blueprint.centromere.tests.mongodb.models.MongoGene;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +49,8 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
-    MongoDataSourceConfig.class
+    EmbeddedMongoDataSourceConfig.class,
+    MongoRepositoryConfig.class
 })
 public class GenericMongoRepositoryTests extends AbstractRepositoryTests {
 

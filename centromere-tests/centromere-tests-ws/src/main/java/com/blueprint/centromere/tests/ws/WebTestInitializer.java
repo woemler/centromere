@@ -16,7 +16,8 @@
 
 package com.blueprint.centromere.tests.ws;
 
-import com.blueprint.centromere.tests.mongodb.MongoDataSourceConfig;
+import com.blueprint.centromere.tests.mongodb.EmbeddedMongoDataSourceConfig;
+import com.blueprint.centromere.tests.mongodb.MongoRepositoryConfig;
 import com.blueprint.centromere.ws.CentromereWebInitializer;
 import com.blueprint.centromere.ws.config.AutoConfigureCentromere;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +28,7 @@ import org.springframework.context.annotation.Import;
  */
 @AutoConfigureCentromere
 @Configuration
-@Import({ MongoDataSourceConfig.class })
+@Import({EmbeddedMongoDataSourceConfig.class, MongoRepositoryConfig.class})
 public class WebTestInitializer extends CentromereWebInitializer {
 
   public static void main(String[] args) {
