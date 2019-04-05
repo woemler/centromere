@@ -128,7 +128,7 @@ public abstract class DelimitedTextFileRecordReader<T extends Model<?>>
     } else {
       String line = ((BufferedReader) reader).readLine();
       if (line == null) return null;
-      for (String bit : line.split("\t")){
+      for (String bit : line.split(delimiter)){
         bits.add(bit.trim());
       }
     }
