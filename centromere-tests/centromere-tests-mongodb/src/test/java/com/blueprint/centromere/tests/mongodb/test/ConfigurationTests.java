@@ -19,7 +19,8 @@ package com.blueprint.centromere.tests.mongodb.test;
 import com.blueprint.centromere.core.repository.ModelRepository;
 import com.blueprint.centromere.core.repository.ModelRepositoryRegistry;
 import com.blueprint.centromere.tests.core.repositories.GeneRepository;
-import com.blueprint.centromere.tests.mongodb.MongoDataSourceConfig;
+import com.blueprint.centromere.tests.mongodb.EmbeddedMongoDataSourceConfig;
+import com.blueprint.centromere.tests.mongodb.MongoRepositoryConfig;
 import com.blueprint.centromere.tests.mongodb.models.MongoGene;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +34,8 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
-    MongoDataSourceConfig.class
+    EmbeddedMongoDataSourceConfig.class,
+    MongoRepositoryConfig.class
 })
 public class ConfigurationTests {
 

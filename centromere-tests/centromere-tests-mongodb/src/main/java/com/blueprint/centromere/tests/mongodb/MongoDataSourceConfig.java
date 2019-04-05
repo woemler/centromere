@@ -16,10 +16,6 @@
 
 package com.blueprint.centromere.tests.mongodb;
 
-import com.blueprint.centromere.core.repository.DefaultModelRepositoryRegistry;
-import com.blueprint.centromere.core.repository.ModelRepositoryRegistry;
-import com.blueprint.centromere.mongodb.MongoModelRepository;
-import com.blueprint.centromere.mongodb.MongoModelRepositoryFactoryBean;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
@@ -27,29 +23,18 @@ import com.mongodb.ServerAddress;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 /**
  * @author woemler
  */
 @PropertySource({ "classpath:data-source.properties" })
 @Configuration
-@EnableMongoRepositories(
-    basePackages = {"com.blueprint.centromere.tests.mongodb.repositories"},
-    repositoryBaseClass = MongoModelRepository.class,
-    repositoryFactoryBeanClass = MongoModelRepositoryFactoryBean.class)
 public class MongoDataSourceConfig extends AbstractMongoConfiguration {
-  
-  @Bean
-  public ModelRepositoryRegistry modelRepositoryRegistry(ApplicationContext context){
-    return new DefaultModelRepositoryRegistry(context);
-  }
 
   @Autowired
   private Environment env;
