@@ -26,7 +26,6 @@ import com.blueprint.centromere.ws.config.ModelResourceRegistry;
 import com.blueprint.centromere.ws.exception.InvalidParameterException;
 import com.blueprint.centromere.ws.exception.ResourceNotFoundException;
 import com.blueprint.centromere.ws.exception.RestError;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.io.Serializable;
@@ -43,7 +42,6 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
@@ -66,236 +64,233 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @SuppressWarnings({"unchecked", "SpringJavaAutowiringInspection"})
 public class ModelAggregationController {
 
-  @Autowired private ModelResourceRegistry resourceRegistry;
-  @Autowired private ModelRepositoryRegistry repositoryRegistry;
-  @Autowired private ModelResourceAssembler assembler;
-  @Autowired /*@Qualifier("defaultConversionService")*/ private ConversionService conversionService;
-  @Autowired private ObjectMapper objectMapper;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModelAggregationController.class);
 
-  @Value("${centromere.web.api.root-url}")
-  private String rootUrl;
-
-  private static final Logger logger = LoggerFactory.getLogger(ModelAggregationController.class);
-
-  /**
-   * {@code GET /api/aggregation/{model}/distinct/{field}}
-   * Fetches the distinct values of the model attribute, {@code field}, which fulfill the given
-   *   query options.
-   *
-   * @param field Name of the model attribute to retrieve unique values of.
-   * @param request {@link HttpServletRequest}
-   * @return List of distinct field values.
-   */
-  @ApiResponses({
-      @ApiResponse(code = 200, message = "OK"),
-      @ApiResponse(code = 400, message = "Invalid options", response = RestError.class),
-      @ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
-      @ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
-  })
-  @RequestMapping(
-      value = "/{uri}/distinct/{field}",
-      method = RequestMethod.GET,
-      produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
-          ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
-          MediaType.TEXT_PLAIN_VALUE })
-  public <T extends Model<ID>, ID extends Serializable> ResponseEntity<ResponseEnvelope<Object>> findDistinct(
-      /*@ApiParam(name = "field", value = "Model field name.")*/ @PathVariable("field") String field,
-      @PathVariable("uri") String uri,
-      HttpServletRequest request)
-  {
-
-    Class<T> model;
-    try {
-      if (!resourceRegistry.isRegisteredResource(uri)) {
-        logger.error(String.format("URI does not map to a registered model: %s", uri));
-        throw new ResourceNotFoundException();
-      }
-      model = (Class<T>) resourceRegistry.getModelByUri(uri);
-    } catch (ModelRegistryException e){
-      e.printStackTrace();
-      throw new ResourceNotFoundException();
-    }
-
-    BeanWrapper wrapper = new BeanWrapperImpl(model);
-    if (!wrapper.isReadableProperty(field)){
-      throw new InvalidParameterException(String.format("Requested field is not a valid model property: %s", field));
-    }
-
-    ModelRepository<T, ID> repository;
-    try {
-      repository = (ModelRepository<T, ID>) repositoryRegistry.getRepositoryByModel(model);
-    } catch (ModelRegistryException e){
-      e.printStackTrace();
-      throw new ResourceNotFoundException();
-    }
-
-    List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromFindDistinctRequest(model, request);
-    Set<Object> distinct = repository.distinct(field, queryCriterias);
-    ResponseEnvelope<Object> envelope = null;
+    @Autowired 
+    private ModelResourceRegistry resourceRegistry;
     
-    if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))){
-      
-      Link selfLink = new Link(rootUrl + "/aggregation/" + uri + "/distinct/" + field +
-          (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
-      Resources<Object> resources = new Resources<>(distinct);
-      resources.add(selfLink);
-      envelope = new ResponseEnvelope<>(resources);
-      
-    } else {
-      
-      envelope = new ResponseEnvelope<>(distinct);
-      
-    }
-    
-    return new ResponseEntity<>(envelope, HttpStatus.OK);
-  }
+    @Autowired 
+    private ModelRepositoryRegistry repositoryRegistry;
 
-  /**
-   * {@code GET /api/aggregation/{model}/count}
-   * Fetches the count of records for the requested model, which fulfill the given
-   *   query options.
-   *
-   * @param request {@link HttpServletRequest}
-   * @return The count of records that satisfy the query.
-   */
-  @ApiResponses({
-      @ApiResponse(code = 200, message = "OK"),
-      @ApiResponse(code = 400, message = "Invalid options", response = RestError.class),
-      @ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
-      @ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
-  })
-  @RequestMapping(
-      value = "/{uri}/count",
-      method = RequestMethod.GET,
-      produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
-          ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
-          MediaType.TEXT_PLAIN_VALUE })
-  public <T extends Model<ID>, ID extends Serializable> ResponseEntity<ResponseEnvelope<Object>> count(
-      @PathVariable("uri") String uri,
-      HttpServletRequest request)
-  {
+    @Value("${centromere.web.api.root-url}")
+    private String rootUrl;
 
-    Class<T> model;
-    
-    try {
-      if (!resourceRegistry.isRegisteredResource(uri)) {
-        logger.error(String.format("URI does not map to a registered model: %s", uri));
-        throw new ResourceNotFoundException();
-      }
-      model = (Class<T>) resourceRegistry.getModelByUri(uri);
-    } catch (ModelRegistryException e){
-      e.printStackTrace();
-      throw new ResourceNotFoundException();
-    }
+    /**
+     * {@code GET /api/aggregation/{model}/distinct/{field}}
+     * Fetches the distinct values of the model attribute, {@code field}, which fulfill the given
+     *   query options.
+     *
+     * @param field Name of the model attribute to retrieve unique values of.
+     * @param request {@link HttpServletRequest}
+     * @return List of distinct field values.
+     */
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid options", response = RestError.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
+        @ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
+    })
+    @RequestMapping(
+        value = "/{uri}/distinct/{field}",
+        method = RequestMethod.GET,
+        produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
+            ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
+            MediaType.TEXT_PLAIN_VALUE })
+    public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope<Object>> findDistinct(
+        /*@ApiParam(name = "field", value = "Model field name.")*/ @PathVariable("field") String field,
+        @PathVariable("uri") String uri,
+        HttpServletRequest request) {
 
-    ModelRepository<T, ID> repository;
-    try {
-      repository = (ModelRepository<T, ID>) repositoryRegistry.getRepositoryByModel(model);
-    } catch (ModelRegistryException e){
-      e.printStackTrace();
-      throw new ResourceNotFoundException();
-    }
+        Class<T> model;
+        try {
+            if (!resourceRegistry.isRegisteredResource(uri)) {
+                LOGGER.error(String.format("URI does not map to a registered model: %s", uri));
+                throw new ResourceNotFoundException();
+            }
+            model = (Class<T>) resourceRegistry.getModelByUri(uri);
+        } catch (ModelRegistryException e) {
+            e.printStackTrace();
+            throw new ResourceNotFoundException();
+        }
 
-    List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromFindDistinctRequest(model, request);
-    Long count = repository.count(queryCriterias);
-    Map<String, Object> responseObject = Collections.singletonMap("count", count);
-    ResponseEnvelope<Object> envelope;
+        BeanWrapper wrapper = new BeanWrapperImpl(model);
+        if (!wrapper.isReadableProperty(field)) {
+            throw new InvalidParameterException(String.format("Requested field is not a valid model property: %s", field));
+        }
 
-    if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))){
-      Link selfLink = new Link(rootUrl + "/aggregation/" + uri + "/count" +
-          (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
-      Resource<Object> resource = new Resource<>(responseObject);
-      resource.add(selfLink);
-      envelope = new ResponseEnvelope<>(resource);
-    } else {
-      envelope = new ResponseEnvelope<>(responseObject);
-    }
+        ModelRepository<T, I> repository;
+        try {
+            repository = (ModelRepository<T, I>) repositoryRegistry.getRepositoryByModel(model);
+        } catch (ModelRegistryException e) {
+            e.printStackTrace();
+            throw new ResourceNotFoundException();
+        }
 
-    return new ResponseEntity<>(envelope, HttpStatus.OK);
-    
-  }
+        List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromFindDistinctRequest(model, request);
+        Set<Object> distinct = repository.distinct(field, queryCriterias);
+        ResponseEnvelope<Object> envelope = null;
 
-  /**
-   * {@code GET /api/aggregation/{model}/group/{field}}
-   * Fetches a collection of records, grouped by the requested field.
-   *
-   * @param field Name of the model attribute to group records by.
-   * @param request {@link HttpServletRequest}
-   * @return List of grouped records.
-   */
-  @ApiResponses({
-      @ApiResponse(code = 200, message = "OK"),
-      @ApiResponse(code = 400, message = "Invalid options", response = RestError.class),
-      @ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
-      @ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
-  })
-  @RequestMapping(
-      value = "/{uri}/group/{field}",
-      method = RequestMethod.GET,
-      produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
-          ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
-          MediaType.TEXT_PLAIN_VALUE })
-  public <T extends Model<ID>, ID extends Serializable> ResponseEntity<ResponseEnvelope<Object>> groupBy(
-      @PathVariable("field") String field,
-      @PathVariable("uri") String uri,
-      HttpServletRequest request)
-  {
+        if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))) {
 
-    Class<T> model;
-    try {
-      if (!resourceRegistry.isRegisteredResource(uri)) {
-        logger.error(String.format("URI does not map to a registered model: %s", uri));
-        throw new ResourceNotFoundException();
-      }
-      model = (Class<T>) resourceRegistry.getModelByUri(uri);
-    } catch (ModelRegistryException e){
-      e.printStackTrace();
-      throw new ResourceNotFoundException();
+            Link selfLink = new Link(rootUrl + "/aggregation/" + uri + "/distinct/" + field +
+                (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
+            Resources<Object> resources = new Resources<>(distinct);
+            resources.add(selfLink);
+            envelope = new ResponseEnvelope<>(resources);
+
+        } else {
+
+            envelope = new ResponseEnvelope<>(distinct);
+
+        }
+
+        return new ResponseEntity<>(envelope, HttpStatus.OK);
     }
 
-    BeanWrapper wrapper = new BeanWrapperImpl(model);
-    if (!wrapper.isReadableProperty(field)){
-      throw new InvalidParameterException(String.format("Requested field is not a valid model property: %s", field));
-    }
+    /**
+     * {@code GET /api/aggregation/{model}/count}
+     * Fetches the count of records for the requested model, which fulfill the given
+     *   query options.
+     *
+     * @param request {@link HttpServletRequest}
+     * @return The count of records that satisfy the query.
+     */
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid options", response = RestError.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
+        @ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
+    })
+    @RequestMapping(
+        value = "/{uri}/count",
+        method = RequestMethod.GET,
+        produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
+            ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
+            MediaType.TEXT_PLAIN_VALUE })
+    public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope<Object>> count(
+        @PathVariable("uri") String uri,
+        HttpServletRequest request) {
 
-    ModelRepository<T, ID> repository;
-    try {
-      repository = (ModelRepository<T, ID>) repositoryRegistry.getRepositoryByModel(model);
-    } catch (ModelRegistryException e){
-      e.printStackTrace();
-      throw new ResourceNotFoundException();
-    }
+        Class<T> model;
 
-    List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromFindDistinctRequest(model, request);
-    Map<Object, List<T>> grouped = new LinkedHashMap<>();
-    for (T record: repository.find(queryCriterias)){
-      wrapper = new BeanWrapperImpl(record);
-      Object fieldValue = wrapper.getPropertyValue(field);
-      List<T> recordList = new ArrayList<>();
-      if (grouped.containsKey(fieldValue)){
-        recordList = grouped.get(fieldValue);
-      }
-      recordList.add(record);
-      grouped.put(fieldValue, recordList);
-    }
-    
-    ResponseEnvelope<Object> envelope;
+        try {
+            if (!resourceRegistry.isRegisteredResource(uri)) {
+                LOGGER.error(String.format("URI does not map to a registered model: %s", uri));
+                throw new ResourceNotFoundException();
+            }
+            model = (Class<T>) resourceRegistry.getModelByUri(uri);
+        } catch (ModelRegistryException e) {
+            e.printStackTrace();
+            throw new ResourceNotFoundException();
+        }
 
-    if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))){
+        ModelRepository<T, I> repository;
+        try {
+            repository = (ModelRepository<T, I>) repositoryRegistry.getRepositoryByModel(model);
+        } catch (ModelRegistryException e) {
+            e.printStackTrace();
+            throw new ResourceNotFoundException();
+        }
 
-      Link selfLink = new Link(rootUrl + "/aggregation/" + uri + "/group/" + field +
-          (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
-      Resource<Object> resource = new Resource<>(grouped);
-      resource.add(selfLink);
-      envelope = new ResponseEnvelope<>(resource);
+        List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromFindDistinctRequest(model, request);
+        Long count = repository.count(queryCriterias);
+        Map<String, Object> responseObject = Collections.singletonMap("count", count);
+        ResponseEnvelope<Object> envelope;
 
-    } else {
+        if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))) {
+            Link selfLink = new Link(rootUrl + "/aggregation/" + uri + "/count" +
+                (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
+            Resource<Object> resource = new Resource<>(responseObject);
+            resource.add(selfLink);
+            envelope = new ResponseEnvelope<>(resource);
+        } else {
+            envelope = new ResponseEnvelope<>(responseObject);
+        }
 
-      envelope = new ResponseEnvelope<>(grouped);
+        return new ResponseEntity<>(envelope, HttpStatus.OK);
 
     }
 
-    return new ResponseEntity<>(envelope, HttpStatus.OK);
-  }
-  
+    /**
+     * {@code GET /api/aggregation/{model}/group/{field}}
+     * Fetches a collection of records, grouped by the requested field.
+     *
+     * @param field Name of the model attribute to group records by.
+     * @param request {@link HttpServletRequest}
+     * @return List of grouped records.
+     */
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 400, message = "Invalid options", response = RestError.class),
+        @ApiResponse(code = 401, message = "Unauthorized", response = RestError.class),
+        @ApiResponse(code = 404, message = "Resource not found.", response = RestError.class)
+    })
+    @RequestMapping(
+        value = "/{uri}/group/{field}",
+        method = RequestMethod.GET,
+        produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
+            ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
+            MediaType.TEXT_PLAIN_VALUE })
+    public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope<Object>> groupBy(
+        @PathVariable("field") String field,
+        @PathVariable("uri") String uri,
+        HttpServletRequest request) {
+
+        Class<T> model;
+        try {
+            if (!resourceRegistry.isRegisteredResource(uri)) {
+                LOGGER.error(String.format("URI does not map to a registered model: %s", uri));
+                throw new ResourceNotFoundException();
+            }
+            model = (Class<T>) resourceRegistry.getModelByUri(uri);
+        } catch (ModelRegistryException e) {
+            e.printStackTrace();
+            throw new ResourceNotFoundException();
+        }
+
+        BeanWrapper wrapper = new BeanWrapperImpl(model);
+        if (!wrapper.isReadableProperty(field)) {
+            throw new InvalidParameterException(String.format("Requested field is not a valid model property: %s", field));
+        }
+
+        ModelRepository<T, I> repository;
+        try {
+            repository = (ModelRepository<T, I>) repositoryRegistry.getRepositoryByModel(model);
+        } catch (ModelRegistryException e) {
+            e.printStackTrace();
+            throw new ResourceNotFoundException();
+        }
+
+        List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromFindDistinctRequest(model, request);
+        Map<Object, List<T>> grouped = new LinkedHashMap<>();
+        for (T record: repository.find(queryCriterias)) {
+            wrapper = new BeanWrapperImpl(record);
+            Object fieldValue = wrapper.getPropertyValue(field);
+            List<T> recordList = new ArrayList<>();
+            if (grouped.containsKey(fieldValue)) {
+                recordList = grouped.get(fieldValue);
+            }
+            recordList.add(record);
+            grouped.put(fieldValue, recordList);
+        }
+
+        ResponseEnvelope<Object> envelope;
+
+        if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))) {
+
+            Link selfLink = new Link(rootUrl + "/aggregation/" + uri + "/group/" + field +
+                (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
+            Resource<Object> resource = new Resource<>(grouped);
+            resource.add(selfLink);
+            envelope = new ResponseEnvelope<>(resource);
+
+        } else {
+
+            envelope = new ResponseEnvelope<>(grouped);
+
+        }
+
+        return new ResponseEntity<>(envelope, HttpStatus.OK);
+    }
+
 }

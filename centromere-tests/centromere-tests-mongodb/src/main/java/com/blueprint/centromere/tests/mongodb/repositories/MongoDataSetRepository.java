@@ -25,5 +25,5 @@ import com.blueprint.centromere.tests.mongodb.models.MongoDataSet;
  */
 @ModelResource("dataset")
 public interface MongoDataSetRepository extends DataSetRepository<MongoDataSet, String> {
-	
+
 }

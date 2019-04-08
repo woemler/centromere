@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,23 +25,23 @@ import com.blueprint.centromere.core.repository.ModelRepositoryRegistry;
  */
 public class ModelRegistryException extends ConfigurationException {
 
-  public ModelRegistryException() {
-  }
+    public ModelRegistryException() {
+    }
 
-  public ModelRegistryException(String message) {
-    super(message);
-  }
+    public ModelRegistryException(String message) {
+        super(message);
+    }
 
-  public ModelRegistryException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public ModelRegistryException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-  public ModelRegistryException(Throwable cause) {
-    super(cause);
-  }
+    public ModelRegistryException(Throwable cause) {
+        super(cause);
+    }
 
-  public ModelRegistryException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
-  }
+    public ModelRegistryException(String message, Throwable cause, boolean enableSuppression,
+        boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

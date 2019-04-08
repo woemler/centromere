@@ -18,27 +18,27 @@ package com.blueprint.centromere.core.exceptions;
 
 /**
  * Generic exception to be thrown when configuration components fail to initialize properly.
- * 
+ *
  * @author woemler
  */
 public class ConfigurationException extends CentromereException {
-	public ConfigurationException() {
-	}
+    public ConfigurationException() {
+    }
 
-	public ConfigurationException(String message) {
-		super(message);
-	}
+    public ConfigurationException(String message) {
+        super(message);
+    }
 
-	public ConfigurationException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public ConfigurationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public ConfigurationException(Throwable cause) {
-		super(cause);
-	}
+    public ConfigurationException(Throwable cause) {
+        super(cause);
+    }
 
-	public ConfigurationException(String message, Throwable cause, boolean enableSuppression,
-			boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
+    public ConfigurationException(String message, Throwable cause, boolean enableSuppression,
+        boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

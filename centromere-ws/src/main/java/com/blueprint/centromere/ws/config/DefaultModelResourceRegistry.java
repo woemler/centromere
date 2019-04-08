@@ -36,76 +36,84 @@ import org.springframework.context.ApplicationContext;
  * Default implementation for the {@link ModelResourceRegistry}, which uses {@link com.blueprint.centromere.core.repository.ModelResource} annotated {@link com.blueprint.centromere.core.repository.ModelRepository} instances 
  *   to define relationships between URIs and resources.  In this implementation, there is assumed 
  *   to be a 1:1 relationship between URIs, model definitions, and repositories.
- * 
+ *
  * @author woemler
  */
 public class DefaultModelResourceRegistry implements ModelResourceRegistry {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultModelRepositoryRegistry.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultModelRepositoryRegistry.class);
 
-  private final ApplicationContext context;
+    private final ApplicationContext context;
 
-  private Map<String, Class<? extends Model<?>>> uriMap = new HashMap<>();
+    private Map<String, Class<? extends Model<?>>> uriMap = new HashMap<>();
 
-  public DefaultModelResourceRegistry(ApplicationContext context) {
-    this.context = context;
-  }
-
-  @PostConstruct
-  public void afterPropertiesSet() throws ConfigurationException {
-    for (Map.Entry<String, Object> entry: context.getBeansWithAnnotation(ModelResource.class).entrySet()){
-      Class<?> type = entry.getValue().getClass();
-      ModelRepository repository = (ModelRepository) entry.getValue();
-      Class<? extends Model<?>> model = repository.getModel();
-      String name = model.getSimpleName().toLowerCase();
-      ModelResource annotation = context.findAnnotationOnBean(entry.getKey(), ModelResource.class);
-      if (!annotation.name().trim().equals("")){
-        name = annotation.name().toLowerCase();
-      } else if (!annotation.value().trim().equals("")){
-        name = annotation.value().toLowerCase();
-      }
-      if (uriMap.containsKey(name)) throw new ModelRegistryException(String.format("Duplicate URI "
-          + "registered for %s.  Does another model class have the same URI?", name));
-      uriMap.put(name, model);
-      logger.info(String.format("Registered resource %s for model %s",
-          type.getName(), model.getName()));
+    public DefaultModelResourceRegistry(ApplicationContext context) {
+        this.context = context;
     }
-  }
 
-  @Override
-  public String getUriByModel(Class<? extends Model<?>> model) throws ModelRegistryException {
-    List<String> uris = new ArrayList<>();
-    for (Map.Entry<String, Class<? extends Model<?>>> entry: uriMap.entrySet()){
-      if (model.isAssignableFrom(entry.getValue())) uris.add(entry.getKey());
+    @PostConstruct
+    public void afterPropertiesSet() throws ConfigurationException {
+        for (Map.Entry<String, Object> entry: context.getBeansWithAnnotation(ModelResource.class).entrySet()) {
+            Class<?> type = entry.getValue().getClass();
+            ModelRepository repository = (ModelRepository) entry.getValue();
+            Class<? extends Model<?>> model = repository.getModel();
+            String name = model.getSimpleName().toLowerCase();
+            ModelResource annotation = context.findAnnotationOnBean(entry.getKey(), ModelResource.class);
+            if (!annotation.name().trim().equals("")) {
+                name = annotation.name().toLowerCase();
+            } else if (!annotation.value().trim().equals("")) {
+                name = annotation.value().toLowerCase();
+            }
+            if (uriMap.containsKey(name)) {
+                throw new ModelRegistryException(String.format("Duplicate URI "
+                    + "registered for %s.  Does another model class have the same URI?", name));
+            }
+            uriMap.put(name, model);
+            LOGGER.info(String.format("Registered resource %s for model %s",
+                type.getName(), model.getName()));
+        }
     }
-    if (uris.isEmpty()) return null;
-    else if (uris.size() == 1) return uris.get(0);
-    else throw new ModelRegistryException(String.format("More than one URI applies to model %s.  "
-          + "Is this a superclass with multiple model subclasses?", model.getName()));
-  }
 
-  @Override
-  public boolean isRegisteredResource(String name){
-    return uriMap.containsKey(name.toLowerCase());
-  }
+    @Override
+    public String getUriByModel(Class<? extends Model<?>> model) throws ModelRegistryException {
+        List<String> uris = new ArrayList<>();
+        for (Map.Entry<String, Class<? extends Model<?>>> entry: uriMap.entrySet()) {
+            if (model.isAssignableFrom(entry.getValue())) {
+                uris.add(entry.getKey());
+            }
+        }
+        if (uris.isEmpty()) {
+            return null;
+        } else if (uris.size() == 1) {
+            return uris.get(0);
+        } else {
+            throw new ModelRegistryException(String.format("More than one URI applies to model %s.  "
+                + "Is this a superclass with multiple model subclasses?", model.getName()));
+        }
+    }
 
-  @Override
-  public Class<? extends Model<?>> getModelByUri(String name){
-    return uriMap.getOrDefault(name.toLowerCase(), null);
-  }
+    @Override
+    public boolean isRegisteredResource(String name) {
+        return uriMap.containsKey(name.toLowerCase());
+    }
 
-  @Override
-  public Collection<String> getRegisteredModelUris() {
-    return uriMap.keySet();
-  }
+    @Override
+    public Class<? extends Model<?>> getModelByUri(String name) {
+        return uriMap.getOrDefault(name.toLowerCase(), null);
+    }
 
-  @Override
-  public boolean isRegisteredModel(Class<?> type){
-    return uriMap.containsValue(type);
-  }
+    @Override
+    public Collection<String> getRegisteredModelUris() {
+        return uriMap.keySet();
+    }
 
-  @Override
-  public Collection<Class<? extends Model<?>>> getRegisteredModels() {
-    return uriMap.values();
-  }
+    @Override
+    public boolean isRegisteredModel(Class<?> type) {
+        return uriMap.containsValue(type);
+    }
+
+    @Override
+    public Collection<Class<? extends Model<?>>> getRegisteredModels() {
+        return uriMap.values();
+    }
 }

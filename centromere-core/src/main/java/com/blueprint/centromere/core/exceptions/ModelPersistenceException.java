@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,29 +18,29 @@ package com.blueprint.centromere.core.exceptions;
 
 /**
  * Generic exception to throw when a model fails to persist due to constraint errors.
- * 
+ *
  * @author woemler
  * @since 0.5.0
  */
 public class ModelPersistenceException extends RuntimeException {
 
-  public ModelPersistenceException() {
-  }
+    public ModelPersistenceException() {
+    }
 
-  public ModelPersistenceException(String message) {
-    super(message);
-  }
+    public ModelPersistenceException(String message) {
+        super(message);
+    }
 
-  public ModelPersistenceException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public ModelPersistenceException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-  public ModelPersistenceException(Throwable cause) {
-    super(cause);
-  }
+    public ModelPersistenceException(Throwable cause) {
+        super(cause);
+    }
 
-  public ModelPersistenceException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
-  }
+    public ModelPersistenceException(String message, Throwable cause, boolean enableSuppression,
+        boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

@@ -23,76 +23,79 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * Standardized configurations for REST API documentation tools.
- * 
+ *
  * @author woemler
  */
-public class ApiDocumentationConfig {
-  
-  public static final String SWAGGER_PROFILE = "api_doc_swagger";
-  public static final String NO_DOCUMENTATION_PROFILE = "api_doc_none";
+public final class ApiDocumentationConfig {
 
-  /**
-   * Configuration for Swagger v2 API documentation, using SpringFox. 
-   */
-  @Configuration
-  @Profile({ SWAGGER_PROFILE })
-  @EnableSwagger2
-  @Import({ BeanValidatorPluginsConfiguration.class })
-  public static class SwaggerConfig {
+    public static final String SWAGGER_PROFILE = "api_doc_swagger";
+    public static final String NO_DOCUMENTATION_PROFILE = "api_doc_none";
 
-    @Autowired 
-    private Environment env;
-    
-    @Autowired
-    private TypeResolver typeResolver;
-    
-    @Autowired
-    private ModelResourceRegistry registry;
-
-    @Bean
-    public Docket api() {
-      return new Docket(DocumentationType.SWAGGER_2)
-          .select()
-          .apis(RequestHandlerSelectors.any())
-          .paths(apiPaths())
-          .build()
-          .apiInfo(apiInfo())
-          .enableUrlTemplating(true);
+    private ApiDocumentationConfig() {
     }
 
-    private ApiInfo apiInfo() {
-      //WebProperties.Api api = webProperties.getApi();
-      return new ApiInfo(
-          env.getRequiredProperty("centromere.web.api.name"),
-          env.getRequiredProperty("centromere.web.api.description"),
-          env.getRequiredProperty("centromere.web.api.version"),
-          env.getRequiredProperty("centromere.web.api.tos"),
-          new Contact(
-              env.getRequiredProperty("centromere.web.api.contact-name"),
-              env.getRequiredProperty("centromere.web.api.contact-url"),
-              env.getRequiredProperty("centromere.web.api.contact-email")
-          ),
-          env.getRequiredProperty("centromere.web.api.license"),
-          env.getRequiredProperty("centromere.web.api.license-url")
-      );
-    }
+    /**
+     * Configuration for Swagger v2 API documentation, using SpringFox. 
+     */
+    @Configuration
+    @Profile({ SWAGGER_PROFILE })
+    @EnableSwagger2
+    @Import({ BeanValidatorPluginsConfiguration.class })
+    public static class SwaggerConfig {
 
-    private Predicate<String> apiPaths() {
-      return PathSelectors.regex(env.getRequiredProperty("centromere.web.api.regex-url"));
-    }
+        @Autowired
+        private Environment env;
 
-    @Bean
-    @Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER)
-    public ModelParameterBuilderPlugin modelParameterBuilderPlugin() {
-      return new ModelParameterBuilderPlugin();
-    }
+        @Autowired
+        private TypeResolver typeResolver;
 
-    @Bean
-    @Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER)
-    public ModelApiListingPlugin mappedModelApiListingPlugin() {
-      return new ModelApiListingPlugin(registry, typeResolver);
-    }
+        @Autowired
+        private ModelResourceRegistry registry;
 
-  }
+        @Bean
+        public Docket api() {
+            return new Docket(DocumentationType.SWAGGER_2)
+                .select()
+                .apis(RequestHandlerSelectors.any())
+                .paths(apiPaths())
+                .build()
+                .apiInfo(apiInfo())
+                .enableUrlTemplating(true);
+        }
+
+        private ApiInfo apiInfo() {
+            //WebProperties.Api api = webProperties.getApi();
+            return new ApiInfo(
+                env.getRequiredProperty("centromere.web.api.name"),
+                env.getRequiredProperty("centromere.web.api.description"),
+                env.getRequiredProperty("centromere.web.api.version"),
+                env.getRequiredProperty("centromere.web.api.tos"),
+                new Contact(
+                    env.getRequiredProperty("centromere.web.api.contact-name"),
+                    env.getRequiredProperty("centromere.web.api.contact-url"),
+                    env.getRequiredProperty("centromere.web.api.contact-email")
+                ),
+                env.getRequiredProperty("centromere.web.api.license"),
+                env.getRequiredProperty("centromere.web.api.license-url")
+            );
+        }
+
+        private Predicate<String> apiPaths() {
+            return PathSelectors.regex(env.getRequiredProperty("centromere.web.api.regex-url"));
+        }
+
+        @Bean
+        @Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER)
+        public ModelParameterBuilderPlugin modelParameterBuilderPlugin() {
+            return new ModelParameterBuilderPlugin();
+        }
+
+        @Bean
+        @Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER)
+        public ModelApiListingPlugin mappedModelApiListingPlugin() {
+            return new ModelApiListingPlugin(registry, typeResolver);
+        }
+
+    }
 
 }

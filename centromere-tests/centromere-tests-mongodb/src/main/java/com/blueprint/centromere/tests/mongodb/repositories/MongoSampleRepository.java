@@ -25,5 +25,5 @@ import com.blueprint.centromere.tests.mongodb.models.MongoSample;
  */
 @ModelResource("sample")
 public interface MongoSampleRepository extends SampleRepository<MongoSample, String> {
-	
+
 }

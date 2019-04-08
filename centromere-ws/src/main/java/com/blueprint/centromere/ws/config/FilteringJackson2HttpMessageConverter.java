@@ -36,76 +36,71 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 /**
  * Uses {@link ResponseEnvelope} to identify filterable entities and
  *   filters or includes fields based upon request options.
- * 
- * @author woemler 
+ *
+ * @author woemler
  */
 
 public class FilteringJackson2HttpMessageConverter extends
     TypeConstrainedMappingJackson2HttpMessageConverter {
 
-  public FilteringJackson2HttpMessageConverter() {
-    super(ResponseEnvelope.class);
-  }
+    public FilteringJackson2HttpMessageConverter() {
+        super(ResponseEnvelope.class);
+    }
 
-  @Override
-	public void setPrefixJson(boolean prefixJson) {
-		super.setPrefixJson(prefixJson);
-	}
+    @Override
+    protected void writeInternal(Object object, Type type, HttpOutputMessage outputMessage)
+        throws IOException, HttpMessageNotWritableException {
 
-	@Override
-	protected void writeInternal(Object object, Type type, HttpOutputMessage outputMessage)
-			throws IOException, HttpMessageNotWritableException {
+        ObjectMapper objectMapper = getObjectMapper();
+        JsonEncoding encoding = this.getJsonEncoding(outputMessage.getHeaders().getContentType());
+        JsonGenerator jsonGenerator = objectMapper.getFactory().createGenerator(outputMessage.getBody(), encoding);
 
-		ObjectMapper objectMapper = getObjectMapper();
-    JsonEncoding encoding = this.getJsonEncoding(outputMessage.getHeaders().getContentType());
-		JsonGenerator jsonGenerator = objectMapper.getFactory().createGenerator(outputMessage.getBody(), encoding);
+        try {
 
-		try {
-      
-      ObjectWriter writer;
-      Object content = object;
-      FilterProvider filters;
+            ObjectWriter writer;
+            Object content = object;
+            FilterProvider filters;
 
-			if (object instanceof ResponseEnvelope) {
+            if (object instanceof ResponseEnvelope) {
 
-				ResponseEnvelope envelope = (ResponseEnvelope) object;
-				content = envelope.getEntity();
-				Set<String> fieldSet = envelope.getFieldSet();
-				Set<String> exclude = envelope.getExclude();
-				
-				if (fieldSet != null && !fieldSet.isEmpty()) {
-					if (content instanceof ResourceSupport){
-						fieldSet.add("content"); // Don't filter out the wrapped content.
-					}
-					filters = new SimpleFilterProvider()
-							.addFilter("fieldFilter", SimpleBeanPropertyFilter.filterOutAllExcept(fieldSet))
-								.setFailOnUnknownId(false);
-				} else if (exclude != null && !exclude.isEmpty()) {
-					filters = new SimpleFilterProvider()
-							.addFilter("fieldFilter", SimpleBeanPropertyFilter.serializeAllExcept(exclude))
-								.setFailOnUnknownId(false);
-				} else {
-					filters = new SimpleFilterProvider()
-							.addFilter("fieldFilter", SimpleBeanPropertyFilter.serializeAllExcept())
-								.setFailOnUnknownId(false);
-				}
+                ResponseEnvelope envelope = (ResponseEnvelope) object;
+                content = envelope.getEntity();
+                Set<String> fieldSet = envelope.getFieldSet();
+                Set<String> exclude = envelope.getExclude();
 
-			} else {
-        filters = new SimpleFilterProvider()
-            .addFilter("fieldFilter", SimpleBeanPropertyFilter.serializeAllExcept())
-            .setFailOnUnknownId(false);
-      }
+                if (fieldSet != null && !fieldSet.isEmpty()) {
+                    if (content instanceof ResourceSupport) {
+                        fieldSet.add("content"); // Don't filter out the wrapped content.
+                    }
+                    filters = new SimpleFilterProvider()
+                        .addFilter("fieldFilter", SimpleBeanPropertyFilter.filterOutAllExcept(fieldSet))
+                        .setFailOnUnknownId(false);
+                } else if (exclude != null && !exclude.isEmpty()) {
+                    filters = new SimpleFilterProvider()
+                        .addFilter("fieldFilter", SimpleBeanPropertyFilter.serializeAllExcept(exclude))
+                        .setFailOnUnknownId(false);
+                } else {
+                    filters = new SimpleFilterProvider()
+                        .addFilter("fieldFilter", SimpleBeanPropertyFilter.serializeAllExcept())
+                        .setFailOnUnknownId(false);
+                }
 
-      writer = objectMapper.writer(filters);
-      writePrefix(jsonGenerator, content);
-			writer.writeValue(jsonGenerator, content);
-			writeSuffix(jsonGenerator, content);
-			jsonGenerator.flush();
+            } else {
+                filters = new SimpleFilterProvider()
+                    .addFilter("fieldFilter", SimpleBeanPropertyFilter.serializeAllExcept())
+                    .setFailOnUnknownId(false);
+            }
 
-		} catch (JsonProcessingException e){
-			e.printStackTrace();
-			throw new HttpMessageNotWritableException("Could not write JSON: " + e.getMessage());
-		}
+            writer = objectMapper.writer(filters);
+            writePrefix(jsonGenerator, content);
+            writer.writeValue(jsonGenerator, content);
+            writeSuffix(jsonGenerator, content);
+            jsonGenerator.flush();
 
-	}
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new HttpMessageNotWritableException("Could not write JSON: " + e.getMessage());
+        }
+
+    }
 }

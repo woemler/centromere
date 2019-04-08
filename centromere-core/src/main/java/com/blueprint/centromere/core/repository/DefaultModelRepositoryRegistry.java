@@ -30,73 +30,85 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
- * Creates a registry of {@link ModelRepository} instances that have the {@link ModelResource} annotation,
- *   and creates a map of {@link Model} classes to repositories, and model URIs to repositories.
- *   This allows lookup of repository classes by model or by HTTP request URL.
- * 
+ * Creates a registry of {@link ModelRepository} instances that have the {@link ModelResource}
+ *   annotation, and creates a map of {@link Model} classes to repositories, and model URIs to 
+ *   repositories. This allows lookup of repository classes by model or by HTTP request URL.
+ *
  * @author woemler
  */
 public class DefaultModelRepositoryRegistry implements ModelRepositoryRegistry {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultModelRepositoryRegistry.class);
+    private static final Logger LOGGER
+        = LoggerFactory.getLogger(DefaultModelRepositoryRegistry.class);
 
-  private final ApplicationContext context;
-  private Map<Class<? extends Model<?>>, ModelRepository<?,?>> repositoryTypeMap = new HashMap<>();
+    private final ApplicationContext context;
+    private Map<Class<? extends Model<?>>, ModelRepository<?, ?>> repositoryTypeMap = new HashMap<>();
 
-  public DefaultModelRepositoryRegistry(ApplicationContext context) {
-    this.context = context;
-  }
-
-  /**
-   * Populates the registry with {@link ModelRepository} beans and their associated {@link Model} types.
-   * 
-   * @throws ConfigurationException
-   */
-  @PostConstruct
-  public void afterPropertiesSet() throws ConfigurationException{
-    //TODO: try this to get rid of warnings: https://stackoverflow.com/questions/14236424/how-can-i-find-all-beans-with-the-custom-annotation-foo
-    for (Map.Entry<String, Object> entry: context.getBeansWithAnnotation(ModelResource.class).entrySet()){
-      Class<?> type = entry.getValue().getClass();
-      ModelRepository repository = (ModelRepository) entry.getValue();
-      Class<? extends Model<?>> model = repository.getModel();
-      if (repositoryTypeMap.containsKey(model)) throw new ModelRegistryException(String.format(
-          "Duplicate model registered for repository %s.  Does more than one repository have the "
-              + "same model?", model.getName()));
-      repositoryTypeMap.put(model, repository);
-      logger.debug(String.format("Registered repository %s for model %s",
-          type.getName(), model.getName()));
+    public DefaultModelRepositoryRegistry(ApplicationContext context) {
+        this.context = context;
     }
-  }
 
-  @Override
-  public boolean isRegisteredModel(Class<?> model) {
-    for (Class<?> type: repositoryTypeMap.keySet()){
-      if (model.isAssignableFrom(type)) return true;
+    /**
+     * Populates the registry with {@link ModelRepository} beans and their associated {@link Model}
+     *   types.
+     *
+     * @throws ConfigurationException config exception
+     */
+    @PostConstruct
+    public void afterPropertiesSet() throws ConfigurationException {
+
+        for (Map.Entry<String, Object> entry:
+            context.getBeansWithAnnotation(ModelResource.class).entrySet()) {
+            Class<?> type = entry.getValue().getClass();
+            ModelRepository repository = (ModelRepository) entry.getValue();
+            Class<? extends Model<?>> model = repository.getModel();
+            if (repositoryTypeMap.containsKey(model)) {
+                throw new ModelRegistryException(String.format(
+                    "Duplicate model registered for repository %s.  Does more than one repository have the"
+                        + " same model?", model.getName()));
+            }
+            repositoryTypeMap.put(model, repository);
+            LOGGER.debug(String.format("Registered repository %s for model %s",
+                type.getName(), model.getName()));
+        }
     }
-    return false;
-  }
 
-  @Override
-  public ModelRepository getRepositoryByModel(Class<? extends Model<?>> model)
-      throws ModelRegistryException{
-    List<ModelRepository> repositories = new ArrayList<>();
-    for (Map.Entry<Class<? extends Model<?>>, ModelRepository<?,?>> entry: repositoryTypeMap.entrySet()){
-      if (model.isAssignableFrom(entry.getKey())) repositories.add(entry.getValue());
+    @Override
+    public boolean isRegisteredModel(Class<?> model) {
+        for (Class<?> type: repositoryTypeMap.keySet()) {
+            if (model.isAssignableFrom(type)) {
+                return true;
+            }
+        }
+        return false;
     }
-    if (repositories.size() > 1) throw new ModelRegistryException(String.format("Type %s matches "
-        + "more than one registered repository.  Is this a superclass with multiple model "
-        + "subclasses?", model.getName()));
-    return repositories.size() > 0 ? repositories.get(0) : null;
-  }
 
-  @Override
-  public Collection<Class<? extends Model<?>>> getRegisteredModels(){
-    return repositoryTypeMap.keySet();
-  }
-  
-  @Override
-  public Collection<? extends ModelRepository<?,?>> getRegisteredModelRepositories(){
-    return repositoryTypeMap.values();
-  }
-  
+    @Override
+    public ModelRepository getRepositoryByModel(Class<? extends Model<?>> model)
+        throws ModelRegistryException {
+        List<ModelRepository> repositories = new ArrayList<>();
+        for (Map.Entry<Class<? extends Model<?>>, ModelRepository<?, ?>> entry:
+            repositoryTypeMap.entrySet()) {
+            if (model.isAssignableFrom(entry.getKey())) {
+                repositories.add(entry.getValue());
+            }
+        }
+        if (repositories.size() > 1) {
+            throw new ModelRegistryException(String.format("Type %s matches "
+                + "more than one registered repository.  Is this a superclass with multiple model "
+                + "subclasses?", model.getName()));
+        }
+        return repositories.size() > 0 ? repositories.get(0) : null;
+    }
+
+    @Override
+    public Collection<Class<? extends Model<?>>> getRegisteredModels() {
+        return repositoryTypeMap.keySet();
+    }
+
+    @Override
+    public Collection<? extends ModelRepository<?, ?>> getRegisteredModelRepositories() {
+        return repositoryTypeMap.values();
+    }
+
 }

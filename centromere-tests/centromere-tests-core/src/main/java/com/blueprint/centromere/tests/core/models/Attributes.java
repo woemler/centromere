@@ -20,47 +20,47 @@ import java.util.Map;
 
 /**
  * Interface for adding controller query methods to entity classes with key-value attributes.
- * 
+ *
  * @author woemler
  * @since 0.4.3
  */
 public interface Attributes {
 
-	/**
-	 * Creates a new attribute key-value mapping.
-	 * 
-	 * @param name attribute name
-	 * @param value attribute value
-	 */
-	void addAttribute(String name, String value);
+    /**
+     * Creates a new attribute key-value mapping.
+     *
+     * @param name attribute name
+     * @param value attribute value
+     */
+    void addAttribute(String name, String value);
 
-	/**
-	 * Adds multiple attribute mappings at once.
-	 * 
-	 * @param attributes Map of key-value attributes
-	 */
-	void addAttributes(Map<String, String> attributes);
+    /**
+     * Adds multiple attribute mappings at once.
+     *
+     * @param attributes Map of key-value attributes
+     */
+    void addAttributes(Map<String, String> attributes);
 
-	/**
-	 * Tests whether an attribute has been registered.
-	 * 
-	 * @param name attribute name.
-	 * @return
-	 */
-	boolean hasAttribute(String name);
+    /**
+     * Tests whether an attribute has been registered.
+     *
+     * @param name attribute name.
+     * @return
+     */
+    boolean hasAttribute(String name);
 
-	/**
-	 * Gets the value of the given attribute.
-	 * 
-	 * @param name attribute name
-	 * @return attribute value.
-	 */
-	String getAttribute(String name);
+    /**
+     * Gets the value of the given attribute.
+     *
+     * @param name attribute name
+     * @return attribute value.
+     */
+    String getAttribute(String name);
 
-	/**
-	 * Returns all of the registered attributes as a {@link Map}.
-	 * 
-	 * @return attribute map.
-	 */
-	Map<String, String> getAttributes();
+    /**
+     * Returns all of the registered attributes as a {@link Map}.
+     *
+     * @return attribute map.
+     */
+    Map<String, String> getAttributes();
 }

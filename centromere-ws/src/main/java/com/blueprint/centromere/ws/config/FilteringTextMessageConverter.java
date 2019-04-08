@@ -43,151 +43,151 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 /**
  * Message converter that takes web service response data and converts it to delimited-text in a
  *   tabular format.  Supports field filtering using {@link ResponseEnvelope} attributes.
- * 
+ *
  * @author woemler
  */
 public class FilteringTextMessageConverter extends AbstractHttpMessageConverter<Object> {
-	
-	private String delimiter = "\t";
-	private final MediaType mediaType;
 
-	public FilteringTextMessageConverter(MediaType supportedMediaType, String delimiter) {
-		super(supportedMediaType);
-		this.delimiter = delimiter;
-		this.mediaType = supportedMediaType;
-	}
+    private String delimiter = "\t";
+    private final MediaType mediaType;
 
-	public FilteringTextMessageConverter(MediaType supportedMediaType) {
-		super(supportedMediaType);
-		this.mediaType = supportedMediaType;
-	}
+    public FilteringTextMessageConverter(MediaType supportedMediaType, String delimiter) {
+        super(supportedMediaType);
+        this.delimiter = delimiter;
+        this.mediaType = supportedMediaType;
+    }
 
-	public void setDelimiter(String delimiter) {
-		this.delimiter = delimiter;
-	}
+    public FilteringTextMessageConverter(MediaType supportedMediaType) {
+        super(supportedMediaType);
+        this.mediaType = supportedMediaType;
+    }
 
-	@Override 
-	protected boolean supports(Class<?> aClass) {
-		return Resource.class.equals(aClass)
-				|| FilterableResource.class.equals(aClass)
-				|| Resources.class.equals(aClass)
-				|| PagedResources.class.equals(aClass)
-				|| ResourceSupport.class.equals(aClass)
-				|| Model.class.isAssignableFrom(aClass)
-				|| ResponseEnvelope.class.equals(aClass);
-	}
+    public void setDelimiter(String delimiter) {
+        this.delimiter = delimiter;
+    }
 
-	@Override 
-	protected Object readInternal(Class<?> aClass, HttpInputMessage httpInputMessage)
-			throws IOException, HttpMessageNotReadableException {
-		return null;
-	}
+    @Override
+    protected boolean supports(Class<?> aClass) {
+        return Resource.class.equals(aClass)
+            || FilterableResource.class.equals(aClass)
+            || Resources.class.equals(aClass)
+            || PagedResources.class.equals(aClass)
+            || ResourceSupport.class.equals(aClass)
+            || Model.class.isAssignableFrom(aClass)
+            || ResponseEnvelope.class.equals(aClass);
+    }
 
-	@Override 
-	protected void writeInternal(Object o, HttpOutputMessage httpOutputMessage)
-			throws IOException, HttpMessageNotWritableException {
-		
-		httpOutputMessage.getHeaders().setContentType(this.mediaType);
-		OutputStream out = httpOutputMessage.getBody();
-		PrintWriter writer = new PrintWriter(out);
-		boolean showHeader = true;
-		Set<String> includedFields = new HashSet<>();
-		Set<String> excludedFields = new HashSet<>();
-		
-		// If object is a ResponseEnvelope, get the wrapped object
-		if (o.getClass().equals(ResponseEnvelope.class)){
-			includedFields = ((ResponseEnvelope) o).getFieldSet();
-			excludedFields = ((ResponseEnvelope) o).getExclude();
-			o = ((ResponseEnvelope) o).getEntity();
-		}
-		if (o.getClass().equals(PageImpl.class)){
-			o = ((Page) o).getContent();
-		}
-		
-		// If the object is not a collection, add it to one for easy iteration
-		if (!(o instanceof Collection<?>)) {
-			o = Arrays.asList(o);
-		}
-		
-		// Iterate through the object collection
-		for (Object entity: (Collection<?>) o){
-		  
-			String entityString;
-      Class<?> currentClass;
-			
-			try {
-			  
-				StringBuilder buffer = new StringBuilder();
-				
-				// Header line
-				if (showHeader){
-				  
-				  currentClass = entity.getClass();
-				  
-				  while (currentClass != null) {
-				    
-            for (Field field : currentClass.getDeclaredFields()) {
-              if (includedFields != null && !includedFields.isEmpty()) {
-                if (includedFields.contains(field.getName())) {
-                  buffer.append(field.getName()).append(delimiter);
-                }
-              } else if (excludedFields != null && !excludedFields.isEmpty()) {
-                if (!excludedFields.contains(field.getName())) {
-                  buffer.append(field.getName()).append(delimiter);
-                }
-              } else {
-                buffer.append(field.getName()).append(delimiter);
-              }
-            }
-            
-            currentClass = currentClass.getSuperclass();
-            
-          }
-				  
-          buffer.append("\n");
-				  
-				}
-				
-				// Write the object data row
-        currentClass = entity.getClass();
+    @Override
+    protected Object readInternal(Class<?> aClass, HttpInputMessage httpInputMessage)
+        throws IOException, HttpMessageNotReadableException {
+        return null;
+    }
 
-        while (currentClass != null) {
-          
-          for (Field field : currentClass.getDeclaredFields()) {
-            field.setAccessible(true);
-            if (includedFields != null && !includedFields.isEmpty()) {
-              if (includedFields.contains(field.getName())) {
-                buffer.append(field.get(entity)).append(delimiter);
-              }
-            } else if (excludedFields != null && !excludedFields.isEmpty()) {
-              if (!excludedFields.contains(field.getName())) {
-                buffer.append(field.get(entity)).append(delimiter);
-              }
-            } else {
-              buffer.append(field.get(entity)).append(delimiter);
-            }
-          }
-          
-          currentClass = currentClass.getSuperclass();
-          
+    @Override
+    protected void writeInternal(Object o, HttpOutputMessage httpOutputMessage)
+        throws IOException, HttpMessageNotWritableException {
+
+        httpOutputMessage.getHeaders().setContentType(this.mediaType);
+        OutputStream out = httpOutputMessage.getBody();
+        PrintWriter writer = new PrintWriter(out);
+        boolean showHeader = true;
+        Set<String> includedFields = new HashSet<>();
+        Set<String> excludedFields = new HashSet<>();
+        Object obj = o;
+
+        // If object is a ResponseEnvelope, get the wrapped object
+        if (obj.getClass().equals(ResponseEnvelope.class)) {
+            includedFields = ((ResponseEnvelope) obj).getFieldSet();
+            excludedFields = ((ResponseEnvelope) obj).getExclude();
+            obj = ((ResponseEnvelope) obj).getEntity();
         }
-				
-				buffer.append("\n");
-				entityString = buffer.toString();
-				
-			} catch (IllegalAccessException e){
-				e.printStackTrace();
-				entityString = "# Invalid record.";
-			}
-			
-			writer.write(entityString);
-			showHeader = false;
-			
-		}
-		
-		
-		writer.close();
-		
-	}
+        if (obj.getClass().equals(PageImpl.class)) {
+            obj = ((Page) obj).getContent();
+        }
+
+        // If the object is not a collection, add it to one for easy iteration
+        if (!(obj instanceof Collection<?>)) {
+            obj = Arrays.asList(obj);
+        }
+
+        // Iterate through the object collection
+        for (Object entity: (Collection<?>) obj) {
+
+            String entityString;
+            Class<?> currentClass;
+
+            try {
+
+                StringBuilder buffer = new StringBuilder();
+
+                // Header line
+                if (showHeader) {
+
+                    currentClass = entity.getClass();
+
+                    while (currentClass != null) {
+
+                        for (Field field : currentClass.getDeclaredFields()) {
+                            if (includedFields != null && !includedFields.isEmpty()) {
+                                if (includedFields.contains(field.getName())) {
+                                    buffer.append(field.getName()).append(delimiter);
+                                }
+                            } else if (excludedFields != null && !excludedFields.isEmpty()) {
+                                if (!excludedFields.contains(field.getName())) {
+                                    buffer.append(field.getName()).append(delimiter);
+                                }
+                            } else {
+                                buffer.append(field.getName()).append(delimiter);
+                            }
+                        }
+
+                        currentClass = currentClass.getSuperclass();
+
+                    }
+
+                    buffer.append("\n");
+
+                }
+
+                // Write the object data row
+                currentClass = entity.getClass();
+
+                while (currentClass != null) {
+
+                    for (Field field : currentClass.getDeclaredFields()) {
+                        field.setAccessible(true);
+                        if (includedFields != null && !includedFields.isEmpty()) {
+                            if (includedFields.contains(field.getName())) {
+                                buffer.append(field.get(entity)).append(delimiter);
+                            }
+                        } else if (excludedFields != null && !excludedFields.isEmpty()) {
+                            if (!excludedFields.contains(field.getName())) {
+                                buffer.append(field.get(entity)).append(delimiter);
+                            }
+                        } else {
+                            buffer.append(field.get(entity)).append(delimiter);
+                        }
+                    }
+
+                    currentClass = currentClass.getSuperclass();
+
+                }
+
+                buffer.append("\n");
+                entityString = buffer.toString();
+
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+                entityString = "# Invalid record.";
+            }
+
+            writer.write(entityString);
+            showHeader = false;
+
+        }
+        
+        writer.close();
+
+    }
 
 }

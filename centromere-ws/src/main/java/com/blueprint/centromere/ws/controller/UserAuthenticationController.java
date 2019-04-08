@@ -34,32 +34,35 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Controller for handling user authentication and token distribution in simple-token-security 
  *   configured web services.
- * 
+ *
  * @author woemler
  */
 @Profile({WebSecurityConfig.SIMPLE_TOKEN_SECURITY_PROFILE})
 @RestController
 public class UserAuthenticationController {
 
-	@Autowired(required = false) private TokenOperations tokenOperations;
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserAuthenticationController.class);
 
-	private static final Logger logger = LoggerFactory.getLogger(UserAuthenticationController.class);
+    @Autowired(required = false) 
+    private TokenOperations tokenOperations;
 
-  /**
-   * Takes the {@link UserDetails} that are produced after authentication and generates a security
-   *   token, based on the {@link TokenDetails} format.  This token will allow the user to make 
-   *   requests to the main API endpoints.
-   * 
-   * @param user
-   * @return
-   */
-	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-	public TokenDetails createToken(@AuthenticationPrincipal UserDetails user){
-	  if (tokenOperations == null) throw new ResourceNotFoundException();
-		Assert.notNull(user, "Unable to authenticate user!");
-		TokenDetails tokenDetails = tokenOperations.createTokenAndDetails(user);
-		logger.info(String.format("Successfully generated authentication token for user: %s", user.getUsername()));
-		return tokenDetails;
-	}
-	
+    /**
+     * Takes the {@link UserDetails} that are produced after authentication and generates a security
+     *   token, based on the {@link TokenDetails} format.  This token will allow the user to make 
+     *   requests to the main API endpoints.
+     *
+     * @param user
+     * @return
+     */
+    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    public TokenDetails createToken(@AuthenticationPrincipal UserDetails user) {
+        if (tokenOperations == null) {
+            throw new ResourceNotFoundException();
+        }
+        Assert.notNull(user, "Unable to authenticate user!");
+        TokenDetails tokenDetails = tokenOperations.createTokenAndDetails(user);
+        LOGGER.info(String.format("Successfully generated authentication token for user: %s", user.getUsername()));
+        return tokenDetails;
+    }
+
 }

@@ -13,13 +13,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
  * @author woemler
  */
 @NoRepositoryBean
-public interface UserRepository<T extends User<ID>, ID extends Serializable> 
-    extends ModelRepository<T, ID>, UserDetailsService {
-  
-  Optional<User> findByUsername(String username);
-  
-  default UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-    return findByUsername(s).orElse(null);
-  }
-  
+public interface UserRepository<T extends User<I>, I extends Serializable>
+    extends ModelRepository<T, I>, UserDetailsService {
+
+    Optional<User> findByUsername(String username);
+
+    default UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        return findByUsername(s).orElse(null);
+    }
+
 }

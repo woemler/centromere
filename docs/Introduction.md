@@ -113,7 +113,7 @@ public class Gene implements Model<String> {
 	private Set<String> aliases;
 	private Map<String,String> attributes;
 
-	public String getId(){ return id; }
+	public String getId() { return id; }
 
 	/* Getters and Setters */
 }
@@ -140,7 +140,7 @@ public class Gene implements Model<String> {
 	private Set<String> aliases;
 	private Map<String,String> attributes;
 
-	public String getId(){ return id; }
+	public String getId() { return id; }
 
 	/* Getters and Setters */
 }
@@ -154,7 +154,7 @@ All Centromere repository classes implement the base `RepositoryOperations` inte
 @ModelRepository(Gene.class)
 public class GeneRepository extends GenericMongoRepository<Gene, String> {
 	@Autowired
-	public GeneRepository(MongoTemplate mongoTemplate){
+	public GeneRepository(MongoTemplate mongoTemplate) {
 		super(mongoTemplate);
 	}
 }
@@ -195,13 +195,13 @@ public class GeneInfoReader extends AbstractRecordFileReader<Gene> {
 					if (line != null && !line.equals("")) gene = getRecordFromLine(line);
 				}
 			}
-		} catch (IOException e){
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return gene;
 	}
 
-	private Gene getRecordFromLine(String line){
+	private Gene getRecordFromLine(String line) {
 		String[] bits = line.split("\\t");
 		Gene gene = new Gene();
 		gene.setSpecies(Integer.parseInt(bits[0]));
@@ -232,7 +232,7 @@ public class GeneValidator implements Validator {
 @Component
 public class GeneRepositoryWriter extends RepositoryRecordWriter<Gene> {
 	@Autowired
-	public GeneRepositoryWriter(GeneRepository repository){
+	public GeneRepositoryWriter(GeneRepository repository) {
 		super(repository);
 	}
 }
@@ -241,7 +241,7 @@ public class GeneRepositoryWriter extends RepositoryRecordWriter<Gene> {
 @Component
 public class GeneInfoProcessor extends GenericRecordProcessor<Gene> {
 	@Autowired
-	public GeneInfoProcessor(GeneRepositoryWriter writer){
+	public GeneInfoProcessor(GeneRepositoryWriter writer) {
 		super(new GeneInfoReader(), new GeneValidator(), writer);
 	}
 }
@@ -442,7 +442,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
 	@Autowired private Environment env;
 
 	@Override
-	public String getDatabaseName(){
+	public String getDatabaseName() {
 		return env.getRequiredProperty("mongo.name");
 	}
 
@@ -488,14 +488,14 @@ public class GeneRepository extends GenericMongoRepository<Gene, String> {
 
     /* Using the MongoDB driver `Query` class and API */
 
-    public List<Gene> findByEntrezGeneId(Long entrezGeneId){
+    public List<Gene> findByEntrezGeneId(Long entrezGeneId) {
         return this.getMongoOperations()
             .find(new Query(Criteria.where("entrezGeneId").is(entrezGeneId));
     }
 
     /* Using `QueryCriteria` and the Centromere repository API */
 
-    public List<Gene> findByGeneSymbolAlias(String name){
+    public List<Gene> findByGeneSymbolAlias(String name) {
         return this.find(new QueryCriteria("aliases", name, Evaluation.EQUALS));
     }
 
@@ -515,12 +515,12 @@ The `GenericJdbcRepository` is the JDBC SQL database implementation of `Reposito
 public SubjectRepository extends GenericJdbcRepository<Subject, Integer> {
 
 	@Autowired
-	public SubjectRepository(DataSource dataSource){
+	public SubjectRepository(DataSource dataSource) {
 	    super(dataSource, new SubjectTableDescription(), new SubjectMapper(), new SubjectUnmapper());
 	}
 
 	public static class SubjectTableDescription extends ComplexTableDescription {
-		public SubjectTableDescription(){
+		public SubjectTableDescription() {
 			super(
 				"subjects", // table name
 				Arrays.asList("subject_id") // primary key ID columns
@@ -530,15 +530,15 @@ public SubjectRepository extends GenericJdbcRepository<Subject, Integer> {
 
 	public static class SubjectMapper implements RowMapper<Subject> {
 		@Override
-		public Subject mapRow(ResultSet rs, int i){
+		public Subject mapRow(ResultSet rs, int i) {
 			Subject subject = new Subject();
 			subject.setId(rs.getInt("subject_id"));
 			subject.setName(rs.getString("name"));
 			subject.setAge(rs.getInt("age"));
 			subject.setGender(rs.getString("gender"));
 			List<Attributes> attributes = new ArrayList();
-			if (rs.getString("attributes") != null){
-				for (String attribute: rs.getString("attributes").split(":::")){
+			if (rs.getString("attributes") != null) {
+				for (String attribute: rs.getString("attributes").split(":::")) {
 					String[] bits = attributes.split("::");
 					attributes.add(new Attribute(bits[0], bits[1]));
 				}
@@ -550,7 +550,7 @@ public SubjectRepository extends GenericJdbcRepository<Subject, Integer> {
 
 	public static class SubjectUnmapper implements RowUnmapper<Subject> {
 		@Override
-		public Map<String,Object> mapColumns(Subject subject){
+		public Map<String,Object> mapColumns(Subject subject) {
 			Map<String,Object> map = new HashMap();
 			map.put("subject_id", subject.getId());
 			map.put("name", subject.getName());
@@ -558,8 +558,8 @@ public SubjectRepository extends GenericJdbcRepository<Subject, Integer> {
 			map.put("gender", subject.getGender());
 			boolean flag = false;
 			StringBuilder sb = new StringBuilder();
-			for (Attribute attribute: subject.getAttributes()){
-				if (flag){
+			for (Attribute attribute: subject.getAttributes()) {
+				if (flag) {
 					sb.append(":::");
 				}
 				flag = true;
@@ -583,7 +583,7 @@ Storing `Subject` records with their `Attributes` in a single table is simple en
 public SubjectRepository extends GenericJdbcRepository<Subject, Integer> {
 
 	@Autowired
-	public SubjectRepository(DataSource dataSource){
+	public SubjectRepository(DataSource dataSource) {
 	    super(dataSource, new SubjectTableDescription(), new SubjectMapper());
 	}
 
@@ -625,7 +625,7 @@ public SubjectRepository extends GenericJdbcRepository<Subject, Integer> {
     	}
 
 	public static class SubjectTableDescription extends ComplexTableDescription {
-		public SubjectTableDescription(){
+		public SubjectTableDescription() {
 			super(
 				"subjects", // table name
 				Arrays.asList("s.subject_id"), // primary key IDs
@@ -638,15 +638,15 @@ public SubjectRepository extends GenericJdbcRepository<Subject, Integer> {
 
 	public static class SubjectMapper implements RowMapper<Subject> {
 		@Override
-		public Subject mapRow(ResultSet rs, int i){
+		public Subject mapRow(ResultSet rs, int i) {
 			Subject subject = new Subject();
 			subject.setId(rs.getInt("subject_id"));
 			subject.setName(rs.getString("name"));
 			subject.setAge(rs.getInt("age"));
 			subject.setGender(rs.getString("gender"));
 			List<Attributes> attributes = new ArrayList();
-			if (rs.getString("attributes") != null){
-				for (String attribute: rs.getString("attributes").split(":::")){
+			if (rs.getString("attributes") != null) {
+				for (String attribute: rs.getString("attributes").split(":::")) {
 					String[] bits = attributes.split("::");
 					attributes.add(new Attribute(bits[0], bits[1]));
 				}
@@ -676,7 +676,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
 	@Autowired private Environment env;
 
 	@Override
-	public String getDatabaseName(){
+	public String getDatabaseName() {
 		return env.getRequiredProperty("mongo.name");
 	}
 
@@ -722,14 +722,14 @@ public class GeneRepository extends GenericMongoRepository<Gene, String> {
 
     /* Using the MongoDB driver `Query` class and API */
 
-    public List<Gene> findByEntrezGeneId(Long entrezGeneId){
+    public List<Gene> findByEntrezGeneId(Long entrezGeneId) {
         return this.getMongoOperations()
             .find(new Query(Criteria.where("entrezGeneId").is(entrezGeneId));
     }
 
     /* Using `QueryCriteria` and the Centromere repository API */
 
-    public List<Gene> findByGeneSymbolAlias(String name){
+    public List<Gene> findByGeneSymbolAlias(String name) {
         return this.find(new QueryCriteria("aliases", name, Evaluation.EQUALS));
     }
 
@@ -761,13 +761,13 @@ public class ImportConfig extends DataImportConfigurer {
     @Autowired private ApplicationContext context;
 
     @Override
-    public Map<String, DataSetMetadata> configureDataSetMappings(Map<String, DataSetMetadata> dataSetMap){
+    public Map<String, DataSetMetadata> configureDataSetMappings(Map<String, DataSetMetadata> dataSetMap) {
         dataSetMap.put("test", new BasicDataSetMetadata(xxx));
         return dataSetMap;
     }
 
     @Override
-    public Map<String, RecordProcessor> configureDataTypeMappings(Map<String, RecordProcessor> dataTypeMap){
+    public Map<String, RecordProcessor> configureDataTypeMappings(Map<String, RecordProcessor> dataTypeMap) {
         dataTypeMap.put("mutations", context.getBean(MutationProcessor.class));
         return dataTypeMap;
     }
@@ -854,11 +854,11 @@ The easiest way to configure Centromere is to use the available auto-configurati
 public class Application extends SpringBootServletInitializer {
 
 	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder application){
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
 		return application.sources(Application.class);
 	}
 
-	public static void main(String[] args){
+	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
 

@@ -34,46 +34,46 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 /**
  * Convenience class for initializing a Spring Boot-based Centromere instance.  This class should be
  *   subclassed and annotated with {@link AutoConfigureCentromere} for the simplest configuration.
- * 
+ *
  * @author woemler
  */
-@SpringBootApplication(exclude = { 
+@SpringBootApplication(exclude = {
     SecurityAutoConfiguration.class,
     UserDetailsServiceAutoConfiguration.class,
     DataSourceAutoConfiguration.class
 })
 public class CentromereWebInitializer extends SpringBootServletInitializer {
 
-  private static final Logger logger = LoggerFactory.getLogger(CentromereWebInitializer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CentromereWebInitializer.class);
 
-  public static void run(Class<?> source, String[] args){
-    SpringApplicationBuilder builder = new SpringApplicationBuilder(source);
-    builder.child(WebApplicationConfig.class, WebSecurityConfig.class, ApiDocumentationConfig.class);
-    builder.profiles(getActiveProfiles(source));
-    builder.web(WebApplicationType.SERVLET);
-    builder.run(args);
-  }
-
-  /**
-   * Checks the {@link AutoConfigureCentromere} annotation, if present, and determines what profiles
-   *   the application should run with, and therefore what configuration classes to initialize.
-   * 
-   * @param source
-   * @return
-   */
-  private static String[] getActiveProfiles(Class<?> source){
-    String[] profiles;
-    if (source.isAnnotationPresent(AutoConfigureCentromere.class)){
-      AutoConfigureCentromere annotation = source.getAnnotation(AutoConfigureCentromere.class);
-      String securityProfile = annotation.webSecurity();
-      String apiDocumentationProfile = annotation.apiDocumentation();
-      profiles = new String[] { securityProfile, apiDocumentationProfile };
-      logger.info(String.format("Running Centromere with profiles: %s", Arrays.asList(profiles)));
-    } else {
-      logger.info("Running Centromere with default profiles.");
-      profiles = new String[]{};
+    public static void run(Class<?> source, String[] args) {
+        SpringApplicationBuilder builder = new SpringApplicationBuilder(source);
+        builder.child(WebApplicationConfig.class, WebSecurityConfig.class, ApiDocumentationConfig.class);
+        builder.profiles(getActiveProfiles(source));
+        builder.web(WebApplicationType.SERVLET);
+        builder.run(args);
     }
-    return profiles;
-  }
+
+    /**
+     * Checks the {@link AutoConfigureCentromere} annotation, if present, and determines what profiles
+     *   the application should run with, and therefore what configuration classes to initialize.
+     *
+     * @param source
+     * @return
+     */
+    private static String[] getActiveProfiles(Class<?> source) {
+        String[] profiles;
+        if (source.isAnnotationPresent(AutoConfigureCentromere.class)) {
+            AutoConfigureCentromere annotation = source.getAnnotation(AutoConfigureCentromere.class);
+            String securityProfile = annotation.webSecurity();
+            String apiDocumentationProfile = annotation.apiDocumentation();
+            profiles = new String[] { securityProfile, apiDocumentationProfile };
+            LOGGER.info(String.format("Running Centromere with profiles: %s", Arrays.asList(profiles)));
+        } else {
+            LOGGER.info("Running Centromere with default profiles.");
+            profiles = new String[]{};
+        }
+        return profiles;
+    }
 
 }

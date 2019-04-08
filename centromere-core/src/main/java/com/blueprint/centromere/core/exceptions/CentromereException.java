@@ -18,29 +18,29 @@ package com.blueprint.centromere.core.exceptions;
 
 /**
  * Generic umbrella exception which should cover all repository, web service, and ETL exceptions.
- * 
+ *
  * @author woemler
  */
 public class CentromereException extends Exception {
 
-  public CentromereException() {
-  }
+    public CentromereException() {
+    }
 
-  public CentromereException(String message) {
-    super(message);
-  }
+    public CentromereException(String message) {
+        super(message);
+    }
 
-  public CentromereException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public CentromereException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-  public CentromereException(Throwable cause) {
-    super(cause);
-  }
+    public CentromereException(Throwable cause) {
+        super(cause);
+    }
 
-  public CentromereException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
-  }
+    public CentromereException(String message, Throwable cause, boolean enableSuppression,
+        boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 
 }

@@ -31,70 +31,72 @@ import org.springframework.data.repository.query.Param;
  * @author woemler
  */
 @NoRepositoryBean
-public interface GeneRepository<T extends Gene<ID>, ID extends Serializable> 
-    extends ModelRepository<T, ID>, AttributeOperations<T>, GuessOperations<T> {
+public interface GeneRepository<T extends Gene<I>, I extends Serializable>
+    extends ModelRepository<T, I>, AttributeOperations<T>, GuessOperations<T> {
 
-	List<T> findBySymbol(@Param("symbol") String symbol);
-  Optional<T> findByEntrezGeneId(Integer entrezGeneId);
-	List<T> findByAliases(@Param("alias") String alias);
-
-	default List<T> findByExternalReference(
-	    @Param("source") String source,
-      @Param("value") String value
-  ){
-    QueryCriteria criteria = new QueryCriteria("externalReferences."+source, value);
-	  return (List<T>) this.find(Collections.singleton(criteria));
-	}
-
-	@Override
-	default List<T> guess(@Param("keyword") String keyword){
-		List<T> genes = new ArrayList<>();
-		QueryCriteria criteria = new QueryCriteria("geneId", keyword);
-		genes.addAll((List<T>) find(Collections.singleton(criteria)));
-    criteria = new QueryCriteria("referenceId", keyword);
-    genes.addAll((List<T>) find(Collections.singleton(criteria)));
-    criteria = new QueryCriteria("symbol", keyword);
-    genes.addAll((List<T>) find(Collections.singleton(criteria)));
-    criteria = new QueryCriteria("aliases", keyword);
-    genes.addAll((List<T>) find(Collections.singleton(criteria)));
-		return genes;
-	}
-
-	@Override
-  default Optional<T> bestGuess(String keyword){
-
-    List<T> genes = new ArrayList<>();
-
-    QueryCriteria criteria = new QueryCriteria("geneId", keyword);
-    genes.addAll((List<T>) find(Collections.singleton(criteria)));
-    if (!genes.isEmpty()){
-      return Optional.of(genes.get(0));
-    }
+    List<T> findBySymbol(@Param("symbol") String symbol);
     
-    try {
-      criteria = new QueryCriteria("entrezGeneId", Integer.parseInt(keyword));
-      genes.addAll((List<T>) find(Collections.singleton(criteria)));
-      if (!genes.isEmpty()) {
-        return Optional.of(genes.get(0));
-      }
-    } catch (Exception e) {
-      //pass
+    Optional<T> findByEntrezGeneId(Integer entrezGeneId);
+    
+    List<T> findByAliases(@Param("alias") String alias);
+
+    default List<T> findByExternalReference(
+        @Param("source") String source,
+        @Param("value") String value
+    ) {
+        QueryCriteria criteria = new QueryCriteria("externalReferences." + source, value);
+        return (List<T>) this.find(Collections.singleton(criteria));
     }
 
-    criteria = new QueryCriteria("symbol", keyword);
-    genes.addAll((List<T>) find(Collections.singleton(criteria)));
-    if (!genes.isEmpty()){
-      return Optional.of(genes.get(0));
+    @Override
+    default List<T> guess(@Param("keyword") String keyword) {
+        List<T> genes = new ArrayList<>();
+        QueryCriteria criteria = new QueryCriteria("geneId", keyword);
+        genes.addAll((List<T>) find(Collections.singleton(criteria)));
+        criteria = new QueryCriteria("referenceId", keyword);
+        genes.addAll((List<T>) find(Collections.singleton(criteria)));
+        criteria = new QueryCriteria("symbol", keyword);
+        genes.addAll((List<T>) find(Collections.singleton(criteria)));
+        criteria = new QueryCriteria("aliases", keyword);
+        genes.addAll((List<T>) find(Collections.singleton(criteria)));
+        return genes;
     }
 
-    criteria = new QueryCriteria("aliases", keyword);
-    genes.addAll((List<T>) find(Collections.singleton(criteria)));
-    if (!genes.isEmpty()){
-      return Optional.of(genes.get(0));
+    @Override
+    default Optional<T> bestGuess(String keyword) {
+
+        List<T> genes = new ArrayList<>();
+
+        QueryCriteria criteria = new QueryCriteria("geneId", keyword);
+        genes.addAll((List<T>) find(Collections.singleton(criteria)));
+        if (!genes.isEmpty()) {
+            return Optional.of(genes.get(0));
+        }
+
+        try {
+            criteria = new QueryCriteria("entrezGeneId", Integer.parseInt(keyword));
+            genes.addAll((List<T>) find(Collections.singleton(criteria)));
+            if (!genes.isEmpty()) {
+                return Optional.of(genes.get(0));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        criteria = new QueryCriteria("symbol", keyword);
+        genes.addAll((List<T>) find(Collections.singleton(criteria)));
+        if (!genes.isEmpty()) {
+            return Optional.of(genes.get(0));
+        }
+
+        criteria = new QueryCriteria("aliases", keyword);
+        genes.addAll((List<T>) find(Collections.singleton(criteria)));
+        if (!genes.isEmpty()) {
+            return Optional.of(genes.get(0));
+        }
+
+        return Optional.empty();
+
     }
-
-    return Optional.empty();
-
-  }
 
 }

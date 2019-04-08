@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,19 @@
 package com.blueprint.centromere.core.model;
 
 /**
- * Ensures that component classes that support {@link Model} classes have accessible type definitions.
- * 
+ * Ensures that component classes that support {@link Model} classes have accessible type 
+ *   definitions.
+ *
  * @author woemler
  * @since 0.4.1
  */
 public interface ModelSupport<T extends Model<?>> {
-	
-	/**
-	 * Returns the model class reference.
-	 * 
-	 * @return model class
-	 */
-	Class<T> getModel();
+
+    /**
+     * Returns the model class reference.
+     *
+     * @return model class
+     */
+    Class<T> getModel();
 
 }

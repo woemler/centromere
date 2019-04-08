@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
  * @author woemler
  */
 public class ResourceNotFoundException extends RestException {
-  public ResourceNotFoundException(){
-    super(HttpStatus.NOT_FOUND, 404, "The requested resource could not be found.");
-  }
+    public ResourceNotFoundException() {
+        super(HttpStatus.NOT_FOUND, 404, "The requested resource could not be found.");
+    }
 }

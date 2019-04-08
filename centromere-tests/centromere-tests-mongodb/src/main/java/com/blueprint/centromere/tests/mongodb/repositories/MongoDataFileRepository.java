@@ -25,5 +25,5 @@ import com.blueprint.centromere.tests.mongodb.models.MongoDataFile;
  */
 @ModelResource("datafile")
 public interface MongoDataFileRepository extends DataFileRepository<MongoDataFile, String> {
-	
+
 }

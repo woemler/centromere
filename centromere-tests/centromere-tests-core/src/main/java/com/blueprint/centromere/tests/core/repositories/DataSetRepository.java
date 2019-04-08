@@ -27,9 +27,13 @@ import org.springframework.data.repository.NoRepositoryBean;
  * @author woemler
  */
 @NoRepositoryBean
-public interface DataSetRepository<T extends DataSet<ID>, ID extends Serializable> extends ModelRepository<T, ID> {
-	Optional<T> findByName(String name);
-	List<T> findBySource(String source);
-	List<T> findBySampleIds(String sampleId);
-  List<T> findByDataFileIds(String dataFileId);
+public interface DataSetRepository<T extends DataSet<I>, I extends Serializable> extends ModelRepository<T, I> {
+    
+    Optional<T> findByName(String name);
+    
+    List<T> findBySource(String source);
+    
+    List<T> findBySampleIds(String sampleId);
+    
+    List<T> findByDataFileIds(String dataFileId);
 }

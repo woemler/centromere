@@ -24,54 +24,54 @@ import java.util.Set;
 /**
  * Wrapper for GET request responses to allow for field filtering via 
  *   {@link FilteringJackson2HttpMessageConverter}
- * 
- * @author woemler 
+ *
+ * @author woemler
  */
 public class ResponseEnvelope<T> {
 
-	private Set<String> fieldSet = new HashSet<>();
-	private Set<String> exclude = new HashSet<>();
-	private final Object entity;
+    private Set<String> fieldSet = new HashSet<>();
+    private Set<String> exclude = new HashSet<>();
+    private final Object entity;
 
-	public ResponseEnvelope(Object entity) {
-		this.entity = entity;
-	}
+    public ResponseEnvelope(Object entity) {
+        this.entity = entity;
+    }
 
-	public ResponseEnvelope(Object entity, Set<String> fieldSet, Set<String> exclude) {
-		this.fieldSet = fieldSet;
-		this.exclude = exclude;
-		this.entity = entity;
-	}
+    public ResponseEnvelope(Object entity, Set<String> fieldSet, Set<String> exclude) {
+        this.fieldSet = fieldSet;
+        this.exclude = exclude;
+        this.entity = entity;
+    }
 
-	public Object getEntity() {
-		return entity;
-	}
+    public Object getEntity() {
+        return entity;
+    }
 
-	@JsonIgnore
-	public Set<String> getFieldSet() {
-		return fieldSet;
-	}
+    @JsonIgnore
+    public Set<String> getFieldSet() {
+        return fieldSet;
+    }
 
-	@JsonIgnore
-	public Set<String> getExclude() {
-		return exclude;
-	}
+    @JsonIgnore
+    public Set<String> getExclude() {
+        return exclude;
+    }
 
-	public void setExclude(Set<String> exclude) {
-		this.exclude = exclude;
-	}
+    public void setExclude(Set<String> exclude) {
+        this.exclude = exclude;
+    }
 
-	public void setFieldSet(Set<String> fieldSet) {
-		this.fieldSet = fieldSet;
-	}
+    public void setFieldSet(Set<String> fieldSet) {
+        this.fieldSet = fieldSet;
+    }
 
-	public void setFields(String fields) {
-		Set<String> fieldSet = new HashSet<String>();
-		if (fields != null) {
-			for (String field : fields.split(",")) {
-				fieldSet.add(field);
-			}
-		}
-		this.fieldSet = fieldSet;
-	}
+    public void setFields(String fields) {
+        Set<String> fieldSet = new HashSet<String>();
+        if (fields != null) {
+            for (String field : fields.split(",")) {
+                fieldSet.add(field);
+            }
+        }
+        this.fieldSet = fieldSet;
+    }
 }

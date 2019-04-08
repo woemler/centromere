@@ -11,43 +11,31 @@ import org.springframework.util.Assert;
  */
 public class RestException extends RuntimeException {
 
-  private HttpStatus status;
-  private Integer code;
-  private String message;
+    private final HttpStatus status;
+    private final Integer code;
+    private final String message;
 
-  public RestException(HttpStatus status, Integer code, String message){
-    Assert.notNull(status,"HttpStatus argument cannot be null.");
-    this.status = status;
-    this.code = code;
-    this.message = message;
-  }
+    public RestException(HttpStatus status, Integer code, String message) {
+        Assert.notNull(status, "HttpStatus argument cannot be null.");
+        this.status = status;
+        this.code = code;
+        this.message = message;
+    }
 
-  public HttpStatus getStatus() {
-    return status;
-  }
+    public HttpStatus getStatus() {
+        return status;
+    }
 
-  public void setStatus(HttpStatus status) {
-    this.status = status;
-  }
+    public Integer getCode() {
+        return code;
+    }
 
-  public Integer getCode() {
-    return code;
-  }
+    public String getMessage() {
+        return message;
+    }
 
-  public void setCode(Integer code) {
-    this.code = code;
-  }
-
-  public String getMessage() {
-    return message;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
-  }
-
-  public RestError getRestError(){
-    return new RestError(status, code, message);
-  }
+    public RestError getRestError() {
+        return new RestError(status, code, message);
+    }
 
 }

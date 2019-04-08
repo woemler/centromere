@@ -19,29 +19,29 @@ package com.blueprint.centromere.core.exceptions;
 /**
  * Generic exception to alert mishandling of query parameter generation, mapping, conversion, or 
  *   execution.
- * 
+ *
  * @author woemler
  * @since 0.4.0
  */
 public class QueryParameterException extends RuntimeException {
 
-	public QueryParameterException() {
-	}
+    public QueryParameterException() {
+    }
 
-	public QueryParameterException(String message) {
-		super(message);
-	}
+    public QueryParameterException(String message) {
+        super(message);
+    }
 
-	public QueryParameterException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public QueryParameterException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public QueryParameterException(Throwable cause) {
-		super(cause);
-	}
+    public QueryParameterException(Throwable cause) {
+        super(cause);
+    }
 
-	public QueryParameterException(String message, Throwable cause, boolean enableSuppression,
-			boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
+    public QueryParameterException(String message, Throwable cause, boolean enableSuppression,
+        boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

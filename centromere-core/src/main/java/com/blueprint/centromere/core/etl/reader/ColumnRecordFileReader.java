@@ -30,65 +30,65 @@ import java.util.Map;
  *
  * @author woemler
  */
-public abstract class ColumnRecordFileReader<T extends Model<?>> 
+public abstract class ColumnRecordFileReader<T extends Model<?>>
     extends DelimitedTextFileRecordReader<T> {
 
-  private List<T> records = new ArrayList<>();
+    private List<T> records = new ArrayList<>();
 
-  public ColumnRecordFileReader(Class<T> model, String delimiter) {
-    super(model, delimiter);
-  }
+    public ColumnRecordFileReader(Class<T> model, String delimiter) {
+        super(model, delimiter);
+    }
 
-  public ColumnRecordFileReader(Class<T> model) {
-    super(model);
-  }
+    public ColumnRecordFileReader(Class<T> model) {
+        super(model);
+    }
 
-  @Override
-  public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
+    @Override
+    public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
 
-    super.doBefore(file, args);
-    
-    Map<Integer, T> recordMap = new LinkedHashMap<>();
-    records = new ArrayList<>();
+        super.doBefore(file, args);
 
-    try {
-      List<String> bits = this.getNextLine();
-      while (bits != null){
-        if (bits.size() > 1){
-          String field = bits.get(0);
-          for (int i = 1; i < bits.size(); i++){
-            T record = recordMap.containsKey(i) ? recordMap.get(i) : this.getModel().newInstance();
-            setModelAttribute(record, field, bits.get(i));
-            recordMap.put(i, record);
-          }
+        Map<Integer, T> recordMap = new LinkedHashMap<>();
+        records = new ArrayList<>();
+
+        try {
+            List<String> bits = this.getNextLine();
+            while (bits != null) {
+                if (bits.size() > 1) {
+                    String field = bits.get(0);
+                    for (int i = 1; i < bits.size(); i++) {
+                        T record = recordMap.containsKey(i) ? recordMap.get(i) : this.getModel().newInstance();
+                        setModelAttribute(record, field, bits.get(i));
+                        recordMap.put(i, record);
+                    }
+                }
+                bits = this.getNextLine();
+            }
+        } catch (Exception e) {
+            throw new DataProcessingException(e);
         }
-        bits = this.getNextLine();
-      }
-    } catch (Exception e){
-      throw new DataProcessingException(e);
+
+        records = new ArrayList<>(recordMap.values());
+
     }
 
-    records = new ArrayList<>(recordMap.values());
+    protected abstract void setModelAttribute(T record, String attribute, String value);
 
-  }
-
-  protected abstract void setModelAttribute(T record, String attribute, String value);
-
-  @Override
-  public T readRecord() throws DataProcessingException {
-    if (records.size() == 0){
-      return null;
-    } else {
-      return records.remove(0);
+    @Override
+    public T readRecord() throws DataProcessingException {
+        if (records.size() == 0) {
+            return null;
+        } else {
+            return records.remove(0);
+        }
     }
-  }
 
-  protected List<T> getRecords() {
-      return records;
-  }
+    protected List<T> getRecords() {
+        return records;
+    }
 
-  protected void setRecords(List<T> records) {
-      this.records = records;
-  }
+    protected void setRecords(List<T> records) {
+        this.records = records;
+    }
 
 }

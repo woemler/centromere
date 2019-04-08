@@ -28,42 +28,42 @@ import org.springframework.data.repository.core.support.RepositoryFactorySupport
 
 /**
  * Factory bean for creating {@link MongoModelRepository} beans.
- * 
+ *
  * @author woemler
  */
-public class MongoModelRepositoryFactoryBean<R extends MongoRepository<T, ID>, T, ID extends Serializable> 
-    extends MongoRepositoryFactoryBean<R, T, ID> {
+public class MongoModelRepositoryFactoryBean<R extends MongoRepository<T, I>, T, I extends Serializable>
+    extends MongoRepositoryFactoryBean<R, T, I> {
 
-  public MongoModelRepositoryFactoryBean(Class<? extends R> repositoryInterface) {
-    super(repositoryInterface);
-  }
-
-  @Override
-  protected RepositoryFactorySupport getFactoryInstance(MongoOperations operations) {
-    return new MongoModelRepositoryFactory<>(operations);
-  }
-
-  private static class MongoModelRepositoryFactory<T, ID extends Serializable>
-      extends MongoRepositoryFactory {
-
-    private final MongoOperations mongoOperations;
-
-    public MongoModelRepositoryFactory(MongoOperations mongoOperations) {
-      super(mongoOperations);
-      this.mongoOperations = mongoOperations;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    protected Object getTargetRepository(RepositoryInformation information) {
-      MongoEntityInformation entityInformation = getEntityInformation(information.getDomainType());
-      return new MongoModelRepository<>(entityInformation, mongoOperations);
+    public MongoModelRepositoryFactoryBean(Class<? extends R> repositoryInterface) {
+        super(repositoryInterface);
     }
 
     @Override
-    protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
-      return MongoModelRepository.class;
+    protected RepositoryFactorySupport getFactoryInstance(MongoOperations operations) {
+        return new MongoModelRepositoryFactory<>(operations);
     }
-  }
+
+    private static class MongoModelRepositoryFactory<T, I extends Serializable>
+        extends MongoRepositoryFactory {
+
+        private final MongoOperations mongoOperations;
+
+        MongoModelRepositoryFactory(MongoOperations mongoOperations) {
+            super(mongoOperations);
+            this.mongoOperations = mongoOperations;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected Object getTargetRepository(RepositoryInformation information) {
+            MongoEntityInformation entityInformation = getEntityInformation(information.getDomainType());
+            return new MongoModelRepository<>(entityInformation, mongoOperations);
+        }
+
+        @Override
+        protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
+            return MongoModelRepository.class;
+        }
+    }
 
 }

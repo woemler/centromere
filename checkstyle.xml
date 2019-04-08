@@ -1,0 +1,162 @@
+<!--
+  ~ Copyright (c) 2019-present, Blueprint Medicines and/or its affiliates. All rights reserved.
+  ~ Blueprint Medicines PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+  -->
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN" "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+<module name="Checker">
+  <module name="FileTabCharacter"/>
+  <!--<module name="SuppressWarningsFilter"/>-->
+  <module name="TreeWalker">
+    <property name="cacheFile" value="target/cachefile"/>
+    <!--<module name="FileContentsHolder"/>-->
+    <module name="AnnotationLocation">
+      <property name="allowSamelineMultipleAnnotations" value="false"/>
+      <property name="allowSamelineSingleParameterlessAnnotation" value="false"/>
+      <property name="allowSamelineParameterizedAnnotation" value="false"/>
+    </module>
+
+    <!-- Annotations -->
+    <module name="DeclarationOrder"/>
+    <module name="DefaultComesLast"/>
+    <module name="EmptyStatement"/>
+
+    <!-- Block Checks -->
+    <module name="AvoidNestedBlocks"/>
+    <module name="EmptyBlock"/>
+    <module name="EmptyCatchBlock"/>
+    <module name="LeftCurly">
+      <property name="option" value="eol"/>
+    </module>
+    <module name="NeedBraces"/>
+    <module name="RightCurly">
+      <property name="option" value="same"/>
+    </module>
+
+    <!-- Class Design -->
+    <module name="FinalClass"/>
+    <module name="HideUtilityClassConstructor"/>
+    <!--<module name="InnerTypeLast"/>-->
+    <module name="InterfaceIsType"/>
+    <module name="MutableException"/>
+    <module name="OneTopLevelClass"/>
+    <!--<module name="ThrowsCount"/>-->
+    <!--<module name="VisibilityModifier"/>-->
+
+    <!-- Coding -->
+    <!-- See http://checkstyle.sf.net/config_coding.html -->
+    <module name="ArrayTrailingComma"/>
+    <!--<module name="AvoidInlineConditionals"/>-->
+    <module name="CovariantEquals"/>
+    <module name="DeclarationOrder"/>
+    <module name="DefaultComesLast"/>
+    <module name="EmptyStatement"/>
+    <module name="EqualsAvoidNull"/>
+    <module name="EqualsHashCode"/>
+    <module name="ExplicitInitialization"/>
+    <module name="FallThrough"/>
+    <!--<module name="FinalLocalVariable"/>-->
+    <!--<module name="HiddenField"/>-->
+    <!--<module name="IllegalCatch"/>-->
+    <module name="IllegalThrows"/>
+    <!--<module name="IllegalType"/>-->
+    <module name="InnerAssignment"/>
+    <!--<module name="MagicNumber">-->
+    <!--<property name="ignoreAnnotation" value="true"/>-->
+    <!--</module>-->
+    <module name="MissingSwitchDefault"/>
+    <module name="ModifiedControlVariable"/>
+    <!--<module name="MultipleStringLiterals"/>-->
+    <module name="MultipleVariableDeclarations"/>
+    <module name="NestedForDepth">
+      <property name="max" value="3"/>
+    </module>
+    <module name="NestedIfDepth">
+      <property name="max" value="3"/>
+    </module>
+    <module name="NestedTryDepth">
+      <property name="max" value="3"/>
+    </module>
+    <module name="NoFinalizer"/>
+    <module name="OneStatementPerLine"/>
+    <module name="OverloadMethodsDeclarationOrder"/>
+    <module name="PackageDeclaration"/>
+    <module name="ParameterAssignment"/>
+    <module name="RequireThis"/>
+    <!--<module name="ReturnCount">-->
+    <!--<property name="max" value="3"/>-->
+    <!--</module>-->
+    <module name="SimplifyBooleanExpression"/>
+    <module name="SimplifyBooleanReturn"/>
+    <module name="StringLiteralEquality"/>
+    <module name="UnnecessaryParentheses"/>
+    <!--<module name="VariableDeclarationUsageDistance"/>-->
+
+    <!-- Imports -->
+    <!-- See http://checkstyle.sf.net/config_import.html -->
+    <module name="IllegalImport"/>
+    <module name="RedundantImport"/>
+    <module name="UnusedImports"/>
+
+    <!-- Miscellaneous -->
+    <module name="ArrayTypeStyle"/>
+    <module name="Indentation"/>
+    <module name="OuterTypeFilename"/>
+    <!--<module name="TodoComment"/>-->
+    <module name="UpperEll"/>
+
+    <!-- Modifiers -->
+    <module name="RedundantModifier"/>
+
+    <!-- Naming Conventions -->
+    <!--<module name="AbstractClassName"/>-->
+    <module name="CatchParameterName"/>
+    <module name="ClassTypeParameterName"/>
+    <module name="ConstantName"/>
+    <module name="InterfaceTypeParameterName"/>
+    <module name="LambdaParameterName"/>
+    <module name="LocalVariableName"/>
+    <module name="MemberName"/>
+    <module name="MethodName"/>
+    <module name="MethodTypeParameterName"/>
+    <module name="PackageName"/>
+    <module name="ParameterName"/>
+    <module name="StaticVariableName"/>
+    <module name="TypeName">
+      <property name="format" value="^[a-zA-Z0-9]*$"/>
+      <property name="tokens" value="CLASS_DEF, INTERFACE_DEF, ANNOTATION_DEF"/>
+    </module>
+    <module name="TypeName">
+      <property name="format" value="^[a-zA-Z0-9_]*$"/>
+      <property name="tokens" value="ENUM_DEF"/>
+    </module>
+
+    <!-- Whitespace -->
+    <module name="EmptyForInitializerPad"/>
+    <module name="EmptyForIteratorPad"/>
+    <module name="EmptyLineSeparator">
+      <property name="allowNoEmptyLineBetweenFields" value="true"/>
+      <property name="allowMultipleEmptyLines" value="false"/>
+      <property name="allowMultipleEmptyLinesInsideClassMembers" value="false"/>
+      <property name="tokens"
+        value="IMPORT, STATIC_IMPORT, CLASS_DEF, INTERFACE_DEF, ENUM_DEF, STATIC_INIT, INSTANCE_INIT, METHOD_DEF, CTOR_DEF, VARIABLE_DEF"/>
+    </module>
+    <module name="GenericWhitespace"/>
+    <module name="MethodParamPad">
+      <!--<property name="tokens" value="METHOD_DEF"/>-->
+      <property name="option" value="nospace"/>
+      <property name="allowLineBreaks" value="true"/>
+    </module>
+    <module name="NoWhitespaceBefore">
+      <property name="allowLineBreaks" value="true"/>
+    </module>
+    <module name="WhitespaceAfter"/>
+    <module name="WhitespaceAround">
+      <property name="allowEmptyTypes" value="true"/>
+      <property name="allowEmptyConstructors" value="true"/>
+      <property name="allowEmptyMethods" value="true"/>
+      <!-- All but RCURLY, to allow e.g. @ComponentScan(basePackages = {"com.sersol.repository"}) -->
+      <property name="tokens"
+        value="ASSIGN, BAND, BAND_ASSIGN, BOR, BOR_ASSIGN, BSR, BSR_ASSIGN, BXOR, BXOR_ASSIGN, COLON, DIV, DIV_ASSIGN, EQUAL, GE, GT, LAND, LCURLY, LE, LITERAL_ASSERT, LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_FOR, LITERAL_IF, LITERAL_RETURN, LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE, LOR, LT, MINUS, MINUS_ASSIGN, MOD, MOD_ASSIGN, NOT_EQUAL, PLUS, PLUS_ASSIGN, QUESTION, SL, SLIST, SL_ASSIGN, SR, SR_ASSIGN, STAR"/>
+    </module>
+  </module>
+</module>

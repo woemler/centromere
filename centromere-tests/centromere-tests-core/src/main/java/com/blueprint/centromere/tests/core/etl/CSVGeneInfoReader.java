@@ -7,8 +7,8 @@ import com.blueprint.centromere.tests.core.models.Gene;
  */
 public class CSVGeneInfoReader<T extends Gene<?>> extends GeneInfoReader<T> {
 
-  public CSVGeneInfoReader(Class<T> model) {
-    super(model, ",");
-  }
+    public CSVGeneInfoReader(Class<T> model) {
+        super(model, ",");
+    }
 
 }

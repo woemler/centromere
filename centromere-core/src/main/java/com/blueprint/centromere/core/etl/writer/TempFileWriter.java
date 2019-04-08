@@ -20,21 +20,22 @@ import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import java.io.File;
 
 /**
+ * File write object, specifically for writing temporary files to the file system.
+ *
  * @author woemler
  */
 public interface TempFileWriter {
 
-  /**
-   * Generates a temporary file to be written by the writer component.  Allows
-   *   the component and external objects to reference a temporary file.
-   * 
-   * @param inputFile
-   * @return
-   */
-  default File getTempFile(File inputFile) throws DataProcessingException {
-    File tempDir = new File(System.getProperty("java.io.tmpdir"));
-    File tempFile = new File(tempDir, inputFile.getAbsolutePath() + ".tmp");
-    return tempFile;
-  }
-  
+    /**
+     * Generates a temporary file to be written by the writer component.  Allows
+     *   the component and external objects to reference a temporary file.
+     *
+     * @param inputFile input file object
+     * @return temporary file object
+     */
+    default File getTempFile(File inputFile) throws DataProcessingException {
+        File tempDir = new File(System.getProperty("java.io.tmpdir"));
+        return new File(tempDir, inputFile.getAbsolutePath() + ".tmp");
+    }
+
 }

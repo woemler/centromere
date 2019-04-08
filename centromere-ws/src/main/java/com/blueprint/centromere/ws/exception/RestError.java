@@ -13,27 +13,27 @@ import org.springframework.util.Assert;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class RestError {
 
-  private final HttpStatus status;
-  private final Integer code;
-  private final String message;
+    private final HttpStatus status;
+    private final Integer code;
+    private final String message;
 
-  public RestError(HttpStatus status, Integer code, String message) {
-    Assert.notNull(status,"HttpStatus argument cannot be null.");
-    this.status = status;
-    this.code = code;
-    this.message = message;
-  }
+    public RestError(HttpStatus status, Integer code, String message) {
+        Assert.notNull(status, "HttpStatus argument cannot be null.");
+        this.status = status;
+        this.code = code;
+        this.message = message;
+    }
 
-  public HttpStatus getStatus() {
-    return status;
-  }
+    public HttpStatus getStatus() {
+        return status;
+    }
 
-  public Integer getCode() {
-    return code;
-  }
+    public Integer getCode() {
+        return code;
+    }
 
-  public String getMessage() {
-    return message;
-  }
+    public String getMessage() {
+        return message;
+    }
 
 }

@@ -32,133 +32,140 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Simple abstract implementation of {@link RecordReader}, for reading delimited text files.  Handles the 
- *   file object opening and closing in the {@code doBefore} and {@code doAfter} methods, as well as 
- *   line parsing for the appropriate delimiter type file readers.
- * 
+ * Simple abstract implementation of {@link RecordReader}, for reading delimited text files.  
+ *   Handles the file object opening and closing in the {@code doBefore} and {@code doAfter}
+ *   methods, as well as line parsing for the appropriate delimiter type file readers.
+ *
  * @author woemler
  */
-public abstract class DelimitedTextFileRecordReader<T extends Model<?>> 
+public abstract class DelimitedTextFileRecordReader<T extends Model<?>>
     implements RecordReader<T>, ModelSupport<T> {
 
-  private static final Logger logger = LoggerFactory.getLogger(DelimitedTextFileRecordReader.class);
+    private static final Logger LOGGER
+        = LoggerFactory.getLogger(DelimitedTextFileRecordReader.class);
 
-  private final Class<T> model;
-  private final String delimiter;
+    private final Class<T> model;
+    private final String delimiter;
 
-	private Closeable reader = null;
+    private Closeable reader;
 
-  public DelimitedTextFileRecordReader(Class<T> model, String delimiter) {
-    this.model = model;
-    this.delimiter = delimiter;
-  }
-
-  public DelimitedTextFileRecordReader(Class<T> model) {
-    this(model, "\t");
-  }
-
-  /**
-	 * Closes any open reader and opens the new target file.  Assigns local variables, if available.
-	 */
-	@Override
-	public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
-	  this.close();
-		this.open(file);
-	}
-
-	/**
-	 * Calls the close method on the reader.
-	 */
-	@Override
-	public void doOnSuccess(File file, Map<String, String> args) throws DataProcessingException {
-		this.close();
-	}
-
-  @Override
-  public void doOnFailure(File file, Map<String, String> args) throws DataProcessingException {
-    this.close();
-  }
-
-  /**
-	 * Opens the target file and creates a the appropriate file reader object, which can be referenced via its
-	 *   getter method.
-	 * 
-	 * @param file
-	 */
-  protected void open(File file) throws DataProcessingException {
-    try {
-      if (",".equals(delimiter)) {
-        reader = new CSVReader(new BufferedReader(new FileReader(file)));
-      } else {
-        reader = new BufferedReader(new FileReader(file));
-      }
-    } catch (IOException e) {
-      throw new DataProcessingException(e);
-    }
-  }
-
-	/**
-	 * Closes the target file, if a reader exists.
-	 */
-	protected void close(){
-		if (reader != null){
-			try {
-				reader.close();
-			} catch (IOException e){
-				logger.debug(e.getMessage());
-			}
-		}
-	}
-
-  /**
-   * Returns the next line from the file.
-   *
-   * @return
-   */
-  protected List<String> getNextLine() throws IOException {
-
-    List<String> bits = new ArrayList<>();
-    
-    if (",".equals(delimiter)){
-      String[] line = ((CSVReader) reader).readNext();
-      if (line == null) return null;
-      for (String bit: line){
-        bits.add(bit.trim());
-      }
-    } else {
-      String line = ((BufferedReader) reader).readLine();
-      if (line == null) return null;
-      for (String bit : line.split(delimiter)){
-        bits.add(bit.trim());
-      }
+    public DelimitedTextFileRecordReader(Class<T> model, String delimiter) {
+        this.model = model;
+        this.delimiter = delimiter;
     }
 
-    return bits;
+    public DelimitedTextFileRecordReader(Class<T> model) {
+        this(model, "\t");
+    }
 
-  }
+    /**
+     * Closes any open reader and opens the new target file.  Assigns local variables, if available.
+     */
+    @Override
+    public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
+        this.close();
+        this.open(file);
+    }
 
-  /**
-   * Tests whether a given line should be skipped.
-   *
-   * @param line
-   * @return
-   */
-  abstract protected boolean isSkippableLine(List<String> line);
+    /**
+     * Calls the close method on the reader.
+     */
+    @Override
+    public void doOnSuccess(File file, Map<String, String> args) throws DataProcessingException {
+        this.close();
+    }
 
-  /**
-   * 
-   * @return
-   */
-  protected String getDelimiter(){
-    return delimiter;
-  }
+    @Override
+    public void doOnFailure(File file, Map<String, String> args) throws DataProcessingException {
+        this.close();
+    }
 
-  /**
-   * {@link ModelSupport#getModel()}
-   */
-	@Override
-	public Class<T> getModel(){
-    return model;
-  }
+    /**
+     * Opens the target file and creates a the appropriate file reader object, which can be 
+     * referenced via its
+     *   getter method.
+     *
+     * @param file input file
+     */
+    protected void open(File file) throws DataProcessingException {
+        try {
+            if (",".equals(delimiter)) {
+                reader = new CSVReader(new BufferedReader(new FileReader(file)));
+            } else {
+                reader = new BufferedReader(new FileReader(file));
+            }
+        } catch (IOException e) {
+            throw new DataProcessingException(e);
+        }
+    }
+
+    /**
+     * Closes the target file, if a reader exists.
+     */
+    protected void close() {
+        if (reader != null) {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                LOGGER.debug(e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Returns the next line from the file.
+     *
+     * @return
+     */
+    protected List<String> getNextLine() throws IOException {
+
+        List<String> bits = new ArrayList<>();
+
+        if (",".equals(delimiter)) {
+            String[] line = ((CSVReader) reader).readNext();
+            if (line == null) {
+                return null;
+            }
+            for (String bit: line) {
+                bits.add(bit.trim());
+            }
+        } else {
+            String line = ((BufferedReader) reader).readLine();
+            if (line == null) {
+                return null;
+            }
+            for (String bit : line.split(delimiter)) {
+                bits.add(bit.trim());
+            }
+        }
+
+        return bits;
+
+    }
+
+    /**
+     * Tests whether a given line should be skipped.
+     *
+     * @param line file line bits
+     * @return
+     */
+    protected abstract boolean isSkippableLine(List<String> line);
+
+    /**
+     * Gets the file delimiter.
+     *
+     * @return
+     */
+    protected String getDelimiter() {
+        return delimiter;
+    }
+
+    /**
+     * See {@link ModelSupport#getModel()}.
+     */
+    @Override
+    public Class<T> getModel() {
+        return model;
+    }
 
 }

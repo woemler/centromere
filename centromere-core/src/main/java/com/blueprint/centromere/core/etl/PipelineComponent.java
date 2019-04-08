@@ -25,36 +25,36 @@ import java.util.Map;
  *   every component should have methods that run before and after data processing occurs. These 
  *   methods should be aware of the file being processed (if any) and any arguments modulating the
  *   data processing.
- * 
+ *
  * @author woemler
  */
 public interface PipelineComponent {
 
-  /**
-   * Runs before the primary data processing method executes.
-   * 
-   * @param file file to be processed
-   * @param args arguments to apply to data processing
-   * @throws DataProcessingException
-   */
-  void doBefore(File file, Map<String, String> args) throws DataProcessingException;
+    /**
+     * Runs before the primary data processing method executes.
+     *
+     * @param file file to be processed
+     * @param args arguments to apply to data processing
+     * @throws DataProcessingException thrown if unhandled issues encountered.
+     */
+    void doBefore(File file, Map<String, String> args) throws DataProcessingException;
 
-  /**
-   * Runs after the primary data processing method completes successfully.
-   *
-   * @param file file to be processed
-   * @param args arguments to apply to data processing
-   * @throws DataProcessingException
-   */
-  void doOnSuccess(File file, Map<String, String> args) throws DataProcessingException;
+    /**
+     * Runs after the primary data processing method completes successfully.
+     *
+     * @param file file to be processed
+     * @param args arguments to apply to data processing
+     * @throws DataProcessingException thrown if unhandled issues encountered.
+     */
+    void doOnSuccess(File file, Map<String, String> args) throws DataProcessingException;
 
-  /**
-   * Runs if the data processing step fails to properly execute.
-   *
-   * @param file file to be processed
-   * @param args arguments to apply to data processing
-   * @throws DataProcessingException
-   */
-  void doOnFailure(File file, Map<String, String> args) throws DataProcessingException;
+    /**
+     * Runs if the data processing step fails to properly execute.
+     *
+     * @param file file to be processed
+     * @param args arguments to apply to data processing
+     * @throws DataProcessingException thrown if unhandled issues encountered.
+     */
+    void doOnFailure(File file, Map<String, String> args) throws DataProcessingException;
 
 }

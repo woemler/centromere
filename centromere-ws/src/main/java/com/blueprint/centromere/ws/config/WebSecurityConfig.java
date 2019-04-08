@@ -43,107 +43,110 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * Default web security configurations.
- * 
+ *
  * @author woemler
  */
-public class WebSecurityConfig  {
-  
-  public static final String NO_SECURITY_PROFILE = "web_security_none";
-  public static final String SIMPLE_TOKEN_SECURITY_PROFILE = "web_security_simple_token";
+public final class WebSecurityConfig  {
 
-  @Configuration
-  @EnableWebSecurity
-  //@EnableGlobalMethodSecurity
-  @PropertySource(value = { "classpath:web-defaults.properties" })
-  @Profile(SIMPLE_TOKEN_SECURITY_PROFILE )
-  @Order(SecurityProperties.BASIC_AUTH_ORDER)
-  public static class DefaultWebSecurityConfig extends WebSecurityConfigurerAdapter {
+    public static final String NO_SECURITY_PROFILE = "web_security_none";
+    public static final String SIMPLE_TOKEN_SECURITY_PROFILE = "web_security_simple_token";
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
-    
-    @Autowired 
-    private Environment env;
-
-    @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
-    @Autowired
-    private UserDetailsService userService;
-    
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-      return new BCryptPasswordEncoder();
+    private WebSecurityConfig() {
     }
 
-    @Bean
-    public AuthenticationEntryPoint unauthorizedHandler(){
-      return new RestAuthenticationEntryPoint();
-    }
+    @Configuration
+    @EnableWebSecurity
+    //@EnableGlobalMethodSecurity
+    @PropertySource(value = { "classpath:web-defaults.properties" })
+    @Profile(SIMPLE_TOKEN_SECURITY_PROFILE )
+    @Order(SecurityProperties.BASIC_AUTH_ORDER)
+    public static class DefaultWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Bean
-    public TokenOperations tokenOperations() {
-      SimpleTokenProvider tokenUtils = new SimpleTokenProvider(env.getRequiredProperty("centromere.web.security.token"));
-      tokenUtils.setTokenLifespan(getTokenLifespan());
-      return tokenUtils;
-    }
+        private static final Logger LOGGER = LoggerFactory.getLogger(WebSecurityConfig.class);
 
-    @Bean
-    public AuthenticationTokenProcessingFilter authenticationTokenProcessingFilter() {
-      return new AuthenticationTokenProcessingFilter(tokenOperations(), userService);
-    }
-    
-    @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+        @Autowired
+        private Environment env;
 
-      auth
-          .userDetailsService(userService)
-          .passwordEncoder(passwordEncoder());
-    }
+        @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
+        @Autowired
+        private UserDetailsService userService;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+            return new BCryptPasswordEncoder();
+        }
 
-      String secureUrl = env.getRequiredProperty("centromere.web.security.secure-url");
-      logger.info(String.format("Configuring web security with RESTRICTED READ and RESTRICTED "
-          + "WRITE with simple token authentication for API root: %s", secureUrl));
+        @Bean
+        public AuthenticationEntryPoint unauthorizedHandler() {
+            return new RestAuthenticationEntryPoint();
+        }
 
-      http
-          .cors()
-            .and()
-          .csrf()
-            .disable()
-          .httpBasic()
-            .and()
-          .formLogin()
-            .disable()
-          .exceptionHandling()
-            .authenticationEntryPoint(unauthorizedHandler())
-            .and()
-          .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-          .authorizeRequests()
-            .antMatchers("/authenticate")
-              .permitAll()
-            .anyRequest()
-              .fullyAuthenticated()
+        @Bean
+        public TokenOperations tokenOperations() {
+            SimpleTokenProvider tokenUtils = new SimpleTokenProvider(env.getRequiredProperty("centromere.web.security.token"));
+            tokenUtils.setTokenLifespan(getTokenLifespan());
+            return tokenUtils;
+        }
+
+        @Bean
+        public AuthenticationTokenProcessingFilter authenticationTokenProcessingFilter() {
+            return new AuthenticationTokenProcessingFilter(tokenOperations(), userService);
+        }
+
+        @Override
+        public void configure(AuthenticationManagerBuilder auth) throws Exception {
+
+            auth
+                .userDetailsService(userService)
+                .passwordEncoder(passwordEncoder());
+        }
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+
+            String secureUrl = env.getRequiredProperty("centromere.web.security.secure-url");
+            LOGGER.info(String.format("Configuring web security with RESTRICTED READ and RESTRICTED "
+                + "WRITE with simple token authentication for API root: %s", secureUrl));
+
+            http
+                .cors()
+                .and()
+                .csrf()
+                .disable()
+                .httpBasic()
+                .and()
+                .formLogin()
+                .disable()
+                .exceptionHandling()
+                .authenticationEntryPoint(unauthorizedHandler())
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests()
+                .antMatchers("/authenticate")
+                .permitAll()
+                .anyRequest()
+                .fullyAuthenticated()
             ;
-      
-      http
-          .addFilterBefore(authenticationTokenProcessingFilter(),
-          UsernamePasswordAuthenticationFilter.class);
+
+            http
+                .addFilterBefore(authenticationTokenProcessingFilter(),
+                    UsernamePasswordAuthenticationFilter.class);
+
+        }
+
+        protected Long getTokenLifespan() {
+            long hour = 1000L * 60 * 60;
+            Long lifespan = hour * 24; // one day
+            if (!env.getProperty("centromere.web.security.token-lifespan-hours").equals("")) {
+                lifespan = hour * env.getRequiredProperty("centromere.web.security.token-lifespan-hours", Long.class);
+            } else if (!env.getProperty("centromere.web.security.token-lifespan-days").equals("")) {
+                lifespan = hour * 24 * env.getRequiredProperty("centromere.web.security.token-lifespan-days", Long.class);
+            }
+            return lifespan;
+        }
 
     }
-
-    protected Long getTokenLifespan(){
-      long hour = 1000L * 60 * 60;
-      Long lifespan = hour * 24; // one day
-      if (!env.getProperty("centromere.web.security.token-lifespan-hours").equals("")){
-        lifespan = hour * env.getRequiredProperty("centromere.web.security.token-lifespan-hours", Long.class);
-      } else if (!env.getProperty("centromere.web.security.token-lifespan-days").equals("")) {
-        lifespan = hour * 24 * env.getRequiredProperty("centromere.web.security.token-lifespan-days", Long.class);
-      }
-      return lifespan;
-    }
-    
-  }
 
 }

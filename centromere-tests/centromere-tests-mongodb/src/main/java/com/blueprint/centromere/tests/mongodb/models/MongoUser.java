@@ -13,7 +13,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @ToString(callSuper = true)
 public class MongoUser extends User<String> {
-  
-  @Id private String id;
+
+    @Id 
+    private String id;
 
 }

@@ -31,8 +31,8 @@ import org.springframework.context.annotation.Import;
 @Import({EmbeddedMongoDataSourceConfig.class, MongoRepositoryConfig.class})
 public class WebTestInitializer extends CentromereWebInitializer {
 
-  public static void main(String[] args) {
-    CentromereWebInitializer.run(WebTestInitializer.class, args);
-  }
+    public static void main(String[] args) {
+        CentromereWebInitializer.run(WebTestInitializer.class, args);
+    }
 
 }
