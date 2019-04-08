@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
  * @author woemler
  */
 public class InvalidParameterException extends RestException {
-  public InvalidParameterException(String message) {
-    super(HttpStatus.BAD_REQUEST, 400, message);
-  }
+    public InvalidParameterException(String message) {
+        super(HttpStatus.BAD_REQUEST, 400, message);
+    }
 }

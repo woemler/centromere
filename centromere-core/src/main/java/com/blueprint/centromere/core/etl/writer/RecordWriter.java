@@ -23,16 +23,16 @@ import com.blueprint.centromere.core.model.Model;
 /**
  * Data import component class for writing imported {@link Model} records to a temporary file or
  *   repository implementation.
- * 
+ *
  * @author woemler
  */
 public interface RecordWriter<T extends Model<?>> extends PipelineComponent {
 
-	/**
-	 * Writes a single {@link Model} entity to the target destination.
-	 * 
-	 * @param record
-	 */
-	void writeRecord(T record) throws DataProcessingException;
+    /**
+     * Writes a single {@link Model} entity to the target destination.
+     *
+     * @param record record to be written.
+     */
+    void writeRecord(T record) throws DataProcessingException;
 
 }

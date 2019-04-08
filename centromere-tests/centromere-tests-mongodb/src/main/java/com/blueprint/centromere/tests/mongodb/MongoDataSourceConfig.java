@@ -36,26 +36,26 @@ import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 @Configuration
 public class MongoDataSourceConfig extends AbstractMongoConfiguration {
 
-  @Autowired
-  private Environment env;
+    @Autowired
+    private Environment env;
 
-  @Override
-  public String getDatabaseName(){
-    return env.getRequiredProperty("mongo.name");
-  }
+    @Override
+    public String getDatabaseName() {
+        return env.getRequiredProperty("mongo.name");
+    }
 
-  @Override
-  @Bean
-  public MongoClient mongoClient() {
-    ServerAddress serverAddress = new ServerAddress(env.getRequiredProperty("mongo.host"));
-    List<MongoCredential> credentials = new ArrayList<>();
-    credentials.add(MongoCredential.createScramSha1Credential(
-        env.getRequiredProperty("mongo.username"),
-        env.getRequiredProperty("mongo.name"),
-        env.getRequiredProperty("mongo.password").toCharArray()
-    ));
-    MongoClientOptions options = new MongoClientOptions.Builder().build();
-    return new MongoClient(serverAddress, credentials, options);
-  }
+    @Override
+    @Bean
+    public MongoClient mongoClient() {
+        ServerAddress serverAddress = new ServerAddress(env.getRequiredProperty("mongo.host"));
+        List<MongoCredential> credentials = new ArrayList<>();
+        credentials.add(MongoCredential.createScramSha1Credential(
+            env.getRequiredProperty("mongo.username"),
+            env.getRequiredProperty("mongo.name"),
+            env.getRequiredProperty("mongo.password").toCharArray()
+        ));
+        MongoClientOptions options = new MongoClientOptions.Builder().build();
+        return new MongoClient(serverAddress, credentials, options);
+    }
 
 }

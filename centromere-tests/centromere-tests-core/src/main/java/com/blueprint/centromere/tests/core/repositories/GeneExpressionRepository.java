@@ -26,11 +26,14 @@ import org.springframework.data.repository.NoRepositoryBean;
  * @author woemler
  */
 @NoRepositoryBean
-public interface GeneExpressionRepository<T extends GeneExpression<ID>, ID extends Serializable>
-    extends ModelRepository<T, ID> {
-  
-  List<T> findBySampleId(ID sampleId);
-  List<T> findByDataFileId(ID dataFileId);
-  List<T> findByDataSetId(ID dataSetId);
-  List<T> findByGeneId(ID geneId);
+public interface GeneExpressionRepository<T extends GeneExpression<I>, I extends Serializable>
+    extends ModelRepository<T, I> {
+
+    List<T> findBySampleId(I sampleId);
+
+    List<T> findByDataFileId(I dataFileId);
+
+    List<T> findByDataSetId(I dataSetId);
+
+    List<T> findByGeneId(I geneId);
 }

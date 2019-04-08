@@ -28,44 +28,48 @@ import springfox.documentation.swagger.common.SwaggerPluginSupport;
  */
 public class ModelParameterBuilderPlugin implements OperationBuilderPlugin {
 
-  @Autowired private TypeResolver typeResolver;
-  @Autowired private ModelResourceRegistry registry;
-  private static final String FIND_METHOD = "find";
-  private static final Logger logger = LoggerFactory.getLogger(ModelParameterBuilderPlugin.class);
+    private static final String FIND_METHOD = "find";
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModelParameterBuilderPlugin.class);
 
-  @Override
-  public void apply(OperationContext context) {
-    logger.info("Swagger Plugin - OperationContext - Name: " + context.getName());
-    if (FIND_METHOD.equals(context.getName())){
-      Operation operation = context.operationBuilder().build();
-      List<Parameter> parameters = operation.getParameters() != null
-          ? operation.getParameters() : new ArrayList<>();
-      for (Class<? extends Model<?>> model: registry.getRegisteredModels() ){
-        for (QueryParameterDescriptor descriptor: QueryParameterUtil.getAvailableQueryParameters(model).values()){
-          parameters.add(createParameterFromDescriptior(descriptor));
+    @Autowired 
+    private TypeResolver typeResolver;
+    
+    @Autowired 
+    private ModelResourceRegistry registry;
+
+    @Override
+    public void apply(OperationContext context) {
+        LOGGER.info("Swagger Plugin - OperationContext - Name: " + context.getName());
+        if (FIND_METHOD.equals(context.getName())) {
+            Operation operation = context.operationBuilder().build();
+            List<Parameter> parameters = operation.getParameters() != null
+                ? operation.getParameters() : new ArrayList<>();
+            for (Class<? extends Model<?>> model: registry.getRegisteredModels() ) {
+                for (QueryParameterDescriptor descriptor: QueryParameterUtil.getAvailableQueryParameters(model).values()) {
+                    parameters.add(createParameterFromDescriptior(descriptor));
+                }
+            }
+            context.operationBuilder().parameters(parameters);
         }
-      }
-      context.operationBuilder().parameters(parameters);
     }
-  }
 
-  @Override
-  public boolean supports(DocumentationType documentationType) {
-    return SwaggerPluginSupport.pluginDoesApply(documentationType);
-  }
+    @Override
+    public boolean supports(DocumentationType documentationType) {
+        return SwaggerPluginSupport.pluginDoesApply(documentationType);
+    }
 
-  private Parameter createParameterFromDescriptior(QueryParameterDescriptor descriptor){
-    return new ParameterBuilder()
-        .name(descriptor.getFieldName())
-        .type(typeResolver.resolve(typeResolver.resolve(descriptor.getType())))
-        .modelRef(new ModelRef("string"))
-        .parameterType("query")
-        .required(false)
-        .description(String.format("Query against the '%s' field.", descriptor.getFieldName()))
-        .defaultValue("")
-        .allowMultiple(false)
-        .parameterAccess("")
-        .build();
-  }
+    private Parameter createParameterFromDescriptior(QueryParameterDescriptor descriptor) {
+        return new ParameterBuilder()
+            .name(descriptor.getFieldName())
+            .type(typeResolver.resolve(typeResolver.resolve(descriptor.getType())))
+            .modelRef(new ModelRef("string"))
+            .parameterType("query")
+            .required(false)
+            .description(String.format("Query against the '%s' field.", descriptor.getFieldName()))
+            .defaultValue("")
+            .allowMultiple(false)
+            .parameterAccess("")
+            .build();
+    }
 
 }

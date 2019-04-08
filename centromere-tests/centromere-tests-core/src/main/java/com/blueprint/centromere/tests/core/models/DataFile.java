@@ -27,57 +27,57 @@ import lombok.Data;
 import org.springframework.data.annotation.Transient;
 
 @Data
-public abstract class DataFile<ID extends Serializable> implements Model<ID>, Attributes {
-  
-  private String filePath;
-  private String dataType;
-	private String model;
-	private String checksum;
-	private Date dateCreated;
-	private Date dateUpdated;
-	
-	@Linked(model = DataSet.class, rel = "dataSet", field = "id") 
-  private ID dataSetId;
-	
-	private Map<String, String> attributes = new HashMap<>();
+public abstract class DataFile<I extends Serializable> implements Model<I>, Attributes {
 
-	@Transient
-  @JsonIgnore
-  public Class<?> getModelType() throws ClassNotFoundException {
-    return Class.forName(model);
-  }
+    private String filePath;
+    private String dataType;
+    private String model;
+    private String checksum;
+    private Date dateCreated;
+    private Date dateUpdated;
 
-  public void setModel(Class<?> modelType){
-	  this.model = modelType.getName();
-  }
-  
-	@Override
-	public Map<String, String> getAttributes() {
-		return attributes;
-	}
+    @Linked(model = DataSet.class, rel = "dataSet", field = "id")
+    private I dataSetId;
 
-	public void setAttributes(Map<String, String> attributes) {
-		this.attributes = attributes;
-	}
+    private Map<String, String> attributes = new HashMap<>();
 
-	@Override
-	public void addAttribute(String name, String value) {
-		attributes.put(name, value);
-	}
+    @Transient
+    @JsonIgnore
+    public Class<?> getModelType() throws ClassNotFoundException {
+        return Class.forName(model);
+    }
 
-	@Override
-	public void addAttributes(Map<String, String> attributes) {
-		this.attributes.putAll(attributes);
-	}
+    public void setModel(Class<?> modelType) {
+        this.model = modelType.getName();
+    }
 
-	@Override
-	public boolean hasAttribute(String name) {
-		return attributes.containsKey(name);
-	}
+    @Override
+    public Map<String, String> getAttributes() {
+        return attributes;
+    }
 
-	@Override
-	public String getAttribute(String name) {
-		return attributes.getOrDefault(name, null);
-	}
+    public void setAttributes(Map<String, String> attributes) {
+        this.attributes = attributes;
+    }
+
+    @Override
+    public void addAttribute(String name, String value) {
+        attributes.put(name, value);
+    }
+
+    @Override
+    public void addAttributes(Map<String, String> attributes) {
+        this.attributes.putAll(attributes);
+    }
+
+    @Override
+    public boolean hasAttribute(String name) {
+        return attributes.containsKey(name);
+    }
+
+    @Override
+    public String getAttribute(String name) {
+        return attributes.getOrDefault(name, null);
+    }
 
 }

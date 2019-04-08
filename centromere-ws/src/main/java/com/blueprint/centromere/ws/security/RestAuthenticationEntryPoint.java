@@ -11,23 +11,23 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 
 /**
  * Handles requests in qhich the user fails to properly authenticate.
- * 
+ *
  * @author woemler
  */
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
-  
-  private static final Logger logger = LoggerFactory.getLogger(RestAuthenticationEntryPoint.class);
 
-  @Override
-  public void commence(
-      HttpServletRequest request,
-      HttpServletResponse response, 
-      AuthenticationException exception
-  ) throws IOException, ServletException {
-    
-    logger.error("Returning unauthorized access error: " + exception.getMessage());
-    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, 
-        "You are not authorized to access the requested resource.");
-    
-  }
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestAuthenticationEntryPoint.class);
+
+    @Override
+    public void commence(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        AuthenticationException exception
+    ) throws IOException, ServletException {
+
+        LOGGER.error("Returning unauthorized access error: " + exception.getMessage());
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+            "You are not authorized to access the requested resource.");
+
+    }
 }

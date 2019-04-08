@@ -24,99 +24,102 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Simple text file reader that parses multiple records from a single line.  The identification of the 
- *   the records in each line is assumed to come from the header row, which is parsed and stored when
- *   encountered in the {@code parseHeader} method.  The {@code readRecord} method can extract multiple
- *   records from a single line and return them one-at-a-time, consistent with standard record reader.
- * 
+ * Simple text file reader that parses multiple records from a single line.  The identification of 
+ *   the records in each line is assumed to come from the header row, which is parsed and stored 
+ *   when encountered in the {@code parseHeader} method.  The {@code readRecord} method can extract 
+ *   multiple records from a single line and return them one-at-a-time, consistent with standard 
+ *   record reader.
+ *
  * @author woemler
  * @since 0.4.3
  */
-public abstract class MultiRecordFileReader<T extends Model<?>> 
-		extends DelimitedTextFileRecordReader<T> {
-  
-	private List<T> recordList = new ArrayList<>();
-	private List<String> headers = new ArrayList<>();
-	private boolean headerFlag = true;
+public abstract class MultiRecordFileReader<T extends Model<?>>
+    extends DelimitedTextFileRecordReader<T> {
 
-  public MultiRecordFileReader(Class<T> model, String delimiter) {
-    super(model, delimiter);
-  }
+    private List<T> recordList = new ArrayList<>();
+    private List<String> headers = new ArrayList<>();
+    private boolean headerFlag = true;
 
-  public MultiRecordFileReader(Class<T> model) {
-    super(model);
-  }
+    public MultiRecordFileReader(Class<T> model, String delimiter) {
+        super(model, delimiter);
+    }
 
-  /**
-	 * Initializes the header and record list objects.
-	 */
-	@Override 
-	public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
-		super.doBefore(file, args);
-		recordList = new ArrayList<>();
-		headers = new ArrayList<>();
-		headerFlag = true;
-	}
+    public MultiRecordFileReader(Class<T> model) {
+        super(model);
+    }
 
-	/**
-	 * {@link RecordReader#readRecord()}
-	 */
-	@Override 
-	public T readRecord() throws DataProcessingException {
-		if (recordList.size() > 0){
-			return recordList.remove(0);
-		} else {
-			try {
-				List<String> line = this.getNextLine();
-				while (line != null){
-					if (!isSkippableLine(line)) {
-						if (isHeaderLine(line)){
-							parseHeader(line);
-							headerFlag = false;
-						} else {
-							recordList = getRecordsFromLine(line);
-							if (recordList.size() > 0) return recordList.remove(0);
-						}
-					} 
-					line = this.getNextLine();
-				}
-			} catch (Exception e){
-				throw new DataProcessingException(e);
-			}
-		}
-		return null;
-	}
+    /**
+     * Initializes the header and record list objects.
+     */
+    @Override
+    public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
+        super.doBefore(file, args);
+        recordList = new ArrayList<>();
+        headers = new ArrayList<>();
+        headerFlag = true;
+    }
 
-	/**
-	 * Extracts the column names from the header line in the file. 
-	 * 
-	 * @param line
-	 */
-	protected void parseHeader(List<String> line) throws DataProcessingException {
-		headers = line;
-	}
+    /**
+     * See {@link RecordReader#readRecord()}.
+     */
+    @Override
+    public T readRecord() throws DataProcessingException {
+        if (recordList.size() > 0) {
+            return recordList.remove(0);
+        } else {
+            try {
+                List<String> line = this.getNextLine();
+                while (line != null) {
+                    if (!isSkippableLine(line)) {
+                        if (isHeaderLine(line)) {
+                            parseHeader(line);
+                            headerFlag = false;
+                        } else {
+                            recordList = getRecordsFromLine(line);
+                            if (recordList.size() > 0) {
+                                return recordList.remove(0);
+                            }
+                        }
+                    }
+                    line = this.getNextLine();
+                }
+            } catch (Exception e) {
+                throw new DataProcessingException(e);
+            }
+        }
+        return null;
+    }
 
-  /**
-   * Tests whether the supplied line is a header.
-   * 
-   * @param line
-   * @return
-   */
-	protected boolean isHeaderLine(List<String> line){
-	  return headerFlag;
-  }
+    /**
+     * Extracts the column names from the header line in the file. 
+     *
+     * @param line input line bits.
+     */
+    protected void parseHeader(List<String> line) throws DataProcessingException {
+        headers = line;
+    }
 
-	/**
-	 * Extracts multiple records from a single line of the text file.  If no valid records are found, 
-	 *   an empty list should be returned. 
-	 * 
-	 * @param line
-	 * @return
-	 */
-	abstract protected List<T> getRecordsFromLine(List<String> line) throws DataProcessingException;
+    /**
+     * Tests whether the supplied line is a header.
+     *
+     * @param line input line bits
+     * @return true if line is the file header
+     */
+    protected boolean isHeaderLine(List<String> line) {
+        return headerFlag;
+    }
 
-	protected List<String> getHeaders(){
-		return headers;
-	}
+    /**
+     * Extracts multiple records from a single line of the text file.  If no valid records are found, 
+     *   an empty list should be returned. 
+     *
+     * @param line input line bits
+     * @return a list of model objects
+     */
+    protected abstract List<T> getRecordsFromLine(List<String> line) throws DataProcessingException;
+
+    protected List<String> getHeaders() {
+        return headers;
+    }
 
 }

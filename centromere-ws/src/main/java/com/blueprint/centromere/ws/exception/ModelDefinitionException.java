@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
  */
 public class ModelDefinitionException extends RestException {
 
-  public ModelDefinitionException(String message) {
-    super(HttpStatus.INTERNAL_SERVER_ERROR, 500, message);
-  }
+    public ModelDefinitionException(String message) {
+        super(HttpStatus.INTERNAL_SERVER_ERROR, 500, message);
+    }
 }

@@ -25,7 +25,8 @@ import java.util.Optional;
  */
 public interface GuessOperations<T extends Model<?>> {
 
-  Optional<T> bestGuess(String keyword);
-  List<T> guess(String keyword);
-  
+    Optional<T> bestGuess(String keyword);
+    
+    List<T> guess(String keyword);
+
 }

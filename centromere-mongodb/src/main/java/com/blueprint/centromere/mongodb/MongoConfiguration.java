@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,22 +29,23 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  * @author woemler
  */
 public class MongoConfiguration {
-  
-  @Configuration
-  @PropertySource({"classpath:mongodb.properties"})
-  @EnableMongoRepositories(
-      basePackages = {"${centromere.repository.base-package}"},
-      repositoryBaseClass = MongoModelRepository.class,
-      repositoryFactoryBeanClass = MongoModelRepositoryFactoryBean.class)
-  public static class DefaultMongoRepositoryConfiguration {
-    
-    @Autowired private ApplicationContext applicationContext;
-    
-    @Bean
-    public ModelRepositoryRegistry modelRepositoryRegistry(){
-      return new DefaultModelRepositoryRegistry(applicationContext);
+
+    @Configuration
+    @PropertySource({"classpath:mongodb.properties"})
+    @EnableMongoRepositories(
+        basePackages = {"${centromere.repository.base-package}"},
+        repositoryBaseClass = MongoModelRepository.class,
+        repositoryFactoryBeanClass = MongoModelRepositoryFactoryBean.class)
+    public static class DefaultMongoRepositoryConfiguration {
+
+        @Autowired 
+        private ApplicationContext applicationContext;
+
+        @Bean
+        public ModelRepositoryRegistry modelRepositoryRegistry() {
+            return new DefaultModelRepositoryRegistry(applicationContext);
+        }
+
     }
-    
-  }
 
 }

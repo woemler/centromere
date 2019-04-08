@@ -25,10 +25,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
-import com.blueprint.centromere.tests.core.repositories.DataFileRepository;
-import com.blueprint.centromere.tests.core.repositories.DataSetRepository;
-import com.blueprint.centromere.tests.core.repositories.GeneRepository;
-import com.blueprint.centromere.tests.core.repositories.SampleRepository;
 import com.blueprint.centromere.tests.ws.WebTestInitializer;
 import com.blueprint.centromere.ws.config.ApiMediaTypes;
 import org.junit.Test;
@@ -49,10 +45,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 @AutoConfigureMockMvc(secure = false)
 public class ModelAggregationControllerTests extends AbstractRepositoryTests {
 
-  @Autowired private GeneRepository geneRepository;
-  @Autowired private SampleRepository sampleRepository;
-  @Autowired private DataSetRepository dataSetRepository;
-  @Autowired private DataFileRepository dataFileRepository;
   @Autowired private MockMvc mockMvc;
 
   // Distinct
@@ -80,8 +72,8 @@ public class ModelAggregationControllerTests extends AbstractRepositoryTests {
   
   @Test
   public void findDistinctWithHal() throws Exception {
-    mockMvc.perform((get("/api/aggregation/gene/distinct/geneType")
-        .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE)))
+    mockMvc.perform(get("/api/aggregation/gene/distinct/geneType")
+        .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("links")))

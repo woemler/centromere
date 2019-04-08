@@ -23,57 +23,57 @@ import java.util.Collection;
 /**
  * Defines the API for a registry bean that performs mapping between web service request URIs and
  *   {@link Model} resources in the data warehouse.
- * 
+ *
  * @author woemler
  */
 public interface ModelResourceRegistry {
 
-  /**
-   * Boolean test to determine if the requested URI is associated with a model resource.
-   * 
-   * @param uri to test
-   * @return true if URI is registered
-   */
-  boolean isRegisteredResource(String uri);
+    /**
+     * Boolean test to determine if the requested URI is associated with a model resource.
+     *
+     * @param uri to test
+     * @return true if URI is registered
+     */
+    boolean isRegisteredResource(String uri);
 
-  /**
-   * Boolean test to determine if the requested type is associated with a web service resource.
-   * 
-   * @param type class to check against the registry.
-   * @return true if class is associated with a model resource
-   */
-  boolean isRegisteredModel(Class<?> type);
+    /**
+     * Boolean test to determine if the requested type is associated with a web service resource.
+     *
+     * @param type class to check against the registry.
+     * @return true if class is associated with a model resource
+     */
+    boolean isRegisteredModel(Class<?> type);
 
-  /**
-   * Fetches the {@link Model} class associated with the given URI, if one is registered.
-   * 
-   * @param uri model URI
-   * @return model class
-   * @throws ModelRegistryException
-   */
-  Class<? extends Model<?>> getModelByUri(String uri) throws ModelRegistryException;
+    /**
+     * Fetches the {@link Model} class associated with the given URI, if one is registered.
+     *
+     * @param uri model URI
+     * @return model class
+     * @throws ModelRegistryException
+     */
+    Class<? extends Model<?>> getModelByUri(String uri) throws ModelRegistryException;
 
-  /**
-   * Returns the URI associated with the given {@link Model}, if registered.
-   * 
-   * @param model target model class
-   * @return registered URI
-   * @throws ModelRegistryException
-   */
-  String getUriByModel(Class<? extends Model<?>> model) throws ModelRegistryException;
+    /**
+     * Returns the URI associated with the given {@link Model}, if registered.
+     *
+     * @param model target model class
+     * @return registered URI
+     * @throws ModelRegistryException
+     */
+    String getUriByModel(Class<? extends Model<?>> model) throws ModelRegistryException;
 
-  /**
-   * Returns a collection of all registered models' URIs.
-   * 
-   * @return
-   */
-  Collection<String> getRegisteredModelUris();
+    /**
+     * Returns a collection of all registered models' URIs.
+     *
+     * @return
+     */
+    Collection<String> getRegisteredModelUris();
 
-  /**
-   * Returns a collection of every registered {@link Model}.
-   * 
-   * @return
-   */
-  Collection<Class<? extends Model<?>>> getRegisteredModels();
+    /**
+     * Returns a collection of every registered {@link Model}.
+     *
+     * @return
+     */
+    Collection<Class<? extends Model<?>>> getRegisteredModels();
 
 }

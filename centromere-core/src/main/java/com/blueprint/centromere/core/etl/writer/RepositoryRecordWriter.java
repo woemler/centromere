@@ -31,97 +31,107 @@ import java.util.Map;
  * Simple implementation of {@link RecordWriter}, that writes all records directly to the database
  *   using a {@link ModelRepository} instance.  Can be configured to write using an
  *   insert, update, or upsert (save) operation.
- * 
+ *
  * @author woemler
  */
-public class RepositoryRecordWriter<T extends Model<ID>, ID extends Serializable>
+public class RepositoryRecordWriter<T extends Model<I>, I extends Serializable>
     implements RecordWriter<T> {
-	
-	public enum WriteMode { INSERT, UPDATE, UPSERT }
-	
-	private final ModelRepository<T, ID> repository;
-	
-	private Integer batchSize = 1;
-	private WriteMode writeMode = WriteMode.INSERT;
-	private List<T> records = new ArrayList<>();
 
-  public RepositoryRecordWriter(ModelRepository<T, ID> repository) {
-    this.repository = repository;
-  }
+    public enum WriteMode { INSERT, UPDATE, UPSERT }
 
-  public RepositoryRecordWriter(ModelRepository<T, ID> repository, WriteMode writeMode) {
-    this.repository = repository;
-    this.writeMode = writeMode;
-  }
-  
-  public RepositoryRecordWriter(ModelRepository<T, ID> repository, WriteMode writeMode, Integer batchSize) {
-    this.repository = repository;
-    this.writeMode = writeMode;
-    this.batchSize = batchSize;
-  }
+    private final ModelRepository<T, I> repository;
 
-  @Override
-	public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
-		records = new ArrayList<>();
-	}
+    private Integer batchSize = 1;
+    private WriteMode writeMode = WriteMode.INSERT;
+    private List<T> records = new ArrayList<>();
 
-	/**
-	 * Writes the input {@link Model} record to the target Repository implementation,
-	 *   using the appropriate operation.
-	 * @param entity
-	 */ 
-	@SuppressWarnings("unchecked")
-	public void writeRecord(T entity) throws DataProcessingException {
-    if (batchSize > 1){
-      records.add(entity);
-      if (records.size() >= batchSize) {
-        writeRecords(records);
+    public RepositoryRecordWriter(ModelRepository<T, I> repository) {
+        this.repository = repository;
+    }
+
+    public RepositoryRecordWriter(ModelRepository<T, I> repository, WriteMode writeMode) {
+        this.repository = repository;
+        this.writeMode = writeMode;
+    }
+
+    /**
+     * Constructs a new writer with all modifiers.
+     *
+     * @param repository repository to write to
+     * @param writeMode specifies write mode
+     * @param batchSize number of records to write at once
+     */
+    public RepositoryRecordWriter(ModelRepository<T, I> repository, WriteMode writeMode,
+        Integer batchSize) {
+        this.repository = repository;
+        this.writeMode = writeMode;
+        this.batchSize = batchSize;
+    }
+
+    @Override
+    public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
         records = new ArrayList<>();
-      }
-    } else {
-      writeRecords(Collections.singleton(entity));
     }
-	}
-	
-	protected void writeRecords(Collection<T> records) throws DataProcessingException {
-	  if (writeMode.equals(WriteMode.INSERT)){
-	    repository.insert(records);
-    } else if (writeMode.equals(WriteMode.UPDATE)){
-	    repository.update(records);
-    } else {
-      for (T record: records){
-        if (record.getId() != null && repository.existsById(record.getId())){
-          repository.update(record);
+
+    /**
+     * Writes the input {@link Model} record to the target Repository implementation,
+     *   using the appropriate operation.
+     * @param entity object to write
+     */
+    @SuppressWarnings("unchecked")
+    public void writeRecord(T entity) throws DataProcessingException {
+        if (batchSize > 1) {
+            records.add(entity);
+            if (records.size() >= batchSize) {
+                writeRecords(records);
+                records = new ArrayList<>();
+            }
         } else {
-          repository.insert(record);
+            writeRecords(Collections.singleton(entity));
         }
-      }
     }
-  }
 
-	@Override
-	public void doOnSuccess(File file, Map<String, String> args) throws DataProcessingException {
-			if (records.size() > 0) writeRecords(records);
-	}
+    protected void writeRecords(Collection<T> records) throws DataProcessingException {
+        if (writeMode.equals(WriteMode.INSERT)) {
+            repository.insert(records);
+        } else if (writeMode.equals(WriteMode.UPDATE)) {
+            repository.update(records);
+        } else {
+            for (T record: records) {
+                if (record.getId() != null && repository.existsById(record.getId())) {
+                    repository.update(record);
+                } else {
+                    repository.insert(record);
+                }
+            }
+        }
+    }
 
-  @Override
-  public void doOnFailure(File file, Map<String, String> args) throws DataProcessingException {
-    
-  }
+    @Override
+    public void doOnSuccess(File file, Map<String, String> args) throws DataProcessingException {
+        if (records.size() > 0) {
+            writeRecords(records);
+        }
+    }
 
-  public Integer getBatchSize() {
-    return batchSize;
-  }
+    @Override
+    public void doOnFailure(File file, Map<String, String> args) throws DataProcessingException {
 
-  public void setBatchSize(Integer batchSize) {
-    this.batchSize = batchSize;
-  }
+    }
 
-  public WriteMode getWriteMode() {
-    return writeMode;
-  }
+    public Integer getBatchSize() {
+        return batchSize;
+    }
 
-  public void setWriteMode(WriteMode writeMode) {
-    this.writeMode = writeMode;
-  }
+    public void setBatchSize(Integer batchSize) {
+        this.batchSize = batchSize;
+    }
+
+    public WriteMode getWriteMode() {
+        return writeMode;
+    }
+
+    public void setWriteMode(WriteMode writeMode) {
+        this.writeMode = writeMode;
+    }
 }

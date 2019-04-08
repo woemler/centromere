@@ -27,88 +27,91 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Basic abstract implementation of {@link RecordWriter}, for writing records to temp files.  Handles the 
- *   file object opening and closing in the {@code doBefore} and {@code doAfter} methods, respectively.
- * 
+ * Basic abstract implementation of {@link RecordWriter}, for writing records to temp files.  
+ *   Handles the file object opening and closing in the {@code doBefore} and {@code doAfter}
+ *   methods, respectively.
+ *
  * @author woemler
  */
-public abstract class AbstractRecordFileWriter<T extends Model<?>> 
-		implements RecordWriter<T>, TempFileWriter {
-  
-  private static final Logger logger = LoggerFactory.getLogger(AbstractRecordFileWriter.class);
-  
-	private FileWriter writer = null;
+public abstract class AbstractRecordFileWriter<T extends Model<?>>
+    implements RecordWriter<T>, TempFileWriter {
 
-  /**
-	 * Opens a new output file for writing.
-	 */
-	@Override
-	public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
-    File tempFile = this.getTempFile(file); 
-    this.open(tempFile);
-		logger.info(String.format("Writing records to file: %s", tempFile.getAbsolutePath()));
-	}
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractRecordFileWriter.class);
 
-	/**
-	 * Closes the open file writer.
-	 */
-	@Override
-	public void doOnSuccess(File file, Map<String, String> args) throws DataProcessingException {
-		this.close();
-	}
+    private FileWriter writer;
 
-  @Override
-  public void doOnFailure(File file, Map<String, String> args) throws DataProcessingException {
-    this.close();
-  }
-
-  /**
-	 * Creates or overwrites an output file, creates a {@link FileWriter} for writing records to the file.
-	 * 
-	 * @param tempFile
-	 */
-	protected void open(File tempFile) throws DataProcessingException {
-		this.close();
-		try {
-			writer = new FileWriter(tempFile);
-		} catch (IOException e){
-			throw new InvalidDataSourceException(String.format("Cannot open output file: %s", tempFile.getAbsolutePath()), e);
-		}
-	}
-
-	/**
-	 * Flushes outstanding records to the output file and then closes the file and its writer object.
-	 */
-	protected void close(){
-		try {
-			writer.flush();
-			writer.close();
-		} catch (Exception e){
-			logger.debug(e.getMessage());
-		}
-	}
-
-  /**
-   * Returns the path of the temporary file to be written, if necessary.  Uses the input file's name
-   *   and the pre-determined temp file directory to generate the name, so as to overwrite previous
-   *   jobs' temp file.
-   * @param inputFile
-   * @return
-   */
-  @Override
-  public File getTempFile(File inputFile) throws DataProcessingException {
-    File tempDir = new File(System.getProperty("java.io.tmpdir"));
-    if (!tempDir.isDirectory() || !tempDir.canWrite()){
-      throw new DataProcessingException(String.format("Unable to read or write to temp directory: %s",
-          tempDir.getAbsolutePath()));
+    /**
+     * Opens a new output file for writing.
+     */
+    @Override
+    public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
+        File tempFile = this.getTempFile(file);
+        this.open(tempFile);
+        LOGGER.info(String.format("Writing records to file: %s", tempFile.getAbsolutePath()));
     }
-    String fileName = "centromere.import.tmp";
-    File tempFile = new File(tempDir, fileName);
-    return tempFile;
-  }
 
-	protected FileWriter getWriter() {
-		return writer;
-	}
-	
+    /**
+     * Closes the open file writer.
+     */
+    @Override
+    public void doOnSuccess(File file, Map<String, String> args) throws DataProcessingException {
+        this.close();
+    }
+
+    @Override
+    public void doOnFailure(File file, Map<String, String> args) throws DataProcessingException {
+        this.close();
+    }
+
+    /**
+     * Creates or overwrites an output file, creates a {@link FileWriter} for writing records to the 
+     *   file.
+     *
+     * @param tempFile temporary file reference
+     */
+    protected void open(File tempFile) throws DataProcessingException {
+        this.close();
+        try {
+            writer = new FileWriter(tempFile);
+        } catch (IOException e) {
+            throw new InvalidDataSourceException(String.format("Cannot open output file: %s",
+                tempFile.getAbsolutePath()), e);
+        }
+    }
+
+    /**
+     * Flushes outstanding records to the output file and then closes the file and its writer object.
+     */
+    protected void close() {
+        try {
+            writer.flush();
+            writer.close();
+        } catch (Exception e) {
+            LOGGER.debug(e.getMessage());
+        }
+    }
+
+    /**
+     * Returns the path of the temporary file to be written, if necessary.  Uses the input file's name
+     *   and the pre-determined temp file directory to generate the name, so as to overwrite previous
+     *   jobs' temp file.
+     * @param inputFile input file object
+     * @return
+     */
+    @Override
+    public File getTempFile(File inputFile) throws DataProcessingException {
+        File tempDir = new File(System.getProperty("java.io.tmpdir"));
+        if (!tempDir.isDirectory() || !tempDir.canWrite()) {
+            throw new DataProcessingException(
+                String.format("Unable to read or write to temp directory: %s",
+                    tempDir.getAbsolutePath()));
+        }
+        String fileName = "centromere.import.tmp";
+        return new File(tempDir, fileName);
+    }
+
+    protected FileWriter getWriter() {
+        return writer;
+    }
+
 }

@@ -26,54 +26,58 @@ import java.util.Map;
 import lombok.Data;
 
 @Data
-public abstract class Gene<ID extends Serializable> implements Attributes, Model<ID> {
-  
-  private String symbol;
-	private Integer entrezGeneId;
-	private Integer taxId;
-	private String chromosome;
-	@Ignored private String chromosomeLocation;
-	private String geneType;
-	@Ignored private String description;
-	private List<String> aliases = new ArrayList<>();
-	private Map<String, String> attributes = new HashMap<>();
-	private Map<String, String> externalReferences = new HashMap<>();
-	
-  public void addExternalReference(String name, String value){
-		externalReferences.put(name, value);
-	}
+public abstract class Gene<I extends Serializable> implements Attributes, Model<I> {
 
-	public boolean hasExternalReference(String name){
-		return externalReferences.containsKey(name);
-	}
+    private String symbol;
+    private Integer entrezGeneId;
+    private Integer taxId;
+    private String chromosome;
+    @Ignored 
+    private String chromosomeLocation;
+    private String geneType;
+    @Ignored 
+    private String description;
+    private List<String> aliases = new ArrayList<>();
+    private Map<String, String> attributes = new HashMap<>();
+    private Map<String, String> externalReferences = new HashMap<>();
 
-	@Override
-	public void addAttribute(String name, String value) {
-		attributes.put(name, value);
-	}
+    public void addExternalReference(String name, String value) {
+        externalReferences.put(name, value);
+    }
 
-	@Override
-	public void addAttributes(Map<String, String> attributes) {
-		this.attributes.putAll(attributes);
-	}
+    public boolean hasExternalReference(String name) {
+        return externalReferences.containsKey(name);
+    }
 
-	@Override
-	public boolean hasAttribute(String name) {
-		return attributes.containsKey(name);
-	}
+    @Override
+    public void addAttribute(String name, String value) {
+        attributes.put(name, value);
+    }
 
-	@Override
-	public String getAttribute(String name) {
-		return attributes.containsKey(name) ? attributes.get(name) : null;
-	}
+    @Override
+    public void addAttributes(Map<String, String> attributes) {
+        this.attributes.putAll(attributes);
+    }
 
-  @Override
-  public Map<String, String> getAttributes() {
-    return attributes;
-  }
+    @Override
+    public boolean hasAttribute(String name) {
+        return attributes.containsKey(name);
+    }
 
-  public void addAlias(String alias){
-		if (!aliases.contains(alias)) this.aliases.add(alias);
-	}
+    @Override
+    public String getAttribute(String name) {
+        return attributes.containsKey(name) ? attributes.get(name) : null;
+    }
+
+    @Override
+    public Map<String, String> getAttributes() {
+        return attributes;
+    }
+
+    public void addAlias(String alias) {
+        if (!aliases.contains(alias)) {
+            this.aliases.add(alias);
+        }
+    }
 
 }

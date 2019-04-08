@@ -18,29 +18,29 @@ package com.blueprint.centromere.core.exceptions;
 
 /**
  * Generic exception thrown when a data processing component encounters a problem.
- * 
+ *
  * @author woemler
  */
 public class DataProcessingException extends CentromereException {
 
-	public DataProcessingException() {
-	}
+    public DataProcessingException() {
+    }
 
-	public DataProcessingException(String message) {
-		super(message);
-	}
+    public DataProcessingException(String message) {
+        super(message);
+    }
 
-	public DataProcessingException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public DataProcessingException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public DataProcessingException(Throwable cause) {
-		super(cause);
-	}
+    public DataProcessingException(Throwable cause) {
+        super(cause);
+    }
 
-	public DataProcessingException(String message, Throwable cause, boolean enableSuppression,
-			boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
+    public DataProcessingException(String message, Throwable cause, boolean enableSuppression,
+        boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 
 }

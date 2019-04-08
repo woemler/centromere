@@ -26,7 +26,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @ToString(callSuper = true)
 public class MongoDataFile extends DataFile<String> {
-  
-  @Id private String id;
+
+    @Id 
+    private String id;
 
 }

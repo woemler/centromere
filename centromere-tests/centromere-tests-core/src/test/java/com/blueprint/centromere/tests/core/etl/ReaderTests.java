@@ -43,7 +43,7 @@ public class ReaderTests {
         gene = reader.readRecord();
       }
       reader.doOnSuccess(file, new HashMap<>());
-    } catch (Exception e){
+    } catch (Exception e) {
       exception = e;
       e.printStackTrace();
       reader.doOnFailure(file, new HashMap<>());
@@ -74,7 +74,7 @@ public class ReaderTests {
         gene = reader.readRecord();
       }
       reader.doOnSuccess(file, new HashMap<>());
-    } catch (Exception e){
+    } catch (Exception e) {
       exception = e;
       e.printStackTrace();
       reader.doOnFailure(file, new HashMap<>());
@@ -83,7 +83,7 @@ public class ReaderTests {
     Assert.assertNull(exception);
     Assert.assertTrue(!genes.isEmpty());
     Assert.assertEquals(genes.size(), 5);
-    for (Gene gene: genes){
+    for (Gene gene: genes) {
       System.out.println(gene.toString());
     }
 

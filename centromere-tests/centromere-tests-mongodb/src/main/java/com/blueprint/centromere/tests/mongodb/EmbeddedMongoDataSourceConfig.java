@@ -13,14 +13,14 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 @Configuration
 public class EmbeddedMongoDataSourceConfig {
 
-  @Bean(destroyMethod = "close")
-  public MongoClient mongo() throws IOException {
-    return new EmbeddedMongoBuilder().build();
-  }
+    @Bean(destroyMethod = "close")
+    public MongoClient mongo() throws IOException {
+        return new EmbeddedMongoBuilder().build();
+    }
 
-  @Bean
-  public MongoTemplate mongoTemplate() throws IOException{
-    return new MongoTemplate(mongo(), "centromere-test");
-  }
+    @Bean
+    public MongoTemplate mongoTemplate() throws IOException {
+        return new MongoTemplate(mongo(), "centromere-test");
+    }
 
 }

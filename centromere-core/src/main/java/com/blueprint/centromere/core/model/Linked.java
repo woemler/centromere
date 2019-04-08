@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
  *   within the source database. The {@link #model()} value indicates the linked model class, the
  *   {@link #field()} value indicates the field in the linked model class that is represented by
  *   this annotated field, and {@link #rel()} provides a name for this relationship.
- * 
+ *
  * @author woemler
  */
 @Inherited
@@ -35,26 +35,26 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface Linked {
 
-  /**
-   * The {@link Model} class type that the annotated field references.
-   *
-   * @return linked model class
-   */
-  Class<?> model();
+    /**
+     * The {@link Model} class type that the annotated field references.
+     *
+     * @return linked model class
+     */
+    Class<?> model();
 
-  /**
-   * Field name in the source {@link Model} type that the annotated field references.  Used to
-   *   construct the query string options in the assembled link.
-   *
-   * @return the linked field in the origin class
-   */
-  String field() default "id";
+    /**
+     * Field name in the source {@link Model} type that the annotated field references.  Used to
+     *   construct the query string options in the assembled link.
+     *
+     * @return the linked field in the origin class
+     */
+    String field() default "id";
 
-  /**
-   * Relationship name to be used in documentation and link creation.
-   * 
-   * @return relationship name
-   */
-  String rel() default "";
-  
+    /**
+     * Relationship name to be used in documentation and link creation.
+     *
+     * @return relationship name
+     */
+    String rel() default "";
+
 }

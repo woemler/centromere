@@ -39,49 +39,49 @@ import org.springframework.web.filter.GenericFilterBean;
  *   expiration times, that allow it to be validated without the user having to submit their credentials
  *   every time a request is made, but still takes steps to prevent user impersonation and token
  *   forgery.
- * 
+ *
  * @author woemler
  */
 public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
-	
-	private final TokenOperations tokenOperations;
-	private final UserDetailsService userDetailsService;
-	
-	public AuthenticationTokenProcessingFilter(TokenOperations tokenOperations, 
-			UserDetailsService userDetailsService){
-		this.tokenOperations = tokenOperations;
-		this.userDetailsService = userDetailsService;
-	}
 
-	@Override 
-	public void doFilter(ServletRequest request, ServletResponse response,
-			FilterChain chain) throws IOException, ServletException {
+    private final TokenOperations tokenOperations;
+    private final UserDetailsService userDetailsService;
 
-		if (!(request instanceof HttpServletRequest)){
-			throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Expecting an HTTP request.");
-		}
-		HttpServletRequest httpRequest = (HttpServletRequest) request;
-		//System.out.println("Remote Host: " + httpRequest.getRemoteHost());
+    public AuthenticationTokenProcessingFilter(TokenOperations tokenOperations,
+        UserDetailsService userDetailsService) {
+        this.tokenOperations = tokenOperations;
+        this.userDetailsService = userDetailsService;
+    }
 
-		String authToken = httpRequest.getHeader("X-Auth-Token");
-		if (authToken == null){
-			authToken = httpRequest.getParameter("token");
-		}
-		
-		String username = tokenOperations.getUserNameFromToken(authToken);
-		
-		if (username != null){
-			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-			if (tokenOperations.validateToken(authToken, userDetails)){
-				UsernamePasswordAuthenticationToken authentication = 
-						new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
-				SecurityContextHolder.getContext().setAuthentication(authentication);
-			}
-		}
-		
-		chain.doFilter(request, response);
-		
-	}
-	
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response,
+        FilterChain chain) throws IOException, ServletException {
+
+        if (!(request instanceof HttpServletRequest)) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Expecting an HTTP request.");
+        }
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        //System.out.println("Remote Host: " + httpRequest.getRemoteHost());
+
+        String authToken = httpRequest.getHeader("X-Auth-Token");
+        if (authToken == null) {
+            authToken = httpRequest.getParameter("token");
+        }
+
+        String username = tokenOperations.getUserNameFromToken(authToken);
+
+        if (username != null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (tokenOperations.validateToken(authToken, userDetails)) {
+                UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        }
+
+        chain.doFilter(request, response);
+
+    }
+
 }

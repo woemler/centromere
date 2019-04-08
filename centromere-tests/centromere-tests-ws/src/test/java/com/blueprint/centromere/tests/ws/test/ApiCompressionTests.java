@@ -11,9 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.core.env.Environment;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
 /**
  * @author woemler
@@ -23,17 +21,17 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc(secure = false)
 public class ApiCompressionTests extends AbstractRepositoryTests {
 
-  private static final String BASE_URL = "/api/gene";
+  //private static final String BASE_URL = "/api/gene";
 
-  @Autowired
-  private MockMvc mockMvc;
+//  @Autowired
+//  private MockMvc mockMvc;
   @Autowired private GeneRepository geneRepository;
-  @Autowired private Environment environment;
+//  @Autowired private Environment environment;
 
   @Before
   public void doBefore() throws Exception {
     geneRepository.deleteAll();
-    for (Integer i = 0; i < 20000; i++){
+    for (Integer i = 0; i < 20000; i++) {
       Gene gene = (Gene) geneRepository.getModel().newInstance();
       gene.setSymbol("Gene"+i.toString());
       gene.setEntrezGeneId(i);
@@ -48,7 +46,7 @@ public class ApiCompressionTests extends AbstractRepositoryTests {
   }
   
   @Test
-  public void placeholderTest(){
+  public void placeholderTest() {
     
   }
 

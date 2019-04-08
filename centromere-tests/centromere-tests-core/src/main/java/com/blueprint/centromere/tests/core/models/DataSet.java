@@ -28,87 +28,97 @@ import java.util.Map;
 import lombok.Data;
 
 @Data
-public abstract class DataSet<ID extends Serializable> implements Model<ID>, Attributes {
-  
-  private String name;
-	private String source;
-	@Ignored private String version;
-	@Ignored private String description;
-	
-	@Linked(model = DataFile.class, rel = "dataFiles", field = "id") 
-  private List<ID> dataFileIds = new ArrayList<>();
-  
-	@Linked(model = Sample.class, rel = "samples", field = "id") 
-  private List<ID> sampleIds = new ArrayList<>();
-	
-  private Map<String, String> attributes = new HashMap<>();
-	
-  @Ignored 
-  private Map<String, String> parameters = new HashMap<>();
+public abstract class DataSet<I extends Serializable> implements Model<I>, Attributes {
 
-  @Override
-	public Map<String, String> getAttributes() {
-		return attributes;
-	}
+    private String name;
+    private String source;
+    @Ignored 
+    private String version;
+    @Ignored 
+    private String description;
 
-	public void setAttributes(Map<String, String> attributes) {
-		this.attributes = attributes;
-	}
+    @Linked(model = DataFile.class, rel = "dataFiles", field = "id")
+    private List<I> dataFileIds = new ArrayList<>();
 
-	@Override
-	public void addAttribute(String name, String value) {
-		attributes.put(name, value);
-	}
+    @Linked(model = Sample.class, rel = "samples", field = "id")
+    private List<I> sampleIds = new ArrayList<>();
 
-	@Override
-	public void addAttributes(Map<String, String> attributes) {
-		this.attributes.putAll(attributes);
-	}
+    private Map<String, String> attributes = new HashMap<>();
 
-	@Override
-	public boolean hasAttribute(String name) {
-		return attributes.containsKey(name);
-	}
+    @Ignored
+    private Map<String, String> parameters = new HashMap<>();
 
-	@Override
-	public String getAttribute(String name) {
-		return attributes.containsKey(name) ? attributes.get(name) : null;
-	}
-
-  public void addParameter(String name, String value) {
-    parameters.put(name, value);
-  }
-
-  public void addParameters(Map<String, String> parameters) {
-    this.parameters.putAll(parameters);
-  }
-
-  public boolean hasParameter(String name) {
-    return parameters.containsKey(name);
-  }
-
-  public String getParameter(String name) {
-    return parameters.containsKey(name) ? parameters.get(name) : null;
-  }
-
-  public void addSampleId(ID sampleId){
-    if (!sampleIds.contains(sampleId)) sampleIds.add(sampleId);
-  }
-  
-  public void addSampleIds(Collection<String> sampleIds){
-    for (String sampleId: sampleIds){
-      if (!sampleIds.contains(sampleId)) sampleIds.add(sampleId);
+    @Override
+    public Map<String, String> getAttributes() {
+        return attributes;
     }
-  }
-  
-  public void addDataFileId(ID dataFileId){
-    if (!dataFileIds.contains(dataFileId)) dataFileIds.add(dataFileId);
-  }
-  
-  public void addDataFileIds(Collection<String> dataFileIds){
-    for (String dataFileId: dataFileIds){
-      if (!dataFileIds.contains(dataFileId)) dataFileIds.add(dataFileId);
+
+    public void setAttributes(Map<String, String> attributes) {
+        this.attributes = attributes;
     }
-  }
+
+    @Override
+    public void addAttribute(String name, String value) {
+        attributes.put(name, value);
+    }
+
+    @Override
+    public void addAttributes(Map<String, String> attributes) {
+        this.attributes.putAll(attributes);
+    }
+
+    @Override
+    public boolean hasAttribute(String name) {
+        return attributes.containsKey(name);
+    }
+
+    @Override
+    public String getAttribute(String name) {
+        return attributes.containsKey(name) ? attributes.get(name) : null;
+    }
+
+    public void addParameter(String name, String value) {
+        parameters.put(name, value);
+    }
+
+    public void addParameters(Map<String, String> parameters) {
+        this.parameters.putAll(parameters);
+    }
+
+    public boolean hasParameter(String name) {
+        return parameters.containsKey(name);
+    }
+
+    public String getParameter(String name) {
+        return parameters.containsKey(name) ? parameters.get(name) : null;
+    }
+
+    public void addSampleId(I sampleId) {
+        if (!sampleIds.contains(sampleId)) {
+            sampleIds.add(sampleId);
+        }
+    }
+
+    public void addSampleIds(Collection<String> sampleIds) {
+        for (String sampleId: sampleIds) {
+            if (!sampleIds.contains(sampleId)) {
+                sampleIds.add(sampleId);
+            }
+        }
+    }
+
+    public void addDataFileId(I dataFileId) {
+        if (!dataFileIds.contains(dataFileId)) {
+            dataFileIds.add(dataFileId);
+        }
+    }
+
+    public void addDataFileIds(Collection<String> dataFileIds) {
+        for (String dataFileId: dataFileIds) {
+            if (!dataFileIds.contains(dataFileId)) {
+                dataFileIds.add(dataFileId);
+            }
+        }
+    }
 
 }

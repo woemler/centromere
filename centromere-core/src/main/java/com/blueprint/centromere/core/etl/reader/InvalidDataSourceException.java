@@ -19,27 +19,29 @@ package com.blueprint.centromere.core.etl.reader;
 import com.blueprint.centromere.core.exceptions.DataProcessingException;
 
 /**
+ * Exception thrown when the supplied file or resource is inaccessible or of the wrong type.
+ *
  * @author woemler
  */
 public class InvalidDataSourceException extends DataProcessingException {
 
-  public InvalidDataSourceException() {
-  }
+    public InvalidDataSourceException() {
+    }
 
-  public InvalidDataSourceException(String message) {
-    super(message);
-  }
+    public InvalidDataSourceException(String message) {
+        super(message);
+    }
 
-  public InvalidDataSourceException(String message, Throwable cause) {
-    super(message, cause);
-  }
+    public InvalidDataSourceException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-  public InvalidDataSourceException(Throwable cause) {
-    super(cause);
-  }
+    public InvalidDataSourceException(Throwable cause) {
+        super(cause);
+    }
 
-  public InvalidDataSourceException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
-  }
+    public InvalidDataSourceException(String message, Throwable cause, boolean enableSuppression,
+        boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

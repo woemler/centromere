@@ -28,7 +28,7 @@ public class Gene implements Model<String> {
   private Map<String,String> attributes;
 
   @Override
-  public String getId(){ return id; }
+  public String getId() { return id; }
 
   /* Getters and Setters */
   
@@ -61,7 +61,7 @@ public class Gene implements Model<String> {
   private Map<String,String> attributes;
   
   @Override
-  public String getId(){ return id; }
+  public String getId() { return id; }
   
   /* Getters and Setters */
   

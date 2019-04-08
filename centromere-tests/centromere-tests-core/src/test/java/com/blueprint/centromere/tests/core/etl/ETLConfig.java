@@ -13,16 +13,16 @@ import org.springframework.context.annotation.Configuration;
 public class ETLConfig {
 
   @Bean
-  public GeneInfoProcessor<TestGene, String> geneInfoProcessor(){
+  public GeneInfoProcessor<TestGene, String> geneInfoProcessor() {
     return new GeneInfoProcessor<>(
         TestGene.class, new 
         GeneInfoReader<>(TestGene.class), 
-        new TestWriter<>(TestGene.class)
+        new TestWriter<>()
     );
   }
   
   @Bean
-  public ModelProcessorBeanRegistry<DataProcessor<?>> processorRegistry(){
+  public ModelProcessorBeanRegistry<DataProcessor<?>> processorRegistry() {
     return new ModelProcessorBeanRegistry<>();
   }
   

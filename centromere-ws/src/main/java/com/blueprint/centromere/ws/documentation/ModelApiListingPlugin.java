@@ -20,49 +20,49 @@ import springfox.documentation.swagger.common.SwaggerPluginSupport;
  */
 public class ModelApiListingPlugin implements ApiListingBuilderPlugin {
 
-  private final ModelResourceRegistry registry;
-  private final TypeResolver typeResolver;
-  
-  @Value("${centromere.web.api.root-url}")
-  private String rootUrl;
+    private final ModelResourceRegistry registry;
+    private final TypeResolver typeResolver;
 
-  public ModelApiListingPlugin(ModelResourceRegistry registry, TypeResolver typeResolver) {
-    this.registry = registry;
-    this.typeResolver = typeResolver;
-  }
+    @Value("${centromere.web.api.root-url}")
+    private String rootUrl;
 
-  @Override
-  public void apply(ApiListingContext apiListingContext) {
-    apiListingContext.apiListingBuilder().apis(getApiDescriptions());
-
-  }
-
-  /**
-   * Iterates through each {@link Model} registered with a {@link ModelResourceRegistry} instance 
-   *   and generates a collection of {@link ApiDescription} objects, which describe the available
-   *   resource endpoints.
-   * 
-   * @return
-   */
-  protected List<ApiDescription> getApiDescriptions(){
-    Assert.notNull(registry, "ModelRegistry must not be null.");
-    List<ApiDescription> descriptions = new ArrayList<>();
-    for (Class<? extends Model<?>> model: registry.getRegisteredModels()){
-      if (registry.isRegisteredModel(model)){
-        try {
-          String path = rootUrl + "/" + registry.getUriByModel(model);
-          descriptions.addAll(SwaggerPluginUtil.getModelApiDescriptions(model, typeResolver, path));
-        } catch (ModelRegistryException e){
-          e.printStackTrace();
-        }
-      }
+    public ModelApiListingPlugin(ModelResourceRegistry registry, TypeResolver typeResolver) {
+        this.registry = registry;
+        this.typeResolver = typeResolver;
     }
-    return descriptions;
-  }
 
-  @Override
-  public boolean supports(DocumentationType documentationType) {
-    return SwaggerPluginSupport.pluginDoesApply(documentationType);
-  }
+    @Override
+    public void apply(ApiListingContext apiListingContext) {
+        apiListingContext.apiListingBuilder().apis(getApiDescriptions());
+
+    }
+
+    /**
+     * Iterates through each {@link Model} registered with a {@link ModelResourceRegistry} instance 
+     *   and generates a collection of {@link ApiDescription} objects, which describe the available
+     *   resource endpoints.
+     *
+     * @return
+     */
+    protected List<ApiDescription> getApiDescriptions() {
+        Assert.notNull(registry, "ModelRegistry must not be null.");
+        List<ApiDescription> descriptions = new ArrayList<>();
+        for (Class<? extends Model<?>> model: registry.getRegisteredModels()) {
+            if (registry.isRegisteredModel(model)) {
+                try {
+                    String path = rootUrl + "/" + registry.getUriByModel(model);
+                    descriptions.addAll(SwaggerPluginUtil.getModelApiDescriptions(model, typeResolver, path));
+                } catch (ModelRegistryException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return descriptions;
+    }
+
+    @Override
+    public boolean supports(DocumentationType documentationType) {
+        return SwaggerPluginSupport.pluginDoesApply(documentationType);
+    }
 
 }

@@ -30,148 +30,153 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
 /**
- * Writes records to a character-delimited text file.  Can be used for file reformatting or temp file
- *   preperation for utilities, such as MySQL Import.
- * 
+ * Writes records to a character-delimited text file.  Can be used for file reformatting or temp 
+ *   file preperation for utilities, such as MySQL Import.
+ *
  * @author woemler
  * @since 0.5.0
  */
-public class DelimtedTextFileWriter<T extends Model<?>> 
+public class DelimtedTextFileWriter<T extends Model<?>>
     extends AbstractRecordFileWriter<T>
     implements ModelSupport<T> {
 
-  private final Class<T> model;
-  
-  private String delimiter = "\t";
-  private String enclosedBy = "";
-  private String escapedBy = "\\\\";
-  private String terminatedBy = "\n";
-  private List<String> ignoredFields = new ArrayList<>();
-  private List<String> columns = new ArrayList<>();
-  private List<String> fields = new ArrayList<>();
-  private boolean headerFlag = true;
+    private final Class<T> model;
 
-  public DelimtedTextFileWriter(Class<T> model) {
-    this.model = model;
-  }
+    private String delimiter = "\t";
+    private String enclosedBy = "";
+    private String escapedBy = "\\\\";
+    private String terminatedBy = "\n";
+    private List<String> ignoredFields = new ArrayList<>();
+    private List<String> columns = new ArrayList<>();
+    private List<String> fields = new ArrayList<>();
+    private boolean headerFlag = true;
 
-  @Override
-  public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
-    super.doBefore(file, args);
-    columns = ModelReflectionUtils.getPersistableNonEntityFieldNames(this.getModel(), ignoredFields);
-    fields = columns;
-  }
-
-  @Override
-  public void writeRecord(T record) throws DataProcessingException {
-    
-    FileWriter writer = this.getWriter();
-    StringBuilder stringBuilder = new StringBuilder();
-    
-    if (headerFlag){
-      boolean flag = false;
-      for (String headerName: columns){
-        if (flag) stringBuilder.append(delimiter);
-        stringBuilder.append(enclosedBy)
-            .append(headerName)
-            .append(enclosedBy);
-        flag = true;
-      }
-
-      try {
-        writer.write(stringBuilder.toString());
-        writer.write(terminatedBy);
-      } catch (IOException e){
-        throw new DataProcessingException(e);
-      }
-      headerFlag = false;
+    public DelimtedTextFileWriter(Class<T> model) {
+        this.model = model;
     }
-    
-    stringBuilder = new StringBuilder();
-    BeanWrapper wrapper = new BeanWrapperImpl(record);
-    boolean flag = false;
-    for (String column: fields){
-      Object value = wrapper.getPropertyValue(column);
-      if (value == null){
-        value = "null";
-      } else if (!"".equals(enclosedBy) && value instanceof String) {
-        value = ((String) value).replaceAll(enclosedBy, escapedBy + enclosedBy);
-      }
-      if (flag) stringBuilder.append(delimiter);
-      stringBuilder.append(enclosedBy)
-          .append(value)
-          .append(enclosedBy);
-      flag = true;
+
+    @Override
+    public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
+        super.doBefore(file, args);
+        columns = ModelReflectionUtils
+            .getPersistableNonEntityFieldNames(this.getModel(), ignoredFields);
+        fields = columns;
     }
-    
-    try {
-      writer.write(stringBuilder.toString());
-      writer.write(terminatedBy);
-    } catch (IOException e){
-      throw new DataProcessingException(e);
+
+    @Override
+    public void writeRecord(T record) throws DataProcessingException {
+
+        FileWriter writer = this.getWriter();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        if (headerFlag) {
+            boolean flag = false;
+            for (String headerName: columns) {
+                if (flag) {
+                    stringBuilder.append(delimiter);
+                }
+                stringBuilder.append(enclosedBy)
+                    .append(headerName)
+                    .append(enclosedBy);
+                flag = true;
+            }
+
+            try {
+                writer.write(stringBuilder.toString());
+                writer.write(terminatedBy);
+            } catch (IOException e) {
+                throw new DataProcessingException(e);
+            }
+            headerFlag = false;
+        }
+
+        stringBuilder = new StringBuilder();
+        BeanWrapper wrapper = new BeanWrapperImpl(record);
+        boolean flag = false;
+        for (String column: fields) {
+            Object value = wrapper.getPropertyValue(column);
+            if (value == null) {
+                value = "null";
+            } else if (!"".equals(enclosedBy) && value instanceof String) {
+                value = ((String) value).replaceAll(enclosedBy, escapedBy + enclosedBy);
+            }
+            if (flag) {
+                stringBuilder.append(delimiter);
+            }
+            stringBuilder.append(enclosedBy)
+                .append(value)
+                .append(enclosedBy);
+            flag = true;
+        }
+
+        try {
+            writer.write(stringBuilder.toString());
+            writer.write(terminatedBy);
+        } catch (IOException e) {
+            throw new DataProcessingException(e);
+        }
+
     }
-    
-  }
 
-  public String getDelimiter() {
-    return delimiter;
-  }
+    public String getDelimiter() {
+        return delimiter;
+    }
 
-  public void setDelimiter(String delimiter) {
-    this.delimiter = delimiter;
-  }
+    public void setDelimiter(String delimiter) {
+        this.delimiter = delimiter;
+    }
 
-  public String getEnclosedBy() {
-    return enclosedBy;
-  }
+    public String getEnclosedBy() {
+        return enclosedBy;
+    }
 
-  public void setEnclosedBy(String enclosedBy) {
-    this.enclosedBy = enclosedBy;
-  }
+    public void setEnclosedBy(String enclosedBy) {
+        this.enclosedBy = enclosedBy;
+    }
 
-  public String getEscapedBy() {
-    return escapedBy;
-  }
+    public String getEscapedBy() {
+        return escapedBy;
+    }
 
-  public void setEscapedBy(String escapedBy) {
-    this.escapedBy = escapedBy;
-  }
+    public void setEscapedBy(String escapedBy) {
+        this.escapedBy = escapedBy;
+    }
 
-  public String getTerminatedBy() {
-    return terminatedBy;
-  }
+    public String getTerminatedBy() {
+        return terminatedBy;
+    }
 
-  public void setTerminatedBy(String terminatedBy) {
-    this.terminatedBy = terminatedBy;
-  }
+    public void setTerminatedBy(String terminatedBy) {
+        this.terminatedBy = terminatedBy;
+    }
 
-  public List<String> getIgnoredFields() {
-    return ignoredFields;
-  }
+    public List<String> getIgnoredFields() {
+        return ignoredFields;
+    }
 
-  public void setIgnoredFields(List<String> ignoredFields) {
-    this.ignoredFields = ignoredFields;
-  }
+    public void setIgnoredFields(List<String> ignoredFields) {
+        this.ignoredFields = ignoredFields;
+    }
 
-  protected List<String> getColumns() {
-    return columns;
-  }
+    protected List<String> getColumns() {
+        return columns;
+    }
 
-  protected void setColumns(List<String> columns) {
-    this.columns = columns;
-  }
+    protected void setColumns(List<String> columns) {
+        this.columns = columns;
+    }
 
-  protected List<String> getFields() {
-    return fields;
-  }
+    protected List<String> getFields() {
+        return fields;
+    }
 
-  protected void setFields(List<String> fields) {
-    this.fields = fields;
-  }
+    protected void setFields(List<String> fields) {
+        this.fields = fields;
+    }
 
-  @Override
-  public Class<T> getModel() {
-    return model;
-  }
+    @Override
+    public Class<T> getModel() {
+        return model;
+    }
 
 }

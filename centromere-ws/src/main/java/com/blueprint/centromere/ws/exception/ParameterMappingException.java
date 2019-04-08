@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
  * @author woemler
  */
 public class ParameterMappingException extends RestException {
-  public ParameterMappingException(String message) {
-    super(HttpStatus.BAD_REQUEST, 400, message);
-  }
+    public ParameterMappingException(String message) {
+        super(HttpStatus.BAD_REQUEST, 400, message);
+    }
 }

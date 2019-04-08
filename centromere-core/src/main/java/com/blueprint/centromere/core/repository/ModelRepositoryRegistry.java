@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors
+ * Copyright 2019 the original author or authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,42 +23,43 @@ import java.util.Collection;
 /**
  * Bean for registering associations between {@link Model} classes and their {@link ModelRepository}
  *   implementations, and for fetching the associated types and beans.
- * 
+ *
  * @author woemler
  */
 public interface ModelRepositoryRegistry {
 
-  /**
-   * Tests whether the given class represents a registered {@link Model} resource. 
-   * 
-   * @param type model type
-   * @return true if model is registered
-   */
-  boolean isRegisteredModel(Class<?> type);
+    /**
+     * Tests whether the given class represents a registered {@link Model} resource. 
+     *
+     * @param type model type
+     * @return true if model is registered
+     */
+    boolean isRegisteredModel(Class<?> type);
 
-  /**
-   * Retrieves the {@link ModelRepository} instance associated with the registered {@link Model} class.
-   * 
-   * @param model model type
-   * @return instance of the repository
-   * @throws ModelRegistryException throws if problem with referencing model or repository
-   */
-  ModelRepository<?, ?> getRepositoryByModel(Class<? extends Model<?>> model)
-      throws ModelRegistryException;
+    /**
+     * Retrieves the {@link ModelRepository} instance associated with the registered {@link Model}
+     *   class.
+     *
+     * @param model model type
+     * @return instance of the repository
+     * @throws ModelRegistryException throws if problem with referencing model or repository
+     */
+    ModelRepository<?, ?> getRepositoryByModel(Class<? extends Model<?>> model)
+        throws ModelRegistryException;
 
-  /**
-   * Retrieves a collection of all {@link ModelRepository} instances associated with all registered 
-   *   {@link Model} classes.
-   * 
-   * @return all registered repositories
-   */
-  Collection<? extends ModelRepository<?,?>> getRegisteredModelRepositories();
+    /**
+     * Retrieves a collection of all {@link ModelRepository} instances associated with all registered 
+     *   {@link Model} classes.
+     *
+     * @return all registered repositories
+     */
+    Collection<? extends ModelRepository<?, ?>> getRegisteredModelRepositories();
 
-  /**
-   * Returns a collection of all registered {@link Model} classes.
-   * 
-   * @return all registered models
-   */
-  Collection<Class<? extends Model<?>>> getRegisteredModels();
+    /**
+     * Returns a collection of all registered {@link Model} classes.
+     *
+     * @return all registered models
+     */
+    Collection<Class<? extends Model<?>>> getRegisteredModels();
 
 }

@@ -28,18 +28,18 @@ import org.springframework.data.repository.query.Param;
 /**
  * @author woemler
  */
-public interface AttributeOperations<T extends Model<?>> extends ModelSupport<T>{
+public interface AttributeOperations<T extends Model<?>> extends ModelSupport<T> {
 
-	@SuppressWarnings("unchecked")
-	default List<T> findWithAttribute(@Param("name") String name){
-    QueryCriteria criteria = new QueryCriteria("attributes."+name, null, Evaluation.NOT_NULL);
-    return (List<T>) ((ModelRepository) this).find(Collections.singleton(criteria));
-	}
+    @SuppressWarnings("unchecked")
+    default List<T> findWithAttribute(@Param("name") String name) {
+        QueryCriteria criteria = new QueryCriteria("attributes." + name, null, Evaluation.NOT_NULL);
+        return (List<T>) ((ModelRepository) this).find(Collections.singleton(criteria));
+    }
 
-	@SuppressWarnings("unchecked")
-	default List<T> findByAttribute(@Param("name") String name, @Param("value") String value){
-    QueryCriteria criteria = new QueryCriteria("attributes."+name, value);
-    return (List<T>) ((ModelRepository) this).find(Collections.singleton(criteria));
-	}
+    @SuppressWarnings("unchecked")
+    default List<T> findByAttribute(@Param("name") String name, @Param("value") String value) {
+        QueryCriteria criteria = new QueryCriteria("attributes." + name, value);
+        return (List<T>) ((ModelRepository) this).find(Collections.singleton(criteria));
+    }
 
 }

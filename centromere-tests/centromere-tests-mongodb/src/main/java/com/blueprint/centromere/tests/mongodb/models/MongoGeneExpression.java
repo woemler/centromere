@@ -22,12 +22,12 @@ import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-
 @Document
 @Data
 @ToString(callSuper = true)
 public class MongoGeneExpression extends GeneExpression<String> {
-  
-  @Id private String id;
+
+    @Id 
+    private String id;
 
 }

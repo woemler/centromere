@@ -22,24 +22,24 @@ import java.io.Serializable;
  * Basic entity interface to ensure that model objects have identifiable attributes.  {@code ID} is 
  *   intended to reflect database primary key identifiers, whether they be primitive types, or a 
  *   unique combination of fields.  
- * 
+ *
  * @author woemler
  */
 @Filterable
-public interface Model<ID extends Serializable> {
+public interface Model<I extends Serializable> {
 
-  /**
-   * Returns the model's database primary key ID or uniquely identifying value.
-   * 
-   * @return ID value
-   */
-  ID getId();
+    /**
+     * Returns the model's database primary key ID or uniquely identifying value.
+     *
+     * @return ID value
+     */
+    I getId();
 
-  /**
-   * Sets the model's identifying value.
-   * 
-   * @param id unique value
-   */
-  void setId(ID id);
-  
+    /**
+     * Sets the model's identifying value.
+     *
+     * @param id unique value
+     */
+    void setId(I id);
+
 }

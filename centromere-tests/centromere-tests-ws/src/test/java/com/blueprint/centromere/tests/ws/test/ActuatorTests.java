@@ -29,53 +29,53 @@ import org.springframework.util.Assert;
 @AutoConfigureMockMvc(secure = false)
 public class ActuatorTests extends AbstractRepositoryTests {
 
-  @Autowired private MockMvc mockMvc;
-  @Autowired private Environment env;
-  
-  @Autowired(required = false) private MongoHealthIndicator mongoHealthIndicator;
-  
-  @Test
-  public void configTest(){
-    Assert.notNull(mongoHealthIndicator);
-  }
-  
-  @Test
-  public void actuatorRootTest() throws Exception {
-    mockMvc.perform(get("/actuator"))
-        .andDo(MockMvcResultHandlers.print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasKey("_links")))
-        .andExpect(jsonPath("$._links", hasKey("self")))
-        .andExpect(jsonPath("$._links", hasKey("health")))
-        .andExpect(jsonPath("$._links", hasKey("info")));
-  }
-  
-  @Test
-  public void healthTest() throws Exception {
-    mockMvc.perform(get("/actuator/health"))
-        .andDo(MockMvcResultHandlers.print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasKey("status")))
-        .andExpect(jsonPath("$.status", is("UP")))
-        .andExpect(jsonPath("$", hasKey("details")))
-        .andExpect(jsonPath("$.details", hasKey("mongo")))
-        .andExpect(jsonPath("$.details.mongo", hasKey("status")))
-        .andExpect(jsonPath("$.details.mongo.status", is("UP")));
-  }
+    @Autowired private MockMvc mockMvc;
+    @Autowired private Environment env;
 
-  @Test
-  public void infoTest() throws Exception {
-    mockMvc.perform(get("/actuator/info"))
-        .andDo(MockMvcResultHandlers.print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasKey("app")))
-        .andExpect(jsonPath("$.app", hasKey("name")))
-        .andExpect(jsonPath("$.app.name", is(env.getRequiredProperty("centromere.web.api.name"))))
-        .andExpect(jsonPath("$", hasKey("api")))
-        .andExpect(jsonPath("$", hasKey("contact")))
-        .andExpect(jsonPath("$", hasKey("dependencies")))
-        .andExpect(jsonPath("$.dependencies", hasKey("centromere")))
-        .andExpect(jsonPath("$.dependencies.centromere", hasKey("version")));
-  }
-  
+    @Autowired(required = false) private MongoHealthIndicator mongoHealthIndicator;
+
+    @Test
+    public void configTest() {
+        Assert.notNull(mongoHealthIndicator);
+    }
+
+    @Test
+    public void actuatorRootTest() throws Exception {
+        mockMvc.perform(get("/actuator"))
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasKey("_links")))
+            .andExpect(jsonPath("$._links", hasKey("self")))
+            .andExpect(jsonPath("$._links", hasKey("health")))
+            .andExpect(jsonPath("$._links", hasKey("info")));
+    }
+
+    @Test
+    public void healthTest() throws Exception {
+        mockMvc.perform(get("/actuator/health"))
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasKey("status")))
+            .andExpect(jsonPath("$.status", is("UP")))
+            .andExpect(jsonPath("$", hasKey("details")))
+            .andExpect(jsonPath("$.details", hasKey("mongo")))
+            .andExpect(jsonPath("$.details.mongo", hasKey("status")))
+            .andExpect(jsonPath("$.details.mongo.status", is("UP")));
+    }
+
+    @Test
+    public void infoTest() throws Exception {
+        mockMvc.perform(get("/actuator/info"))
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasKey("app")))
+            .andExpect(jsonPath("$.app", hasKey("name")))
+            .andExpect(jsonPath("$.app.name", is(env.getRequiredProperty("centromere.web.api.name"))))
+            .andExpect(jsonPath("$", hasKey("api")))
+            .andExpect(jsonPath("$", hasKey("contact")))
+            .andExpect(jsonPath("$", hasKey("dependencies")))
+            .andExpect(jsonPath("$.dependencies", hasKey("centromere")))
+            .andExpect(jsonPath("$.dependencies.centromere", hasKey("version")));
+    }
+
 }

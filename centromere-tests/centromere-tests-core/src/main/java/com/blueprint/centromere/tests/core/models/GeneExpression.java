@@ -25,20 +25,20 @@ import lombok.Data;
  * @author woemler
  */
 @Data
-public abstract class GeneExpression<ID extends Serializable> implements Model<ID> {
-  
-  @Linked(model = DataFile.class, rel = "dataFile", field = "id")
-  private ID dataFileId;
+public abstract class GeneExpression<I extends Serializable> implements Model<I> {
 
-  @Linked(model = DataSet.class, rel = "dataSet", field = "id")
-  private ID dataSetId;
+    @Linked(model = DataFile.class, rel = "dataFile", field = "id")
+    private I dataFileId;
 
-  @Linked(model = Sample.class, rel = "sample", field = "id")
-  private ID sampleId;
+    @Linked(model = DataSet.class, rel = "dataSet", field = "id")
+    private I dataSetId;
 
-  @Linked(model = Gene.class, rel = "gene", field = "id")
-  private ID geneId;
-  
-  private Double value;
+    @Linked(model = Sample.class, rel = "sample", field = "id")
+    private I sampleId;
+
+    @Linked(model = Gene.class, rel = "gene", field = "id")
+    private I geneId;
+
+    private Double value;
 
 }

@@ -22,16 +22,16 @@ import com.blueprint.centromere.core.model.Model;
 
 /**
  * Data import component class.  Reads from a data source and returns {@link Model} class instances.
- * 
+ *
  * @author woemler
  */
 public interface RecordReader<T extends Model<?>> extends PipelineComponent {
 
-	/**
-	 * Generates and returns a single {@link Model} entity from the input data source.
-	 * 
-	 * @return a single {@link Model} record.
-	 */
-	T readRecord() throws DataProcessingException;
+    /**
+     * Generates and returns a single {@link Model} entity from the input data source.
+     *
+     * @return a single {@link Model} record.
+     */
+    T readRecord() throws DataProcessingException;
 
 }

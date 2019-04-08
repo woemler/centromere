@@ -36,126 +36,128 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  * The base {@link Model} repository interface, as an extension of Spring Data's core 
  *   {@link PagingAndSortingRepository} interface. This interface should be implemented for each
  *   database technology to be used with Centromere.
- * 
+ *
  * @author woemler
  * @since 0.5.0
  */
 @NoRepositoryBean
-public interface ModelRepository<T extends Model<ID>, ID extends Serializable>
-		extends PagingAndSortingRepository<T, ID>, ModelSupport<T> {
-  
-  Logger logger = LoggerFactory.getLogger(ModelRepository.class);
+public interface ModelRepository<T extends Model<I>, I extends Serializable>
+    extends PagingAndSortingRepository<T, I>, ModelSupport<T> {
 
-  /**
-   * Searches for all records that satisfy the requested criteria.
-   *
-   * @param queryCriterias {@link QueryCriteria}
-   * @return all matching {@code T} records.
-   */
-  Iterable<T> find(Iterable<QueryCriteria> queryCriterias);
+    Logger LOGGER = LoggerFactory.getLogger(ModelRepository.class);
 
-  /**
-   * Searches for all records that satisfy the requested criteria, and returns them in the
-   *   requested order.
-   *
-   * @param queryCriterias {@link QueryCriteria}
-   * @param sort {@link Sort}
-   * @return all matching {@code T} records.
-   */
-  Iterable<T> find(Iterable<QueryCriteria> queryCriterias, Sort sort);
+    /**
+     * Searches for all records that satisfy the requested criteria.
+     *
+     * @param queryCriterias {@link QueryCriteria}
+     * @return all matching {@code T} records.
+     */
+    Iterable<T> find(Iterable<QueryCriteria> queryCriterias);
 
-  /**
-   * Searches for all records that satisfy the requested criteria, and returns them as a paged
-   *   collection.
-   *
-   * @param queryCriterias {@link QueryCriteria}
-   * @param pageable {@link Pageable}
-   * @return {@link Page} containing the desired set of records.
-   */
-  Page<T> find(Iterable<QueryCriteria> queryCriterias, Pageable pageable);
+    /**
+     * Searches for all records that satisfy the requested criteria, and returns them in the
+     *   requested order.
+     *
+     * @param queryCriterias {@link QueryCriteria}
+     * @param sort {@link Sort}
+     * @return all matching {@code T} records.
+     */
+    Iterable<T> find(Iterable<QueryCriteria> queryCriterias, Sort sort);
 
-  /**
-   * Returns a count of all records that satify the requested criteria.
-   *
-   * @param criterias {@link QueryCriteria}
-   * @return a count of {@code T} records.
-   */
-  long count(Iterable<QueryCriteria> criterias);
+    /**
+     * Searches for all records that satisfy the requested criteria, and returns them as a paged
+     *   collection.
+     *
+     * @param queryCriterias {@link QueryCriteria}
+     * @param pageable {@link Pageable}
+     * @return {@link Page} containing the desired set of records.
+     */
+    Page<T> find(Iterable<QueryCriteria> queryCriterias, Pageable pageable);
 
-  /**
-   * Returns a unsorted list of distinct values of the requested field.
-   *
-   * @param field Model field name.
-   * @return Sorted list of distinct values of {@code field}.
-   */
-  default Set<Object> distinct(String field){
-    Sort sort = new Sort(Sort.Direction.ASC, field);
-    HashSet<Object> distinct = new HashSet<>();
-    for (T obj: findAll(sort)){
-      BeanWrapper wrapper = new BeanWrapperImpl(obj);
-      if (!wrapper.isReadableProperty(field)){
-        throw new QueryParameterException(String.format("Submitted parameter is not valid entity field: %s", field));
-      }
-      distinct.add(wrapper.getPropertyValue(field));
+    /**
+     * Returns a count of all records that satify the requested criteria.
+     *
+     * @param criterias {@link QueryCriteria}
+     * @return a count of {@code T} records.
+     */
+    long count(Iterable<QueryCriteria> criterias);
+
+    /**
+     * Returns a unsorted list of distinct values of the requested field.
+     *
+     * @param field Model field name.
+     * @return Sorted list of distinct values of {@code field}.
+     */
+    default Set<Object> distinct(String field) {
+        Sort sort = new Sort(Sort.Direction.ASC, field);
+        HashSet<Object> distinct = new HashSet<>();
+        for (T obj: findAll(sort)) {
+            BeanWrapper wrapper = new BeanWrapperImpl(obj);
+            if (!wrapper.isReadableProperty(field)) {
+                throw new QueryParameterException(String.format("Submitted parameter is not valid entity "
+                    + "field: %s", field));
+            }
+            distinct.add(wrapper.getPropertyValue(field));
+        }
+        return distinct;
     }
-    return distinct;
-  }
 
-  /**
-   * Returns a unsorted list of distinct values of the requested field, filtered using a {@link QueryCriteria}
-   *   based query.
-   *
-   * @param field Model field name.
-   * @param criterias Query criteria to filter the field values by.
-   * @return Sorted list of distinct values of {@code field}.
-   */
-  default Set<Object> distinct(String field, Iterable<QueryCriteria> criterias){
-    HashSet<Object> distinct = new HashSet<>();
-    Sort sort = new Sort(Sort.Direction.ASC, field);
-    for (T obj: find(criterias, sort)){
-      BeanWrapper wrapper = new BeanWrapperImpl(obj);
-      if (!wrapper.isReadableProperty(field)){
-        throw new QueryParameterException(String.format("Submitted parameter is not valid entity field: %s", field));
-      }
-      distinct.add(wrapper.getPropertyValue(field));
+    /**
+     * Returns a unsorted list of distinct values of the requested field, filtered using a 
+     *   {@link QueryCriteria} based query.
+     *
+     * @param field Model field name.
+     * @param criterias Query criteria to filter the field values by.
+     * @return Sorted list of distinct values of {@code field}.
+     */
+    default Set<Object> distinct(String field, Iterable<QueryCriteria> criterias) {
+        HashSet<Object> distinct = new HashSet<>();
+        Sort sort = new Sort(Sort.Direction.ASC, field);
+        for (T obj: find(criterias, sort)) {
+            BeanWrapper wrapper = new BeanWrapperImpl(obj);
+            if (!wrapper.isReadableProperty(field)) {
+                throw new QueryParameterException(String.format("Submitted parameter is not valid entity "
+                    + "field: %s", field));
+            }
+            distinct.add(wrapper.getPropertyValue(field));
+        }
+        return distinct;
     }
-    return distinct;
-  }
 
-	/* Create records */
+    /* Create records */
 
-  /**
-   * Creates a new record in the repository and returns the updated model object.
-   *
-   * @param entity instance of {@code T} to be persisted.
-   * @return updated instance of the entity.
-   */
-  <S extends T> S insert(S entity);
+    /**
+     * Creates a new record in the repository and returns the updated model object.
+     *
+     * @param entity instance of {@code T} to be persisted.
+     * @return updated instance of the entity.
+     */
+    <S extends T> S insert(S entity);
 
-  /**
-   * Creates multiple new records and returns their updated representations.
-   *
-   * @param entities collection of records to be persisted.
-   * @return updated instances of the entity objects.
-   */
-  <S extends T> Iterable<S> insert(Iterable<S> entities);
+    /**
+     * Creates multiple new records and returns their updated representations.
+     *
+     * @param entities collection of records to be persisted.
+     * @return updated instances of the entity objects.
+     */
+    <S extends T> Iterable<S> insert(Iterable<S> entities);
 
-	/* Update records */
+    /* Update records */
 
-  /**
-   * Updates an existing record in the repository and returns its instance.
-   *
-   * @param entity updated record to be persisted in the repository.
-   * @return the updated entity object.
-   */
-  <S extends T> S update(S entity);
+    /**
+     * Updates an existing record in the repository and returns its instance.
+     *
+     * @param entity updated record to be persisted in the repository.
+     * @return the updated entity object.
+     */
+    <S extends T> S update(S entity);
 
-  /**
-   * Updates multiple records and returns their instances.
-   *
-   * @param entities collection of records to update.
-   * @return updated instances of the entity objects.
-   */
-  <S extends T> Iterable<S> update(Iterable<S> entities);
+    /**
+     * Updates multiple records and returns their instances.
+     *
+     * @param entities collection of records to update.
+     * @return updated instances of the entity objects.
+     */
+    <S extends T> Iterable<S> update(Iterable<S> entities);
 
 }

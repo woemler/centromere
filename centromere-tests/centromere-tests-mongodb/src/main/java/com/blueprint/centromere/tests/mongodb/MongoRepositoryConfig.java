@@ -19,9 +19,9 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
     repositoryFactoryBeanClass = MongoModelRepositoryFactoryBean.class)
 public class MongoRepositoryConfig {
 
-  @Bean
-  public ModelRepositoryRegistry modelRepositoryRegistry(ApplicationContext context){
-    return new DefaultModelRepositoryRegistry(context);
-  }
+    @Bean
+    public ModelRepositoryRegistry modelRepositoryRegistry(ApplicationContext context) {
+        return new DefaultModelRepositoryRegistry(context);
+    }
 
 }

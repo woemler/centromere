@@ -12,14 +12,14 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author woemler
  */
 @Data
-public abstract class User<ID extends Serializable> implements UserDetails, Model<ID> {
+public abstract class User<I extends Serializable> implements UserDetails, Model<I> {
 
-  private String username;
-  private String password;
-  private List<? extends GrantedAuthority> authorities = new ArrayList<>();
-  private boolean accountNonExpired;
-  private boolean accountNonLocked;
-  private boolean credentialsNonExpired;
-  private boolean enabled;
-  
+    private String username;
+    private String password;
+    private List<? extends GrantedAuthority> authorities = new ArrayList<>();
+    private boolean accountNonExpired;
+    private boolean accountNonLocked;
+    private boolean credentialsNonExpired;
+    private boolean enabled;
+
 }

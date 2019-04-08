@@ -34,11 +34,11 @@ import java.lang.annotation.Target;
 @JsonIgnore
 public @interface Ignored {
 
-  /**
-   * Flag to indicate that the marked field should not be visible in API output.
-   * 
-   * @return
-   */
-  boolean hidden() default false;
-  
+    /**
+     * Flag to indicate that the marked field should not be visible in API output.
+     *
+     * @return
+     */
+    boolean hidden() default false;
+
 }

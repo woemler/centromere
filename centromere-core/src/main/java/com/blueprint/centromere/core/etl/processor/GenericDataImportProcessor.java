@@ -32,220 +32,243 @@ import org.springframework.validation.Validator;
 
 /**
  * Basic {@link DataProcessor} implementation, which can be used to handle most file import jobs.
- *   The {@link #doBefore(File, Map)}, {@link #doOnSuccess(File, Map)}, and {@link #doOnFailure(File, Map)} 
- *   methods can be overridden to handle data set or data file metadata persistence, pre/post-processing, 
- *   or other maintenance tasks. 
- * 
+ *   The {@link #doBefore(File, Map)}, {@link #doOnSuccess(File, Map)}, and 
+ *   {@link #doOnFailure(File, Map)} methods can be overridden to handle data set or data file 
+ *   metadata persistence, pre/post-processing, or other maintenance tasks. 
+ *
  * @author woemler
  */
-public class GenericDataImportProcessor<T extends Model<?>> 
-		implements DataProcessor<T>, ModelSupport<T> {
+public class GenericDataImportProcessor<T extends Model<?>>
+    implements DataProcessor<T>, ModelSupport<T> {
 
-  private static final Logger logger = LoggerFactory.getLogger(GenericDataImportProcessor.class);
-  
-	private final Class<T> model;
-	private final RecordReader<T> reader;
-	private final RecordWriter<T> writer;
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenericDataImportProcessor.class);
 
-  private Validator validator = null;
-	private boolean isConfigured = false;
-	private boolean isInFailedState = false;
-	private Integer recordCount = 0;
+    private final Class<T> model;
+    private final RecordReader<T> reader;
+    private final RecordWriter<T> writer;
 
-  public GenericDataImportProcessor(Class<T> model,
-      RecordReader<T> reader, RecordWriter<T> writer) {
-    this.model = model;
-    this.reader = reader;
-    this.writer = writer;
-  }
+    private Validator validator;
+    private boolean isConfigured;
+    private boolean isInFailedState;
+    private Integer recordCount = 0;
 
-  public GenericDataImportProcessor(Class<T> model,
-      RecordReader<T> reader, RecordWriter<T> writer,
-      Validator validator) {
-    this.model = model;
-    this.reader = reader;
-    this.writer = writer;
-    this.validator = validator;
-  }
-
-  /**
-   * Performs configuration steps prior to each execution of {@link #processFile(File, Map)}.  Assigns
-   *   dataImportProperties and metadata objects to the individual processing components that are expecting them.
-   */
-	@SuppressWarnings("unchecked")
-	@Override
-	public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
-	  isInFailedState = false;
-		isConfigured = true;
-    recordCount = 0;
-	}
-
-  /**
-   * To be executed after the main component method is called for the last time.  Handles job cleanup
-   *   and association of metadata records.
-   */
-  @Override
-  public void doOnSuccess(File file, Map<String, String> args) throws DataProcessingException {
-    
-  }
-
-  /**
-   * Executes if the {@link #processFile(File, Map)} method fails to execute properly, in place of the
-   * {@link #doOnSuccess(File, Map)} method.
-   */
-  @Override
-  public void doOnFailure(File file, Map<String, String> args) throws DataProcessingException {
-    
-  }
-
-  /**
-	 * {@link DataProcessor#processFile(File, Map)}
-	 */
-  @Override
-	public void processFile(File file, Map<String, String> args) throws DataProcessingException {
-    
-    try {
-
-      recordCount = 0;
-      
-      if (!isConfigured)
-        throw new DataProcessingException("Processor configuration method has not run!"); 
-
-      if (isInFailedState) {
-        throw new DataProcessingException("Record processor is in failed state and is aborting run.");
-      }
-
-      runComponentDoBefore(file, args);
-
-      if (isInFailedState) {
-        logger.warn("Record processor is in failed state and is aborting run.");
-        return;
-      }
-    
-      processRecords(file, args);
-
-      if (isInFailedState) {
-        logger.warn("Record processor is in failed state and is aborting run.");
-        return;
-      }
-
-      runComponentDoOnSuccess(file, args);
-
-      logger.info(
-          String.format("Successfully processed %d records from data source: %s", recordCount, file.getAbsolutePath()));
-
-    } catch (Exception ex){
-      isInFailedState = true;
-      runComponentDoOnFailure(file, args);
-      throw ex;
+    /**
+     * Constructs the processor without a {@link Validator}.
+     *
+     * @param model associated model
+     * @param reader file reader
+     * @param writer record writer
+     */
+    public GenericDataImportProcessor(Class<T> model,
+        RecordReader<T> reader, RecordWriter<T> writer) {
+        this.model = model;
+        this.reader = reader;
+        this.writer = writer;
     }
-		
-	}
 
-  /**
-   * Runs all of the {@link PipelineComponent#doBefore(File, Map)} methods, 
-   *   and throws appropriate exceptions if problems are encountered.
-   * 
-   * @throws DataProcessingException
-   */
-	protected void runComponentDoBefore(File file, Map<String, String> args) throws DataProcessingException {
-    logger.debug("Running doBefore method for processor components.");
-    reader.doBefore(file, args);
-    writer.doBefore(file, args);
-  }
+    /**
+     * Constructs the processor with all components.
+     *
+     * @param model associated model
+     * @param reader file reader
+     * @param writer record writer
+     * @param validator record validator
+     */
+    public GenericDataImportProcessor(Class<T> model,
+        RecordReader<T> reader, RecordWriter<T> writer,
+        Validator validator) {
+        this.model = model;
+        this.reader = reader;
+        this.writer = writer;
+        this.validator = validator;
+    }
 
-  /**
-   * Runs all of the {@link PipelineComponent#doOnSuccess(File, Map)} 
-   *   methods, and throws appropriate exceptions if problems are encountered.
-   *
-   * @throws DataProcessingException
-   */
-  protected void runComponentDoOnSuccess(File file, Map<String,String> args) throws DataProcessingException {
-    logger.debug("Running doOnSuccess methods for processor components.");
-    writer.doOnSuccess(file, args);
-    reader.doOnSuccess(file, args);
-  }
+    /**
+     * Performs configuration steps prior to each execution of {@link #processFile(File, Map)}.  
+     *   Assigns dataImportProperties and metadata objects to the individual processing components 
+     *   that are expecting them.
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
+        isInFailedState = false;
+        isConfigured = true;
+        recordCount = 0;
+    }
 
-  /**
-   * Runs all of the {@link PipelineComponent#doOnFailure(File, Map)}
-   *    methods, and throws appropriate exceptions if problems are encountered.
-   * 
-   * @param file
-   * @param args
-   * @throws DataProcessingException
-   */
-  protected void runComponentDoOnFailure(File file, Map<String,String> args) throws DataProcessingException {
-    logger.info("Running doAfter methods for processor components.");
-    writer.doOnFailure(file, args);
-    reader.doOnFailure(file, args);
-  }
+    /**
+     * To be executed after the main component method is called for the last time.  Handles job 
+     *   cleanup and association of metadata records.
+     */
+    @Override
+    public void doOnSuccess(File file, Map<String, String> args) throws DataProcessingException {
 
-  /**
-   * Processes all of the incoming records.  Filters and validates records, if the appropriate
-   *   components are set.
-   * 
-   * @throws DataProcessingException
-   */
-  protected void processRecords(File file, Map<String, String> args) throws DataProcessingException {
-    
-    logger.debug("Processing records.");
-    
-    T record = reader.readRecord();
-    
-    // Process each record
-    while (record != null) {
+    }
 
-      recordCount++;
+    /**
+     * Executes if the {@link #processFile(File, Map)} method fails to execute properly, in place 
+     *   of the {@link #doOnSuccess(File, Map)} method.
+     */
+    @Override
+    public void doOnFailure(File file, Map<String, String> args) throws DataProcessingException {
 
-      if (validator != null) {
-        DataBinder dataBinder = new DataBinder(record);
-        dataBinder.setValidator(validator);
-        dataBinder.validate();
-        BindingResult bindingResult = dataBinder.getBindingResult();
-        if (bindingResult.hasErrors()) {
-          logger.warn(String.format("Record failed validation: %s", record.toString()));
-          if (Boolean.parseBoolean(args.getOrDefault("skip-invalid-records", "false"))) {
-            record = reader.readRecord();
-            continue;
-          } else {
+    }
+
+    /**
+     * See {@link DataProcessor#processFile(File, Map)}.
+     */
+    @Override
+    public void processFile(File file, Map<String, String> args) throws DataProcessingException {
+
+        try {
+
+            recordCount = 0;
+
+            if (!isConfigured) {
+                throw new DataProcessingException("Processor configuration method has not run!");
+            }
+
+            if (isInFailedState) {
+                throw new DataProcessingException("Record processor is in failed state and is "
+                    + "aborting run.");
+            }
+
+            runComponentDoBefore(file, args);
+
+            if (isInFailedState) {
+                LOGGER.warn("Record processor is in failed state and is aborting run.");
+                return;
+            }
+
+            processRecords(file, args);
+
+            if (isInFailedState) {
+                LOGGER.warn("Record processor is in failed state and is aborting run.");
+                return;
+            }
+
+            runComponentDoOnSuccess(file, args);
+
+            LOGGER.info(
+                String.format("Successfully processed %d records from data source: %s", recordCount,
+                    file.getAbsolutePath()));
+
+        } catch (Exception ex) {
             isInFailedState = true;
-            throw new DataProcessingException(bindingResult.toString());
-          }
+            runComponentDoOnFailure(file, args);
+            throw ex;
         }
-      }
-      writer.writeRecord(record);
-      
-      record = reader.readRecord();
-      
+
     }
-    
-  }
 
-  public Class<T> getModel() {
-		return model;
-	}
+    /**
+     * Runs all of the {@link PipelineComponent#doBefore(File, Map)} methods, 
+     *   and throws appropriate exceptions if problems are encountered.
+     *
+     * @throws DataProcessingException processing exception
+     */
+    protected void runComponentDoBefore(File file, Map<String, String> args)
+        throws DataProcessingException {
+        LOGGER.debug("Running doBefore method for processor components.");
+        reader.doBefore(file, args);
+        writer.doBefore(file, args);
+    }
 
-  public RecordReader<T> getReader() {
-		return reader;
-	}
+    /**
+     * Runs all of the {@link PipelineComponent#doOnSuccess(File, Map)}
+     *   methods, and throws appropriate exceptions if problems are encountered.
+     *
+     * @throws DataProcessingException processing exception
+     */
+    protected void runComponentDoOnSuccess(File file, Map<String, String> args)
+        throws DataProcessingException {
+        LOGGER.debug("Running doOnSuccess methods for processor components.");
+        writer.doOnSuccess(file, args);
+        reader.doOnSuccess(file, args);
+    }
 
-	public Validator getValidator() {
-		return validator;
-	}
+    /**
+     * Runs all of the {@link PipelineComponent#doOnFailure(File, Map)}
+     *    methods, and throws appropriate exceptions if problems are encountered.
+     *
+     * @param file input file
+     * @param args processor arguments
+     * @throws DataProcessingException processing exception
+     */
+    protected void runComponentDoOnFailure(File file, Map<String, String> args)
+        throws DataProcessingException {
+        LOGGER.info("Running doAfter methods for processor components.");
+        writer.doOnFailure(file, args);
+        reader.doOnFailure(file, args);
+    }
 
-	public void setValidator(Validator validator) {
-		this.validator = validator;
-	}
+    /**
+     * Processes all of the incoming records.  Filters and validates records, if the appropriate
+     *   components are set.
+     *
+     * @throws DataProcessingException processing exception
+     */
+    protected void processRecords(File file, Map<String, String> args)
+        throws DataProcessingException {
 
-  public RecordWriter<T> getWriter() {
-		return writer;
-	}
+        LOGGER.debug("Processing records.");
 
-  public boolean isInFailedState() {
-		return isInFailedState;
-	}
+        T record = reader.readRecord();
 
-	public void setInFailedState(boolean inFailedState) {
-		isInFailedState = inFailedState;
-	}
+        // Process each record
+        while (record != null) {
+
+            recordCount++;
+
+            if (validator != null) {
+                DataBinder dataBinder = new DataBinder(record);
+                dataBinder.setValidator(validator);
+                dataBinder.validate();
+                BindingResult bindingResult = dataBinder.getBindingResult();
+                if (bindingResult.hasErrors()) {
+                    LOGGER.warn(String.format("Record failed validation: %s", record.toString()));
+                    if (Boolean.parseBoolean(args.getOrDefault("skip-invalid-records", "false"))) {
+                        record = reader.readRecord();
+                        continue;
+                    } else {
+                        isInFailedState = true;
+                        throw new DataProcessingException(bindingResult.toString());
+                    }
+                }
+            }
+            writer.writeRecord(record);
+
+            record = reader.readRecord();
+
+        }
+
+    }
+
+    public Class<T> getModel() {
+        return model;
+    }
+
+    public RecordReader<T> getReader() {
+        return reader;
+    }
+
+    public Validator getValidator() {
+        return validator;
+    }
+
+    public void setValidator(Validator validator) {
+        this.validator = validator;
+    }
+
+    public RecordWriter<T> getWriter() {
+        return writer;
+    }
+
+    public boolean isInFailedState() {
+        return isInFailedState;
+    }
+
+    public void setInFailedState(boolean inFailedState) {
+        isInFailedState = inFailedState;
+    }
 }

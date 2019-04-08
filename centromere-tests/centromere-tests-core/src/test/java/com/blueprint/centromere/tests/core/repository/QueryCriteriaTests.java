@@ -23,7 +23,7 @@ import org.springframework.util.Assert;
 public class QueryCriteriaTests {
 
   @Test
-  public void criteriaTest(){
+  public void criteriaTest() {
     List<QueryCriteria> criterias = Arrays.asList(
         new QueryCriteria("key", "value"),
         new QueryCriteria("num", 3, Evaluation.GREATER_THAN_EQUALS)
@@ -43,7 +43,7 @@ public class QueryCriteriaTests {
   }
 
   @Test
-  public void standardQueryParameterDescriptorTest(){
+  public void standardQueryParameterDescriptorTest() {
     QueryParameterDescriptor descriptor = new QueryParameterDescriptor();
     descriptor.setParamName("param");
     descriptor.setFieldName("field");
@@ -57,7 +57,7 @@ public class QueryCriteriaTests {
   }
 
   @Test
-  public void regexQueryParameterDescriptorTest(){
+  public void regexQueryParameterDescriptorTest() {
     QueryParameterDescriptor descriptor = new QueryParameterDescriptor();
     descriptor.setParamName("attributes.\\w+");
     descriptor.setEvaluation(Evaluation.EQUALS);
@@ -71,7 +71,7 @@ public class QueryCriteriaTests {
   }
 
   @Test
-  public void dynamicQueryParameterDescriptorTest(){
+  public void dynamicQueryParameterDescriptorTest() {
     
     QueryParameterDescriptor descriptor = new QueryParameterDescriptor();
     descriptor.setEvaluation(Evaluation.EQUALS);
@@ -103,7 +103,7 @@ public class QueryCriteriaTests {
     Exception exception = null;
     try {
       criteria = descriptor.createQueryCriteria("valueBadSuffix", 1.23);
-    } catch (Exception e){
+    } catch (Exception e) {
       exception = e;
     }
     Assert.notNull(exception, "Exception is null");
@@ -112,12 +112,12 @@ public class QueryCriteriaTests {
   }
 
   @Test
-  public void modelToDescriptorTest(){
+  public void modelToDescriptorTest() {
     Map<String,QueryParameterDescriptor> descriptorMap
         = QueryParameterUtil.getAvailableQueryParameters(TestGene.class);
-    for (Map.Entry entry: descriptorMap.entrySet()){
+    for (Map.Entry entry: descriptorMap.entrySet()) {
       System.out.println(String.format("param: %s   descriptor: %s", entry.getKey(),
-          (entry.getValue()).toString()));
+          entry.getValue()));
     }
     Assert.notNull(descriptorMap);
     Assert.notEmpty(descriptorMap);
@@ -136,7 +136,7 @@ public class QueryCriteriaTests {
   }
 
   @Test
-  public void parameterToCriteriaTest(){
+  public void parameterToCriteriaTest() {
 
     QueryCriteria criteria = QueryParameterUtil.getQueryCriteriaFromParameter("name", new Object[]{"Will"}, String.class, Evaluation.EQUALS);
     Assert.notNull(criteria);
@@ -154,7 +154,7 @@ public class QueryCriteriaTests {
     Assert.notNull(criteria.getValue());
     Assert.isTrue(criteria.getValue() instanceof List);
     Assert.notEmpty((List<String>) criteria.getValue());
-    Assert.isTrue("Will".equals((((List<String>) criteria.getValue()).get(0))));
+    Assert.isTrue("Will".equals(((List<String>) criteria.getValue()).get(0)));
     Assert.notNull(criteria.getEvaluation());
     Assert.isTrue(Evaluation.IN.equals(criteria.getEvaluation()));
 
@@ -165,7 +165,7 @@ public class QueryCriteriaTests {
     Assert.notNull(criteria.getValue());
     Assert.isTrue(criteria.getValue() instanceof List);
     Assert.notEmpty((List<Double>) criteria.getValue());
-    Assert.isTrue((((List<Double>) criteria.getValue()).get(0) == 1.2));
+    Assert.isTrue(((List<Double>) criteria.getValue()).get(0) == 1.2);
     Assert.notNull(criteria.getEvaluation());
     Assert.isTrue(Evaluation.BETWEEN.equals(criteria.getEvaluation()));
 
