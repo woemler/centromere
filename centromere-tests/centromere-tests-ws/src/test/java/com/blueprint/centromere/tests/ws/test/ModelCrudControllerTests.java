@@ -50,6 +50,7 @@ import com.jayway.jsonpath.JsonPath;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.util.Assert;
 
 /**
  * @author woemler
@@ -527,7 +527,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   }
   
   @Test
-  public void isTrueTest() throws Exception {
+  public void assertTrueTest() throws Exception {
     mockMvc.perform(get("/api/search/user?enabledIsTrue"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
@@ -599,12 +599,12 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .andExpect(jsonPath("$[0].symbol", is("GeneA")));
 
     List<Gene> genes = geneRepository.findBySymbol("GeneA");
-    Assert.notNull(genes);
-    Assert.notEmpty(genes);
+    Assert.assertNotNull(genes);
+    Assert.assertTrue(!genes.isEmpty());
     Gene gene = genes.get(0);
-    Assert.isTrue("GeneA".equals(gene.getSymbol()));
+    Assert.assertTrue("GeneA".equals(gene.getSymbol()));
     gene.setSymbol("GeneX");
-    Assert.notNull(gene.getId());
+    Assert.assertNotNull(gene.getId());
 
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.setFilterProvider(new SimpleFilterProvider().addFilter("fieldFilter",
@@ -654,9 +654,9 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   public void oneToManyLinkedTest() throws Exception {
 
     DataSet dataSet = ((List<DataSet>) dataSetRepository.findAll()).get(0);
-    Assert.notNull(dataSet);
-    Assert.notNull(dataSet.getSampleIds());
-    Assert.isTrue(!dataSet.getSampleIds().isEmpty());
+    Assert.assertNotNull(dataSet);
+    Assert.assertNotNull(dataSet.getSampleIds());
+    Assert.assertTrue(!dataSet.getSampleIds().isEmpty());
     System.out.println(dataSet.getSampleIds().toString());
     
     mockMvc.perform(get("/api/search/dataset/" + dataSet.getId() + "/samples"))
@@ -672,9 +672,9 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   public void oneToManyLinkedTestWithHal() throws Exception {
 
     DataSet dataSet = ((List<DataSet>) dataSetRepository.findAll()).get(0);
-    Assert.notNull(dataSet);
-    Assert.notNull(dataSet.getSampleIds());
-    Assert.isTrue(!dataSet.getSampleIds().isEmpty());
+    Assert.assertNotNull(dataSet);
+    Assert.assertNotNull(dataSet.getSampleIds());
+    Assert.assertTrue(!dataSet.getSampleIds().isEmpty());
     System.out.println(dataSet.getSampleIds().toString());
 
     mockMvc.perform(get("/api/search/dataset/" + dataSet.getId() + "/samples")
@@ -703,10 +703,10 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   public void manyToOneLinkedTest() throws Exception {
 
     GeneExpression geneExpression = ((List<GeneExpression>) geneExpressionRepository.findAll()).get(0);
-    Assert.notNull(geneExpression);
+    Assert.assertNotNull(geneExpression);
     
     Optional<Gene> geneOptional = geneRepository.findById(geneExpression.getGeneId());
-    Assert.isTrue(geneOptional.isPresent());
+    Assert.assertTrue(geneOptional.isPresent());
     Gene gene = geneOptional.get();
     
     mockMvc.perform(get("/api/search/geneexpression/" + geneExpression.getId() + "/gene"))
@@ -723,10 +723,10 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   public void manyToOneLinkedTestWithHal() throws Exception {
 
     GeneExpression geneExpression = ((List<GeneExpression>) geneExpressionRepository.findAll()).get(0);
-    Assert.notNull(geneExpression);
+    Assert.assertNotNull(geneExpression);
 
     Optional<Gene> geneOptional = geneRepository.findById(geneExpression.getGeneId());
-    Assert.isTrue(geneOptional.isPresent());
+    Assert.assertTrue(geneOptional.isPresent());
     Gene gene = geneOptional.get();
 
     mockMvc.perform(get("/api/search/geneexpression/" + geneExpression.getId() + "/gene")
@@ -791,7 +791,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 //  @Test
 //  public void defaultCompressionTest() throws Exception {
 //
-//    Assert.isTrue(environment.getProperty("server.compression.enabled").equals("true"));
+//    Assert.assertTrue(environment.getProperty("server.compression.enabled").equals("true"));
 //
 //    mockMvc.perform(get(BASE_URL + "?size=1000").header("Accept-Encoding", "gzip, deflate"))
 //        .andExpect(status().isOk())

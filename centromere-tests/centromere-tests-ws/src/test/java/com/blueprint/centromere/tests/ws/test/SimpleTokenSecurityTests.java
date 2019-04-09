@@ -31,6 +31,7 @@ import com.blueprint.centromere.ws.security.TokenDetails;
 import com.blueprint.centromere.ws.security.simple.SimpleTokenProvider;
 import com.jayway.jsonpath.JsonPath;
 import java.util.Optional;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +46,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.util.Assert;
 
 /**
  * @author woemler
@@ -78,11 +78,11 @@ public class SimpleTokenSecurityTests {
 	
 	@Test
   public void configurationTest() throws Exception {
-	  Assert.notNull(userDetailsService);
-	  Assert.notNull(userRepository);
-	  Assert.isTrue(userDetailsService.equals(userRepository));
-	  Assert.notNull(passwordEncoder);
-	  Assert.notNull(tokenUtils);
+	  Assert.assertNotNull(userDetailsService);
+	  Assert.assertNotNull(userRepository);
+	  Assert.assertTrue(userDetailsService.equals(userRepository));
+	  Assert.assertNotNull(passwordEncoder);
+	  Assert.assertNotNull(tokenUtils);
   }
 
 	@Test
@@ -94,8 +94,8 @@ public class SimpleTokenSecurityTests {
 	@Test
 	public void validTokenRequestTest() throws Exception {
 		User user = (User) userRepository.loadUserByUsername("user");
-		Assert.notNull(user);
-		Assert.isTrue("user".equals(user.getUsername()));
+		Assert.assertNotNull(user);
+		Assert.assertTrue("user".equals(user.getUsername()));
 		TokenDetails tokenDetails = tokenUtils.createTokenAndDetails(user);
 		mockMvc.perform(get("/api/search/gene")
 				.header("X-Auth-Token", tokenDetails.getToken()))
@@ -139,10 +139,10 @@ public class SimpleTokenSecurityTests {
 	public void userAuthenticationTest() throws Exception {
 	  
 	  Optional<User> userOptional = userRepository.findByUsername("user");
-	  Assert.isTrue(userOptional.isPresent());
+	  Assert.assertTrue(userOptional.isPresent());
 	  User user = userOptional.get();
-	  Assert.isTrue("user".equals(user.getUsername()));
-	  Assert.isTrue(passwordEncoder.matches("password", user.getPassword()));
+	  Assert.assertTrue("user".equals(user.getUsername()));
+	  Assert.assertTrue(passwordEncoder.matches("password", user.getPassword()));
 
     mockMvc.perform(get("/api/gene"))
         .andExpect(status().isUnauthorized());

@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.blueprint.centromere.tests.core.AbstractRepositoryTests;
 import com.blueprint.centromere.tests.ws.WebTestInitializer;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.util.Assert;
 
 /**
  * @author woemler
@@ -36,7 +36,7 @@ public class ActuatorTests extends AbstractRepositoryTests {
 
     @Test
     public void configTest() {
-        Assert.notNull(mongoHealthIndicator);
+        Assert.assertNotNull(mongoHealthIndicator);
     }
 
     @Test

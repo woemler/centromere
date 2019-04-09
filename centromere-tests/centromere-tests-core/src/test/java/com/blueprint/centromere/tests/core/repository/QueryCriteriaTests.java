@@ -9,11 +9,11 @@ import com.blueprint.centromere.tests.core.TestGene;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.Assert;
 
 /**
  * @author woemler
@@ -28,18 +28,18 @@ public class QueryCriteriaTests {
         new QueryCriteria("key", "value"),
         new QueryCriteria("num", 3, Evaluation.GREATER_THAN_EQUALS)
     );
-    Assert.notNull(criterias);
-    Assert.notEmpty(criterias);
-    Assert.isTrue(criterias.size() == 2);
+    Assert.assertNotNull(criterias);
+    Assert.assertTrue(!criterias.isEmpty());
+    Assert.assertTrue(criterias.size() == 2);
     QueryCriteria criteria = criterias.get(0);
-    Assert.isTrue("key".equals(criteria.getKey()));
-    Assert.isTrue("value".equals(criteria.getValue()));
-    Assert.isTrue(Evaluation.EQUALS.equals(criteria.getEvaluation()));
+    Assert.assertTrue("key".equals(criteria.getKey()));
+    Assert.assertTrue("value".equals(criteria.getValue()));
+    Assert.assertTrue(Evaluation.EQUALS.equals(criteria.getEvaluation()));
     criteria = criterias.get(1);
-    Assert.notNull(criteria);
-    Assert.isTrue("num".equals(criteria.getKey()));
-    Assert.isTrue((int) criteria.getValue() == 3);
-    Assert.isTrue(Evaluation.GREATER_THAN_EQUALS.equals(criteria.getEvaluation()));
+    Assert.assertNotNull(criteria);
+    Assert.assertTrue("num".equals(criteria.getKey()));
+    Assert.assertTrue((int) criteria.getValue() == 3);
+    Assert.assertTrue(Evaluation.GREATER_THAN_EQUALS.equals(criteria.getEvaluation()));
   }
 
   @Test
@@ -50,10 +50,10 @@ public class QueryCriteriaTests {
     descriptor.setType(Integer.class);
     descriptor.setEvaluation(Evaluation.GREATER_THAN);
     QueryCriteria criteria = descriptor.createQueryCriteria(4);
-    Assert.notNull(criteria);
-    Assert.isTrue("field".equals(criteria.getKey()));
-    Assert.isTrue((int) criteria.getValue() == 4);
-    Assert.isTrue(Evaluation.GREATER_THAN.equals(criteria.getEvaluation()));
+    Assert.assertNotNull(criteria);
+    Assert.assertTrue("field".equals(criteria.getKey()));
+    Assert.assertTrue((int) criteria.getValue() == 4);
+    Assert.assertTrue(Evaluation.GREATER_THAN.equals(criteria.getEvaluation()));
   }
 
   @Test
@@ -62,12 +62,11 @@ public class QueryCriteriaTests {
     descriptor.setParamName("attributes.\\w+");
     descriptor.setEvaluation(Evaluation.EQUALS);
     descriptor.setRegexMatch(true);
-    Assert.isTrue(descriptor.parameterNameMatches("attributes.isKinase"));
-    Assert.isTrue(Evaluation.EQUALS.equals(descriptor.getDynamicEvaluation("attributes.isKinase")),
-        String.format("Expected EQUALS, got %s", descriptor.getDynamicEvaluation("attributes.isKinase").toString()));
-    Assert.isTrue(!descriptor.parameterNameMatches("attributes"));
-    Assert.isTrue(descriptor.parameterNameMatches("attributes.nameIsNull"));
-    Assert.isTrue(Evaluation.EQUALS.equals(descriptor.getDynamicEvaluation("attributes.nameIsNull")));
+    Assert.assertTrue(descriptor.parameterNameMatches("attributes.isKinase"));
+    Assert.assertEquals(Evaluation.EQUALS, descriptor.getDynamicEvaluation("attributes.isKinase"));
+    Assert.assertTrue(!descriptor.parameterNameMatches("attributes"));
+    Assert.assertTrue(descriptor.parameterNameMatches("attributes.nameIsNull"));
+    Assert.assertTrue(Evaluation.EQUALS.equals(descriptor.getDynamicEvaluation("attributes.nameIsNull")));
   }
 
   @Test
@@ -80,25 +79,23 @@ public class QueryCriteriaTests {
     descriptor.setFieldName("value");
     descriptor.setType(Double.class);
     
-    Assert.isTrue(descriptor.parameterNameMatches("value"), "Parameter name does not match");
-    Assert.isTrue(Evaluation.EQUALS.equals(descriptor.getDynamicEvaluation("value")), "Evaluation does not match");
-    Assert.isTrue(!descriptor.parameterNameMatches("values"), "Param name should not be 'values'");
-    Assert.isTrue(descriptor.parameterNameMatches("valueGreaterThan"), "Dynamic param name does not match");
-    Assert.isTrue(Evaluation.GREATER_THAN.equals(descriptor.getDynamicEvaluation("valueGreaterThan")),
-        String.format("Expected GREATER_THAN, was %s", descriptor.getDynamicEvaluation("valueGreaterThan").toString()));
-    Assert.isTrue(descriptor.parameterNameMatches("valueBetweenIncluding"), "Dynamic param name does not match");
-    Assert.isTrue(Evaluation.BETWEEN_INCLUSIVE.equals(descriptor.getDynamicEvaluation("valueBetweenIncluding")),
-        String.format("Expected BETWEEN_INCLUSIVE, was %s", descriptor.getDynamicEvaluation("valueBetweenIncluding").toString()));
+    Assert.assertTrue(descriptor.parameterNameMatches("value"));
+    Assert.assertEquals(Evaluation.EQUALS, descriptor.getDynamicEvaluation("value"));
+    Assert.assertTrue(!descriptor.parameterNameMatches("values"));
+    Assert.assertTrue(descriptor.parameterNameMatches("valueGreaterThan"));
+    Assert.assertEquals(Evaluation.GREATER_THAN, descriptor.getDynamicEvaluation("valueGreaterThan"));
+    Assert.assertTrue(descriptor.parameterNameMatches("valueBetweenIncluding"));
+    Assert.assertEquals(Evaluation.BETWEEN_INCLUSIVE, descriptor.getDynamicEvaluation("valueBetweenIncluding"));
     
     QueryCriteria criteria = descriptor.createQueryCriteria(1.23);
-    Assert.isTrue("value".equals(criteria.getKey()), "Key should be 'value'");
-    Assert.isTrue(criteria.getValue().equals(1.23), "Value does not match");
-    Assert.isTrue(Evaluation.EQUALS.equals(criteria.getEvaluation()), "Evaluation does not match");
+    Assert.assertEquals("value", criteria.getKey());
+    Assert.assertEquals(criteria.getValue(), 1.23);
+    Assert.assertEquals(Evaluation.EQUALS, criteria.getEvaluation());
     
     criteria = descriptor.createQueryCriteria("valueGreaterThan", 1.23);
-    Assert.isTrue("value".equals(criteria.getKey()), "Key should be 'value'");
-    Assert.isTrue(criteria.getValue().equals(1.23), "Value does not match");
-    Assert.isTrue(Evaluation.GREATER_THAN.equals(criteria.getEvaluation()), "Evaluation does not match");
+    Assert.assertEquals("value", criteria.getKey());
+    Assert.assertEquals(criteria.getValue(), 1.23);
+    Assert.assertEquals(Evaluation.GREATER_THAN, criteria.getEvaluation());
     
     Exception exception = null;
     try {
@@ -106,8 +103,8 @@ public class QueryCriteriaTests {
     } catch (Exception e) {
       exception = e;
     }
-    Assert.notNull(exception, "Exception is null");
-    Assert.isTrue(exception instanceof QueryParameterException, "Exception must be QueryParameterException");
+    Assert.assertNotNull(exception);
+    Assert.assertTrue(exception instanceof QueryParameterException);
     
   }
 
@@ -119,55 +116,55 @@ public class QueryCriteriaTests {
       System.out.println(String.format("param: %s   descriptor: %s", entry.getKey(),
           entry.getValue()));
     }
-    Assert.notNull(descriptorMap);
-    Assert.notEmpty(descriptorMap);
-    Assert.isTrue(descriptorMap.size() == 9, String.format("Size is actually %s", descriptorMap.size()));
-    Assert.isTrue(descriptorMap.containsKey("attributes.\\w+"));
-    Assert.isTrue(!descriptorMap.containsKey("attributes"));
+    Assert.assertNotNull(descriptorMap);
+    Assert.assertTrue(!descriptorMap.isEmpty());
+    Assert.assertEquals(descriptorMap.size(), 9);
+    Assert.assertTrue(descriptorMap.containsKey("attributes.\\w+"));
+    Assert.assertTrue(!descriptorMap.containsKey("attributes"));
     QueryParameterDescriptor descriptor = descriptorMap.get("entrezGeneId");
-    Assert.notNull(descriptor);
-    Assert.isTrue(descriptor.getType().equals(Integer.class));
+    Assert.assertNotNull(descriptor);
+    Assert.assertEquals(descriptor.getType(), Integer.class);
     descriptor = descriptorMap.get("symbol");
-    Assert.notNull(descriptor);
-    Assert.isTrue("symbol".equals(descriptor.getParamName()));
-    Assert.isTrue("symbol".equals(descriptor.getFieldName()));
-    Assert.isTrue(Evaluation.EQUALS.equals(descriptor.getEvaluation()));
-    Assert.isTrue(!descriptorMap.containsKey("geneSymbol"));
+    Assert.assertNotNull(descriptor);
+    Assert.assertEquals("symbol", descriptor.getParamName());
+    Assert.assertEquals("symbol", descriptor.getFieldName());
+    Assert.assertEquals(Evaluation.EQUALS, descriptor.getEvaluation());
+    Assert.assertTrue(!descriptorMap.containsKey("geneSymbol"));
   }
 
   @Test
   public void parameterToCriteriaTest() {
 
     QueryCriteria criteria = QueryParameterUtil.getQueryCriteriaFromParameter("name", new Object[]{"Will"}, String.class, Evaluation.EQUALS);
-    Assert.notNull(criteria);
-    Assert.notNull(criteria.getKey());
-    Assert.isTrue("name".equals(criteria.getKey()));
-    Assert.notNull(criteria.getValue());
-    Assert.isTrue("Will".equals(criteria.getValue()));
-    Assert.notNull(criteria.getEvaluation());
-    Assert.isTrue(Evaluation.EQUALS.equals(criteria.getEvaluation()));
+    Assert.assertNotNull(criteria);
+    Assert.assertNotNull(criteria.getKey());
+    Assert.assertEquals("name", criteria.getKey());
+    Assert.assertNotNull(criteria.getValue());
+    Assert.assertEquals("Will", criteria.getValue());
+    Assert.assertNotNull(criteria.getEvaluation());
+    Assert.assertEquals(Evaluation.EQUALS, criteria.getEvaluation());
 
     criteria = QueryParameterUtil.getQueryCriteriaFromParameter("name", new Object[]{"Will", "Joe"}, String.class, Evaluation.EQUALS);
-    Assert.notNull(criteria);
-    Assert.notNull(criteria.getKey());
-    Assert.isTrue("name".equals(criteria.getKey()));
-    Assert.notNull(criteria.getValue());
-    Assert.isTrue(criteria.getValue() instanceof List);
-    Assert.notEmpty((List<String>) criteria.getValue());
-    Assert.isTrue("Will".equals(((List<String>) criteria.getValue()).get(0)));
-    Assert.notNull(criteria.getEvaluation());
-    Assert.isTrue(Evaluation.IN.equals(criteria.getEvaluation()));
+    Assert.assertNotNull(criteria);
+    Assert.assertNotNull(criteria.getKey());
+    Assert.assertEquals("name", criteria.getKey());
+    Assert.assertNotNull(criteria.getValue());
+    Assert.assertTrue(criteria.getValue() instanceof List);
+    Assert.assertTrue(!((List<String>) criteria.getValue()).isEmpty());
+    Assert.assertEquals("Will", ((List<String>) criteria.getValue()).get(0));
+    Assert.assertNotNull(criteria.getEvaluation());
+    Assert.assertEquals(Evaluation.IN, criteria.getEvaluation());
 
     criteria = QueryParameterUtil.getQueryCriteriaFromParameter("value", new Object[]{"1.2", "3.1"}, Double.class, Evaluation.BETWEEN);
-    Assert.notNull(criteria);
-    Assert.notNull(criteria.getKey());
-    Assert.isTrue("value".equals(criteria.getKey()));
-    Assert.notNull(criteria.getValue());
-    Assert.isTrue(criteria.getValue() instanceof List);
-    Assert.notEmpty((List<Double>) criteria.getValue());
-    Assert.isTrue(((List<Double>) criteria.getValue()).get(0) == 1.2);
-    Assert.notNull(criteria.getEvaluation());
-    Assert.isTrue(Evaluation.BETWEEN.equals(criteria.getEvaluation()));
+    Assert.assertNotNull(criteria);
+    Assert.assertNotNull(criteria.getKey());
+    Assert.assertEquals("value", criteria.getKey());
+    Assert.assertNotNull(criteria.getValue());
+    Assert.assertTrue(criteria.getValue() instanceof List);
+    Assert.assertTrue(!((List<Double>) criteria.getValue()).isEmpty());
+    Assert.assertEquals(((List<Double>) criteria.getValue()).get(0), Double.valueOf(1.2));
+    Assert.assertNotNull(criteria.getEvaluation());
+    Assert.assertEquals(Evaluation.BETWEEN, criteria.getEvaluation());
 
   }
 
