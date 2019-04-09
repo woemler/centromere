@@ -26,6 +26,14 @@ These are the current requirements for developing data warehouses with Centromer
 
 \* Support for additional database technologies is coming soon. 
 
+## Building
+
+You can build the entire project, run tests, generate JavaDocs and JaCoCo reports using the `centromere-parent` POM file:
+
+```bash
+mvn clean javadoc:javadoc install jacoco:report-aggregate
+```
+
 ## Maven Artifacts
 
 Artifacts for Centromere release builds are available from the Maven Central Repository:

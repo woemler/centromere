@@ -22,12 +22,12 @@ import com.blueprint.centromere.tests.core.repositories.GeneRepository;
 import com.blueprint.centromere.tests.mongodb.EmbeddedMongoDataSourceConfig;
 import com.blueprint.centromere.tests.mongodb.MongoRepositoryConfig;
 import com.blueprint.centromere.tests.mongodb.models.MongoGene;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.Assert;
 
 /**
  * @author woemler
@@ -43,11 +43,11 @@ public class ConfigurationTests {
 
   @Test
   public void modelResourceTest() throws Exception {
-    Assert.notNull(repositoryRegistry, "RepositoryRegistry must not be null");
+    Assert.assertNotNull(repositoryRegistry);
     System.out.println(repositoryRegistry.getRegisteredModelRepositories().toString());
     ModelRepository repository = repositoryRegistry.getRepositoryByModel(MongoGene.class);
-    Assert.notNull(repository, "GeneRepository is not registered.");
-    Assert.isTrue(repository instanceof GeneRepository, "Repository does not implement GeneRepository");
+    Assert.assertNotNull(repository);
+    Assert.assertTrue(repository instanceof GeneRepository);
   }
 
 }
