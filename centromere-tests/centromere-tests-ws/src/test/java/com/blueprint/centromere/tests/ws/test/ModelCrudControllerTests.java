@@ -127,7 +127,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
     Gene gene = (Gene) geneRepository.findByEntrezGeneId(1).get();
 
-    mockMvc.perform(get("/api/search/gene/{id}?exclude=links,symbol", gene.getId()))
+    mockMvc.perform(get("/api/search/gene/{id}?_exclude=links,symbol", gene.getId()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.entrezGeneId", is(1)))
         .andExpect(jsonPath("$", not(hasKey("symbol"))))
@@ -203,7 +203,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findFieldExcludedWithHal() throws Exception {
-    mockMvc.perform(get("/api/search/gene?exclude=links,symbol").accept(
+    mockMvc.perform(get("/api/search/gene?_exclude=links,symbol").accept(
         ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
@@ -216,7 +216,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findFieldFilteredWithHal() throws Exception {
-    mockMvc.perform(get("/api/search/gene?fields=links,symbol").accept(
+    mockMvc.perform(get("/api/search/gene?_include=links,symbol").accept(
         ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
@@ -263,7 +263,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findPagedWithHal() throws Exception {
-    mockMvc.perform(get("/api/search/gene?page=1&size=3").accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
+    mockMvc.perform(get("/api/search/gene?_page=1&_size=3").accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
         .andExpect(status().isOk())
         .andDo(MockMvcResultHandlers.print())
         .andExpect(jsonPath("$", hasKey("content")))
@@ -282,7 +282,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findPagedWithoutHal() throws Exception {
-    mockMvc.perform(get("/api/search/gene?page=1&size=3"))
+    mockMvc.perform(get("/api/search/gene?_page=1&_size=3"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$.content", hasSize(2)))
@@ -294,7 +294,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findSortedWithHal() throws Exception {
-    mockMvc.perform(get("/api/search/gene?sort=symbol,desc").accept(
+    mockMvc.perform(get("/api/search/gene?_sort=symbol,desc").accept(
         ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("content")))
@@ -302,6 +302,15 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
         .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
         .andExpect(jsonPath("$.content[0].entrezGeneId", is(5)));
   }
+
+    @Test
+    public void findSortedWithoutHal() throws Exception {
+        mockMvc.perform(get("/api/search/gene?_sort=symbol,desc"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(5)))
+            .andExpect(jsonPath("$[0]", hasKey("entrezGeneId")))
+            .andExpect(jsonPath("$[0].entrezGeneId", is(5)));
+    }
   
   // Dynamic Find Params
   
@@ -803,7 +812,7 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
   
   @Test
   public void corsTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?size=10").header("Origin", "http://www.someurl.com"))
+    mockMvc.perform(get("/api/search/gene?_size=10").header("Origin", "http://www.someurl.com"))
         .andExpect(status().isOk());
   }
 

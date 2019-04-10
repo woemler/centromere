@@ -65,19 +65,19 @@ public class FilteringJackson2HttpMessageConverter extends
 
                 ResponseEnvelope envelope = (ResponseEnvelope) object;
                 content = envelope.getEntity();
-                Set<String> fieldSet = envelope.getFieldSet();
-                Set<String> exclude = envelope.getExclude();
+                Set<String> includedFields = envelope.getIncludedFields();
+                Set<String> excludedFields = envelope.getExcludedFields();
 
-                if (fieldSet != null && !fieldSet.isEmpty()) {
+                if (includedFields != null && !includedFields.isEmpty()) {
                     if (content instanceof ResourceSupport) {
-                        fieldSet.add("content"); // Don't filter out the wrapped content.
+                        includedFields.add("content"); // Don't filter out the wrapped content.
                     }
                     filters = new SimpleFilterProvider()
-                        .addFilter("fieldFilter", SimpleBeanPropertyFilter.filterOutAllExcept(fieldSet))
+                        .addFilter("fieldFilter", SimpleBeanPropertyFilter.filterOutAllExcept(includedFields))
                         .setFailOnUnknownId(false);
-                } else if (exclude != null && !exclude.isEmpty()) {
+                } else if (excludedFields != null && !excludedFields.isEmpty()) {
                     filters = new SimpleFilterProvider()
-                        .addFilter("fieldFilter", SimpleBeanPropertyFilter.serializeAllExcept(exclude))
+                        .addFilter("fieldFilter", SimpleBeanPropertyFilter.serializeAllExcept(excludedFields))
                         .setFailOnUnknownId(false);
                 } else {
                     filters = new SimpleFilterProvider()

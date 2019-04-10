@@ -24,7 +24,6 @@ import com.blueprint.centromere.core.repository.QueryParameterUtil;
 import com.blueprint.centromere.ws.exception.InvalidParameterException;
 import com.blueprint.centromere.ws.exception.ParameterMappingException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -40,9 +39,6 @@ import org.slf4j.LoggerFactory;
 public final class RequestUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtils.class);
-    private static final List<String> FIELD_FILTER_PARAMETERS = Arrays.asList("fields", "exclude");
-    private static final List<String> OTHER_PARAMETERS = Arrays.asList("format");
-    private static final List<String> PAGINATION_PARAMETERS = Arrays.asList("page", "size", "sort");
 
     private RequestUtils() {
     }
@@ -54,23 +50,23 @@ public final class RequestUtils {
      */
     public static List<String> findAllParameters() {
         List<String> params = new ArrayList<>();
-        params.addAll(FIELD_FILTER_PARAMETERS);
-        params.addAll(PAGINATION_PARAMETERS);
-        params.addAll(OTHER_PARAMETERS);
+        params.addAll(ReservedRequestParameters.FIELD_FILTER_PARAMETERS);
+        params.addAll(ReservedRequestParameters.PAGINATION_PARAMETERS);
+        params.addAll(ReservedRequestParameters.OTHER_PARAMETERS);
         return params;
     }
 
     public static List<String> findOneParameters() {
         List<String> params = new ArrayList<>();
-        params.addAll(FIELD_FILTER_PARAMETERS);
-        params.addAll(OTHER_PARAMETERS);
+        params.addAll(ReservedRequestParameters.FIELD_FILTER_PARAMETERS);
+        params.addAll(ReservedRequestParameters.OTHER_PARAMETERS);
         return params;
     }
 
     public static List<String> findDistinctParameters() {
         List<String> params = new ArrayList<>();
-        params.addAll(FIELD_FILTER_PARAMETERS);
-        params.addAll(OTHER_PARAMETERS);
+        params.addAll(ReservedRequestParameters.FIELD_FILTER_PARAMETERS);
+        params.addAll(ReservedRequestParameters.OTHER_PARAMETERS);
         return params;
     }
 
@@ -236,16 +232,16 @@ public final class RequestUtils {
     }
 
     /**
-     * Extracts the requested filtered fields parameter from a request.
+     * Extracts the requested included fields parameter from a request.
      *
      * @param request
      * @return
      */
-    public static Set<String> getFilteredFieldsFromRequest(HttpServletRequest request) {
+    public static Set<String> getIncludedFieldsFromRequest(HttpServletRequest request) {
         Set<String> fields = new HashSet<>();
-        if (request.getParameterMap().containsKey("fields")) {
+        if (request.getParameterMap().containsKey(ReservedRequestParameters.INCLUDED_FIELDS_PARAMETER)) {
             fields = new HashSet<>();
-            String[] params = request.getParameter("fields").split(",");
+            String[] params = request.getParameter(ReservedRequestParameters.INCLUDED_FIELDS_PARAMETER).split(",");
             for (String field: params) {
                 fields.add(field.trim());
             }
@@ -254,21 +250,42 @@ public final class RequestUtils {
     }
 
     /**
-     * Extracts the requested filtered fields parameter from a request.
+     * Extracts the requested excluded fields parameter from a request.
      *
      * @param request
      * @return
      */
     public static Set<String> getExcludedFieldsFromRequest(HttpServletRequest request) {
         Set<String> exclude = new HashSet<>();
-        if (request.getParameterMap().containsKey("exclude")) {
+        if (request.getParameterMap().containsKey(ReservedRequestParameters.EXCLUDED_FIELDS_PARAMETER)) {
             exclude = new HashSet<>();
-            String[] params = request.getParameter("exclude").split(",");
+            String[] params = request.getParameter(ReservedRequestParameters.EXCLUDED_FIELDS_PARAMETER).split(",");
             for (String field: params) {
                 exclude.add(field.trim());
             }
         }
         return exclude;
+    }
+
+    /**
+     * Checks the request parameters for indications of a paged-response request.
+     * 
+     * @param request
+     * @return
+     */
+    public static boolean isPagedRequest(HttpServletRequest request) {
+        return request.getParameterMap().containsKey(ReservedRequestParameters.PAGE_PARAMETER) 
+            || request.getParameterMap().containsKey(ReservedRequestParameters.SIZE_PARAMETER);
+    }
+
+    /**
+     * Checks the request parameters for indications of a sorted-response request.
+     *
+     * @param request
+     * @return
+     */
+    public static boolean isSortableRequest(HttpServletRequest request) {
+        return request.getParameterMap().containsKey(ReservedRequestParameters.SORT_PARAMETER);
     }
 
 }

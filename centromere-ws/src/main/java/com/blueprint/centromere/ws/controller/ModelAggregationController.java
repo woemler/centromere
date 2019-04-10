@@ -96,8 +96,8 @@ public class ModelAggregationController {
         produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
             ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
             MediaType.TEXT_PLAIN_VALUE })
-    public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope<Object>> findDistinct(
-        /*@ApiParam(name = "field", value = "Model field name.")*/ @PathVariable("field") String field,
+    public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope> findDistinct(
+        @PathVariable("field") String field,
         @PathVariable("uri") String uri,
         HttpServletRequest request) {
 
@@ -128,7 +128,7 @@ public class ModelAggregationController {
 
         List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromFindDistinctRequest(model, request);
         Set<Object> distinct = repository.distinct(field, queryCriterias);
-        ResponseEnvelope<Object> envelope = null;
+        ResponseEnvelope envelope = null;
 
         if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))) {
 
@@ -136,11 +136,11 @@ public class ModelAggregationController {
                 (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
             Resources<Object> resources = new Resources<>(distinct);
             resources.add(selfLink);
-            envelope = new ResponseEnvelope<>(resources);
+            envelope = new ResponseEnvelope(resources);
 
         } else {
 
-            envelope = new ResponseEnvelope<>(distinct);
+            envelope = new ResponseEnvelope(distinct);
 
         }
 
@@ -167,7 +167,7 @@ public class ModelAggregationController {
         produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
             ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
             MediaType.TEXT_PLAIN_VALUE })
-    public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope<Object>> count(
+    public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope> count(
         @PathVariable("uri") String uri,
         HttpServletRequest request) {
 
@@ -195,16 +195,16 @@ public class ModelAggregationController {
         List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromFindDistinctRequest(model, request);
         Long count = repository.count(queryCriterias);
         Map<String, Object> responseObject = Collections.singletonMap("count", count);
-        ResponseEnvelope<Object> envelope;
+        ResponseEnvelope envelope;
 
         if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))) {
             Link selfLink = new Link(rootUrl + "/aggregation/" + uri + "/count" +
                 (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
             Resource<Object> resource = new Resource<>(responseObject);
             resource.add(selfLink);
-            envelope = new ResponseEnvelope<>(resource);
+            envelope = new ResponseEnvelope(resource);
         } else {
-            envelope = new ResponseEnvelope<>(responseObject);
+            envelope = new ResponseEnvelope(responseObject);
         }
 
         return new ResponseEntity<>(envelope, HttpStatus.OK);
@@ -231,7 +231,7 @@ public class ModelAggregationController {
         produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
             ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
             MediaType.TEXT_PLAIN_VALUE })
-    public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope<Object>> groupBy(
+    public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope> groupBy(
         @PathVariable("field") String field,
         @PathVariable("uri") String uri,
         HttpServletRequest request) {
@@ -274,7 +274,7 @@ public class ModelAggregationController {
             grouped.put(fieldValue, recordList);
         }
 
-        ResponseEnvelope<Object> envelope;
+        ResponseEnvelope envelope;
 
         if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))) {
 
@@ -282,11 +282,11 @@ public class ModelAggregationController {
                 (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
             Resource<Object> resource = new Resource<>(grouped);
             resource.add(selfLink);
-            envelope = new ResponseEnvelope<>(resource);
+            envelope = new ResponseEnvelope(resource);
 
         } else {
 
-            envelope = new ResponseEnvelope<>(grouped);
+            envelope = new ResponseEnvelope(grouped);
 
         }
 

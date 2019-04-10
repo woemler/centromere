@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
@@ -56,8 +55,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedResources;
@@ -110,9 +107,11 @@ public class ModelCrudController {
      * @return {@code T} instance
      */
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "fields", value = "List of fields to be included in response objects",
+        @ApiImplicitParam(name = ReservedRequestParameters.INCLUDED_FIELDS_PARAMETER, 
+            value = "List of fields to be included in response objects",
             dataType = "string", paramType = "query"),
-        @ApiImplicitParam(name = "exclude", value = "List of fields to be excluded from response objects",
+        @ApiImplicitParam(name = ReservedRequestParameters.EXCLUDED_FIELDS_PARAMETER, 
+            value = "List of fields to be excluded from response objects",
             dataType = "string", paramType = "query")
     })
     @ApiResponses({
@@ -127,7 +126,7 @@ public class ModelCrudController {
         produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
             ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
             MediaType.TEXT_PLAIN_VALUE })
-    public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope<T>> findById(
+    public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope> findById(
         @ApiParam(name = "id", value = "Model record primary id.") @PathVariable String id,
         @PathVariable String uri,
         HttpServletRequest request
@@ -148,19 +147,19 @@ public class ModelCrudController {
         if (RequestUtils.requestContainsNonDefaultParameters(RequestUtils.findOneParameters(), request.getParameterMap())) {
             throw new InvalidParameterException("Request contains invalid query string options.");
         }
-        Set<String> fields = RequestUtils.getFilteredFieldsFromRequest(request);
-        Set<String> exclude = RequestUtils.getExcludedFieldsFromRequest(request);
+        Set<String> includedFields = RequestUtils.getIncludedFieldsFromRequest(request);
+        Set<String> excludedFields = RequestUtils.getExcludedFieldsFromRequest(request);
         Optional<T> optional = repository.findById(convertModelIdParameter(id, model));
         if (!optional.isPresent()) {
             throw new ResourceNotFoundException();
         }
-        ResponseEnvelope<T> envelope;
+        ResponseEnvelope envelope;
         T entity = optional.get();
         if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))) {
             FilterableResource resource = assembler.toResource(entity);
-            envelope = new ResponseEnvelope<>(resource, fields, exclude);
+            envelope = new ResponseEnvelope(resource, includedFields, excludedFields);
         } else {
-            envelope = new ResponseEnvelope<>(entity, fields, exclude);
+            envelope = new ResponseEnvelope(entity, includedFields, excludedFields);
         }
         return new ResponseEntity<>(envelope, HttpStatus.OK);
     }
@@ -176,16 +175,29 @@ public class ModelCrudController {
      * @return a {@link List} of {@link Model} objects.
      */
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "page", value = "Page number.", defaultValue = "0", dataType = "int",
+        @ApiImplicitParam(name = ReservedRequestParameters.PAGE_PARAMETER, 
+            value = "Page number.", 
+            defaultValue = "0", 
+            dataType = "int",
             paramType = "query"),
-        @ApiImplicitParam(name = "size", value = "Number of records per page.", defaultValue = "1000",
-            dataType = "int", paramType = "query"),
-        @ApiImplicitParam(name = "sort", value = "Sort order field and direction.", dataType = "string",
-            paramType = "query", example = "name,asc"),
-        @ApiImplicitParam(name = "fields", value = "List of fields to be included in response objects",
-            dataType = "string", paramType = "query"),
-        @ApiImplicitParam(name = "exclude", value = "List of fields to be excluded from response objects",
-            dataType = "string", paramType = "query")
+        @ApiImplicitParam(name = ReservedRequestParameters.SIZE_PARAMETER, 
+            value = "Number of records per page.", 
+            defaultValue = "1000",
+            dataType = "int", 
+            paramType = "query"),
+        @ApiImplicitParam(name = ReservedRequestParameters.SORT_PARAMETER, 
+            value = "Sort order field and direction.", 
+            dataType = "string",
+            paramType = "query", 
+            example = "name,asc"),
+        @ApiImplicitParam(name = ReservedRequestParameters.INCLUDED_FIELDS_PARAMETER, 
+            value = "List of fields to be included in response objects",
+            dataType = "string", 
+            paramType = "query"),
+        @ApiImplicitParam(name = ReservedRequestParameters.EXCLUDED_FIELDS_PARAMETER, 
+            value = "List of fields to be excluded from response objects",
+            dataType = "string", 
+            paramType = "query")
     })
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK"),
@@ -199,9 +211,9 @@ public class ModelCrudController {
         produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
             ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
             MediaType.TEXT_PLAIN_VALUE})
-    public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope<T>> find(
-        @PageableDefault(size = 1000) Pageable pageable,
+    public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope> find(
         @PathVariable String uri,
+        Pageable pageable,
         PagedResourcesAssembler pagedResourcesAssembler,
         HttpServletRequest request
     ) {
@@ -221,25 +233,24 @@ public class ModelCrudController {
         LOGGER.info(String.format("Resolved request to model %s and repository %s",
             model.getName(), repository.getClass().getName()));
 
-        Set<String> fields = RequestUtils.getFilteredFieldsFromRequest(request);
-        Set<String> exclude = RequestUtils.getExcludedFieldsFromRequest(request);
-        if (!fields.isEmpty()) {
-            LOGGER.info(String.format("Selected fields: %s", fields.toString()));
+        Set<String> includedFields = RequestUtils.getIncludedFieldsFromRequest(request);
+        Set<String> excludedFields = RequestUtils.getExcludedFieldsFromRequest(request);
+        if (!includedFields.isEmpty()) {
+            LOGGER.info(String.format("Selected includedFields: %s", includedFields.toString()));
         }
-        if (!exclude.isEmpty()) {
-            LOGGER.info(String.format("Excluded fields: %s", exclude.toString()));
+        if (!excludedFields.isEmpty()) {
+            LOGGER.info(String.format("Excluded fields: %s", excludedFields.toString()));
         }
 
-        ResponseEnvelope<T> envelope;
-        Map<String, String[]> parameterMap = request.getParameterMap();
+        ResponseEnvelope envelope;
         String mediaType = request.getHeader("Accept");
 
         List<QueryCriteria> criterias = RequestUtils.getQueryCriteriaFromFindRequest(model, request);
 
         Link selfLink = new Link(rootUrl + "/search/" + uri +
             (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
-
-        if (parameterMap.containsKey("page") || parameterMap.containsKey("size")) {
+        
+        if (RequestUtils.isPagedRequest(request)) {
 
             Page<T> page = repository.find(criterias, pageable);
             LOGGER.info(String.format("Query returned %d paged records, out of %d total", page.getSize(), page.getTotalElements()));
@@ -248,21 +259,20 @@ public class ModelCrudController {
 
                 PagedResources<FilterableResource> pagedResources
                     = pagedResourcesAssembler.toResource(page, assembler, selfLink);
-                envelope = new ResponseEnvelope<>(pagedResources, fields, exclude);
+                envelope = new ResponseEnvelope(pagedResources, includedFields, excludedFields);
 
             } else {
 
-                envelope = new ResponseEnvelope<>(page, fields, exclude);
+                envelope = new ResponseEnvelope(page, includedFields, excludedFields);
 
             }
 
         } else {
-
-            Sort sort = pageable.getSort();
+            
             List<T> entities;
 
-            if (sort != null) {
-                entities = (List<T>) repository.find(criterias, sort);
+            if (RequestUtils.isSortableRequest(request)) {
+                entities = (List<T>) repository.find(criterias, pageable.getSort());
             } else {
                 entities = (List<T>) repository.find(criterias);
             }
@@ -272,9 +282,9 @@ public class ModelCrudController {
                 List<FilterableResource> resourceList = assembler.toResources(entities);
                 Resources<FilterableResource> resources = new Resources<>(resourceList);
                 resources.add(selfLink);
-                envelope = new ResponseEnvelope<>(resources, fields, exclude);
+                envelope = new ResponseEnvelope(resources, includedFields, excludedFields);
             } else {
-                envelope = new ResponseEnvelope<>(entities, fields, exclude);
+                envelope = new ResponseEnvelope(entities, includedFields, excludedFields);
             }
 
         }
@@ -463,16 +473,29 @@ public class ModelCrudController {
      * @return a {@link List} of {@link Model} objects.
      */
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "page", value = "Page number.", defaultValue = "0", dataType = "int",
+        @ApiImplicitParam(name = ReservedRequestParameters.PAGE_PARAMETER,
+            value = "Page number.",
+            defaultValue = "0",
+            dataType = "int",
             paramType = "query"),
-        @ApiImplicitParam(name = "size", value = "Number of records per page.", defaultValue = "1000",
-            dataType = "int", paramType = "query"),
-        @ApiImplicitParam(name = "sort", value = "Sort order field and direction.", dataType = "string",
-            paramType = "query", example = "name,asc"),
-        @ApiImplicitParam(name = "fields", value = "List of fields to be included in response objects",
-            dataType = "string", paramType = "query"),
-        @ApiImplicitParam(name = "exclude", value = "List of fields to be excluded from response objects",
-            dataType = "string", paramType = "query")
+        @ApiImplicitParam(name = ReservedRequestParameters.SIZE_PARAMETER,
+            value = "Number of records per page.",
+            defaultValue = "1000",
+            dataType = "int",
+            paramType = "query"),
+        @ApiImplicitParam(name = ReservedRequestParameters.SORT_PARAMETER,
+            value = "Sort order field and direction.",
+            dataType = "string",
+            paramType = "query",
+            example = "name,asc"),
+        @ApiImplicitParam(name = ReservedRequestParameters.INCLUDED_FIELDS_PARAMETER,
+            value = "List of fields to be included in response objects",
+            dataType = "string",
+            paramType = "query"),
+        @ApiImplicitParam(name = ReservedRequestParameters.EXCLUDED_FIELDS_PARAMETER,
+            value = "List of fields to be excluded from response objects",
+            dataType = "string",
+            paramType = "query")
     })
     @ApiResponses({
         @ApiResponse(code = 200, message = "OK"),
@@ -486,11 +509,11 @@ public class ModelCrudController {
         produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
             ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
             MediaType.TEXT_PLAIN_VALUE})
-    public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope<T>> findLinked(
-        @PageableDefault(size = 1000) Pageable pageable,
+    public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope> findLinked(
         @PathVariable("uri") String uri,
         @PathVariable("id") I id,
         @PathVariable("meta") String meta,
+        Pageable pageable,
         PagedResourcesAssembler pagedResourcesAssembler,
         HttpServletRequest request
     ) {
@@ -545,17 +568,16 @@ public class ModelCrudController {
             relModel.getName(), metaRepository.getClass().getName()));
 
         // Get the include/exclude fields
-        Set<String> fields = RequestUtils.getFilteredFieldsFromRequest(request);
-        Set<String> exclude = RequestUtils.getExcludedFieldsFromRequest(request);
-        if (!fields.isEmpty()) {
-            LOGGER.info(String.format("Selected fields: %s", fields.toString()));
+        Set<String> includedFields = RequestUtils.getIncludedFieldsFromRequest(request);
+        Set<String> excludedFields = RequestUtils.getExcludedFieldsFromRequest(request);
+        if (!includedFields.isEmpty()) {
+            LOGGER.info(String.format("Selected included fields: %s", includedFields.toString()));
         }
-        if (!exclude.isEmpty()) {
-            LOGGER.info(String.format("Excluded fields: %s", exclude.toString()));
+        if (!excludedFields.isEmpty()) {
+            LOGGER.info(String.format("Excluded fields: %s", excludedFields.toString()));
         }
 
-        ResponseEnvelope<T> envelope;
-        Map<String, String[]> parameterMap = request.getParameterMap();
+        ResponseEnvelope envelope;
         String mediaType = request.getHeader("Accept");
 
         // Get the foreign key field values to be used in the query
@@ -575,7 +597,7 @@ public class ModelCrudController {
         Link selfLink = new Link(rootUrl + "/search/" + uri + "/" + id + "/" + meta +
             (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
 
-        if (parameterMap.containsKey("page") || parameterMap.containsKey("size")) {
+        if (RequestUtils.isPagedRequest(request)) {
 
             Page<?> page = metaRepository.find(criterias, pageable);
 
@@ -583,21 +605,20 @@ public class ModelCrudController {
 
                 PagedResources<FilterableResource> pagedResources
                     = pagedResourcesAssembler.toResource(page, assembler, selfLink);
-                envelope = new ResponseEnvelope<>(pagedResources, fields, exclude);
+                envelope = new ResponseEnvelope(pagedResources, includedFields, excludedFields);
 
             } else {
 
-                envelope = new ResponseEnvelope<>(page, fields, exclude);
+                envelope = new ResponseEnvelope(page, includedFields, excludedFields);
 
             }
 
         } else {
-
-            Sort sort = pageable.getSort();
+            
             List<? extends Model<?>> entities;
 
-            if (sort != null) {
-                entities = (List<? extends Model<?>>) metaRepository.find(criterias, sort);
+            if (RequestUtils.isSortableRequest(request)) {
+                entities = (List<? extends Model<?>>) metaRepository.find(criterias, pageable.getSort());
             } else {
                 entities = (List<? extends Model<?>>) metaRepository.find(criterias);
             }
@@ -606,9 +627,9 @@ public class ModelCrudController {
                 List<FilterableResource> resourceList = assembler.toResources(entities);
                 Resources<FilterableResource> resources = new Resources<>(resourceList);
                 resources.add(selfLink);
-                envelope = new ResponseEnvelope<>(resources, fields, exclude);
+                envelope = new ResponseEnvelope(resources, includedFields, excludedFields);
             } else {
-                envelope = new ResponseEnvelope<>(entities, fields, exclude);
+                envelope = new ResponseEnvelope(entities, includedFields, excludedFields);
             }
 
         }
