@@ -25,7 +25,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @AutoConfigureMockMvc(secure = false)
 public class MediaTypeTests extends AbstractRepositoryTests {
 
-  private static final String TEST_URL = "/api/search/gene?size=10";
+  private static final String TEST_URL = "/api/search/gene?_size=10";
 
   @Autowired
   private MockMvc mockMvc;
@@ -46,7 +46,7 @@ public class MediaTypeTests extends AbstractRepositoryTests {
 
   @Test
   public void jsonQueryParameterTest() throws Exception {
-    mockMvc.perform(get(TEST_URL + "&format=json"))
+    mockMvc.perform(get(TEST_URL + "&_format=json"))
         .andExpect(status().isOk())
         .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
   }
@@ -60,7 +60,7 @@ public class MediaTypeTests extends AbstractRepositoryTests {
 
   @Test
   public void halJsonQueryParameterTest() throws Exception {
-    mockMvc.perform(get(TEST_URL + "&format=haljson"))
+    mockMvc.perform(get(TEST_URL + "&_format=haljson"))
         .andExpect(status().isOk())
         .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith("application/hal+json"));
   }
@@ -74,7 +74,7 @@ public class MediaTypeTests extends AbstractRepositoryTests {
 
   @Test
   public void xmlQueryParameterTest() throws Exception {
-    mockMvc.perform(get(TEST_URL + "&format=xml"))
+    mockMvc.perform(get(TEST_URL + "&_format=xml"))
         .andExpect(status().isOk())
         .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_XML));
   }
@@ -88,7 +88,7 @@ public class MediaTypeTests extends AbstractRepositoryTests {
 
   @Test
   public void halXmlQueryParameterTest() throws Exception {
-    mockMvc.perform(get(TEST_URL + "&format=halxml"))
+    mockMvc.perform(get(TEST_URL + "&_format=halxml"))
         .andExpect(status().isOk())
         .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(ApiMediaTypes.APPLICATION_HAL_XML_VALUE));
   }
@@ -102,7 +102,7 @@ public class MediaTypeTests extends AbstractRepositoryTests {
 
   @Test
   public void textTableQueryParameterTest() throws Exception {
-    mockMvc.perform(get(TEST_URL + "&format=text"))
+    mockMvc.perform(get(TEST_URL + "&_format=text"))
         .andExpect(status().isOk())
         .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN));
   }

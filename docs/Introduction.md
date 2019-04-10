@@ -314,7 +314,7 @@ Requests can specify which entity fields will be returned, or excluded:
 
 ```
 GET /genes?fields=entrezGeneId,primaryGeneSymbol
-GET /genes?exclude=description,links
+GET /genes?excludedFields=description,links
 ```
 
 #### Hypermedia

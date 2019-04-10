@@ -27,19 +27,21 @@ import java.util.Set;
  *
  * @author woemler
  */
-public class ResponseEnvelope<T> {
+public class ResponseEnvelope {
 
-    private Set<String> fieldSet = new HashSet<>();
-    private Set<String> exclude = new HashSet<>();
+    private final Set<String> includedFields;
+    private final Set<String> excludedFields;
     private final Object entity;
 
     public ResponseEnvelope(Object entity) {
         this.entity = entity;
+        this.includedFields = new HashSet<>();
+        this.excludedFields = new HashSet<>();
     }
 
-    public ResponseEnvelope(Object entity, Set<String> fieldSet, Set<String> exclude) {
-        this.fieldSet = fieldSet;
-        this.exclude = exclude;
+    public ResponseEnvelope(Object entity, Set<String> includedFields, Set<String> excludedFields) {
+        this.includedFields = includedFields;
+        this.excludedFields = excludedFields;
         this.entity = entity;
     }
 
@@ -48,30 +50,13 @@ public class ResponseEnvelope<T> {
     }
 
     @JsonIgnore
-    public Set<String> getFieldSet() {
-        return fieldSet;
+    public Set<String> getIncludedFields() {
+        return includedFields;
     }
 
     @JsonIgnore
-    public Set<String> getExclude() {
-        return exclude;
+    public Set<String> getExcludedFields() {
+        return excludedFields;
     }
 
-    public void setExclude(Set<String> exclude) {
-        this.exclude = exclude;
-    }
-
-    public void setFieldSet(Set<String> fieldSet) {
-        this.fieldSet = fieldSet;
-    }
-
-    public void setFields(String fields) {
-        Set<String> fieldSet = new HashSet<String>();
-        if (fields != null) {
-            for (String field : fields.split(",")) {
-                fieldSet.add(field);
-            }
-        }
-        this.fieldSet = fieldSet;
-    }
 }

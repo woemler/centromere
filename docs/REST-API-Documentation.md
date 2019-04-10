@@ -13,7 +13,7 @@ Operator | Description | Example
 `In` | Attribute exactly equals at least one of the multiple inputs. Equivalent to using no operator suffix and comma-separated inputs. | `?species=mouse,human` or `?speciesIn=mouse,human` are equivalent.
 `NotIn` | Attribute does not equal any of the multiple inputs. | `?speciesNotIn=mouse,human`
 `Like` | Fuzzy attribute match to input.  Works like a case-insensitive substring match for character fields. | `?geneLike=akt`
-`NotLike` | Inverse fuzzy attribute match to inout. Will exclude all records that pass a case-insensitive substring match on a character field. | `?geneNotLike=akt`
+`NotLike` | Inverse fuzzy attribute match to inout. Will excludedFields all records that pass a case-insensitive substring match on a character field. | `?geneNotLike=akt`
 `StartsWith` | String attribute begins with the input characters. | `?nameStartsWith=Joe`
 `EndsWith` | String attribute ends with input characters. | `?nameEndsWith=Smith`
 `GreaterThan` | Numerical attribute is greater than the input value. | `?signalGreaterThan=2.5`
@@ -167,7 +167,7 @@ curl -H "Accept: application/hal+json" http//mycentromere/api/search/datafiles
 
 ### Excluding and Including Attributes
 
-You can modify what model attributes are returned in the response using the `exclude` and `include` query parameters.  For example, given a model definition:
+You can modify what model attributes are returned in the response using the `excludedFields` and `include` query parameters.  For example, given a model definition:
 
 ```java
 public class Person implements Model<String> {
@@ -183,10 +183,10 @@ public class Person implements Model<String> {
 }
 ```
 
-You can remove attributes from the response objects by using the `exclude` query string parameter:
+You can remove attributes from the response objects by using the `excludedFields` query string parameter:
 
 ```
-GET /api/search/people?exclude=id,dateJoined,details
+GET /api/search/people?excludedFields=id,dateJoined,details
 
 response = [
   {

@@ -97,8 +97,8 @@ public class FilteringTextMessageConverter extends AbstractHttpMessageConverter<
 
         // If object is a ResponseEnvelope, get the wrapped object
         if (obj.getClass().equals(ResponseEnvelope.class)) {
-            includedFields = ((ResponseEnvelope) obj).getFieldSet();
-            excludedFields = ((ResponseEnvelope) obj).getExclude();
+            includedFields = ((ResponseEnvelope) obj).getIncludedFields();
+            excludedFields = ((ResponseEnvelope) obj).getExcludedFields();
             obj = ((ResponseEnvelope) obj).getEntity();
         }
         if (obj.getClass().equals(PageImpl.class)) {
