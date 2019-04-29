@@ -22,104 +22,11 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.blueprint</groupId>
-        <artifactId>centromere-parent</artifactId>
-        <version>0.6.0-SNAPSHOT</version>
-        <relativePath>../centromere-parent/pom.xml</relativePath>
-    </parent>
-
-    <artifactId>centromere-core</artifactId>
-    <name>Centromere Core</name>
-    <packaging>jar</packaging>
-
-    <description>Genomic data warehouse and web service utilities.</description>
-    <url>https://github.com/blueprintmedicines/centromere</url>
-
-    <licenses>
-        <license>
-            <name>The Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <name>Will Oemler</name>
-            <email>woemler@blueprintmedicines.com</email>
-            <organization>Blueprint Medicines</organization>
-            <organizationUrl>http://www.blueprintmedicines.com</organizationUrl>
-        </developer>
-    </developers>
-
-    <scm>
-        <connection>scm:git:git@github.com:blueprintmedicines/centromere.git</connection>
-        <developerConnection>scm:git:git@github.com:blueprintmedicines/centromere.git</developerConnection>
-        <url>git@github.com:blueprintmedicines/centromere.git</url>
-    </scm>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
-    <dependencies>
-      
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-core</artifactId>
-      </dependency>
-
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-context</artifactId>
-      </dependency>
-
-      <dependency>
-          <groupId>org.springframework.data</groupId>
-          <artifactId>spring-data-commons</artifactId>
-      </dependency>
-
-      <dependency>
-        <groupId>javax.annotation</groupId>
-        <artifactId>javax.annotation-api</artifactId>
-      </dependency>
-
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>27.0.1-jre</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-      </dependency>
-
-      <dependency>
-        <groupId>com.opencsv</groupId>
-        <artifactId>opencsv</artifactId>
-        <version>4.1</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-test</artifactId>
-        <scope>test</scope>
-      </dependency>
-
-    </dependencies>
-
     <build>
       
         <finalName>${project.artifactId}-${project.version}</finalName>
-        <plugins>
+
+      <plugins>
 
           <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
@@ -192,7 +99,7 @@
               <dependency>
                 <groupId>com.puppycrawl.tools</groupId>
                 <artifactId>checkstyle</artifactId>
-                <version>8.15</version>
+                <version>8.18</version>
               </dependency>
             </dependencies>
             <executions>
@@ -236,5 +143,100 @@
 
         </plugins>
     </build>
+
+  <artifactId>centromere-core</artifactId>
+  <name>Centromere Core</name>
+  <packaging>jar</packaging>
+
+  <description>Genomic data warehouse and web service utilities.</description>
+  <url>https://github.com/blueprintmedicines/centromere</url>
+
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Will Oemler</name>
+      <email>woemler@blueprintmedicines.com</email>
+      <organization>Blueprint Medicines</organization>
+      <organizationUrl>http://www.blueprintmedicines.com</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git@github.com:blueprintmedicines/centromere.git</connection>
+    <developerConnection>scm:git:git@github.com:blueprintmedicines/centromere.git
+    </developerConnection>
+    <url>git@github.com:blueprintmedicines/centromere.git</url>
+  </scm>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.data</groupId>
+      <artifactId>spring-data-commons</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>27.0.1-jre</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.opencsv</groupId>
+      <artifactId>opencsv</artifactId>
+      <version>4.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <parent>
+    <groupId>com.blueprint.cbbi</groupId>
+    <artifactId>centromere-parent</artifactId>
+    <version>0.6.0-SNAPSHOT</version>
+    <relativePath>../centromere-parent/pom.xml</relativePath>
+  </parent>
 
 </project>

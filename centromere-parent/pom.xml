@@ -12,60 +12,6 @@
     <version>2.0.7.RELEASE</version>
   </parent>
   
-  <groupId>com.blueprint</groupId>
-  <artifactId>centromere-parent</artifactId>
-  <version>0.6.0-SNAPSHOT</version>
-  <name>Centromere Parent</name>
-  <packaging>pom</packaging>
-  
-  <description>Genomic data warehouse and web service utilities.</description>
-  <url>https://github.com/blueprintmedicines/centromere</url>
-  
-  <modules>
-    <module>../centromere-core</module>
-    <module>../centromere-mongodb</module>
-    <module>../centromere-ws</module>
-    <module>../centromere-tests</module>
-  </modules>
-
-  <licenses>
-    <license>
-      <name>The Apache License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-    </license>
-  </licenses>
-
-  <developers>
-    <developer>
-      <name>Will Oemler</name>
-      <email>woemler@blueprintmedicines.com</email>
-      <organization>Blueprint Medicines</organization>
-      <organizationUrl>http://www.blueprintmedicines.com</organizationUrl>
-    </developer>
-  </developers>
-
-  <scm>
-    <connection>scm:git:git@github.com:blueprintmedicines/centromere.git</connection>
-    <developerConnection>scm:git:git@github.com:blueprintmedicines/centromere.git</developerConnection>
-    <url>git@github.com:blueprintmedicines/centromere.git</url>
-  </scm>
-
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
-
-  <dependencies>
-
-
-  </dependencies>
-
   <build>
 
     <finalName>${project.artifactId}-${project.version}</finalName>
@@ -113,6 +59,19 @@
           <show>public</show>
           <nohelp>true</nohelp>
         </configuration>
+        <executions>
+          <execution>
+            <configuration>
+              <nohelp>true</nohelp>
+              <show>public</show>
+            </configuration>
+            <goals>
+              <goal>aggregate</goal>
+            </goals>
+            <id>aggregate</id>
+            <phase>site</phase>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>
@@ -137,5 +96,60 @@
 
     </plugins>
   </build>
+  <artifactId>centromere-parent</artifactId>
+  <version>0.6.0-SNAPSHOT</version>
+  <name>Centromere Parent</name>
+  <packaging>pom</packaging>
+
+  <description>Genomic data warehouse and web service utilities.</description>
+  <url>https://github.com/blueprintmedicines/centromere</url>
+
+  <modules>
+    <module>../centromere-core</module>
+    <module>../centromere-mongodb</module>
+    <module>../centromere-ws</module>
+    <module>../centromere-tests</module>
+  </modules>
+
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Will Oemler</name>
+      <email>woemler@blueprintmedicines.com</email>
+      <organization>Blueprint Medicines</organization>
+      <organizationUrl>http://www.blueprintmedicines.com</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git@github.com:blueprintmedicines/centromere.git</connection>
+    <developerConnection>scm:git:git@github.com:blueprintmedicines/centromere.git
+    </developerConnection>
+    <url>git@github.com:blueprintmedicines/centromere.git</url>
+  </scm>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
+  <dependencies>
+
+
+  </dependencies>
+
+  <groupId>com.blueprint.cbbi</groupId>
 
 </project>

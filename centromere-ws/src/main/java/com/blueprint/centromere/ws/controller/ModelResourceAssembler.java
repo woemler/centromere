@@ -151,16 +151,16 @@ public class ModelResourceAssembler
         } else {
             collection = Collections.singleton(object);
         }
-        String s = "";
+        StringBuffer s = new StringBuffer();
         boolean flag = false;
         for (Object o: collection) {
             if (flag) {
-                s = s + ",";
+                s.append(",");
             }
-            s = s + o.toString();
+            s.append(o.toString());
             flag = true;
         }
-        return s;
+        return s.toString();
     }
 
     private List<Link> addLinks(List<Link> links) {

@@ -2,38 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <parent>
-    <artifactId>centromere-tests</artifactId>
-    <groupId>com.blueprint</groupId>
-    <version>0.6.0-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
-
-  <artifactId>centromere-tests-ws</artifactId>
-  <name>Centromere Tests WS</name>
-
-  <dependencies>
-
-    <dependency>
-      <groupId>com.blueprint</groupId>
-      <artifactId>centromere-tests-mongodb</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.blueprint</groupId>
-      <artifactId>centromere-ws</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-tomcat</artifactId>
-    </dependency>
-
-  </dependencies>
-
   <build>
 
     <finalName>${project.artifactId}-${project.version}</finalName>
@@ -110,7 +78,7 @@
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>8.15</version>
+            <version>8.18</version>
           </dependency>
         </dependencies>
         <executions>
@@ -154,6 +122,38 @@
 
     </plugins>
   </build>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>centromere-tests-ws</artifactId>
+  <name>Centromere Tests WS</name>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.blueprint.cbbi</groupId>
+      <artifactId>centromere-tests-mongodb</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.blueprint.cbbi</groupId>
+      <artifactId>centromere-ws</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-tomcat</artifactId>
+    </dependency>
+
+  </dependencies>
+
+  <parent>
+    <artifactId>centromere-tests</artifactId>
+    <groupId>com.blueprint.cbbi</groupId>
+    <version>0.6.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
 
 </project>
