@@ -60,7 +60,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @since 0.5.0
  */
 @Controller
-@RequestMapping("${centromere.web.api.root-url}/aggregation")
+@RequestMapping("${centromere.web.api.root-url}/aggregate")
 @SuppressWarnings({"unchecked", "SpringJavaAutowiringInspection"})
 public class ModelAggregationController {
 
@@ -76,7 +76,7 @@ public class ModelAggregationController {
     private String rootUrl;
 
     /**
-     * {@code GET /api/aggregation/{model}/distinct/{field}}
+     * {@code GET /api/aggregate/{model}/distinct/{field}}
      * Fetches the distinct values of the model attribute, {@code field}, which fulfill the given
      *   query options.
      *
@@ -132,7 +132,7 @@ public class ModelAggregationController {
 
         if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))) {
 
-            Link selfLink = new Link(rootUrl + "/aggregation/" + uri + "/distinct/" + field +
+            Link selfLink = new Link(rootUrl + "/aggregate/" + uri + "/distinct/" + field +
                 (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
             Resources<Object> resources = new Resources<>(distinct);
             resources.add(selfLink);
@@ -148,7 +148,7 @@ public class ModelAggregationController {
     }
 
     /**
-     * {@code GET /api/aggregation/{model}/count}
+     * {@code GET /api/aggregate/{model}/count}
      * Fetches the count of records for the requested model, which fulfill the given
      *   query options.
      *
@@ -198,7 +198,7 @@ public class ModelAggregationController {
         ResponseEnvelope envelope;
 
         if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))) {
-            Link selfLink = new Link(rootUrl + "/aggregation/" + uri + "/count" +
+            Link selfLink = new Link(rootUrl + "/aggregate/" + uri + "/count" +
                 (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
             Resource<Object> resource = new Resource<>(responseObject);
             resource.add(selfLink);
@@ -212,7 +212,7 @@ public class ModelAggregationController {
     }
 
     /**
-     * {@code GET /api/aggregation/{model}/group/{field}}
+     * {@code GET /api/aggregate/{model}/group/{field}}
      * Fetches a collection of records, grouped by the requested field.
      *
      * @param field Name of the model attribute to group records by.
@@ -278,7 +278,7 @@ public class ModelAggregationController {
 
         if (ApiMediaTypes.isHalMediaType(request.getHeader("Accept"))) {
 
-            Link selfLink = new Link(rootUrl + "/aggregation/" + uri + "/group/" + field +
+            Link selfLink = new Link(rootUrl + "/aggregate/" + uri + "/group/" + field +
                 (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
             Resource<Object> resource = new Resource<>(grouped);
             resource.add(selfLink);

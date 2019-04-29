@@ -51,20 +51,20 @@ public class ModelAggregationControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void findDistinct() throws Exception {
-    mockMvc.perform(get("/api/aggregation/gene/distinct/geneType"))
+      mockMvc.perform(get("/api/aggregate/gene/distinct/geneType"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(2)));
   }
 
   @Test
   public void invalidFindDistinct() throws Exception {
-    mockMvc.perform(get("/api/aggregation/gene/distinct/badField"))
+      mockMvc.perform(get("/api/aggregate/gene/distinct/badField"))
         .andExpect(status().isBadRequest());
   }
 
   @Test
   public void findDistinctFiltered() throws Exception {
-    mockMvc.perform(get("/api/aggregation/gene/distinct/symbol?geneType=protein-coding"))
+      mockMvc.perform(get("/api/aggregate/gene/distinct/symbol?geneType=protein-coding"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(3)))
         .andExpect(jsonPath("$[2]", is("GeneD")));
@@ -72,7 +72,7 @@ public class ModelAggregationControllerTests extends AbstractRepositoryTests {
   
   @Test
   public void findDistinctWithHal() throws Exception {
-    mockMvc.perform(get("/api/aggregation/gene/distinct/geneType")
+      mockMvc.perform(get("/api/aggregate/gene/distinct/geneType")
         .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
@@ -81,7 +81,7 @@ public class ModelAggregationControllerTests extends AbstractRepositoryTests {
         .andExpect(jsonPath("$.links[0]", hasKey("rel")))
         .andExpect(jsonPath("$.links[0].rel", is("self")))
         .andExpect(jsonPath("$.links[0]", hasKey("href")))
-        .andExpect(jsonPath("$.links[0].href", is("/api/aggregation/gene/distinct/geneType")))
+          .andExpect(jsonPath("$.links[0].href", is("/api/aggregate/gene/distinct/geneType")))
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$.content", hasSize(2)));
     
@@ -91,7 +91,7 @@ public class ModelAggregationControllerTests extends AbstractRepositoryTests {
   
   @Test
   public void countResources() throws Exception {
-    mockMvc.perform(get("/api/aggregation/gene/count"))
+      mockMvc.perform(get("/api/aggregate/gene/count"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("count")))
         .andExpect(jsonPath("$.count", is(5)));
@@ -99,7 +99,7 @@ public class ModelAggregationControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void countResourcesWithFilter() throws Exception {
-    mockMvc.perform(get("/api/aggregation/gene/count?geneType=protein-coding"))
+      mockMvc.perform(get("/api/aggregate/gene/count?geneType=protein-coding"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("count")))
         .andExpect(jsonPath("$.count", is(3)));
@@ -107,13 +107,13 @@ public class ModelAggregationControllerTests extends AbstractRepositoryTests {
   
   @Test
   public void countInvalidResource() throws Exception {
-    mockMvc.perform(get("/api/aggregation/bad/count"))
+      mockMvc.perform(get("/api/aggregate/bad/count"))
         .andExpect(status().isNotFound());
   }
   
   @Test
   public void countWithHal() throws Exception {
-    mockMvc.perform(get("/api/aggregation/gene/count?geneType=protein-coding")
+      mockMvc.perform(get("/api/aggregate/gene/count?geneType=protein-coding")
         .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("links")))
@@ -121,7 +121,8 @@ public class ModelAggregationControllerTests extends AbstractRepositoryTests {
         .andExpect(jsonPath("$.links[0]", hasKey("rel")))
         .andExpect(jsonPath("$.links[0].rel", is("self")))
         .andExpect(jsonPath("$.links[0]", hasKey("href")))
-        .andExpect(jsonPath("$.links[0].href", is("/api/aggregation/gene/count?geneType=protein-coding")))
+          .andExpect(
+              jsonPath("$.links[0].href", is("/api/aggregate/gene/count?geneType=protein-coding")))
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$.content", hasKey("count")))
         .andExpect(jsonPath("$.content.count", is(3)));
@@ -130,7 +131,7 @@ public class ModelAggregationControllerTests extends AbstractRepositoryTests {
   // Group
   @Test
   public void groupByField() throws Exception {
-    mockMvc.perform(get("/api/aggregation/gene/group/geneType"))
+      mockMvc.perform(get("/api/aggregate/gene/group/geneType"))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("protein-coding")))
@@ -145,7 +146,7 @@ public class ModelAggregationControllerTests extends AbstractRepositoryTests {
 
   @Test
   public void groupByFieldWithFiltering() throws Exception {
-    mockMvc.perform(get("/api/aggregation/gene/group/geneType?geneType=protein-coding"))
+      mockMvc.perform(get("/api/aggregate/gene/group/geneType?geneType=protein-coding"))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$", hasKey("protein-coding")))
@@ -157,13 +158,13 @@ public class ModelAggregationControllerTests extends AbstractRepositoryTests {
   
   @Test
   public void groupByInvalidField() throws Exception {
-    mockMvc.perform(get("/api/aggregation/gene/group/bad"))
+      mockMvc.perform(get("/api/aggregate/gene/group/bad"))
         .andExpect(status().isBadRequest());
   }
   
   @Test
   public void groupByWithHal() throws Exception {
-    mockMvc.perform(get("/api/aggregation/gene/group/geneType")
+      mockMvc.perform(get("/api/aggregate/gene/group/geneType")
         .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
         .andDo(MockMvcResultHandlers.print())
         .andExpect(status().isOk())
@@ -172,7 +173,7 @@ public class ModelAggregationControllerTests extends AbstractRepositoryTests {
         .andExpect(jsonPath("$.links[0]", hasKey("rel")))
         .andExpect(jsonPath("$.links[0].rel", is("self")))
         .andExpect(jsonPath("$.links[0]", hasKey("href")))
-        .andExpect(jsonPath("$.links[0].href", is("/api/aggregation/gene/group/geneType")))
+          .andExpect(jsonPath("$.links[0].href", is("/api/aggregate/gene/group/geneType")))
         .andExpect(jsonPath("$", hasKey("content")))
         .andExpect(jsonPath("$.content", hasKey("protein-coding")))
         .andExpect(jsonPath("$.content.protein-coding", hasSize(3)))
