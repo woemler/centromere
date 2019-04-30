@@ -19,6 +19,7 @@ package com.blueprint.centromere.ws.config;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.ws.controller.FilterableResource;
 import com.blueprint.centromere.ws.controller.ResponseEnvelope;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -84,6 +85,7 @@ public class FilteringTextMessageConverter extends AbstractHttpMessageConverter<
     }
 
     @Override
+    @SuppressFBWarnings(value = "DM_DEFAULT_ENCODING", justification = "Default of UTF16 is fine.")
     protected void writeInternal(Object o, HttpOutputMessage httpOutputMessage)
         throws IOException, HttpMessageNotWritableException {
 

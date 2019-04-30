@@ -21,8 +21,8 @@ import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelReflectionUtils;
 import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +66,7 @@ public class DelimtedTextFileWriter<T extends Model<?>>
     @Override
     public void writeRecord(T record) throws DataProcessingException {
 
-        FileWriter writer = this.getWriter();
+        Writer writer = this.getWriter();
         StringBuilder stringBuilder = new StringBuilder();
 
         if (headerFlag) {

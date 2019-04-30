@@ -18,6 +18,7 @@ package com.blueprint.centromere.ws.security.simple;
 
 import com.blueprint.centromere.ws.security.TokenDetails;
 import com.blueprint.centromere.ws.security.TokenOperations;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
@@ -66,6 +67,7 @@ public class SimpleTokenProvider implements TokenOperations {
      * @param expires timestamp (in milliseconds) when the token expires.
      * @return string representation of the hash
      */
+    @SuppressFBWarnings(value = "DM_DEFAULT_ENCODING", justification = "Default of UTF16 is fine.")
     private String computeSignature(UserDetails userDetails, long expires) {
 
         StringBuilder signatureBuilder = new StringBuilder();
@@ -83,7 +85,6 @@ public class SimpleTokenProvider implements TokenOperations {
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("No MD5 algorithm available!");
         }
-
         return new String(Hex.encode(digest.digest(signatureBuilder.toString().getBytes())));
 
     }

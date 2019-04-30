@@ -184,6 +184,12 @@
     </dependency>
 
     <dependency>
+      <artifactId>annotations</artifactId>
+      <groupId>com.google.code.findbugs</groupId>
+      <version>2.0.3</version>
+    </dependency>
+
+    <dependency>
       <artifactId>spring-boot-starter-test</artifactId>
       <groupId>org.springframework.boot</groupId>
       <scope>test</scope>

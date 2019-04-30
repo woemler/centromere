@@ -23,8 +23,10 @@ import com.opencsv.CSVReader;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -90,9 +92,11 @@ public abstract class DelimitedTextFileRecordReader<T extends Model<?>>
     protected void open(File file) throws DataProcessingException {
         try {
             if (",".equals(delimiter)) {
-                reader = new CSVReader(new BufferedReader(new FileReader(file)));
+                reader = new CSVReader(new BufferedReader(new InputStreamReader(
+                    new FileInputStream(file), StandardCharsets.UTF_8)));
             } else {
-                reader = new BufferedReader(new FileReader(file));
+                reader = new BufferedReader(new InputStreamReader(
+                    new FileInputStream(file), StandardCharsets.UTF_8));
             }
         } catch (IOException e) {
             throw new DataProcessingException(e);
