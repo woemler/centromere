@@ -32,9 +32,9 @@ import org.springframework.validation.Validator;
 
 /**
  * Basic {@link DataProcessor} implementation, which can be used to handle most file import jobs.
- *   The {@link #doBefore(File, Map)}, {@link #doOnSuccess(File, Map)}, and 
- *   {@link #doOnFailure(File, Map)} methods can be overridden to handle data set or data file 
- *   metadata persistence, pre/post-processing, or other maintenance tasks. 
+ * The {@link #doBefore(File, Map)}, {@link #doOnSuccess(File, Map)}, and {@link #doOnFailure(File,
+ * Map)} methods can be overridden to handle data set or data file metadata persistence,
+ * pre/post-processing, or other maintenance tasks.
  *
  * @author woemler
  */
@@ -84,9 +84,9 @@ public class GenericDataImportProcessor<T extends Model<?>>
     }
 
     /**
-     * Performs configuration steps prior to each execution of {@link #processFile(File, Map)}.  
-     *   Assigns dataImportProperties and metadata objects to the individual processing components 
-     *   that are expecting them.
+     * Performs configuration steps prior to each execution of {@link #processFile(File, Map)}.
+     * Assigns dataImportProperties and metadata objects to the individual processing components
+     * that are expecting them.
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -97,8 +97,8 @@ public class GenericDataImportProcessor<T extends Model<?>>
     }
 
     /**
-     * To be executed after the main component method is called for the last time.  Handles job 
-     *   cleanup and association of metadata records.
+     * To be executed after the main component method is called for the last time.  Handles job
+     * cleanup and association of metadata records.
      */
     @Override
     public void doOnSuccess(File file, Map<String, String> args) throws DataProcessingException {
@@ -106,8 +106,8 @@ public class GenericDataImportProcessor<T extends Model<?>>
     }
 
     /**
-     * Executes if the {@link #processFile(File, Map)} method fails to execute properly, in place 
-     *   of the {@link #doOnSuccess(File, Map)} method.
+     * Executes if the {@link #processFile(File, Map)} method fails to execute properly, in place of
+     * the {@link #doOnSuccess(File, Map)} method.
      */
     @Override
     public void doOnFailure(File file, Map<String, String> args) throws DataProcessingException {
@@ -162,8 +162,8 @@ public class GenericDataImportProcessor<T extends Model<?>>
     }
 
     /**
-     * Runs all of the {@link PipelineComponent#doBefore(File, Map)} methods, 
-     *   and throws appropriate exceptions if problems are encountered.
+     * Runs all of the {@link PipelineComponent#doBefore(File, Map)} methods, and throws appropriate
+     * exceptions if problems are encountered.
      *
      * @throws DataProcessingException processing exception
      */
@@ -175,8 +175,8 @@ public class GenericDataImportProcessor<T extends Model<?>>
     }
 
     /**
-     * Runs all of the {@link PipelineComponent#doOnSuccess(File, Map)}
-     *   methods, and throws appropriate exceptions if problems are encountered.
+     * Runs all of the {@link PipelineComponent#doOnSuccess(File, Map)} methods, and throws
+     * appropriate exceptions if problems are encountered.
      *
      * @throws DataProcessingException processing exception
      */
@@ -188,8 +188,8 @@ public class GenericDataImportProcessor<T extends Model<?>>
     }
 
     /**
-     * Runs all of the {@link PipelineComponent#doOnFailure(File, Map)}
-     *    methods, and throws appropriate exceptions if problems are encountered.
+     * Runs all of the {@link PipelineComponent#doOnFailure(File, Map)} methods, and throws
+     * appropriate exceptions if problems are encountered.
      *
      * @param file input file
      * @param args processor arguments
@@ -204,7 +204,7 @@ public class GenericDataImportProcessor<T extends Model<?>>
 
     /**
      * Processes all of the incoming records.  Filters and validates records, if the appropriate
-     *   components are set.
+     * components are set.
      *
      * @throws DataProcessingException processing exception
      */

@@ -19,8 +19,8 @@ package com.blueprint.centromere.ws.security;
 import java.util.Date;
 
 /**
- * Simple representation of a user authentication token used to verify user credentials in a stateless
- *   manner.  
+ * Simple representation of a user authentication token used to verify user credentials in a
+ * stateless manner.
  *
  * @author woemler
  */
@@ -31,7 +31,8 @@ public class TokenDetails {
     private Date issued;
     private Date expires;
 
-    public TokenDetails() { }
+    public TokenDetails() {
+    }
 
     public TokenDetails(String token, String username, Date issueDate, Date expirationDate) {
         this.token = token;

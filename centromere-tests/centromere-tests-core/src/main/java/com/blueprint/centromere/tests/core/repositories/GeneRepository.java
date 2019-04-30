@@ -35,9 +35,9 @@ public interface GeneRepository<T extends Gene<I>, I extends Serializable>
     extends ModelRepository<T, I>, AttributeOperations<T>, GuessOperations<T> {
 
     List<T> findBySymbol(@Param("symbol") String symbol);
-    
+
     Optional<T> findByEntrezGeneId(Integer entrezGeneId);
-    
+
     List<T> findByAliases(@Param("alias") String alias);
 
     default List<T> findByExternalReference(

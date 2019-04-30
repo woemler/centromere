@@ -21,14 +21,15 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc(secure = false)
 public class WebConfigurationTests {
 
-  @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-  @Test
-  public void corsEnabledTest() throws Exception {
-    mockMvc.perform(options("/api/genes")
-        .header("Access-Control-Request-Method", "GET")
-        .header("Origin", "http://www.someurl.com"))
-        .andExpect(status().isOk());
-  }
-  
+    @Test
+    public void corsEnabledTest() throws Exception {
+        mockMvc.perform(options("/api/genes")
+            .header("Access-Control-Request-Method", "GET")
+            .header("Origin", "http://www.someurl.com"))
+            .andExpect(status().isOk());
+    }
+
 }

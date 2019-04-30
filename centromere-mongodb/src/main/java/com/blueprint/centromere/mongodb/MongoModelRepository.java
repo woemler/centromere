@@ -37,7 +37,7 @@ import org.springframework.data.mongodb.repository.support.SimpleMongoRepository
 
 /**
  * Base implementation of {@link ModelRepository} for MongoDB databases. Extends the Spring Data
- *   MongoDB {@link SimpleMongoRepository} class.
+ * MongoDB {@link SimpleMongoRepository} class.
  *
  * @author woemler
  * @since 0.5.0
@@ -49,9 +49,10 @@ public class MongoModelRepository<T extends Model<I>, I extends Serializable>
     private final MongoOperations mongoOperations;
     private final Class<T> model;
 
-    public MongoModelRepository(MongoEntityInformation<T, I> metadata, MongoOperations mongoOperations) {
+    public MongoModelRepository(MongoEntityInformation<T, I> metadata,
+        MongoOperations mongoOperations) {
         super(metadata, mongoOperations);
-        this.mongoOperations = mongoOperations; 
+        this.mongoOperations = mongoOperations;
         this.model = metadata.getJavaType();
     }
 
@@ -115,8 +116,9 @@ public class MongoModelRepository<T extends Model<I>, I extends Serializable>
             mongoOperations.save(entity);
             return entity;
         } else {
-            throw new ModelPersistenceException(String.format("Model record does not exist in the database,"
-                + " and cannot be updated: %s", entity.toString()));
+            throw new ModelPersistenceException(
+                String.format("Model record does not exist in the database,"
+                    + " and cannot be updated: %s", entity.toString()));
         }
     }
 
@@ -128,7 +130,7 @@ public class MongoModelRepository<T extends Model<I>, I extends Serializable>
      */
     @Override
     public <S extends T> Iterable<S> update(Iterable<S> entities) {
-        for (S entity: entities) {
+        for (S entity : entities) {
             this.update(entity);
         }
         return entities;
@@ -143,31 +145,34 @@ public class MongoModelRepository<T extends Model<I>, I extends Serializable>
     }
 
     /**
-     * Converts a collection of {@link QueryCriteria}
-     *  objects into Spring Data MongoDB {@link Criteria}
-     *  objects, used to build a {@link Query}.
+     * Converts a collection of {@link QueryCriteria} objects into Spring Data MongoDB {@link
+     * Criteria} objects, used to build a {@link Query}.
      *
      * @param queryCriterias list of query options to be converted.
      * @return {@link Criteria} representation of the dataimport.
      */
     private Criteria getQueryFromQueryCriteria(Iterable<QueryCriteria> queryCriterias) {
         List<Criteria> criteriaList = new ArrayList<>();
-        for (QueryCriteria queryCriteria: queryCriterias) {
+        for (QueryCriteria queryCriteria : queryCriterias) {
             Criteria criteria;
             Pattern pattern;
             if (queryCriteria != null) {
                 switch (queryCriteria.getEvaluation()) {
                     case EQUALS:
-                        criteria = new Criteria(queryCriteria.getKey()).is(queryCriteria.getValue());
+                        criteria = new Criteria(queryCriteria.getKey())
+                            .is(queryCriteria.getValue());
                         break;
                     case NOT_EQUALS:
-                        criteria = new Criteria(queryCriteria.getKey()).ne(queryCriteria.getValue());
+                        criteria = new Criteria(queryCriteria.getKey())
+                            .ne(queryCriteria.getValue());
                         break;
                     case IN:
-                        criteria = new Criteria(queryCriteria.getKey()).in((Collection) queryCriteria.getValue());
+                        criteria = new Criteria(queryCriteria.getKey())
+                            .in((Collection) queryCriteria.getValue());
                         break;
                     case NOT_IN:
-                        criteria = new Criteria(queryCriteria.getKey()).nin((Collection) queryCriteria.getValue());
+                        criteria = new Criteria(queryCriteria.getKey())
+                            .nin((Collection) queryCriteria.getValue());
                         break;
                     case IS_NULL:
                         criteria = new Criteria(queryCriteria.getKey()).is(null);
@@ -182,53 +187,70 @@ public class MongoModelRepository<T extends Model<I>, I extends Serializable>
                         criteria = new Criteria(queryCriteria.getKey()).is(false);
                         break;
                     case GREATER_THAN:
-                        criteria = new Criteria(queryCriteria.getKey()).gt(queryCriteria.getValue());
+                        criteria = new Criteria(queryCriteria.getKey())
+                            .gt(queryCriteria.getValue());
                         break;
                     case GREATER_THAN_EQUALS:
-                        criteria = new Criteria(queryCriteria.getKey()).gte(queryCriteria.getValue());
+                        criteria = new Criteria(queryCriteria.getKey())
+                            .gte(queryCriteria.getValue());
                         break;
                     case LESS_THAN:
-                        criteria = new Criteria(queryCriteria.getKey()).lt(queryCriteria.getValue());
+                        criteria = new Criteria(queryCriteria.getKey())
+                            .lt(queryCriteria.getValue());
                         break;
                     case LESS_THAN_EQUALS:
-                        criteria = new Criteria(queryCriteria.getKey()).lte(queryCriteria.getValue());
+                        criteria = new Criteria(queryCriteria.getKey())
+                            .lte(queryCriteria.getValue());
                         break;
                     case BETWEEN:
                         criteria = new Criteria().andOperator(
-                            Criteria.where(queryCriteria.getKey()).gt(((List) queryCriteria.getValue()).get(0)),
-                            Criteria.where(queryCriteria.getKey()).lt(((List) queryCriteria.getValue()).get(1)));
+                            Criteria.where(queryCriteria.getKey())
+                                .gt(((List) queryCriteria.getValue()).get(0)),
+                            Criteria.where(queryCriteria.getKey())
+                                .lt(((List) queryCriteria.getValue()).get(1)));
                         break;
                     case OUTSIDE:
                         criteria = new Criteria().orOperator(
-                            Criteria.where(queryCriteria.getKey()).lt(((List) queryCriteria.getValue()).get(0)),
-                            Criteria.where(queryCriteria.getKey()).gt(((List) queryCriteria.getValue()).get(1)));
+                            Criteria.where(queryCriteria.getKey())
+                                .lt(((List) queryCriteria.getValue()).get(0)),
+                            Criteria.where(queryCriteria.getKey())
+                                .gt(((List) queryCriteria.getValue()).get(1)));
                         break;
                     case BETWEEN_INCLUSIVE:
                         criteria = new Criteria().andOperator(
-                            Criteria.where(queryCriteria.getKey()).gte(((List) queryCriteria.getValue()).get(0)),
-                            Criteria.where(queryCriteria.getKey()).lte(((List) queryCriteria.getValue()).get(1)));
+                            Criteria.where(queryCriteria.getKey())
+                                .gte(((List) queryCriteria.getValue()).get(0)),
+                            Criteria.where(queryCriteria.getKey())
+                                .lte(((List) queryCriteria.getValue()).get(1)));
                         break;
                     case OUTSIDE_INCLUSIVE:
                         criteria = new Criteria().orOperator(
-                            Criteria.where(queryCriteria.getKey()).lte(((List) queryCriteria.getValue()).get(0)),
-                            Criteria.where(queryCriteria.getKey()).gte(((List) queryCriteria.getValue()).get(1)));
+                            Criteria.where(queryCriteria.getKey())
+                                .lte(((List) queryCriteria.getValue()).get(0)),
+                            Criteria.where(queryCriteria.getKey())
+                                .gte(((List) queryCriteria.getValue()).get(1)));
                         break;
                     case LIKE:
-                        pattern = Pattern.compile((String) queryCriteria.getValue(), Pattern.CASE_INSENSITIVE);
+                        pattern = Pattern
+                            .compile((String) queryCriteria.getValue(), Pattern.CASE_INSENSITIVE);
                         criteria = new Criteria(queryCriteria.getKey()).regex(pattern);
                         break;
                     case NOT_LIKE:
-                        pattern = Pattern.compile((String) queryCriteria.getValue(), Pattern.CASE_INSENSITIVE);
+                        pattern = Pattern
+                            .compile((String) queryCriteria.getValue(), Pattern.CASE_INSENSITIVE);
                         criteria = new Criteria(queryCriteria.getKey()).not().regex(pattern);
                         break;
                     case STARTS_WITH:
-                        criteria = new Criteria(queryCriteria.getKey()).regex("^" + queryCriteria.getValue());
+                        criteria = new Criteria(queryCriteria.getKey())
+                            .regex("^" + queryCriteria.getValue());
                         break;
                     case ENDS_WITH:
-                        criteria = new Criteria(queryCriteria.getKey()).regex(queryCriteria.getValue() + "$");
+                        criteria = new Criteria(queryCriteria.getKey())
+                            .regex(queryCriteria.getValue() + "$");
                         break;
                     default:
-                        criteria = new Criteria(queryCriteria.getKey()).is(queryCriteria.getValue());
+                        criteria = new Criteria(queryCriteria.getKey())
+                            .is(queryCriteria.getValue());
                 }
                 criteriaList.add(criteria);
             }

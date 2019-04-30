@@ -16,7 +16,8 @@ import org.springframework.security.web.AuthenticationEntryPoint;
  */
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RestAuthenticationEntryPoint.class);
+    private static final Logger LOGGER = LoggerFactory
+        .getLogger(RestAuthenticationEntryPoint.class);
 
     @Override
     public void commence(

@@ -27,7 +27,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString(callSuper = true)
 public class MongoSample extends Sample<String> {
 
-    @Id 
+    @Id
     private String id;
 
 }

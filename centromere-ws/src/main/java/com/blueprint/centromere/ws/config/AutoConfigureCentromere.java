@@ -25,10 +25,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
- * Performs automatic configuration of core components of Centromere. This annotation is not 
- *   required for running Centromere web service applications, but it does make configuration much
- *   easier. This is intended to be used in conjunction with the {@link com.blueprint.centromere.ws.CentromereWebInitializer}
- *   Spring Boot initializer implementation.
+ * Performs automatic configuration of core components of Centromere. This annotation is not
+ * required for running Centromere web service applications, but it does make configuration much
+ * easier. This is intended to be used in conjunction with the {@link
+ * com.blueprint.centromere.ws.CentromereWebInitializer} Spring Boot initializer implementation.
  *
  * @author woemler
  * @since 0.4.3
@@ -47,15 +47,11 @@ public @interface AutoConfigureCentromere {
 
     /**
      * If true, web API access will require authentication.
-     *
-     * @return
      */
     String webSecurity() default WebSecurityConfig.NO_SECURITY_PROFILE;
 
     /**
      * If true, web services will include automatic API documentation.
-     *
-     * @return
      */
     String apiDocumentation() default ApiDocumentationConfig.NO_DOCUMENTATION_PROFILE;
 

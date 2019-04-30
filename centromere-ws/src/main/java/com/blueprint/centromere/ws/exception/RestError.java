@@ -6,7 +6,7 @@ import org.springframework.util.Assert;
 
 /**
  * Simple representation of a web services exception.  Returns to the user an HTTP status code,
- *   API-specific error code, user message, developer message, and URL for more information.
+ * API-specific error code, user message, developer message, and URL for more information.
  *
  * @author woemler
  */

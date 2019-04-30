@@ -20,9 +20,9 @@ import com.blueprint.centromere.core.exceptions.QueryParameterException;
 import java.util.regex.Pattern;
 
 /**
- * POJO that describes a model query parameter, used when reflecting 
- *   {@link com.blueprint.centromere.core.model.Model} classes and mapping HTTP requests to 
- *   {@link QueryCriteria}.
+ * POJO that describes a model query parameter, used when reflecting {@link
+ * com.blueprint.centromere.core.model.Model} classes and mapping HTTP requests to {@link
+ * QueryCriteria}.
  *
  * @author woemler
  * @since 0.4.2
@@ -36,7 +36,8 @@ public class QueryParameterDescriptor {
     private boolean regexMatch;
     private boolean dynaimicParameters = true;
 
-    public QueryParameterDescriptor() { }
+    public QueryParameterDescriptor() {
+    }
 
     /**
      * Constructs a parameter descriptor with all available arguments.
@@ -124,9 +125,9 @@ public class QueryParameterDescriptor {
 
     /**
      * Tests whether the submitted parameter name matches that described by the object.  If regex is
-     *   enabled, evaluation is performed by a regex match test.  If dynamic options is enabled,
-     *   the test will try to match the submitted string against all combinations of the defined
-     *   parameter name plus valid {@link Evaluation} suffixes.
+     * enabled, evaluation is performed by a regex match test.  If dynamic options is enabled, the
+     * test will try to match the submitted string against all combinations of the defined parameter
+     * name plus valid {@link Evaluation} suffixes.
      *
      * @param p submitted parameter string
      * @return true if valid parameter
@@ -135,7 +136,7 @@ public class QueryParameterDescriptor {
         if (regexMatch) {
             return Pattern.compile(paramName).matcher(p).matches();
         } else if (dynaimicParameters) {
-            for (String suffix: Evaluation.SUFFIX_STRINGS) {
+            for (String suffix : Evaluation.SUFFIX_STRINGS) {
                 if ((paramName + suffix).equals(p)) {
                     return true;
                 }
@@ -147,9 +148,9 @@ public class QueryParameterDescriptor {
 
     /**
      * Given an input parameter name, determines what the name of the field to be queried in the
-     *   database layer is.  If regex is enabled, the supplied parameter name will be returned, as it
-     *   is expected to have matched against the predetermined regex pattern.  Otherwise, the actual
-     *   field name is returned, if available.
+     * database layer is.  If regex is enabled, the supplied parameter name will be returned, as it
+     * is expected to have matched against the predetermined regex pattern.  Otherwise, the actual
+     * field name is returned, if available.
      *
      * @param p submitted parameter string
      * @return field name corresponding to database field
@@ -166,10 +167,10 @@ public class QueryParameterDescriptor {
 
     /**
      * Determines which {@link Evaluation} value should be returned.  If dynamic options are not
-     *   enabled or the submitted parameter name matches the default, the default evaluation value
-     *   is returned.  Otherwise, the submitted parameter string is matched to the appropriate
-     *   evaluation suffix to determine which should be returned.  If no match is made, an
-     *   {@link QueryParameterException} will be thrown.
+     * enabled or the submitted parameter name matches the default, the default evaluation value is
+     * returned.  Otherwise, the submitted parameter string is matched to the appropriate evaluation
+     * suffix to determine which should be returned.  If no match is made, an {@link
+     * QueryParameterException} will be thrown.
      *
      * @param parameterName parameter name
      * @return evaluation to be applied.
@@ -184,7 +185,7 @@ public class QueryParameterDescriptor {
         }
         Evaluation eval = null;
         if (parameterNameMatches(parameterName)) {
-            for (String suffix: Evaluation.SUFFIX_STRINGS) {
+            for (String suffix : Evaluation.SUFFIX_STRINGS) {
                 if ((paramName + suffix).equals(parameterName)) {
                     eval = Evaluation.fromSuffix(suffix);
                 }
@@ -193,8 +194,9 @@ public class QueryParameterDescriptor {
         if (eval != null) {
             return eval;
         } else {
-            throw new QueryParameterException(String.format("Not a valid dynamic parameter for defined "
-                + "parameter %s: %s", paramName, parameterName));
+            throw new QueryParameterException(
+                String.format("Not a valid dynamic parameter for defined "
+                    + "parameter %s: %s", paramName, parameterName));
         }
     }
 
@@ -209,8 +211,8 @@ public class QueryParameterDescriptor {
     }
 
     /**
-     * Returns a {@link QueryCriteria} object with an {@link Evaluation} value determined by the 
-     *   supplied parameter name.
+     * Returns a {@link QueryCriteria} object with an {@link Evaluation} value determined by the
+     * supplied parameter name.
      *
      * @param parameterName parameter name
      * @param value value to check

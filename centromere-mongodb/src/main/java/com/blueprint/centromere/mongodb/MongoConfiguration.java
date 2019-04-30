@@ -38,7 +38,7 @@ public class MongoConfiguration {
         repositoryFactoryBeanClass = MongoModelRepositoryFactoryBean.class)
     public static class DefaultMongoRepositoryConfiguration {
 
-        @Autowired 
+        @Autowired
         private ApplicationContext applicationContext;
 
         @Bean

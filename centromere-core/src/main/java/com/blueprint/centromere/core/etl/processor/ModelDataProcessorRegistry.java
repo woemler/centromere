@@ -23,14 +23,14 @@ import java.util.Collection;
 
 /**
  * Bean for registering associations between {@link Model} classes and their {@link ModelRepository}
- *   implementations, and for fetching the associated types and beans.
+ * implementations, and for fetching the associated types and beans.
  *
  * @author woemler
  */
 public interface ModelDataProcessorRegistry<T extends DataProcessor<?>> {
 
     /**
-     * Tests whether the given class represents a registered {@link Model} resource. 
+     * Tests whether the given class represents a registered {@link Model} resource.
      *
      * @param type model type
      * @return true if model is registered
@@ -39,7 +39,7 @@ public interface ModelDataProcessorRegistry<T extends DataProcessor<?>> {
     boolean isRegisteredModel(Class<? extends Model<?>> type) throws ModelRegistryException;
 
     /**
-     * Tests whether the given data type is associated with a registered {@link DataProcessor}. 
+     * Tests whether the given data type is associated with a registered {@link DataProcessor}.
      *
      * @param dataType data type string
      * @return true if data type is registered
@@ -48,8 +48,8 @@ public interface ModelDataProcessorRegistry<T extends DataProcessor<?>> {
     boolean isRegisteredDataType(String dataType) throws ModelRegistryException;
 
     /**
-     * Retrieves a collection of {@link DataProcessor} instances associated with the registered 
-     *   {@link Model} class.
+     * Retrieves a collection of {@link DataProcessor} instances associated with the registered
+     * {@link Model} class.
      *
      * @param model model type
      * @return instance of the repository
@@ -68,8 +68,8 @@ public interface ModelDataProcessorRegistry<T extends DataProcessor<?>> {
     T getProcessorByDataType(String dataType) throws ModelRegistryException;
 
     /**
-     * Retrieves a collection of all {@link DataProcessor} instances associated with all registered 
-     *   {@link Model} classes and data types.
+     * Retrieves a collection of all {@link DataProcessor} instances associated with all registered
+     * {@link Model} classes and data types.
      *
      * @return all registered repositories
      */
@@ -84,8 +84,6 @@ public interface ModelDataProcessorRegistry<T extends DataProcessor<?>> {
 
     /**
      * Returns a collection of all registered data type strings.
-     *
-     * @return
      */
     Collection<String> getRegisteredDataTypes();
 

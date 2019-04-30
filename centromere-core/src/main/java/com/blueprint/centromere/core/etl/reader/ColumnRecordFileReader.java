@@ -26,7 +26,7 @@ import java.util.Map;
 
 /**
  * Reads plain text files and maps a single column to a single record, to be emitted when the file's
- *   line reading is exhausted.  Assumes that the the first column represents field identifiers.
+ * line reading is exhausted.  Assumes that the the first column represents field identifiers.
  *
  * @author woemler
  */
@@ -57,7 +57,8 @@ public abstract class ColumnRecordFileReader<T extends Model<?>>
                 if (bits.size() > 1) {
                     String field = bits.get(0);
                     for (int i = 1; i < bits.size(); i++) {
-                        T record = recordMap.containsKey(i) ? recordMap.get(i) : this.getModel().newInstance();
+                        T record = recordMap.containsKey(i) ? recordMap.get(i)
+                            : this.getModel().newInstance();
                         setModelAttribute(record, field, bits.get(i));
                         recordMap.put(i, record);
                     }

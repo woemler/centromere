@@ -56,7 +56,8 @@ public class MongoModelRepositoryFactoryBean<R extends MongoRepository<T, I>, T,
         @SuppressWarnings("unchecked")
         @Override
         protected Object getTargetRepository(RepositoryInformation information) {
-            MongoEntityInformation entityInformation = getEntityInformation(information.getDomainType());
+            MongoEntityInformation entityInformation = getEntityInformation(
+                information.getDomainType());
             return new MongoModelRepository<>(entityInformation, mongoOperations);
         }
 

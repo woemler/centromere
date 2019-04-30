@@ -38,20 +38,18 @@ public class ModelApiListingPlugin implements ApiListingBuilderPlugin {
     }
 
     /**
-     * Iterates through each {@link Model} registered with a {@link ModelResourceRegistry} instance 
-     *   and generates a collection of {@link ApiDescription} objects, which describe the available
-     *   resource endpoints.
-     *
-     * @return
+     * Iterates through each {@link Model} registered with a {@link ModelResourceRegistry} instance
+     * and generates a collection of {@link ApiDescription} objects, which describe the available
+     * resource endpoints.
      */
     protected List<ApiDescription> getApiDescriptions() {
         Assert.notNull(registry, "ModelRegistry must not be null.");
         List<ApiDescription> descriptions = new ArrayList<>();
-        for (Class<? extends Model<?>> model: registry.getRegisteredModels()) {
+        for (Class<? extends Model<?>> model : registry.getRegisteredModels()) {
             if (registry.isRegisteredModel(model)) {
                 try {
-                    String path = rootUrl + "/" + registry.getUriByModel(model);
-                    descriptions.addAll(SwaggerPluginUtil.getModelApiDescriptions(model, typeResolver, path));
+                    descriptions.addAll(createModelSearchDescriptions(model));
+                    descriptions.addAll(createModelAggregationDescriptions(model));
                 } catch (ModelRegistryException e) {
                     e.printStackTrace();
                 }
@@ -63,6 +61,57 @@ public class ModelApiListingPlugin implements ApiListingBuilderPlugin {
     @Override
     public boolean supports(DocumentationType documentationType) {
         return SwaggerPluginSupport.pluginDoesApply(documentationType);
+    }
+
+    /**
+     * Generates search endpoint descriptions for the given model.
+     */
+    private List<ApiDescription> createModelSearchDescriptions(Class<? extends Model<?>> model)
+        throws ModelRegistryException {
+        List<ApiDescription> descriptions = new ArrayList<>();
+        descriptions.add(
+            new ApiDescription(
+                rootUrl + "/search/" + registry.getUriByModel(model) + "/{id}",
+                model.getSimpleName() + " single resource operations",
+                ModelResourceOperationsPluginUtil.findSingleModelOperations(model, typeResolver),
+                false));
+        descriptions.add(
+            new ApiDescription(
+                rootUrl + "/search/" + registry.getUriByModel(model),
+                model.getSimpleName() + " collection resource operations",
+                ModelResourceOperationsPluginUtil
+                    .findCollectionModelOperations(model, typeResolver),
+                false));
+        //TODO: add other search endpoints programatically
+        return descriptions;
+    }
+
+    /**
+     * Generates aggregation endpoint descriptions for the given model.
+     */
+    private List<ApiDescription> createModelAggregationDescriptions(
+        Class<? extends Model<?>> model) throws ModelRegistryException {
+        List<ApiDescription> descriptions = new ArrayList<>();
+        descriptions.add(
+            new ApiDescription(
+                rootUrl + "/aggregate/" + registry.getUriByModel(model) + "/distinct/{field}",
+                model.getSimpleName() + " distinct field value operation",
+                ModelResourceOperationsPluginUtil.findDistinctOperations(model, typeResolver),
+                false));
+        descriptions.add(
+            new ApiDescription(
+                rootUrl + "/aggregate/" + registry.getUriByModel(model) + "/count",
+                model.getSimpleName() + " record count operation",
+                ModelResourceOperationsPluginUtil.countOperations(model, typeResolver),
+                false));
+        descriptions.add(
+            new ApiDescription(
+                rootUrl + "/aggregate/" + registry.getUriByModel(model) + "/group/{field}",
+                model.getSimpleName() + " group operation",
+                ModelResourceOperationsPluginUtil.findGroupedOperations(model, typeResolver),
+                false));
+        //TODO: add other search endpoints programatically
+        return descriptions;
     }
 
 }

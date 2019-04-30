@@ -35,12 +35,12 @@ public final class ApiDocumentationConfig {
     }
 
     /**
-     * Configuration for Swagger v2 API documentation, using SpringFox. 
+     * Configuration for Swagger v2 API documentation, using SpringFox.
      */
     @Configuration
-    @Profile({ SWAGGER_PROFILE })
+    @Profile({SWAGGER_PROFILE})
     @EnableSwagger2
-    @Import({ BeanValidatorPluginsConfiguration.class })
+    @Import({BeanValidatorPluginsConfiguration.class})
     public static class SwaggerConfig {
 
         @Autowired

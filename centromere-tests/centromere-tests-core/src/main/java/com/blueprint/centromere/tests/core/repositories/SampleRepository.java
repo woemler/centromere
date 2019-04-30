@@ -33,17 +33,17 @@ public interface SampleRepository<T extends Sample<I>, I extends Serializable>
     extends ModelRepository<T, I>, AttributeOperations<T>, GuessOperations<T> {
 
     List<T> findByName(String name);
-    
+
     List<T> findBySubjectId(String subjectId);
-    
+
     List<T> findByAliases(@Param("alias") String alias);
-    
+
     List<T> findBySampleType(@Param("type") String sampleType);
-    
+
     List<T> findByTissue(@Param("tissue") String tissue);
-    
+
     List<T> findByHistology(@Param("histology") String histology);
-    
+
     List<T> findBySpecies(@Param("species") String species);
 
     @Override

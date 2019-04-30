@@ -32,8 +32,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controller for handling user authentication and token distribution in simple-token-security 
- *   configured web services.
+ * Controller for handling user authentication and token distribution in simple-token-security
+ * configured web services.
  *
  * @author woemler
  */
@@ -41,18 +41,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserAuthenticationController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserAuthenticationController.class);
+    private static final Logger LOGGER = LoggerFactory
+        .getLogger(UserAuthenticationController.class);
 
-    @Autowired(required = false) 
+    @Autowired(required = false)
     private TokenOperations tokenOperations;
 
     /**
      * Takes the {@link UserDetails} that are produced after authentication and generates a security
-     *   token, based on the {@link TokenDetails} format.  This token will allow the user to make 
-     *   requests to the main API endpoints.
-     *
-     * @param user
-     * @return
+     * token, based on the {@link TokenDetails} format.  This token will allow the user to make
+     * requests to the main API endpoints.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public TokenDetails createToken(@AuthenticationPrincipal UserDetails user) {
@@ -61,7 +59,8 @@ public class UserAuthenticationController {
         }
         Assert.notNull(user, "Unable to authenticate user!");
         TokenDetails tokenDetails = tokenOperations.createTokenAndDetails(user);
-        LOGGER.info(String.format("Successfully generated authentication token for user: %s", user.getUsername()));
+        LOGGER.info(String.format("Successfully generated authentication token for user: %s",
+            user.getUsername()));
         return tokenDetails;
     }
 

@@ -42,14 +42,14 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 
 /**
  * Message converter that takes web service response data and converts it to delimited-text in a
- *   tabular format.  Supports field filtering using {@link ResponseEnvelope} attributes.
+ * tabular format.  Supports field filtering using {@link ResponseEnvelope} attributes.
  *
  * @author woemler
  */
 public class FilteringTextMessageConverter extends AbstractHttpMessageConverter<Object> {
 
-    private String delimiter = "\t";
     private final MediaType mediaType;
+    private String delimiter = "\t";
 
     public FilteringTextMessageConverter(MediaType supportedMediaType, String delimiter) {
         super(supportedMediaType);
@@ -111,7 +111,7 @@ public class FilteringTextMessageConverter extends AbstractHttpMessageConverter<
         }
 
         // Iterate through the object collection
-        for (Object entity: (Collection<?>) obj) {
+        for (Object entity : (Collection<?>) obj) {
 
             String entityString;
             Class<?> currentClass;
@@ -185,7 +185,7 @@ public class FilteringTextMessageConverter extends AbstractHttpMessageConverter<
             showHeader = false;
 
         }
-        
+
         writer.close();
 
     }

@@ -71,10 +71,15 @@ public class WebApplicationConfig {
         ModelCrudController.class,
         RestExceptionHandler.class
     })
-    @PropertySource(value = { "classpath:web-defaults.properties" })
+    @PropertySource(value = {"classpath:web-defaults.properties"})
     public static class DefaultWebApplicationConfig implements WebMvcConfigurer {
 
         private static final Logger LOGGER = LoggerFactory.getLogger(WebApplicationConfig.class);
+
+        @Bean
+        public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+            return new PropertySourcesPlaceholderConfigurer();
+        }
 
         @Bean
         public ModelRepositoryRegistry modelRepositoryRegistry(ApplicationContext context) {
@@ -87,12 +92,8 @@ public class WebApplicationConfig {
         }
 
         @Bean
-        public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-            return new PropertySourcesPlaceholderConfigurer();
-        }
-
-        @Bean
-        public ModelResourceAssembler mappingModelResourceAssembler(ModelResourceRegistry modelResourceRegistry) {
+        public ModelResourceAssembler mappingModelResourceAssembler(
+            ModelResourceRegistry modelResourceRegistry) {
             return new ModelResourceAssembler(modelResourceRegistry);
         }
 
@@ -153,10 +154,10 @@ public class WebApplicationConfig {
         }
 
     }
-    
-    private static final class CustomPageableHandlerMethodArgumentResolver 
+
+    private static final class CustomPageableHandlerMethodArgumentResolver
         implements HandlerMethodArgumentResolver, PageableArgumentResolver {
-        
+
         private String pageParameterName = ReservedRequestParameters.PAGE_PARAMETER;
         private String sizeParameterName = ReservedRequestParameters.SIZE_PARAMETER;
         private String sortParameterName = ReservedRequestParameters.SORT_PARAMETER;
@@ -166,23 +167,23 @@ public class WebApplicationConfig {
         @Override
         public Pageable resolveArgument(
             MethodParameter methodParameter,
-            ModelAndViewContainer modelAndViewContainer, 
+            ModelAndViewContainer modelAndViewContainer,
             NativeWebRequest nativeWebRequest,
             WebDataBinderFactory webDataBinderFactory) {
 
             HttpServletRequest request = (HttpServletRequest) nativeWebRequest.getNativeRequest();
             Map<String, String[]> paramMap = request.getParameterMap();
-            if (!paramMap.containsKey(pageParameterName) 
-                && !paramMap.containsKey(sizeParameterName) 
+            if (!paramMap.containsKey(pageParameterName)
+                && !paramMap.containsKey(sizeParameterName)
                 && !paramMap.containsKey(sortParameterName)) {
                 return null;
             }
-            
+
             Integer page = 0;
             Integer size = defaultPageSize;
             Sort sort = null;
-            
-            if (paramMap.containsKey(sortParameterName) 
+
+            if (paramMap.containsKey(sortParameterName)
                 && paramMap.get(sortParameterName).length > 0
                 && !"".equals(paramMap.get(sortParameterName)[0].trim())) {
                 String sortParam = paramMap.get(sortParameterName)[0].trim();
@@ -192,26 +193,26 @@ public class WebApplicationConfig {
                 } else {
                     sort = Sort.by(Direction.ASC, sortParam);
                 }
-            } 
+            }
 
             if (paramMap.containsKey(sizeParameterName)
                 && paramMap.get(sizeParameterName).length > 0
                 && !"".equals(paramMap.get(sizeParameterName)[0].trim())) {
                 size = Integer.parseInt(paramMap.get(sizeParameterName)[0]);
             }
-            
+
             if (paramMap.containsKey(pageParameterName)
                 && paramMap.get(pageParameterName).length > 0
                 && !"".equals(paramMap.get(pageParameterName)[0].trim())) {
                 page = Integer.parseInt(paramMap.get(pageParameterName)[0]);
             }
-            
+
             if (sort != null) {
                 return PageRequest.of(page, size, sort);
             } else {
                 return PageRequest.of(page, size);
             }
-            
+
         }
 
         @Override

@@ -17,8 +17,8 @@ import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 
 /**
  * Extension of Spring HATEOAS's {@link ResourceAssemblerSupport}, which automatically builds self
- *   links, based upon the {@link Model} class's `getId()` method signature, and by inferring
- *   related models by fields annotated with {@link com.blueprint.centromere.core.model.Linked}.
+ * links, based upon the {@link Model} class's `getId()` method signature, and by inferring related
+ * models by fields annotated with {@link com.blueprint.centromere.core.model.Linked}.
  *
  * @author woemler
  */
@@ -38,27 +38,25 @@ public class ModelResourceAssembler
 
     /**
      * Determines the URI to use for the requested model.
-     *
-     * @param model
-     * @return
      */
     private String getModelUri(Class<? extends Model<?>> model) {
         try {
             return rootUrl + "/search/" + registry.getUriByModel(model);
         } catch (ModelRegistryException e) {
-            throw new RequestFailureException(String.format("Model cannot be mapped to valid resource: %s", model.getName()));
+            throw new RequestFailureException(
+                String.format("Model cannot be mapped to valid resource: %s", model.getName()));
         }
     }
 
     /**
-     * Converts a {@link Model} object into a {@link FilterableResource}, adding the appropriate links.
-     *
-     * @param t
-     * @return
+     * Converts a {@link Model} object into a {@link FilterableResource}, adding the appropriate
+     * links.
      */
     public FilterableResource toResource(Model t) {
         FilterableResource<Model> resource = new FilterableResource<>(t);
-        resource.add(new Link(getModelUri((Class<? extends Model<?>>) t.getClass()) + "/" + t.getId(), "self"));
+        resource.add(
+            new Link(getModelUri((Class<? extends Model<?>>) t.getClass()) + "/" + t.getId(),
+                "self"));
         List<Link> links = addLinks(new ArrayList<>());
         links.addAll(this.addLinkedModelLinks(t));
         resource.add(links);
@@ -66,11 +64,8 @@ public class ModelResourceAssembler
     }
 
     /**
-     * Inspects the target {@link Model} class for {@link com.blueprint.centromere.core.model.Linked} annotations, and creates links
-     *   based upon the inferred relationship and field names.
-     *
-     * @param t
-     * @return
+     * Inspects the target {@link Model} class for {@link com.blueprint.centromere.core.model.Linked}
+     * annotations, and creates links based upon the inferred relationship and field names.
      */
     private List<Link> addLinkedModelLinks(Model t) {
         List<Link> links = new ArrayList<>();
@@ -88,13 +83,15 @@ public class ModelResourceAssembler
                     Link link = null;
                     try {
                         field.setAccessible(true);
-                        if (!field.getType().isArray() && !Collection.class.isAssignableFrom(field.getType())) {
+                        if (!field.getType().isArray() && !Collection.class
+                            .isAssignableFrom(field.getType())) {
                             link = new Link(getModelUri(fkClass) + "/" + field.get(t), relName);
                         } else if (getRelatedModelForeignKeyId(current, fkClass) != null
                             && (field.getType().isArray() || Collection.class
                             .isAssignableFrom(field.getType()))) {
                             link = new Link(getModelUri(fkClass) + "?"
-                                + getRelatedModelForeignKeyId(current, fkClass) + "=" + t.getId(), relName);
+                                + getRelatedModelForeignKeyId(current, fkClass) + "=" + t.getId(),
+                                relName);
                         } else {
                             link = new Link(getModelUri(fkClass) + "?" + fieldName + "="
                                 + collectionToString(field.get(t)), relName);
@@ -113,8 +110,8 @@ public class ModelResourceAssembler
     }
 
     /**
-     * Inspects a {@link Model} class for a relationship to another model, as defined by a 
-     *   {@link Linked} annotation, and returns the field name for the primary key ID.
+     * Inspects a {@link Model} class for a relationship to another model, as defined by a {@link
+     * Linked} annotation, and returns the field name for the primary key ID.
      *
      * @param source parent model
      * @param relation linked model
@@ -138,9 +135,6 @@ public class ModelResourceAssembler
 
     /**
      * Converts a collection of objects into a comma-separated string.
-     *
-     * @param object
-     * @return
      */
     private String collectionToString(Object object) {
         Collection<Object> collection;
@@ -153,7 +147,7 @@ public class ModelResourceAssembler
         }
         StringBuffer s = new StringBuffer();
         boolean flag = false;
-        for (Object o: collection) {
+        for (Object o : collection) {
             if (flag) {
                 s.append(",");
             }

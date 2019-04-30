@@ -46,7 +46,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  *
  * @author woemler
  */
-public final class WebSecurityConfig  {
+public final class WebSecurityConfig {
 
     public static final String NO_SECURITY_PROFILE = "web_security_none";
     public static final String SIMPLE_TOKEN_SECURITY_PROFILE = "web_security_simple_token";
@@ -57,8 +57,8 @@ public final class WebSecurityConfig  {
     @Configuration
     @EnableWebSecurity
     //@EnableGlobalMethodSecurity
-    @PropertySource(value = { "classpath:web-defaults.properties" })
-    @Profile(SIMPLE_TOKEN_SECURITY_PROFILE )
+    @PropertySource(value = {"classpath:web-defaults.properties"})
+    @Profile(SIMPLE_TOKEN_SECURITY_PROFILE)
     @Order(SecurityProperties.BASIC_AUTH_ORDER)
     public static class DefaultWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -83,7 +83,8 @@ public final class WebSecurityConfig  {
 
         @Bean
         public TokenOperations tokenOperations() {
-            SimpleTokenProvider tokenUtils = new SimpleTokenProvider(env.getRequiredProperty("centromere.web.security.token"));
+            SimpleTokenProvider tokenUtils = new SimpleTokenProvider(
+                env.getRequiredProperty("centromere.web.security.token"));
             tokenUtils.setTokenLifespan(getTokenLifespan());
             return tokenUtils;
         }
@@ -105,8 +106,9 @@ public final class WebSecurityConfig  {
         protected void configure(HttpSecurity http) throws Exception {
 
             String secureUrl = env.getRequiredProperty("centromere.web.security.secure-url");
-            LOGGER.info(String.format("Configuring web security with RESTRICTED READ and RESTRICTED "
-                + "WRITE with simple token authentication for API root: %s", secureUrl));
+            LOGGER
+                .info(String.format("Configuring web security with RESTRICTED READ and RESTRICTED "
+                    + "WRITE with simple token authentication for API root: %s", secureUrl));
 
             http
                 .cors()
@@ -140,9 +142,12 @@ public final class WebSecurityConfig  {
             long hour = 1000L * 60 * 60;
             Long lifespan = hour * 24; // one day
             if (!env.getProperty("centromere.web.security.token-lifespan-hours").equals("")) {
-                lifespan = hour * env.getRequiredProperty("centromere.web.security.token-lifespan-hours", Long.class);
+                lifespan = hour * env
+                    .getRequiredProperty("centromere.web.security.token-lifespan-hours",
+                        Long.class);
             } else if (!env.getProperty("centromere.web.security.token-lifespan-days").equals("")) {
-                lifespan = hour * 24 * env.getRequiredProperty("centromere.web.security.token-lifespan-days", Long.class);
+                lifespan = hour * 24 * env
+                    .getRequiredProperty("centromere.web.security.token-lifespan-days", Long.class);
             }
             return lifespan;
         }

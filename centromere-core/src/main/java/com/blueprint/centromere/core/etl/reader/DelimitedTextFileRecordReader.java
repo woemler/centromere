@@ -32,9 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Simple abstract implementation of {@link RecordReader}, for reading delimited text files.  
- *   Handles the file object opening and closing in the {@code doBefore} and {@code doAfter}
- *   methods, as well as line parsing for the appropriate delimiter type file readers.
+ * Simple abstract implementation of {@link RecordReader}, for reading delimited text files. Handles
+ * the file object opening and closing in the {@code doBefore} and {@code doAfter} methods, as well
+ * as line parsing for the appropriate delimiter type file readers.
  *
  * @author woemler
  */
@@ -59,7 +59,8 @@ public abstract class DelimitedTextFileRecordReader<T extends Model<?>>
     }
 
     /**
-     * Closes any open reader and opens the new target file.  Assigns local variables, if available.
+     * Closes any open reader and opens the new target file.  Assigns local variables, if
+     * available.
      */
     @Override
     public void doBefore(File file, Map<String, String> args) throws DataProcessingException {
@@ -81,9 +82,8 @@ public abstract class DelimitedTextFileRecordReader<T extends Model<?>>
     }
 
     /**
-     * Opens the target file and creates a the appropriate file reader object, which can be 
-     * referenced via its
-     *   getter method.
+     * Opens the target file and creates a the appropriate file reader object, which can be
+     * referenced via its getter method.
      *
      * @param file input file
      */
@@ -114,8 +114,6 @@ public abstract class DelimitedTextFileRecordReader<T extends Model<?>>
 
     /**
      * Returns the next line from the file.
-     *
-     * @return
      */
     protected List<String> getNextLine() throws IOException {
 
@@ -126,7 +124,7 @@ public abstract class DelimitedTextFileRecordReader<T extends Model<?>>
             if (line == null) {
                 return null;
             }
-            for (String bit: line) {
+            for (String bit : line) {
                 bits.add(bit.trim());
             }
         } else {
@@ -147,14 +145,11 @@ public abstract class DelimitedTextFileRecordReader<T extends Model<?>>
      * Tests whether a given line should be skipped.
      *
      * @param line file line bits
-     * @return
      */
     protected abstract boolean isSkippableLine(List<String> line);
 
     /**
      * Gets the file delimiter.
-     *
-     * @return
      */
     protected String getDelimiter() {
         return delimiter;

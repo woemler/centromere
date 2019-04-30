@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
-  
+  <artifactId>centromere-ws</artifactId>
+
   <build>
 
     <finalName>${project.artifactId}-${project.version}</finalName>
@@ -12,51 +12,49 @@
 
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
+        <version>3.8.0</version>
       </plugin>
 
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.1</version>
         <configuration>
           <includes>
             <include>**/*Tests.java</include>
           </includes>
         </configuration>
+        <version>2.22.1</version>
       </plugin>
 
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.0.1</version>
         <executions>
           <execution>
-            <id>attach-sources</id>
             <goals>
               <goal>jar-no-fork</goal>
             </goals>
+            <id>attach-sources</id>
           </execution>
         </executions>
-      </plugin>
-
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
         <version>3.0.1</version>
-        <configuration>
-          <show>public</show>
-          <nohelp>true</nohelp>
-        </configuration>
       </plugin>
 
       <plugin>
-        <groupId>org.jacoco</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <nohelp>true</nohelp>
+          <show>public</show>
+        </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+        <version>3.0.1</version>
+      </plugin>
+
+      <plugin>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.3</version>
         <executions>
           <execution>
             <goals>
@@ -64,75 +62,178 @@
             </goals>
           </execution>
           <execution>
-            <id>report</id>
-            <phase>test</phase>
             <goals>
               <goal>report</goal>
             </goals>
+            <id>report</id>
+            <phase>test</phase>
           </execution>
         </executions>
+        <groupId>org.jacoco</groupId>
+        <version>0.8.3</version>
       </plugin>
 
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.0.0</version>
+        <configuration>
+          <configLocation>../checkstyle.xml</configLocation>
+          <consoleOutput>true</consoleOutput>
+        </configuration>
         <dependencies>
           <dependency>
-            <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
+            <groupId>com.puppycrawl.tools</groupId>
             <version>8.18</version>
           </dependency>
         </dependencies>
         <executions>
           <execution>
-            <id>checkstyle</id>
-            <phase>validate</phase>
             <goals>
               <goal>check</goal>
             </goals>
+            <id>checkstyle</id>
+            <phase>validate</phase>
           </execution>
         </executions>
-        <configuration>
-          <consoleOutput>true</consoleOutput>
-          <configLocation>../checkstyle.xml</configLocation>
-        </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+        <version>3.0.0</version>
       </plugin>
 
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
-        <version>3.11.0</version>
         <configuration>
-          <linkXRef>false</linkXRef>
-          <includeTests>true</includeTests>
-          <printFailingErrors>true</printFailingErrors>
           <failOnViolation>true</failOnViolation>
-          <targetJdk>1.8</targetJdk>
+          <includeTests>true</includeTests>
+          <linkXRef>false</linkXRef>
+          <printFailingErrors>true</printFailingErrors>
           <rulesets>
             <ruleset>../pmd.xml</ruleset>
           </rulesets>
+          <targetJdk>1.8</targetJdk>
         </configuration>
         <executions>
           <execution>
-            <phase>validate</phase>
             <goals>
               <goal>check</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
+        <groupId>org.apache.maven.plugins</groupId>
+        <version>3.11.0</version>
       </plugin>
 
     </plugins>
   </build>
 
-  <artifactId>centromere-ws</artifactId>
-  <name>Centromere Web Services</name>
-  <packaging>jar</packaging>
+  <dependencies>
 
+    <dependency>
+      <artifactId>centromere-core</artifactId>
+      <groupId>com.blueprint.cbbi</groupId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>spring-boot-starter-hateoas</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>spring-boot-starter-security</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>spring-oxm</artifactId>
+      <groupId>org.springframework</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>javax.servlet-api</artifactId>
+      <groupId>javax.servlet</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>commons-codec</artifactId>
+      <groupId>commons-codec</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>xstream</artifactId>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <version>1.4.10</version>
+    </dependency>
+
+    <dependency>
+      <artifactId>jackson-databind</artifactId>
+      <groupId>com.fasterxml.jackson.core</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>jackson-dataformat-yaml</artifactId>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>jackson-dataformat-xml</artifactId>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>lombok</artifactId>
+      <groupId>org.projectlombok</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>springfox-swagger2</artifactId>
+      <groupId>io.springfox</groupId>
+      <version>${springfox.version}</version>
+    </dependency>
+
+    <dependency>
+      <artifactId>springfox-bean-validators</artifactId>
+      <groupId>io.springfox</groupId>
+      <version>${springfox.version}</version>
+    </dependency>
+
+    <dependency>
+      <artifactId>springfox-swagger-ui</artifactId>
+      <groupId>io.springfox</groupId>
+      <version>${springfox.version}</version>
+    </dependency>
+
+  </dependencies>
   <description>Genomic data warehouse and web service utilities.</description>
-  <url>https://github.com/blueprintmedicines/centromere</url>
+  <developers>
+    <developer>
+      <email>woemler@blueprintmedicines.com</email>
+      <name>Will Oemler</name>
+      <organization>Blueprint Medicines</organization>
+      <organizationUrl>http://www.blueprintmedicines.com</organizationUrl>
+    </developer>
+  </developers>
 
+  <distributionManagement>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
   <licenses>
     <license>
       <name>The Apache License, Version 2.0</name>
@@ -140,14 +241,23 @@
     </license>
   </licenses>
 
-  <developers>
-    <developer>
-      <name>Will Oemler</name>
-      <email>woemler@blueprintmedicines.com</email>
-      <organization>Blueprint Medicines</organization>
-      <organizationUrl>http://www.blueprintmedicines.com</organizationUrl>
-    </developer>
-  </developers>
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>Centromere Web Services</name>
+
+  <packaging>jar</packaging>
+
+  <parent>
+    <artifactId>centromere-parent</artifactId>
+    <groupId>com.blueprint.cbbi</groupId>
+    <relativePath>../centromere-parent/pom.xml</relativePath>
+    <version>0.6.0-SNAPSHOT</version>
+  </parent>
+
+  <properties>
+    <centromere.version>${project.version}</centromere.version>
+    <springfox.version>2.6.1</springfox.version>
+  </properties>
 
   <scm>
     <connection>scm:git:git@github.com:blueprintmedicines/centromere.git</connection>
@@ -156,116 +266,6 @@
     <url>git@github.com:blueprintmedicines/centromere.git</url>
   </scm>
 
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
-
-  <properties>
-    <centromere.version>${project.version}</centromere.version>
-    <springfox.version>2.6.1</springfox.version>
-  </properties>
-
-  <dependencies>
-
-    <dependency>
-      <groupId>com.blueprint.cbbi</groupId>
-      <artifactId>centromere-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-hateoas</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-security</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-actuator</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-oxm</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.thoughtworks.xstream</groupId>
-      <artifactId>xstream</artifactId>
-      <version>1.4.10</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-yaml</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-xml</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>io.springfox</groupId>
-      <artifactId>springfox-swagger2</artifactId>
-      <version>${springfox.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>io.springfox</groupId>
-      <artifactId>springfox-bean-validators</artifactId>
-      <version>${springfox.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>io.springfox</groupId>
-      <artifactId>springfox-swagger-ui</artifactId>
-      <version>${springfox.version}</version>
-    </dependency>
-
-  </dependencies>
-
-  <parent>
-    <artifactId>centromere-parent</artifactId>
-    <groupId>com.blueprint.cbbi</groupId>
-    <version>0.6.0-SNAPSHOT</version>
-    <relativePath>../centromere-parent/pom.xml</relativePath>
-  </parent>
+  <url>https://github.com/blueprintmedicines/centromere</url>
 
 </project>

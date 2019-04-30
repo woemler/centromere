@@ -31,8 +31,8 @@ import org.springframework.context.ApplicationContext;
 
 /**
  * Creates a registry of {@link ModelRepository} instances that have the {@link ModelResource}
- *   annotation, and creates a map of {@link Model} classes to repositories, and model URIs to 
- *   repositories. This allows lookup of repository classes by model or by HTTP request URL.
+ * annotation, and creates a map of {@link Model} classes to repositories, and model URIs to
+ * repositories. This allows lookup of repository classes by model or by HTTP request URL.
  *
  * @author woemler
  */
@@ -50,14 +50,14 @@ public class DefaultModelRepositoryRegistry implements ModelRepositoryRegistry {
 
     /**
      * Populates the registry with {@link ModelRepository} beans and their associated {@link Model}
-     *   types.
+     * types.
      *
      * @throws ConfigurationException config exception
      */
     @PostConstruct
     public void afterPropertiesSet() throws ConfigurationException {
 
-        for (Map.Entry<String, Object> entry:
+        for (Map.Entry<String, Object> entry :
             context.getBeansWithAnnotation(ModelResource.class).entrySet()) {
             Class<?> type = entry.getValue().getClass();
             ModelRepository repository = (ModelRepository) entry.getValue();
@@ -75,7 +75,7 @@ public class DefaultModelRepositoryRegistry implements ModelRepositoryRegistry {
 
     @Override
     public boolean isRegisteredModel(Class<?> model) {
-        for (Class<?> type: repositoryTypeMap.keySet()) {
+        for (Class<?> type : repositoryTypeMap.keySet()) {
             if (model.isAssignableFrom(type)) {
                 return true;
             }
@@ -87,7 +87,7 @@ public class DefaultModelRepositoryRegistry implements ModelRepositoryRegistry {
     public ModelRepository getRepositoryByModel(Class<? extends Model<?>> model)
         throws ModelRegistryException {
         List<ModelRepository> repositories = new ArrayList<>();
-        for (Map.Entry<Class<? extends Model<?>>, ModelRepository<?, ?>> entry:
+        for (Map.Entry<Class<? extends Model<?>>, ModelRepository<?, ?>> entry :
             repositoryTypeMap.entrySet()) {
             if (model.isAssignableFrom(entry.getKey())) {
                 repositories.add(entry.getValue());

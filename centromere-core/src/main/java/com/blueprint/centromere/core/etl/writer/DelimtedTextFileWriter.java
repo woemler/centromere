@@ -30,8 +30,8 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
 /**
- * Writes records to a character-delimited text file.  Can be used for file reformatting or temp 
- *   file preperation for utilities, such as MySQL Import.
+ * Writes records to a character-delimited text file.  Can be used for file reformatting or temp
+ * file preperation for utilities, such as MySQL Import.
  *
  * @author woemler
  * @since 0.5.0
@@ -71,7 +71,7 @@ public class DelimtedTextFileWriter<T extends Model<?>>
 
         if (headerFlag) {
             boolean flag = false;
-            for (String headerName: columns) {
+            for (String headerName : columns) {
                 if (flag) {
                     stringBuilder.append(delimiter);
                 }
@@ -93,7 +93,7 @@ public class DelimtedTextFileWriter<T extends Model<?>>
         stringBuilder = new StringBuilder();
         BeanWrapper wrapper = new BeanWrapperImpl(record);
         boolean flag = false;
-        for (String column: fields) {
+        for (String column : fields) {
             Object value = wrapper.getPropertyValue(column);
             if (value == null) {
                 value = "null";

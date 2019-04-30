@@ -22,7 +22,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Identifies an annotated {@link DataProcessor} as the primary handler of the specified data types.
+ * Identifies an annotated {@link DataProcessor} as the primary handler of the specified data
+ * types.
+ *
  * @author woemler
  */
 @Retention(RetentionPolicy.RUNTIME)

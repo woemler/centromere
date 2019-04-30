@@ -28,11 +28,13 @@ These are the current requirements for developing data warehouses with Centromer
 
 ## Building
 
-You can build the entire project, run tests, generate JavaDocs and JaCoCo reports using the `centromere-parent` POM file:
+You can build the entire project using the supplied `build.sh` script:
 
 ```bash
-mvn clean javadoc:javadoc install jacoco:report-aggregate
+./build.sh
 ```
+
+This script will compile the project, run tests, generate reports and JavaDocs.
 
 ## Maven Artifacts
 

@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Reserved query parameters for API requests.
- * 
+ *
  * @author woemler
  */
 public final class ReservedRequestParameters {
@@ -27,5 +27,5 @@ public final class ReservedRequestParameters {
 
     private ReservedRequestParameters() {
     }
-    
+
 }

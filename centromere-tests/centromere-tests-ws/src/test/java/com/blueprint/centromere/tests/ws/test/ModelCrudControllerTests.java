@@ -71,237 +71,246 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 @AutoConfigureMockMvc(secure = false)
 public class ModelCrudControllerTests extends AbstractRepositoryTests {
 
-  @Autowired private GeneRepository geneRepository;
-  @Autowired private DataSetRepository dataSetRepository;
-  @Autowired private GeneExpressionRepository geneExpressionRepository;
-  @Autowired private MockMvc mockMvc;
-  @Autowired private ModelResourceRegistry registry;
+    @Autowired
+    private GeneRepository geneRepository;
+    @Autowired
+    private DataSetRepository dataSetRepository;
+    @Autowired
+    private GeneExpressionRepository geneExpressionRepository;
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ModelResourceRegistry registry;
 
-  @Test
-  public void headTest() throws Exception {
-    mockMvc.perform(head("/api/search/gene"))
-        .andExpect(status().isOk());
-  }
-  
-  // Find
+    @Test
+    public void headTest() throws Exception {
+        mockMvc.perform(head("/api/search/gene"))
+            .andExpect(status().isOk());
+    }
 
-  @Test
-  public void findByIdWithHal() throws Exception {
-    
-    System.out.println("Gene URI: " + registry.getUriByModel(geneRepository.getModel()));
-    System.out.println(String.format("Registered models: %s", registry.getRegisteredModels()));
+    // Find
 
-    Gene gene = (Gene) geneRepository.findByEntrezGeneId(1).get();
+    @Test
+    public void findByIdWithHal() throws Exception {
 
-    mockMvc.perform(get("/api/search/gene/{id}", gene.getId())
-        .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
-        .andDo(MockMvcResultHandlers.print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.entrezGeneId", is(1)))
-        .andExpect(jsonPath("$.symbol", is("GeneA")))
-        .andExpect(jsonPath("$.links", hasSize(1)))
-        .andExpect(jsonPath("$.links[0].rel", is("self")))
-        .andExpect(jsonPath("$.links[0].href", endsWith("/api/search/gene/" + gene.getId())));
-  }
+        System.out.println("Gene URI: " + registry.getUriByModel(geneRepository.getModel()));
+        System.out.println(String.format("Registered models: %s", registry.getRegisteredModels()));
 
-  @Test
-  public void findByIdNoHal() throws Exception {
+        Gene gene = (Gene) geneRepository.findByEntrezGeneId(1).get();
 
-    Gene gene = (Gene) geneRepository.findByEntrezGeneId(1).get();
+        mockMvc.perform(get("/api/search/gene/{id}", gene.getId())
+            .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.entrezGeneId", is(1)))
+            .andExpect(jsonPath("$.symbol", is("GeneA")))
+            .andExpect(jsonPath("$.links", hasSize(1)))
+            .andExpect(jsonPath("$.links[0].rel", is("self")))
+            .andExpect(jsonPath("$.links[0].href", endsWith("/api/search/gene/" + gene.getId())));
+    }
 
-    mockMvc.perform(get("/api/search/gene/{id}", gene.getId()))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.entrezGeneId", is(1)))
-        .andExpect(jsonPath("$.symbol", is("GeneA")))
-        .andExpect(jsonPath("$", not(hasKey("links"))));
-  }
+    @Test
+    public void findByIdNoHal() throws Exception {
 
-  @Test
-  public void findByIdNotFound() throws Exception{
-    mockMvc.perform(get("/api/search/gene/{id}", "abcd"))
-        .andExpect(status().isNotFound());
-  }
+        Gene gene = (Gene) geneRepository.findByEntrezGeneId(1).get();
 
-  @Test
-  public void findByIdFiltered() throws Exception {
+        mockMvc.perform(get("/api/search/gene/{id}", gene.getId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.entrezGeneId", is(1)))
+            .andExpect(jsonPath("$.symbol", is("GeneA")))
+            .andExpect(jsonPath("$", not(hasKey("links"))));
+    }
 
-    Gene gene = (Gene) geneRepository.findByEntrezGeneId(1).get();
+    @Test
+    public void findByIdNotFound() throws Exception {
+        mockMvc.perform(get("/api/search/gene/{id}", "abcd"))
+            .andExpect(status().isNotFound());
+    }
 
-    mockMvc.perform(get("/api/search/gene/{id}?_exclude=links,symbol", gene.getId()))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.entrezGeneId", is(1)))
-        .andExpect(jsonPath("$", not(hasKey("symbol"))))
-        .andExpect(jsonPath("$", not(hasKey("links"))));
-  }
+    @Test
+    public void findByIdFiltered() throws Exception {
 
-  @Test
-  public void findAllWithHal() throws Exception {
-    mockMvc.perform(get("/api/search/gene").accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasKey("content")))
-        .andExpect(jsonPath("$.content", hasSize(5)))
-        .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
-        .andExpect(jsonPath("$.content[0].entrezGeneId", is(1)))
-        .andExpect(jsonPath("$", hasKey("links")))
-        .andExpect(jsonPath("$.links", hasSize(1)))
-        .andExpect(jsonPath("$.links[0].rel", is("self")))
-        .andExpect(jsonPath("$.links[0].href", endsWith("/api/search/gene")))
-        .andExpect(jsonPath("$", not(hasKey("pageMetadata"))));
-  }
+        Gene gene = (Gene) geneRepository.findByEntrezGeneId(1).get();
 
-  @Test
-  public void findAllWithoutHal() throws Exception {
-    mockMvc.perform(get("/api/search/gene"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(5)))
-        .andExpect(jsonPath("$[0]", hasKey("entrezGeneId")))
-        .andExpect(jsonPath("$[0].entrezGeneId", is(1)))
-        .andExpect(jsonPath("$[0]", not(hasKey("links"))))
-        .andExpect(jsonPath("$", not(hasKey("pageMetadata"))));
-  }
-  
-  @Test
-  public void findAllWithHalAndLinkedRefs() throws Exception {
-    
-    MvcResult result = mockMvc.perform(get("/api/search/geneexpression")
-        .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
-        .andReturn();
-    
-    DocumentContext document = JsonPath.parse(result.getResponse().getContentAsString());
+        mockMvc.perform(get("/api/search/gene/{id}?_exclude=links,symbol", gene.getId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.entrezGeneId", is(1)))
+            .andExpect(jsonPath("$", not(hasKey("symbol"))))
+            .andExpect(jsonPath("$", not(hasKey("links"))));
+    }
 
+    @Test
+    public void findAllWithHal() throws Exception {
+        mockMvc.perform(get("/api/search/gene").accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasKey("content")))
+            .andExpect(jsonPath("$.content", hasSize(5)))
+            .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
+            .andExpect(jsonPath("$.content[0].entrezGeneId", is(1)))
+            .andExpect(jsonPath("$", hasKey("links")))
+            .andExpect(jsonPath("$.links", hasSize(1)))
+            .andExpect(jsonPath("$.links[0].rel", is("self")))
+            .andExpect(jsonPath("$.links[0].href", endsWith("/api/search/gene")))
+            .andExpect(jsonPath("$", not(hasKey("pageMetadata"))));
+    }
 
-    mockMvc.perform(get("/api/search/geneexpression")
-        .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasKey("links")))
-        .andExpect(jsonPath("$.links", hasSize(1)))
-        .andExpect(jsonPath("$.links[0]", hasKey("rel")))
-        .andExpect(jsonPath("$.links[0].rel", is("self")))
-        .andExpect(jsonPath("$.links[0]", hasKey("href")))
-        .andExpect(jsonPath("$.links[0].href", is("/api/search/geneexpression")))
-        .andExpect(jsonPath("$", hasKey("content")))
-        .andExpect(jsonPath("$.content", hasSize(6)))
-        .andExpect(jsonPath("$.content[0]", hasKey("geneId")))
-        .andExpect(jsonPath("$.content[0]", hasKey("id")))
-        .andExpect(jsonPath("$.content[0]", hasKey("links")))
-        .andExpect(jsonPath("$.content[0].links", hasSize(5)))
-        .andExpect(jsonPath("$.content[0].links[0]", hasKey("rel")))
-        .andExpect(jsonPath("$.content[0].links[0].rel", is("self")))
-        .andExpect(jsonPath("$.content[0].links[0]", hasKey("href")))
-        .andExpect(jsonPath("$.content[0].links[0].href", is("/api/search/geneexpression/" + document.read("$.content[0].id").toString())))
-        .andExpect(jsonPath("$.content[0].links[4]", hasKey("rel")))
-        .andExpect(jsonPath("$.content[0].links[4].rel", is("gene")))
-        .andExpect(jsonPath("$.content[0].links[4]", hasKey("href")))
-        .andExpect(jsonPath("$.content[0].links[4].href", is("/api/search/gene/" + document.read("$.content[0].geneId").toString())));
-    
-    String geneUrl = document.read("$.content[0].links[4].href");
-    
-    mockMvc.perform(get(geneUrl))
-        .andExpect(status().isOk());
-    
-  }
+    @Test
+    public void findAllWithoutHal() throws Exception {
+        mockMvc.perform(get("/api/search/gene"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(5)))
+            .andExpect(jsonPath("$[0]", hasKey("entrezGeneId")))
+            .andExpect(jsonPath("$[0].entrezGeneId", is(1)))
+            .andExpect(jsonPath("$[0]", not(hasKey("links"))))
+            .andExpect(jsonPath("$", not(hasKey("pageMetadata"))));
+    }
 
-  @Test
-  public void findFieldExcludedWithHal() throws Exception {
-    mockMvc.perform(get("/api/search/gene?_exclude=links,symbol").accept(
-        ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasKey("content")))
-        .andExpect(jsonPath("$.content", hasSize(5)))
-        .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
-        .andExpect(jsonPath("$.content[0].entrezGeneId", is(1)))
-        .andExpect(jsonPath("$.content[0]", not(hasKey("symbol"))))
-        .andExpect(jsonPath("$.content[0]", not(hasKey("links"))));
-  }
+    @Test
+    public void findAllWithHalAndLinkedRefs() throws Exception {
 
-  @Test
-  public void findFieldFilteredWithHal() throws Exception {
-    mockMvc.perform(get("/api/search/gene?_include=links,symbol").accept(
-        ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasKey("content")))
-        .andExpect(jsonPath("$.content", hasSize(5)))
-        .andExpect(jsonPath("$.content[0]", not(hasKey("geneId"))))
-        .andExpect(jsonPath("$.content[0]", hasKey("symbol")))
-        .andExpect(jsonPath("$.content[0]", hasKey("links")));
-  }
+        MvcResult result = mockMvc.perform(get("/api/search/geneexpression")
+            .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
+            .andReturn();
 
-  @Test
-  public void findBySimpleParamWithHal() throws Exception {
-    mockMvc.perform(get("/api/search/gene?geneType=pseudo").accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasKey("content")))
-        .andExpect(jsonPath("$.content", hasSize(2)))
-        .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
-        .andExpect(jsonPath("$.content[0].entrezGeneId", is(3)))
-        .andExpect(jsonPath("$", hasKey("links")))
-        .andExpect(jsonPath("$.links", hasSize(1)))
-        .andExpect(jsonPath("$.links[0].rel", is("self")))
-        .andExpect(jsonPath("$.links[0].href", endsWith("/api/search/gene?geneType=pseudo")))
-        .andExpect(jsonPath("$", not(hasKey("pageMetadata"))));
-  }
+        DocumentContext document = JsonPath.parse(result.getResponse().getContentAsString());
 
-  @Test
-  public void findByCollectionItemNoHal() throws Exception {
-    mockMvc.perform(get("/api/search/gene?aliases=MNO").accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0]", hasKey("entrezGeneId")))
-        .andExpect(jsonPath("$[0].entrezGeneId", is(5)))
-        .andExpect(jsonPath("$[0]", not(hasKey("links"))));
-  }
+        mockMvc.perform(get("/api/search/geneexpression")
+            .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasKey("links")))
+            .andExpect(jsonPath("$.links", hasSize(1)))
+            .andExpect(jsonPath("$.links[0]", hasKey("rel")))
+            .andExpect(jsonPath("$.links[0].rel", is("self")))
+            .andExpect(jsonPath("$.links[0]", hasKey("href")))
+            .andExpect(jsonPath("$.links[0].href", is("/api/search/geneexpression")))
+            .andExpect(jsonPath("$", hasKey("content")))
+            .andExpect(jsonPath("$.content", hasSize(6)))
+            .andExpect(jsonPath("$.content[0]", hasKey("geneId")))
+            .andExpect(jsonPath("$.content[0]", hasKey("id")))
+            .andExpect(jsonPath("$.content[0]", hasKey("links")))
+            .andExpect(jsonPath("$.content[0].links", hasSize(5)))
+            .andExpect(jsonPath("$.content[0].links[0]", hasKey("rel")))
+            .andExpect(jsonPath("$.content[0].links[0].rel", is("self")))
+            .andExpect(jsonPath("$.content[0].links[0]", hasKey("href")))
+            .andExpect(jsonPath("$.content[0].links[0].href",
+                is("/api/search/geneexpression/" + document.read("$.content[0].id").toString())))
+            .andExpect(jsonPath("$.content[0].links[4]", hasKey("rel")))
+            .andExpect(jsonPath("$.content[0].links[4].rel", is("gene")))
+            .andExpect(jsonPath("$.content[0].links[4]", hasKey("href")))
+            .andExpect(jsonPath("$.content[0].links[4].href",
+                is("/api/search/gene/" + document.read("$.content[0].geneId").toString())));
 
-  @Test
-  public void findByMapItemNoHal() throws Exception {
-    mockMvc.perform(get("/api/search/gene?attributes.isKinase=Y").accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(2)))
-        .andExpect(jsonPath("$[0]", hasKey("entrezGeneId")))
-        .andExpect(jsonPath("$[0].entrezGeneId", is(1)))
-        .andExpect(jsonPath("$[0]", not(hasKey("links"))));
-  }
+        String geneUrl = document.read("$.content[0].links[4].href");
 
-  @Test
-  public void findPagedWithHal() throws Exception {
-    mockMvc.perform(get("/api/search/gene?_page=1&_size=3").accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
-        .andExpect(status().isOk())
-        .andDo(MockMvcResultHandlers.print())
-        .andExpect(jsonPath("$", hasKey("content")))
-        .andExpect(jsonPath("$.content", hasSize(2)))
-        .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
-        .andExpect(jsonPath("$.content[0].entrezGeneId", is(4)))
-        .andExpect(jsonPath("$", hasKey("links")))
-        .andExpect(jsonPath("$.links", hasSize(4)))
-        .andExpect(jsonPath("$.links[0].rel", is("first")))
-        .andExpect(jsonPath("$", hasKey("page")))
-        .andExpect(jsonPath("$.page.totalElements", is(5)))
-        .andExpect(jsonPath("$.page.number", is(1)))
-        .andExpect(jsonPath("$.page.size", is(3)))
-        .andExpect(jsonPath("$.page.totalPages", is(2)));
-  }
+        mockMvc.perform(get(geneUrl))
+            .andExpect(status().isOk());
 
-  @Test
-  public void findPagedWithoutHal() throws Exception {
-    mockMvc.perform(get("/api/search/gene?_page=1&_size=3"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasKey("content")))
-        .andExpect(jsonPath("$.content", hasSize(2)))
-        .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
-        .andExpect(jsonPath("$.content[0].entrezGeneId", is(4)))
-        .andExpect(jsonPath("$.content[0]", not(hasKey("links"))))
-        .andExpect(jsonPath("$", not(hasKey("links"))));
-  }
+    }
 
-  @Test
-  public void findSortedWithHal() throws Exception {
-    mockMvc.perform(get("/api/search/gene?_sort=symbol,desc").accept(
-        ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasKey("content")))
-        .andExpect(jsonPath("$.content", hasSize(5)))
-        .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
-        .andExpect(jsonPath("$.content[0].entrezGeneId", is(5)));
-  }
+    @Test
+    public void findFieldExcludedWithHal() throws Exception {
+        mockMvc.perform(get("/api/search/gene?_exclude=links,symbol").accept(
+            ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasKey("content")))
+            .andExpect(jsonPath("$.content", hasSize(5)))
+            .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
+            .andExpect(jsonPath("$.content[0].entrezGeneId", is(1)))
+            .andExpect(jsonPath("$.content[0]", not(hasKey("symbol"))))
+            .andExpect(jsonPath("$.content[0]", not(hasKey("links"))));
+    }
+
+    @Test
+    public void findFieldFilteredWithHal() throws Exception {
+        mockMvc.perform(get("/api/search/gene?_include=links,symbol").accept(
+            ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasKey("content")))
+            .andExpect(jsonPath("$.content", hasSize(5)))
+            .andExpect(jsonPath("$.content[0]", not(hasKey("geneId"))))
+            .andExpect(jsonPath("$.content[0]", hasKey("symbol")))
+            .andExpect(jsonPath("$.content[0]", hasKey("links")));
+    }
+
+    @Test
+    public void findBySimpleParamWithHal() throws Exception {
+        mockMvc.perform(get("/api/search/gene?geneType=pseudo")
+            .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasKey("content")))
+            .andExpect(jsonPath("$.content", hasSize(2)))
+            .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
+            .andExpect(jsonPath("$.content[0].entrezGeneId", is(3)))
+            .andExpect(jsonPath("$", hasKey("links")))
+            .andExpect(jsonPath("$.links", hasSize(1)))
+            .andExpect(jsonPath("$.links[0].rel", is("self")))
+            .andExpect(jsonPath("$.links[0].href", endsWith("/api/search/gene?geneType=pseudo")))
+            .andExpect(jsonPath("$", not(hasKey("pageMetadata"))));
+    }
+
+    @Test
+    public void findByCollectionItemNoHal() throws Exception {
+        mockMvc.perform(get("/api/search/gene?aliases=MNO").accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$[0]", hasKey("entrezGeneId")))
+            .andExpect(jsonPath("$[0].entrezGeneId", is(5)))
+            .andExpect(jsonPath("$[0]", not(hasKey("links"))));
+    }
+
+    @Test
+    public void findByMapItemNoHal() throws Exception {
+        mockMvc.perform(
+            get("/api/search/gene?attributes.isKinase=Y").accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(2)))
+            .andExpect(jsonPath("$[0]", hasKey("entrezGeneId")))
+            .andExpect(jsonPath("$[0].entrezGeneId", is(1)))
+            .andExpect(jsonPath("$[0]", not(hasKey("links"))));
+    }
+
+    @Test
+    public void findPagedWithHal() throws Exception {
+        mockMvc.perform(get("/api/search/gene?_page=1&_size=3")
+            .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(jsonPath("$", hasKey("content")))
+            .andExpect(jsonPath("$.content", hasSize(2)))
+            .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
+            .andExpect(jsonPath("$.content[0].entrezGeneId", is(4)))
+            .andExpect(jsonPath("$", hasKey("links")))
+            .andExpect(jsonPath("$.links", hasSize(4)))
+            .andExpect(jsonPath("$.links[0].rel", is("first")))
+            .andExpect(jsonPath("$", hasKey("page")))
+            .andExpect(jsonPath("$.page.totalElements", is(5)))
+            .andExpect(jsonPath("$.page.number", is(1)))
+            .andExpect(jsonPath("$.page.size", is(3)))
+            .andExpect(jsonPath("$.page.totalPages", is(2)));
+    }
+
+    @Test
+    public void findPagedWithoutHal() throws Exception {
+        mockMvc.perform(get("/api/search/gene?_page=1&_size=3"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasKey("content")))
+            .andExpect(jsonPath("$.content", hasSize(2)))
+            .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
+            .andExpect(jsonPath("$.content[0].entrezGeneId", is(4)))
+            .andExpect(jsonPath("$.content[0]", not(hasKey("links"))))
+            .andExpect(jsonPath("$", not(hasKey("links"))));
+    }
+
+    @Test
+    public void findSortedWithHal() throws Exception {
+        mockMvc.perform(get("/api/search/gene?_sort=symbol,desc").accept(
+            ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasKey("content")))
+            .andExpect(jsonPath("$.content", hasSize(5)))
+            .andExpect(jsonPath("$.content[0]", hasKey("entrezGeneId")))
+            .andExpect(jsonPath("$.content[0].entrezGeneId", is(5)));
+    }
 
     @Test
     public void findSortedWithoutHal() throws Exception {
@@ -311,492 +320,496 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
             .andExpect(jsonPath("$[0]", hasKey("entrezGeneId")))
             .andExpect(jsonPath("$[0].entrezGeneId", is(5)));
     }
-  
-  // Dynamic Find Params
-  
-  @Test
-  public void findByStringLike() throws Exception {
-    mockMvc.perform(get("/api/search/gene?symbolLike=eneB"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0]", hasKey("symbol")))
-        .andExpect(jsonPath("$[0].symbol", is("GeneB")));
-  }
 
-  @Test
-  public void invalidFindByStringLike() throws Exception {
-    mockMvc.perform(get("/api/search/gene?taxIdLike=06"))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$", hasKey("code")))
-        .andExpect(jsonPath("$.code", is(400)));
-  }
+    // Dynamic Find Params
 
-  @Test
-  public void findByStringStartsWith() throws Exception {
-    mockMvc.perform(get("/api/search/gene?geneTypeStartsWith=protein"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(3)))
-        .andExpect(jsonPath("$[0]", hasKey("symbol")))
-        .andExpect(jsonPath("$[0].symbol", is("GeneA")));
-  }
+    @Test
+    public void findByStringLike() throws Exception {
+        mockMvc.perform(get("/api/search/gene?symbolLike=eneB"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$[0]", hasKey("symbol")))
+            .andExpect(jsonPath("$[0].symbol", is("GeneB")));
+    }
 
-  @Test
-  public void invalidFindByStringStartsWith() throws Exception {
-    mockMvc.perform(get("/api/search/gene?taxIdStartsWith=96"))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$", hasKey("code")))
-        .andExpect(jsonPath("$.code", is(400)));
-  }
+    @Test
+    public void invalidFindByStringLike() throws Exception {
+        mockMvc.perform(get("/api/search/gene?taxIdLike=06"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$", hasKey("code")))
+            .andExpect(jsonPath("$.code", is(400)));
+    }
 
-  @Test
-  public void findByStringEndsWith() throws Exception {
-    mockMvc.perform(get("/api/search/gene?symbolEndsWith=eneB"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0]", hasKey("symbol")))
-        .andExpect(jsonPath("$[0].symbol", is("GeneB")));
-  }
+    @Test
+    public void findByStringStartsWith() throws Exception {
+        mockMvc.perform(get("/api/search/gene?geneTypeStartsWith=protein"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(3)))
+            .andExpect(jsonPath("$[0]", hasKey("symbol")))
+            .andExpect(jsonPath("$[0].symbol", is("GeneA")));
+    }
 
-  @Test
-  public void invalidFindByStringEndsWith() throws Exception {
-    mockMvc.perform(get("/api/search/gene?taxIdEndsWith=06"))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$", hasKey("code")))
-        .andExpect(jsonPath("$.code", is(400)));
-  }
+    @Test
+    public void invalidFindByStringStartsWith() throws Exception {
+        mockMvc.perform(get("/api/search/gene?taxIdStartsWith=96"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$", hasKey("code")))
+            .andExpect(jsonPath("$.code", is(400)));
+    }
 
-  @Test
-  public void findByStringIn() throws Exception {
-    mockMvc.perform(get("/api/search/gene?symbolIn=GeneA,GeneB"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(2)))
-        .andExpect(jsonPath("$[0]", hasKey("symbol")))
-        .andExpect(jsonPath("$[0].symbol", is("GeneA")));
-  }
+    @Test
+    public void findByStringEndsWith() throws Exception {
+        mockMvc.perform(get("/api/search/gene?symbolEndsWith=eneB"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$[0]", hasKey("symbol")))
+            .andExpect(jsonPath("$[0].symbol", is("GeneB")));
+    }
 
-  @Test
-  public void findByNumberIn() throws Exception {
-    mockMvc.perform(get("/api/search/gene?taxIdIn=9606,1000"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(5)))
-        .andExpect(jsonPath("$[0]", hasKey("symbol")))
-        .andExpect(jsonPath("$[0].symbol", is("GeneA")));
-  }
+    @Test
+    public void invalidFindByStringEndsWith() throws Exception {
+        mockMvc.perform(get("/api/search/gene?taxIdEndsWith=06"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$", hasKey("code")))
+            .andExpect(jsonPath("$.code", is(400)));
+    }
 
-  @Test
-  public void findByStringNotIn() throws Exception {
-    mockMvc.perform(get("/api/search/gene?symbolNotIn=GeneA,GeneB"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(3)))
-        .andExpect(jsonPath("$[0]", hasKey("symbol")))
-        .andExpect(jsonPath("$[0].symbol", is("GeneC")));
-  }
+    @Test
+    public void findByStringIn() throws Exception {
+        mockMvc.perform(get("/api/search/gene?symbolIn=GeneA,GeneB"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(2)))
+            .andExpect(jsonPath("$[0]", hasKey("symbol")))
+            .andExpect(jsonPath("$[0].symbol", is("GeneA")));
+    }
 
-  @Test
-  public void findByNumberNotIn() throws Exception {
-    mockMvc.perform(get("/api/search/gene?taxIdNotIn=9606,1000"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(0)));
-  }
+    @Test
+    public void findByNumberIn() throws Exception {
+        mockMvc.perform(get("/api/search/gene?taxIdIn=9606,1000"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(5)))
+            .andExpect(jsonPath("$[0]", hasKey("symbol")))
+            .andExpect(jsonPath("$[0].symbol", is("GeneA")));
+    }
 
-  @Test
-  public void findByNumberNotInTest() throws Exception {
-    mockMvc.perform(get("/api/search/geneexpression?valueNotIn=2.34,4.56"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(4)))
-        .andExpect(jsonPath("$[0]", hasKey("value")))
-        .andExpect(jsonPath("$[0].value", is(1.23)));
-  }
-  
-  @Test
-  public void findByNumberGreaterThanTest() throws Exception {
-    mockMvc.perform(get("/api/search/geneexpression?valueGreaterThan=5.0"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(3)))
-        .andExpect(jsonPath("$[0]", hasKey("value")))
-        .andExpect(jsonPath("$[0].value", is(6.78)));
-  }
+    @Test
+    public void findByStringNotIn() throws Exception {
+        mockMvc.perform(get("/api/search/gene?symbolNotIn=GeneA,GeneB"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(3)))
+            .andExpect(jsonPath("$[0]", hasKey("symbol")))
+            .andExpect(jsonPath("$[0].symbol", is("GeneC")));
+    }
 
-  @Test
-  public void findByNumberGreaterThanOrEqualsTest() throws Exception {
-    mockMvc.perform(get("/api/search/geneexpression?valueGreaterThanOrEquals=9.1"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(2)))
-        .andExpect(jsonPath("$[0]", hasKey("value")))
-        .andExpect(jsonPath("$[0].value", is(9.1)));
-  }
+    @Test
+    public void findByNumberNotIn() throws Exception {
+        mockMvc.perform(get("/api/search/gene?taxIdNotIn=9606,1000"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(0)));
+    }
 
-  @Test
-  public void findByNumberLessThanTest() throws Exception {
-    mockMvc.perform(get("/api/search/geneexpression?valueLessThan=5.0"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(3)))
-        .andExpect(jsonPath("$[0]", hasKey("value")))
-        .andExpect(jsonPath("$[0].value", is(1.23)));
-  }
+    @Test
+    public void findByNumberNotInTest() throws Exception {
+        mockMvc.perform(get("/api/search/geneexpression?valueNotIn=2.34,4.56"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(4)))
+            .andExpect(jsonPath("$[0]", hasKey("value")))
+            .andExpect(jsonPath("$[0].value", is(1.23)));
+    }
 
-  @Test
-  public void findByNumberLessThanOrEqualsTest() throws Exception {
-    mockMvc.perform(get("/api/search/geneexpression?valueLessThanOrEquals=2.34"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(2)))
-        .andExpect(jsonPath("$[0]", hasKey("value")))
-        .andExpect(jsonPath("$[0].value", is(1.23)));
-  }
+    @Test
+    public void findByNumberGreaterThanTest() throws Exception {
+        mockMvc.perform(get("/api/search/geneexpression?valueGreaterThan=5.0"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(3)))
+            .andExpect(jsonPath("$[0]", hasKey("value")))
+            .andExpect(jsonPath("$[0].value", is(6.78)));
+    }
 
-  @Test
-  public void invalidGreaterThanNumberTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?symbolGreaterThan=100"))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$", hasKey("code")))
-        .andExpect(jsonPath("$.code", is(400)));
-  }
+    @Test
+    public void findByNumberGreaterThanOrEqualsTest() throws Exception {
+        mockMvc.perform(get("/api/search/geneexpression?valueGreaterThanOrEquals=9.1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(2)))
+            .andExpect(jsonPath("$[0]", hasKey("value")))
+            .andExpect(jsonPath("$[0].value", is(9.1)));
+    }
 
-  @Test
-  public void invalidGreaterThanOrEqualsNumberTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?symbolGreaterThanOrEquals=100"))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$", hasKey("code")))
-        .andExpect(jsonPath("$.code", is(400)));
-  }
+    @Test
+    public void findByNumberLessThanTest() throws Exception {
+        mockMvc.perform(get("/api/search/geneexpression?valueLessThan=5.0"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(3)))
+            .andExpect(jsonPath("$[0]", hasKey("value")))
+            .andExpect(jsonPath("$[0].value", is(1.23)));
+    }
 
-  @Test
-  public void invalidLessThanNumberTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?symbolLessThan=100"))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$", hasKey("code")))
-        .andExpect(jsonPath("$.code", is(400)));
-  }
+    @Test
+    public void findByNumberLessThanOrEqualsTest() throws Exception {
+        mockMvc.perform(get("/api/search/geneexpression?valueLessThanOrEquals=2.34"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(2)))
+            .andExpect(jsonPath("$[0]", hasKey("value")))
+            .andExpect(jsonPath("$[0].value", is(1.23)));
+    }
 
-  @Test
-  public void invalidLessThanOrEqualsNumberTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?symbolLessThanOrEquals=100"))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$", hasKey("code")))
-        .andExpect(jsonPath("$.code", is(400)));
-  }
-  
-  @Test
-  public void findByNumberBetweenTest() throws Exception {
-    mockMvc.perform(get("/api/search/geneexpression?valueBetween=3.0,7.0"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(2)))
-        .andExpect(jsonPath("$[0]", hasKey("value")))
-        .andExpect(jsonPath("$[0].value", is(4.56)));
-  }
+    @Test
+    public void invalidGreaterThanNumberTest() throws Exception {
+        mockMvc.perform(get("/api/search/gene?symbolGreaterThan=100"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$", hasKey("code")))
+            .andExpect(jsonPath("$.code", is(400)));
+    }
 
-  @Test
-  public void findByNumberOutsideTest() throws Exception {
-    mockMvc.perform(get("/api/search/geneexpression?valueOutside=3.0,7.0"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(4)))
-        .andExpect(jsonPath("$[0]", hasKey("value")))
-        .andExpect(jsonPath("$[0].value", is(1.23)));
-  }
+    @Test
+    public void invalidGreaterThanOrEqualsNumberTest() throws Exception {
+        mockMvc.perform(get("/api/search/gene?symbolGreaterThanOrEquals=100"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$", hasKey("code")))
+            .andExpect(jsonPath("$.code", is(400)));
+    }
 
-  @Test
-  public void invalidOutsideNumberTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?symbolOutside=100,10000"))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$", hasKey("code")))
-        .andExpect(jsonPath("$.code", is(400)));
-  }
+    @Test
+    public void invalidLessThanNumberTest() throws Exception {
+        mockMvc.perform(get("/api/search/gene?symbolLessThan=100"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$", hasKey("code")))
+            .andExpect(jsonPath("$.code", is(400)));
+    }
 
-  @Test
-  public void invalidBetweenNumberTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?symbolBetween=100,10000"))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$", hasKey("code")))
-        .andExpect(jsonPath("$.code", is(400)));
-  }
-  
-  @Test
-  public void isNullTest() throws Exception {
-    
-    Gene gene = ((List<Gene>) geneRepository.findAll()).get(0);
-    gene.setGeneType(null);
-    Serializable id = gene.getId();
-    geneRepository.update(gene);
-    
-    mockMvc.perform(get("/api/search/gene?geneTypeIsNull"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0]", hasKey("geneType")))
-        .andExpect(jsonPath("$[0].geneType", nullValue()))
-        .andExpect(jsonPath("$[0].id", is(id)));
-  }
+    @Test
+    public void invalidLessThanOrEqualsNumberTest() throws Exception {
+        mockMvc.perform(get("/api/search/gene?symbolLessThanOrEquals=100"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$", hasKey("code")))
+            .andExpect(jsonPath("$.code", is(400)));
+    }
 
-  @Test
-  public void isNotNullTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?symbolIsNotNull"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(5)))
-        .andExpect(jsonPath("$[0]", hasKey("symbol")))
-        .andExpect(jsonPath("$[0].symbol", not(nullValue())));
-  }
-  
-  @Test
-  public void assertTrueTest() throws Exception {
-    mockMvc.perform(get("/api/search/user?enabledIsTrue"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0]", hasKey("enabled")))
-        .andExpect(jsonPath("$[0].enabled", is(true)));
-  }
+    @Test
+    public void findByNumberBetweenTest() throws Exception {
+        mockMvc.perform(get("/api/search/geneexpression?valueBetween=3.0,7.0"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(2)))
+            .andExpect(jsonPath("$[0]", hasKey("value")))
+            .andExpect(jsonPath("$[0].value", is(4.56)));
+    }
 
-  @Test
-  public void isFalseTest() throws Exception {
-    mockMvc.perform(get("/api/search/user?enabledIsFalse"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(0)));
-  }
-  
-  // Ignored options
-  
-  @Test
-  public void ignoredParameterTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?chromosomeLocation=xxx"))
-        .andExpect(status().isBadRequest());
-    mockMvc.perform(get("/api/search/gene"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(5)))
-        .andExpect(jsonPath("$[0]", hasKey("chromosomeLocation")));
-  }
-  
-  // Create
+    @Test
+    public void findByNumberOutsideTest() throws Exception {
+        mockMvc.perform(get("/api/search/geneexpression?valueOutside=3.0,7.0"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(4)))
+            .andExpect(jsonPath("$[0]", hasKey("value")))
+            .andExpect(jsonPath("$[0].value", is(1.23)));
+    }
 
-  @Test
-  public void createTest() throws Exception {
+    @Test
+    public void invalidOutsideNumberTest() throws Exception {
+        mockMvc.perform(get("/api/search/gene?symbolOutside=100,10000"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$", hasKey("code")))
+            .andExpect(jsonPath("$.code", is(400)));
+    }
 
-    Gene gene = (Gene) geneRepository.getModel().newInstance();
-    gene.setEntrezGeneId(6);
-    gene.setSymbol("GeneF");
-    gene.setTaxId(9606);
-    gene.setChromosome("10");
-    gene.setGeneType("protein-coding");
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.setFilterProvider(new SimpleFilterProvider().addFilter("fieldFilter",
-        SimpleBeanPropertyFilter.serializeAllExcept()).setFailOnUnknownId(false));
-    objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    @Test
+    public void invalidBetweenNumberTest() throws Exception {
+        mockMvc.perform(get("/api/search/gene?symbolBetween=100,10000"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$", hasKey("code")))
+            .andExpect(jsonPath("$.code", is(400)));
+    }
 
-    mockMvc.perform(post("/api/search/gene")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(gene)))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$", hasKey("entrezGeneId")))
-        .andExpect(jsonPath("$.entrezGeneId", is(6)));
+    @Test
+    public void isNullTest() throws Exception {
 
-    Gene newGene = (Gene) geneRepository.findByEntrezGeneId(6).get();
+        Gene gene = ((List<Gene>) geneRepository.findAll()).get(0);
+        gene.setGeneType(null);
+        Serializable id = gene.getId();
+        geneRepository.update(gene);
 
-    mockMvc.perform(get("/api/search/gene/{id}", newGene.getId()))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.entrezGeneId", is(6)));
+        mockMvc.perform(get("/api/search/gene?geneTypeIsNull"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$[0]", hasKey("geneType")))
+            .andExpect(jsonPath("$[0].geneType", nullValue()))
+            .andExpect(jsonPath("$[0].id", is(id)));
+    }
 
-    geneRepository.delete(newGene);
+    @Test
+    public void isNotNullTest() throws Exception {
+        mockMvc.perform(get("/api/search/gene?symbolIsNotNull"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(5)))
+            .andExpect(jsonPath("$[0]", hasKey("symbol")))
+            .andExpect(jsonPath("$[0].symbol", not(nullValue())));
+    }
 
-  }
-  
-  // Update
+    @Test
+    public void assertTrueTest() throws Exception {
+        mockMvc.perform(get("/api/search/user?enabledIsTrue"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$[0]", hasKey("enabled")))
+            .andExpect(jsonPath("$[0].enabled", is(true)));
+    }
 
-  @Test
-  public void updateTest() throws Exception {
+    @Test
+    public void isFalseTest() throws Exception {
+        mockMvc.perform(get("/api/search/user?enabledIsFalse"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(0)));
+    }
 
-    mockMvc.perform(get("/api/search/gene?symbol=GeneA"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0]", hasKey("symbol")))
-        .andExpect(jsonPath("$[0].symbol", is("GeneA")));
+    // Ignored options
 
-    List<Gene> genes = geneRepository.findBySymbol("GeneA");
-    Assert.assertNotNull(genes);
-    Assert.assertTrue(!genes.isEmpty());
-    Gene gene = genes.get(0);
-    Assert.assertTrue("GeneA".equals(gene.getSymbol()));
-    gene.setSymbol("GeneX");
-    Assert.assertNotNull(gene.getId());
+    @Test
+    public void ignoredParameterTest() throws Exception {
+        mockMvc.perform(get("/api/search/gene?chromosomeLocation=xxx"))
+            .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/search/gene"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(5)))
+            .andExpect(jsonPath("$[0]", hasKey("chromosomeLocation")));
+    }
 
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.setFilterProvider(new SimpleFilterProvider().addFilter("fieldFilter",
-        SimpleBeanPropertyFilter.serializeAllExcept()).setFailOnUnknownId(false));
-    //objectMapper.setSerializationInclusion(Include.NON_EMPTY);
+    // Create
 
-    System.out.println(gene.toString());
-    System.out.println(objectMapper.writeValueAsString(gene));
+    @Test
+    public void createTest() throws Exception {
 
-    mockMvc.perform(put("/api/search/gene/{id}", gene.getId())
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsBytes(gene)))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$", hasKey("symbol")))
-        .andExpect(jsonPath("$.symbol", is("GeneX")));
+        Gene gene = (Gene) geneRepository.getModel().newInstance();
+        gene.setEntrezGeneId(6);
+        gene.setSymbol("GeneF");
+        gene.setTaxId(9606);
+        gene.setChromosome("10");
+        gene.setGeneType("protein-coding");
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setFilterProvider(new SimpleFilterProvider().addFilter("fieldFilter",
+            SimpleBeanPropertyFilter.serializeAllExcept()).setFailOnUnknownId(false));
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
-    mockMvc.perform(get("/api/search/gene/{id}", gene.getId()))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.symbol", is("GeneX")));
+        mockMvc.perform(post("/api/search/gene")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsBytes(gene)))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$", hasKey("entrezGeneId")))
+            .andExpect(jsonPath("$.entrezGeneId", is(6)));
 
-  }
-  
-  // Delete
+        Gene newGene = (Gene) geneRepository.findByEntrezGeneId(6).get();
 
-  @Test
-  public void deleteTest() throws Exception {
+        mockMvc.perform(get("/api/search/gene/{id}", newGene.getId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.entrezGeneId", is(6)));
 
-    Gene gene = (Gene) geneRepository.getModel().newInstance();
-    gene.setEntrezGeneId(7);
-    gene.setSymbol("GeneG");
-    gene.setTaxId(9606);
-    gene.setChromosome("10");
-    gene.setGeneType("protein-coding");
-    geneRepository.insert(gene);
+        geneRepository.delete(newGene);
 
-    mockMvc.perform(delete("/api/search/gene/{id}", gene.getId()))
-        .andExpect(status().isOk());
+    }
 
-    mockMvc.perform(get("/api/search/gene/{id}", gene.getId()))
-        .andExpect(status().isNotFound());
+    // Update
 
-  }
-  
-  // Linked resources
-  
-  @Test
-  public void oneToManyLinkedTest() throws Exception {
+    @Test
+    public void updateTest() throws Exception {
 
-    DataSet dataSet = ((List<DataSet>) dataSetRepository.findAll()).get(0);
-    Assert.assertNotNull(dataSet);
-    Assert.assertNotNull(dataSet.getSampleIds());
-    Assert.assertTrue(!dataSet.getSampleIds().isEmpty());
-    System.out.println(dataSet.getSampleIds().toString());
-    
-    mockMvc.perform(get("/api/search/dataset/" + dataSet.getId() + "/samples"))
-        .andDo(MockMvcResultHandlers.print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", not(hasKey("links"))))
-        .andExpect(jsonPath("$", hasSize(5)))
-        .andExpect(jsonPath("$[0]", hasKey("sampleType")));
-    
-  }
+        mockMvc.perform(get("/api/search/gene?symbol=GeneA"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$[0]", hasKey("symbol")))
+            .andExpect(jsonPath("$[0].symbol", is("GeneA")));
 
-  @Test
-  public void oneToManyLinkedTestWithHal() throws Exception {
+        List<Gene> genes = geneRepository.findBySymbol("GeneA");
+        Assert.assertNotNull(genes);
+        Assert.assertTrue(!genes.isEmpty());
+        Gene gene = genes.get(0);
+        Assert.assertTrue("GeneA".equals(gene.getSymbol()));
+        gene.setSymbol("GeneX");
+        Assert.assertNotNull(gene.getId());
 
-    DataSet dataSet = ((List<DataSet>) dataSetRepository.findAll()).get(0);
-    Assert.assertNotNull(dataSet);
-    Assert.assertNotNull(dataSet.getSampleIds());
-    Assert.assertTrue(!dataSet.getSampleIds().isEmpty());
-    System.out.println(dataSet.getSampleIds().toString());
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setFilterProvider(new SimpleFilterProvider().addFilter("fieldFilter",
+            SimpleBeanPropertyFilter.serializeAllExcept()).setFailOnUnknownId(false));
+        //objectMapper.setSerializationInclusion(Include.NON_EMPTY);
 
-    mockMvc.perform(get("/api/search/dataset/" + dataSet.getId() + "/samples")
-        .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
-        .andDo(MockMvcResultHandlers.print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasKey("links")))
-        .andExpect(jsonPath("$.links", hasSize(1)))
-        .andExpect(jsonPath("$.links[0]", hasKey("rel")))
-        .andExpect(jsonPath("$.links[0].rel", is("self")))
-        .andExpect(jsonPath("$.links[0]", hasKey("href")))
-        .andExpect(jsonPath("$.links[0].href", is("/api/search/dataset/" + dataSet.getId() + "/samples")))
-        .andExpect(jsonPath("$", hasKey("content")))
-        .andExpect(jsonPath("$.content", hasSize(5)))
-        .andExpect(jsonPath("$.content[0]", hasKey("sampleType")))
-        .andExpect(jsonPath("$.content[0]", hasKey("links")))
-        .andExpect(jsonPath("$.content[0].links", hasSize(1)))
-        .andExpect(jsonPath("$.content[0].links[0]", hasKey("rel")))
-        .andExpect(jsonPath("$.content[0].links[0].rel", is("self")))
-        .andExpect(jsonPath("$.content[0].links[0]", hasKey("href")))
-        .andExpect(jsonPath("$.content[0].links[0].href", startsWith("/api/search/sample/")));
+        System.out.println(gene.toString());
+        System.out.println(objectMapper.writeValueAsString(gene));
 
-  }
-  
-  @Test
-  public void manyToOneLinkedTest() throws Exception {
+        mockMvc.perform(put("/api/search/gene/{id}", gene.getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsBytes(gene)))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$", hasKey("symbol")))
+            .andExpect(jsonPath("$.symbol", is("GeneX")));
 
-    GeneExpression geneExpression = ((List<GeneExpression>) geneExpressionRepository.findAll()).get(0);
-    Assert.assertNotNull(geneExpression);
-    
-    Optional<Gene> geneOptional = geneRepository.findById(geneExpression.getGeneId());
-    Assert.assertTrue(geneOptional.isPresent());
-    Gene gene = geneOptional.get();
-    
-    mockMvc.perform(get("/api/search/geneexpression/" + geneExpression.getId() + "/gene"))
-        .andDo(MockMvcResultHandlers.print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", not(hasKey("links"))))
-        .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$[0]", hasKey("symbol")))
-        .andExpect(jsonPath("$[0].symbol", is(gene.getSymbol())));
-    
-  }
+        mockMvc.perform(get("/api/search/gene/{id}", gene.getId()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.symbol", is("GeneX")));
 
-  @Test
-  public void manyToOneLinkedTestWithHal() throws Exception {
+    }
 
-    GeneExpression geneExpression = ((List<GeneExpression>) geneExpressionRepository.findAll()).get(0);
-    Assert.assertNotNull(geneExpression);
+    // Delete
 
-    Optional<Gene> geneOptional = geneRepository.findById(geneExpression.getGeneId());
-    Assert.assertTrue(geneOptional.isPresent());
-    Gene gene = geneOptional.get();
+    @Test
+    public void deleteTest() throws Exception {
 
-    mockMvc.perform(get("/api/search/geneexpression/" + geneExpression.getId() + "/gene")
-        .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
-        .andDo(MockMvcResultHandlers.print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasKey("links")))
-        .andExpect(jsonPath("$.links", hasSize(1)))
-        .andExpect(jsonPath("$.links[0]", hasKey("rel")))
-        .andExpect(jsonPath("$.links[0].rel", is("self")))
-        .andExpect(jsonPath("$.links[0]", hasKey("href")))
-        .andExpect(jsonPath("$.links[0].href", is("/api/search/geneexpression/" + geneExpression.getId() + "/gene")))
-        .andExpect(jsonPath("$", hasKey("content")))
-        .andExpect(jsonPath("$.content", hasSize(1)))
-        .andExpect(jsonPath("$.content[0]", hasKey("symbol")))
-        .andExpect(jsonPath("$.content[0].symbol", is(gene.getSymbol())))
-        .andExpect(jsonPath("$.content[0]", hasKey("links")))
-        .andExpect(jsonPath("$.content[0].links", hasSize(1)))
-        .andExpect(jsonPath("$.content[0].links[0]", hasKey("rel")))
-        .andExpect(jsonPath("$.content[0].links[0].rel", is("self")))
-        .andExpect(jsonPath("$.content[0].links[0]", hasKey("href")))
-        .andExpect(jsonPath("$.content[0].links[0].href", is("/api/search/gene/" + gene.getId())));
+        Gene gene = (Gene) geneRepository.getModel().newInstance();
+        gene.setEntrezGeneId(7);
+        gene.setSymbol("GeneG");
+        gene.setTaxId(9606);
+        gene.setChromosome("10");
+        gene.setGeneType("protein-coding");
+        geneRepository.insert(gene);
 
-  }
-  
-  // Exceptions
+        mockMvc.perform(delete("/api/search/gene/{id}", gene.getId()))
+            .andExpect(status().isOk());
 
-  @Test
-  public void resourceNotFoundExceptionTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene/{id}", "abc123"))
-        .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.status", is("NOT_FOUND")))
-        .andExpect(jsonPath("$.code", is(404)));
-  }
+        mockMvc.perform(get("/api/search/gene/{id}", gene.getId()))
+            .andExpect(status().isNotFound());
 
-  @Test
-  public void invalidParameterExceptionTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene/{id}?bad=param", 1L))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-        .andExpect(jsonPath("$.code", is(400)));
-    mockMvc.perform(get("/api/search/gene?bad=param"))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-        .andExpect(jsonPath("$.code", is(400)))
-        .andExpect(jsonPath("$", hasKey("message")));
-  }
+    }
 
-  @Test
-  public void parameterMappingExceptionTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?taxId=bad"))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
-        .andExpect(jsonPath("$.code", is(400)))
-        .andExpect(jsonPath("$", hasKey("message")));
-  }
-  
-  
-  // Compression
-  
-  // TODO: How to get this to pass? Do we need more data to get the compression to trigger?
+    // Linked resources
+
+    @Test
+    public void oneToManyLinkedTest() throws Exception {
+
+        DataSet dataSet = ((List<DataSet>) dataSetRepository.findAll()).get(0);
+        Assert.assertNotNull(dataSet);
+        Assert.assertNotNull(dataSet.getSampleIds());
+        Assert.assertTrue(!dataSet.getSampleIds().isEmpty());
+        System.out.println(dataSet.getSampleIds().toString());
+
+        mockMvc.perform(get("/api/search/dataset/" + dataSet.getId() + "/samples"))
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", not(hasKey("links"))))
+            .andExpect(jsonPath("$", hasSize(5)))
+            .andExpect(jsonPath("$[0]", hasKey("sampleType")));
+
+    }
+
+    @Test
+    public void oneToManyLinkedTestWithHal() throws Exception {
+
+        DataSet dataSet = ((List<DataSet>) dataSetRepository.findAll()).get(0);
+        Assert.assertNotNull(dataSet);
+        Assert.assertNotNull(dataSet.getSampleIds());
+        Assert.assertTrue(!dataSet.getSampleIds().isEmpty());
+        System.out.println(dataSet.getSampleIds().toString());
+
+        mockMvc.perform(get("/api/search/dataset/" + dataSet.getId() + "/samples")
+            .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasKey("links")))
+            .andExpect(jsonPath("$.links", hasSize(1)))
+            .andExpect(jsonPath("$.links[0]", hasKey("rel")))
+            .andExpect(jsonPath("$.links[0].rel", is("self")))
+            .andExpect(jsonPath("$.links[0]", hasKey("href")))
+            .andExpect(jsonPath("$.links[0].href",
+                is("/api/search/dataset/" + dataSet.getId() + "/samples")))
+            .andExpect(jsonPath("$", hasKey("content")))
+            .andExpect(jsonPath("$.content", hasSize(5)))
+            .andExpect(jsonPath("$.content[0]", hasKey("sampleType")))
+            .andExpect(jsonPath("$.content[0]", hasKey("links")))
+            .andExpect(jsonPath("$.content[0].links", hasSize(1)))
+            .andExpect(jsonPath("$.content[0].links[0]", hasKey("rel")))
+            .andExpect(jsonPath("$.content[0].links[0].rel", is("self")))
+            .andExpect(jsonPath("$.content[0].links[0]", hasKey("href")))
+            .andExpect(jsonPath("$.content[0].links[0].href", startsWith("/api/search/sample/")));
+
+    }
+
+    @Test
+    public void manyToOneLinkedTest() throws Exception {
+
+        GeneExpression geneExpression = ((List<GeneExpression>) geneExpressionRepository.findAll())
+            .get(0);
+        Assert.assertNotNull(geneExpression);
+
+        Optional<Gene> geneOptional = geneRepository.findById(geneExpression.getGeneId());
+        Assert.assertTrue(geneOptional.isPresent());
+        Gene gene = geneOptional.get();
+
+        mockMvc.perform(get("/api/search/geneexpression/" + geneExpression.getId() + "/gene"))
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", not(hasKey("links"))))
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$[0]", hasKey("symbol")))
+            .andExpect(jsonPath("$[0].symbol", is(gene.getSymbol())));
+
+    }
+
+    @Test
+    public void manyToOneLinkedTestWithHal() throws Exception {
+
+        GeneExpression geneExpression = ((List<GeneExpression>) geneExpressionRepository.findAll())
+            .get(0);
+        Assert.assertNotNull(geneExpression);
+
+        Optional<Gene> geneOptional = geneRepository.findById(geneExpression.getGeneId());
+        Assert.assertTrue(geneOptional.isPresent());
+        Gene gene = geneOptional.get();
+
+        mockMvc.perform(get("/api/search/geneexpression/" + geneExpression.getId() + "/gene")
+            .accept(ApiMediaTypes.APPLICATION_HAL_JSON_VALUE))
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasKey("links")))
+            .andExpect(jsonPath("$.links", hasSize(1)))
+            .andExpect(jsonPath("$.links[0]", hasKey("rel")))
+            .andExpect(jsonPath("$.links[0].rel", is("self")))
+            .andExpect(jsonPath("$.links[0]", hasKey("href")))
+            .andExpect(jsonPath("$.links[0].href",
+                is("/api/search/geneexpression/" + geneExpression.getId() + "/gene")))
+            .andExpect(jsonPath("$", hasKey("content")))
+            .andExpect(jsonPath("$.content", hasSize(1)))
+            .andExpect(jsonPath("$.content[0]", hasKey("symbol")))
+            .andExpect(jsonPath("$.content[0].symbol", is(gene.getSymbol())))
+            .andExpect(jsonPath("$.content[0]", hasKey("links")))
+            .andExpect(jsonPath("$.content[0].links", hasSize(1)))
+            .andExpect(jsonPath("$.content[0].links[0]", hasKey("rel")))
+            .andExpect(jsonPath("$.content[0].links[0].rel", is("self")))
+            .andExpect(jsonPath("$.content[0].links[0]", hasKey("href")))
+            .andExpect(
+                jsonPath("$.content[0].links[0].href", is("/api/search/gene/" + gene.getId())));
+
+    }
+
+    // Exceptions
+
+    @Test
+    public void resourceNotFoundExceptionTest() throws Exception {
+        mockMvc.perform(get("/api/search/gene/{id}", "abc123"))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.status", is("NOT_FOUND")))
+            .andExpect(jsonPath("$.code", is(404)));
+    }
+
+    @Test
+    public void invalidParameterExceptionTest() throws Exception {
+        mockMvc.perform(get("/api/search/gene/{id}?bad=param", 1L))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+            .andExpect(jsonPath("$.code", is(400)));
+        mockMvc.perform(get("/api/search/gene?bad=param"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+            .andExpect(jsonPath("$.code", is(400)))
+            .andExpect(jsonPath("$", hasKey("message")));
+    }
+
+    @Test
+    public void parameterMappingExceptionTest() throws Exception {
+        mockMvc.perform(get("/api/search/gene?taxId=bad"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status", is("BAD_REQUEST")))
+            .andExpect(jsonPath("$.code", is(400)))
+            .andExpect(jsonPath("$", hasKey("message")));
+    }
+
+    // Compression
+
+    // TODO: How to get this to pass? Do we need more data to get the compression to trigger?
 //  @Test
 //  public void defaultCompressionTest() throws Exception {
 //
@@ -807,13 +820,13 @@ public class ModelCrudControllerTests extends AbstractRepositoryTests {
 //        .andDo(MockMvcResultHandlers.print())
 //        .andExpect(MockMvcResultMatchers.header().string("Content-Encoding", "gzip"));
 //  }
-  
-  // CORS
-  
-  @Test
-  public void corsTest() throws Exception {
-    mockMvc.perform(get("/api/search/gene?_size=10").header("Origin", "http://www.someurl.com"))
-        .andExpect(status().isOk());
-  }
+
+    // CORS
+
+    @Test
+    public void corsTest() throws Exception {
+        mockMvc.perform(get("/api/search/gene?_size=10").header("Origin", "http://www.someurl.com"))
+            .andExpect(status().isOk());
+    }
 
 }

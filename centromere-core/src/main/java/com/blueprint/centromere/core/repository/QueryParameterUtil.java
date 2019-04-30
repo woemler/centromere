@@ -41,13 +41,14 @@ import org.springframework.core.convert.support.DefaultConversionService;
 public final class QueryParameterUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryParameterUtil.class);
-    
+
     private QueryParameterUtil() {
     }
 
     /**
-     * Inspects a {@link Model} class and returns all of the available and acceptable query parameter
-     *   definitions, as a map of parameter names and {@link QueryParameterDescriptor} objects.
+     * Inspects a {@link Model} class and returns all of the available and acceptable query
+     * parameter definitions, as a map of parameter names and {@link QueryParameterDescriptor}
+     * objects.
      *
      * @param model model to inspect
      * @return map of parameter names and their descriptors
@@ -73,12 +74,14 @@ public final class QueryParameterUtil {
 
                 if (Collection.class.isAssignableFrom(type)) {
 
-                    ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+                    ParameterizedType parameterizedType = (ParameterizedType) field
+                        .getGenericType();
                     type = parameterizedType.getActualTypeArguments()[0].getClass();
 
                 } else if (Map.class.isAssignableFrom(type)) {
 
-                    ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
+                    ParameterizedType parameterizedType = (ParameterizedType) field
+                        .getGenericType();
                     type = (Class<?>) parameterizedType.getActualTypeArguments()[1];
                     paramName = paramName + ".\\w+";
                     regex = true;
@@ -94,7 +97,8 @@ public final class QueryParameterUtil {
 
                 String fieldName = field.getName();
                 boolean dynamic = true;
-                QueryParameterDescriptor descriptor = new QueryParameterDescriptor(paramName, fieldName,
+                QueryParameterDescriptor descriptor = new QueryParameterDescriptor(paramName,
+                    fieldName,
                     type, Evaluation.EQUALS, regex, dynamic);
                 paramMap.put(paramName, descriptor);
 
@@ -110,8 +114,9 @@ public final class QueryParameterUtil {
     }
 
     /**
-     * Inspects a {@link Model} class and returns all of the available and acceptable query parameter
-     *   definitions, as a map of parameter names and {@link QueryParameterDescriptor} objects.
+     * Inspects a {@link Model} class and returns all of the available and acceptable query
+     * parameter definitions, as a map of parameter names and {@link QueryParameterDescriptor}
+     * objects.
      *
      * @param model model to inspect
      * @return map of parameter names and their descriptors
@@ -123,13 +128,12 @@ public final class QueryParameterUtil {
 
     /**
      * Creates a {@link QueryCriteria} object based upon a request parameter and {@link Evaluation}
-     *   value.
+     * value.
      *
      * @param param parameter name
      * @param values evaluated values
      * @param type object types
      * @param evaluation evaluation to apply
-     * @return
      */
     public static QueryCriteria getQueryCriteriaFromParameter(
         String param,
@@ -139,23 +143,28 @@ public final class QueryParameterUtil {
     ) {
 
         if (!dynamicParamEvalutationMatchesType(evaluation, type)) {
-            throw new QueryParameterException(String.format("Evaluation %s cannot be applied to field "
-                + "type %s", evaluation.toString(), type.getName()));
+            throw new QueryParameterException(
+                String.format("Evaluation %s cannot be applied to field "
+                    + "type %s", evaluation.toString(), type.getName()));
         }
-        
+
         switch (evaluation) {
             case EQUALS:
                 if (values.length > 1) {
-                    return new QueryCriteria(param, convertParameterArray(values, type), Evaluation.IN);
+                    return new QueryCriteria(param, convertParameterArray(values, type),
+                        Evaluation.IN);
                 }
-                return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.EQUALS);
+                return new QueryCriteria(param, convertParameter(values[0], type),
+                    Evaluation.EQUALS);
             case NOT_EQUALS:
-                return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.NOT_EQUALS);
+                return new QueryCriteria(param, convertParameter(values[0], type),
+                    Evaluation.NOT_EQUALS);
             case IN:
                 return new QueryCriteria(param, convertParameterArray(values, type), Evaluation.IN);
             case NOT_IN:
-                return new QueryCriteria(param, convertParameterArray(values, type), Evaluation.NOT_IN);
-            case LIKE :
+                return new QueryCriteria(param, convertParameterArray(values, type),
+                    Evaluation.NOT_IN);
+            case LIKE:
                 return new QueryCriteria(param, values[0], Evaluation.LIKE);
             case NOT_LIKE:
                 return new QueryCriteria(param, values[0], Evaluation.NOT_LIKE);
@@ -174,7 +183,8 @@ public final class QueryParameterUtil {
                 return new QueryCriteria(param, convertParameter(values[0], type),
                     Evaluation.GREATER_THAN_EQUALS);
             case LESS_THAN:
-                return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.LESS_THAN);
+                return new QueryCriteria(param, convertParameter(values[0], type),
+                    Evaluation.LESS_THAN);
             case LESS_THAN_EQUALS:
                 return new QueryCriteria(param, convertParameter(values[0], type),
                     Evaluation.LESS_THAN_EQUALS);
@@ -191,9 +201,11 @@ public final class QueryParameterUtil {
                 return new QueryCriteria(param, Arrays.asList(convertParameter(values[0], type),
                     convertParameter(values[1], type)), Evaluation.OUTSIDE_INCLUSIVE);
             case STARTS_WITH:
-                return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.STARTS_WITH);
+                return new QueryCriteria(param, convertParameter(values[0], type),
+                    Evaluation.STARTS_WITH);
             case ENDS_WITH:
-                return new QueryCriteria(param, convertParameter(values[0], type), Evaluation.ENDS_WITH);
+                return new QueryCriteria(param, convertParameter(values[0], type),
+                    Evaluation.ENDS_WITH);
             default:
                 return null;
         }
@@ -201,7 +213,7 @@ public final class QueryParameterUtil {
 
     /**
      * Tests to see whether the selected {@link Evaluation} can be applied to the target attribute
-     *   type.
+     * type.
      *
      * @param evaluation query evaluation
      * @param type parameter type
@@ -266,7 +278,6 @@ public final class QueryParameterUtil {
      *
      * @param param param name
      * @param type object type
-     * @return
      */
     private static Object convertParameter(Object param, Class<?> type,
         ConversionService conversionService) {
@@ -275,8 +286,9 @@ public final class QueryParameterUtil {
                 return conversionService.convert(param, type);
             } catch (ConversionFailedException e) {
                 e.printStackTrace();
-                throw new QueryParameterException(String.format("Unable to convert parameter string to %s",
-                    type.getName()));
+                throw new QueryParameterException(
+                    String.format("Unable to convert parameter string to %s",
+                        type.getName()));
             }
         } else {
             return param;
@@ -292,16 +304,15 @@ public final class QueryParameterUtil {
     }
 
     /**
-     * Converts an array of objects into the appropriate type defined by the model field being 
-     *   queried.
+     * Converts an array of objects into the appropriate type defined by the model field being
+     * queried.
      *
      * @param params parameter names
      * @param type object types
-     * @return
      */
     private static List<Object> convertParameterArray(Object[] params, Class<?> type) {
         List<Object> objects = new ArrayList<>();
-        for (Object param: params) {
+        for (Object param : params) {
             objects.add(convertParameter(param, type));
         }
         return objects;

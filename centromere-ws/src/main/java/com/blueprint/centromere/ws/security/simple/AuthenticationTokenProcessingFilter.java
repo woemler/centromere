@@ -34,11 +34,10 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
- * Authenticates user requests using a previously generated {@link TokenDetails}.
- *   The token contains a hashed representation of the user's credentials and token creation and 
- *   expiration times, that allow it to be validated without the user having to submit their credentials
- *   every time a request is made, but still takes steps to prevent user impersonation and token
- *   forgery.
+ * Authenticates user requests using a previously generated {@link TokenDetails}. The token contains
+ * a hashed representation of the user's credentials and token creation and expiration times, that
+ * allow it to be validated without the user having to submit their credentials every time a request
+ * is made, but still takes steps to prevent user impersonation and token forgery.
  *
  * @author woemler
  */
@@ -58,7 +57,8 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
         FilterChain chain) throws IOException, ServletException {
 
         if (!(request instanceof HttpServletRequest)) {
-            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Expecting an HTTP request.");
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+                "Expecting an HTTP request.");
         }
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         //System.out.println("Remote Host: " + httpRequest.getRemoteHost());
@@ -74,8 +74,10 @@ public class AuthenticationTokenProcessingFilter extends GenericFilterBean {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             if (tokenOperations.validateToken(authToken, userDetails)) {
                 UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+                    new UsernamePasswordAuthenticationToken(userDetails, null,
+                        userDetails.getAuthorities());
+                authentication
+                    .setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }

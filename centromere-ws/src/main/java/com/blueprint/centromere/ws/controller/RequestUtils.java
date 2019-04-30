@@ -45,8 +45,6 @@ public final class RequestUtils {
 
     /**
      * Returns a list of the default query string options used by {@link }.
-     *
-     * @return
      */
     public static List<String> findAllParameters() {
         List<String> params = new ArrayList<>();
@@ -71,61 +69,55 @@ public final class RequestUtils {
     }
 
     /**
-     * Converts query string options in a {@link HttpServletRequest} to a list of {@link QueryCriteria},
-     *   based upon the available model query options and the default {@code GET} method options.
-     *
-     * @param model
-     * @param request
-     * @return
+     * Converts query string options in a {@link HttpServletRequest} to a list of {@link
+     * QueryCriteria}, based upon the available model query options and the default {@code GET}
+     * method options.
      */
     public static List<QueryCriteria> getQueryCriteriaFromFindRequest(
         Class<? extends Model<?>> model,
         HttpServletRequest request
     ) {
 
-        LOGGER.info(String.format("Generating QueryCriteria for 'find' request options: model=%s params=%s",
-            model.getName(), request.getQueryString()));
+        LOGGER.info(
+            String.format("Generating QueryCriteria for 'find' request options: model=%s params=%s",
+                model.getName(), request.getQueryString()));
 
         List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(
             QueryParameterUtil.getAvailableQueryParameters(model),
             findAllParameters(),
             request.getParameterMap());
 
-        LOGGER.info(String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
+        LOGGER.info(
+            String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
 
         return criteriaList;
     }
 
     /**
-     * Converts query string options in a {@link HttpServletRequest} to a list of {@link QueryCriteria},
-     *   based upon the available model query options and the distinct operation endpoint options.
-     *
-     * @param model
-     * @param request
-     * @return
+     * Converts query string options in a {@link HttpServletRequest} to a list of {@link
+     * QueryCriteria}, based upon the available model query options and the distinct operation
+     * endpoint options.
      */
     public static List<QueryCriteria> getQueryCriteriaFromFindDistinctRequest(
         Class<? extends Model<?>> model,
         HttpServletRequest request
     ) {
-        LOGGER.info(String.format("Generating QueryCriteria for 'findDistinct' request options: model=%s params=%s",
+        LOGGER.info(String.format(
+            "Generating QueryCriteria for 'findDistinct' request options: model=%s params=%s",
             model.getName(), request.getQueryString()));
         List<String> defaultParameters = findDistinctParameters();
-        Map<String, QueryParameterDescriptor> paramMap = QueryParameterUtil.getAvailableQueryParameters(model);
-        List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(paramMap, defaultParameters, request.getParameterMap());
-        LOGGER.info(String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
+        Map<String, QueryParameterDescriptor> paramMap = QueryParameterUtil
+            .getAvailableQueryParameters(model);
+        List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(paramMap, defaultParameters,
+            request.getParameterMap());
+        LOGGER.info(
+            String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
         return criteriaList;
     }
 
     /**
-     * Generates the {@link QueryCriteria} required to query a linked {@link Model} based upon it's 
-     *   relationship to the parent resource.
-     *
-     * @param model
-     * @param relField
-     * @param relFieldValues
-     * @param request
-     * @return
+     * Generates the {@link QueryCriteria} required to query a linked {@link Model} based upon it's
+     * relationship to the parent resource.
      */
     public static List<QueryCriteria> getQueryCriteriaFromFindLinkedRequest(
         Class<? extends Model<?>> model,
@@ -134,8 +126,9 @@ public final class RequestUtils {
         HttpServletRequest request
     ) {
 
-        LOGGER.info(String.format("Generating QueryCriteria for 'find' request options: model=%s params=%s",
-            model.getName(), request.getQueryString()));
+        LOGGER.info(
+            String.format("Generating QueryCriteria for 'find' request options: model=%s params=%s",
+                model.getName(), request.getQueryString()));
 
         List<QueryCriteria> criteriaList = getQueryCriteriaFromRequest(
             QueryParameterUtil.getAvailableQueryParameters(model),
@@ -143,21 +136,18 @@ public final class RequestUtils {
             request.getParameterMap());
         criteriaList.add(new QueryCriteria(relField, relFieldValues, Evaluation.IN));
 
-        LOGGER.info(String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
+        LOGGER.info(
+            String.format("Generated QueryCriteria for request: %s", criteriaList.toString()));
 
         return criteriaList;
     }
 
     /**
      * Checks to see if the request contains invalid query string options.
-     *
-     * @param defaultParameters
-     * @param requestParams
-     * @return
      */
     public static boolean requestContainsNonDefaultParameters(Collection<String> defaultParameters,
         Map<String, String[]> requestParams) {
-        for (String param: requestParams.keySet()) {
+        for (String param : requestParams.keySet()) {
             if (!defaultParameters.contains(param)) {
                 return true;
             }
@@ -167,7 +157,7 @@ public final class RequestUtils {
 
     /**
      * Extracts valid repository query options from a map of submitted request options, and
-     *   generates a list of {@link QueryCriteria} for querying the database.
+     * generates a list of {@link QueryCriteria} for querying the database.
      *
      * @param validParams map of valid query options for the target {@link Model}
      * @param defaultParameters default query options for the given controller method
@@ -182,7 +172,7 @@ public final class RequestUtils {
 
         List<QueryCriteria> criteriaList = new ArrayList<>();
 
-        for (Map.Entry<String, String[]> entry: paramMap.entrySet()) {
+        for (Map.Entry<String, String[]> entry : paramMap.entrySet()) {
 
             String paramName = entry.getKey();
             String[] paramValue = entry.getValue()[0] != null
@@ -193,7 +183,7 @@ public final class RequestUtils {
                 continue;
             }
 
-            for (Map.Entry<String, QueryParameterDescriptor> e: validParams.entrySet()) {
+            for (Map.Entry<String, QueryParameterDescriptor> e : validParams.entrySet()) {
 
                 QueryParameterDescriptor descriptor = e.getValue();
 
@@ -220,8 +210,9 @@ public final class RequestUtils {
             if (criteria != null) {
                 criteriaList.add(criteria);
             } else {
-                LOGGER.warn(String.format("Unable to map request parameter to available model options: "
-                    + "%s", paramName));
+                LOGGER.warn(
+                    String.format("Unable to map request parameter to available model options: "
+                        + "%s", paramName));
                 throw new InvalidParameterException("Invalid request parameter: " + paramName);
             }
 
@@ -233,16 +224,15 @@ public final class RequestUtils {
 
     /**
      * Extracts the requested included fields parameter from a request.
-     *
-     * @param request
-     * @return
      */
     public static Set<String> getIncludedFieldsFromRequest(HttpServletRequest request) {
         Set<String> fields = new HashSet<>();
-        if (request.getParameterMap().containsKey(ReservedRequestParameters.INCLUDED_FIELDS_PARAMETER)) {
+        if (request.getParameterMap()
+            .containsKey(ReservedRequestParameters.INCLUDED_FIELDS_PARAMETER)) {
             fields = new HashSet<>();
-            String[] params = request.getParameter(ReservedRequestParameters.INCLUDED_FIELDS_PARAMETER).split(",");
-            for (String field: params) {
+            String[] params = request
+                .getParameter(ReservedRequestParameters.INCLUDED_FIELDS_PARAMETER).split(",");
+            for (String field : params) {
                 fields.add(field.trim());
             }
         }
@@ -251,16 +241,15 @@ public final class RequestUtils {
 
     /**
      * Extracts the requested excluded fields parameter from a request.
-     *
-     * @param request
-     * @return
      */
     public static Set<String> getExcludedFieldsFromRequest(HttpServletRequest request) {
         Set<String> exclude = new HashSet<>();
-        if (request.getParameterMap().containsKey(ReservedRequestParameters.EXCLUDED_FIELDS_PARAMETER)) {
+        if (request.getParameterMap()
+            .containsKey(ReservedRequestParameters.EXCLUDED_FIELDS_PARAMETER)) {
             exclude = new HashSet<>();
-            String[] params = request.getParameter(ReservedRequestParameters.EXCLUDED_FIELDS_PARAMETER).split(",");
-            for (String field: params) {
+            String[] params = request
+                .getParameter(ReservedRequestParameters.EXCLUDED_FIELDS_PARAMETER).split(",");
+            for (String field : params) {
                 exclude.add(field.trim());
             }
         }
@@ -269,20 +258,14 @@ public final class RequestUtils {
 
     /**
      * Checks the request parameters for indications of a paged-response request.
-     * 
-     * @param request
-     * @return
      */
     public static boolean isPagedRequest(HttpServletRequest request) {
-        return request.getParameterMap().containsKey(ReservedRequestParameters.PAGE_PARAMETER) 
+        return request.getParameterMap().containsKey(ReservedRequestParameters.PAGE_PARAMETER)
             || request.getParameterMap().containsKey(ReservedRequestParameters.SIZE_PARAMETER);
     }
 
     /**
      * Checks the request parameters for indications of a sorted-response request.
-     *
-     * @param request
-     * @return
      */
     public static boolean isSortableRequest(HttpServletRequest request) {
         return request.getParameterMap().containsKey(ReservedRequestParameters.SORT_PARAMETER);

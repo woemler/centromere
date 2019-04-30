@@ -27,8 +27,8 @@ import org.springframework.security.crypto.codec.Hex;
 import org.springframework.util.Assert;
 
 /**
- * Simple implementation of {@link TokenOperations} that
- *   creates a user authentication token from hashed credentials and authentication time stamps.
+ * Simple implementation of {@link TokenOperations} that creates a user authentication token from
+ * hashed credentials and authentication time stamps.
  *
  * @author woemler
  */
@@ -121,8 +121,6 @@ public class SimpleTokenProvider implements TokenOperations {
 
     /**
      * Sets the lifespan of the token in a time period defined by days.
-     *
-     * @param days
      */
     public void setTokenLifespanDays(Long days) {
         Assert.notNull(days, "Number of days must not be null.");
@@ -134,8 +132,6 @@ public class SimpleTokenProvider implements TokenOperations {
 
     /**
      * Sets the lifespan of the token in a time period defined by hours.
-     *
-     * @param hours
      */
     public void setTokenLifespanHours(Long hours) {
         Assert.notNull(hours, "Number of hours must not be null.");
@@ -147,8 +143,6 @@ public class SimpleTokenProvider implements TokenOperations {
 
     /**
      * Sets the token lifespan.
-     *
-     * @param time
      */
     public void setTokenLifespan(Long time) {
         Assert.notNull(time, "Token lifespan must not be null");
@@ -157,9 +151,6 @@ public class SimpleTokenProvider implements TokenOperations {
 
     /**
      * Creates a {@link TokenDetails} object, based upon submitted {@link UserDetails}.
-     *
-     * @param userDetails
-     * @return
      */
     public TokenDetails createTokenAndDetails(UserDetails userDetails) {
         String token = this.createToken(userDetails);

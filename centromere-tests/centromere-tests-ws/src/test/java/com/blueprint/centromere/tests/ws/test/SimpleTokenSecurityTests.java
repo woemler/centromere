@@ -56,132 +56,137 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 @ActiveProfiles({WebSecurityConfig.SIMPLE_TOKEN_SECURITY_PROFILE})
 @SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection"})
 public class SimpleTokenSecurityTests {
-	
-	@Autowired(required = false) private PasswordEncoder passwordEncoder;
-	@Autowired private UserRepository userRepository;
-	@Autowired(required = false) private SimpleTokenProvider tokenUtils;
-	@Autowired private MockMvc mockMvc;
-	@Autowired(required = false) private UserDetailsService userDetailsService;
-	
-	@Before
-	public void setup() throws Exception {
-		userRepository.deleteAll();
-    User user = (User) userRepository.getModel().newInstance();
-    user.setUsername("user");
-    user.setPassword(passwordEncoder.encode("password"));
-    user.setEnabled(true);
-    user.setAccountNonExpired(true);
-    user.setCredentialsNonExpired(true);
-    user.setAccountNonLocked(true);
-    userRepository.save(user);
-	}
-	
-	@Test
-  public void configurationTest() throws Exception {
-	  Assert.assertNotNull(userDetailsService);
-	  Assert.assertNotNull(userRepository);
-	  Assert.assertTrue(userDetailsService.equals(userRepository));
-	  Assert.assertNotNull(passwordEncoder);
-	  Assert.assertNotNull(tokenUtils);
-  }
 
-	@Test
-	public void nonAuthenticatedGetRequestTest() throws Exception {
-		mockMvc.perform(get("/api/gene"))
-				.andExpect(status().isUnauthorized());
-	}
+    @Autowired(required = false)
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired(required = false)
+    private SimpleTokenProvider tokenUtils;
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired(required = false)
+    private UserDetailsService userDetailsService;
 
-	@Test
-	public void validTokenRequestTest() throws Exception {
-		User user = (User) userRepository.loadUserByUsername("user");
-		Assert.assertNotNull(user);
-		Assert.assertTrue("user".equals(user.getUsername()));
-		TokenDetails tokenDetails = tokenUtils.createTokenAndDetails(user);
-		mockMvc.perform(get("/api/search/gene")
-				.header("X-Auth-Token", tokenDetails.getToken()))
-				.andExpect(status().isOk());
-	}
+    @Before
+    public void setup() throws Exception {
+        userRepository.deleteAll();
+        User user = (User) userRepository.getModel().newInstance();
+        user.setUsername("user");
+        user.setPassword(passwordEncoder.encode("password"));
+        user.setEnabled(true);
+        user.setAccountNonExpired(true);
+        user.setCredentialsNonExpired(true);
+        user.setAccountNonLocked(true);
+        userRepository.save(user);
+    }
 
-	@Test
-	public void badTokenTest() throws Exception {
-		mockMvc.perform(get("/api/gene")
-				.header("X-Auth-Token", "user:23459837145:gwerhg97wr9tgwg"))
-				.andExpect(status().isUnauthorized());
-	}
-	
-	@Test
-	public void invalidUserAuthenticationTest() throws Exception {
-		mockMvc.perform(post("/authenticate")
-				.with(httpBasic("not", "correct")))
-				.andExpect(status().isUnauthorized());
-    mockMvc.perform(get("/api/genes"))
-        .andExpect(status().isUnauthorized());
-	}
+    @Test
+    public void configurationTest() throws Exception {
+        Assert.assertNotNull(userDetailsService);
+        Assert.assertNotNull(userRepository);
+        Assert.assertTrue(userDetailsService.equals(userRepository));
+        Assert.assertNotNull(passwordEncoder);
+        Assert.assertNotNull(tokenUtils);
+    }
 
-	@Test
-	public void invalidPasswordAuthenticationTest() throws Exception {
-		mockMvc.perform(post("/authenticate")
-				.with(httpBasic("user", "notpassword")))
-				.andExpect(status().isUnauthorized());
-    mockMvc.perform(get("/api/genes"))
-        .andExpect(status().isUnauthorized());
-	}
+    @Test
+    public void nonAuthenticatedGetRequestTest() throws Exception {
+        mockMvc.perform(get("/api/gene"))
+            .andExpect(status().isUnauthorized());
+    }
 
-	@Test
-	public void validPasswordAuthenticationTest() throws Exception {
-		mockMvc.perform(post("/authenticate")
-				.with(httpBasic("user", "password")))
-				.andDo(MockMvcResultHandlers.print())
-				.andExpect(status().isOk());
-	}
+    @Test
+    public void validTokenRequestTest() throws Exception {
+        User user = (User) userRepository.loadUserByUsername("user");
+        Assert.assertNotNull(user);
+        Assert.assertTrue("user".equals(user.getUsername()));
+        TokenDetails tokenDetails = tokenUtils.createTokenAndDetails(user);
+        mockMvc.perform(get("/api/search/gene")
+            .header("X-Auth-Token", tokenDetails.getToken()))
+            .andExpect(status().isOk());
+    }
 
-	@Test
-	public void userAuthenticationTest() throws Exception {
-	  
-	  Optional<User> userOptional = userRepository.findByUsername("user");
-	  Assert.assertTrue(userOptional.isPresent());
-	  User user = userOptional.get();
-	  Assert.assertTrue("user".equals(user.getUsername()));
-	  Assert.assertTrue(passwordEncoder.matches("password", user.getPassword()));
+    @Test
+    public void badTokenTest() throws Exception {
+        mockMvc.perform(get("/api/gene")
+            .header("X-Auth-Token", "user:23459837145:gwerhg97wr9tgwg"))
+            .andExpect(status().isUnauthorized());
+    }
 
-    mockMvc.perform(get("/api/gene"))
-        .andExpect(status().isUnauthorized());
-	  
-	  MvcResult result = mockMvc.perform(post("/authenticate")
-        .header("Accept", "application/json")
-				.with(httpBasic("user", "password")))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$", hasKey("token")))
-				.andReturn();
+    @Test
+    public void invalidUserAuthenticationTest() throws Exception {
+        mockMvc.perform(post("/authenticate")
+            .with(httpBasic("not", "correct")))
+            .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/genes"))
+            .andExpect(status().isUnauthorized());
+    }
 
-		String json = result.getResponse().getContentAsString();
-		String token = JsonPath.read(json, "$.token");
+    @Test
+    public void invalidPasswordAuthenticationTest() throws Exception {
+        mockMvc.perform(post("/authenticate")
+            .with(httpBasic("user", "notpassword")))
+            .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/genes"))
+            .andExpect(status().isUnauthorized());
+    }
 
-		mockMvc.perform(get("/api/search/gene")
-				.header("X-Auth-Token", token))
-				.andExpect(status().isOk());
-	}
-	
-	@Test
-  public void actuatorSecurityTest() throws Exception {
-	  
-	  mockMvc.perform(get("/actuator"))
-        .andExpect(status().isUnauthorized());
+    @Test
+    public void validPasswordAuthenticationTest() throws Exception {
+        mockMvc.perform(post("/authenticate")
+            .with(httpBasic("user", "password")))
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(status().isOk());
+    }
 
-    MvcResult result = mockMvc.perform(post("/authenticate")
-        .header("Accept", "application/json")
-        .with(httpBasic("user", "password")))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$", hasKey("token")))
-        .andReturn();
+    @Test
+    public void userAuthenticationTest() throws Exception {
 
-    String json = result.getResponse().getContentAsString();
-    String token = JsonPath.read(json, "$.token");
+        Optional<User> userOptional = userRepository.findByUsername("user");
+        Assert.assertTrue(userOptional.isPresent());
+        User user = userOptional.get();
+        Assert.assertTrue("user".equals(user.getUsername()));
+        Assert.assertTrue(passwordEncoder.matches("password", user.getPassword()));
 
-    mockMvc.perform(get("/actuator")
-        .header("X-Auth-Token", token))
-        .andExpect(status().isOk());
-	  
-  }
-	
+        mockMvc.perform(get("/api/gene"))
+            .andExpect(status().isUnauthorized());
+
+        MvcResult result = mockMvc.perform(post("/authenticate")
+            .header("Accept", "application/json")
+            .with(httpBasic("user", "password")))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasKey("token")))
+            .andReturn();
+
+        String json = result.getResponse().getContentAsString();
+        String token = JsonPath.read(json, "$.token");
+
+        mockMvc.perform(get("/api/search/gene")
+            .header("X-Auth-Token", token))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void actuatorSecurityTest() throws Exception {
+
+        mockMvc.perform(get("/actuator"))
+            .andExpect(status().isUnauthorized());
+
+        MvcResult result = mockMvc.perform(post("/authenticate")
+            .header("Accept", "application/json")
+            .with(httpBasic("user", "password")))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasKey("token")))
+            .andReturn();
+
+        String json = result.getResponse().getContentAsString();
+        String token = JsonPath.read(json, "$.token");
+
+        mockMvc.perform(get("/actuator")
+            .header("X-Auth-Token", token))
+            .andExpect(status().isOk());
+
+    }
+
 }

@@ -27,9 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Basic abstract implementation of {@link RecordWriter}, for writing records to temp files.  
- *   Handles the file object opening and closing in the {@code doBefore} and {@code doAfter}
- *   methods, respectively.
+ * Basic abstract implementation of {@link RecordWriter}, for writing records to temp files. Handles
+ * the file object opening and closing in the {@code doBefore} and {@code doAfter} methods,
+ * respectively.
  *
  * @author woemler
  */
@@ -64,8 +64,8 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
     }
 
     /**
-     * Creates or overwrites an output file, creates a {@link FileWriter} for writing records to the 
-     *   file.
+     * Creates or overwrites an output file, creates a {@link FileWriter} for writing records to the
+     * file.
      *
      * @param tempFile temporary file reference
      */
@@ -80,7 +80,8 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
     }
 
     /**
-     * Flushes outstanding records to the output file and then closes the file and its writer object.
+     * Flushes outstanding records to the output file and then closes the file and its writer
+     * object.
      */
     protected void close() {
         try {
@@ -92,11 +93,11 @@ public abstract class AbstractRecordFileWriter<T extends Model<?>>
     }
 
     /**
-     * Returns the path of the temporary file to be written, if necessary.  Uses the input file's name
-     *   and the pre-determined temp file directory to generate the name, so as to overwrite previous
-     *   jobs' temp file.
+     * Returns the path of the temporary file to be written, if necessary.  Uses the input file's
+     * name and the pre-determined temp file directory to generate the name, so as to overwrite
+     * previous jobs' temp file.
+     *
      * @param inputFile input file object
-     * @return
      */
     @Override
     public File getTempFile(File inputFile) throws DataProcessingException {

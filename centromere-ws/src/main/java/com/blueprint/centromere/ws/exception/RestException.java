@@ -4,8 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.Assert;
 
 /**
- * Base exception class for web services.  Generates a {@link RestError} object, that will be returned
- *   in the HTTP response when the exception is thrown.
+ * Base exception class for web services.  Generates a {@link RestError} object, that will be
+ * returned in the HTTP response when the exception is thrown.
  *
  * @author woemler
  */

@@ -33,15 +33,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
- * Default implementation for the {@link ModelResourceRegistry}, which uses {@link com.blueprint.centromere.core.repository.ModelResource} annotated {@link com.blueprint.centromere.core.repository.ModelRepository} instances 
- *   to define relationships between URIs and resources.  In this implementation, there is assumed 
- *   to be a 1:1 relationship between URIs, model definitions, and repositories.
+ * Default implementation for the {@link ModelResourceRegistry}, which uses {@link
+ * com.blueprint.centromere.core.repository.ModelResource} annotated {@link
+ * com.blueprint.centromere.core.repository.ModelRepository} instances to define relationships
+ * between URIs and resources.  In this implementation, there is assumed to be a 1:1 relationship
+ * between URIs, model definitions, and repositories.
  *
  * @author woemler
  */
 public class DefaultModelResourceRegistry implements ModelResourceRegistry {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultModelRepositoryRegistry.class);
+    private static final Logger LOGGER = LoggerFactory
+        .getLogger(DefaultModelRepositoryRegistry.class);
 
     private final ApplicationContext context;
 
@@ -53,12 +56,14 @@ public class DefaultModelResourceRegistry implements ModelResourceRegistry {
 
     @PostConstruct
     public void afterPropertiesSet() throws ConfigurationException {
-        for (Map.Entry<String, Object> entry: context.getBeansWithAnnotation(ModelResource.class).entrySet()) {
+        for (Map.Entry<String, Object> entry : context.getBeansWithAnnotation(ModelResource.class)
+            .entrySet()) {
             Class<?> type = entry.getValue().getClass();
             ModelRepository repository = (ModelRepository) entry.getValue();
             Class<? extends Model<?>> model = repository.getModel();
             String name = model.getSimpleName().toLowerCase();
-            ModelResource annotation = context.findAnnotationOnBean(entry.getKey(), ModelResource.class);
+            ModelResource annotation = context
+                .findAnnotationOnBean(entry.getKey(), ModelResource.class);
             if (!annotation.name().trim().equals("")) {
                 name = annotation.name().toLowerCase();
             } else if (!annotation.value().trim().equals("")) {
@@ -77,7 +82,7 @@ public class DefaultModelResourceRegistry implements ModelResourceRegistry {
     @Override
     public String getUriByModel(Class<? extends Model<?>> model) throws ModelRegistryException {
         List<String> uris = new ArrayList<>();
-        for (Map.Entry<String, Class<? extends Model<?>>> entry: uriMap.entrySet()) {
+        for (Map.Entry<String, Class<? extends Model<?>>> entry : uriMap.entrySet()) {
             if (model.isAssignableFrom(entry.getValue())) {
                 uris.add(entry.getKey());
             }
@@ -87,8 +92,9 @@ public class DefaultModelResourceRegistry implements ModelResourceRegistry {
         } else if (uris.size() == 1) {
             return uris.get(0);
         } else {
-            throw new ModelRegistryException(String.format("More than one URI applies to model %s.  "
-                + "Is this a superclass with multiple model subclasses?", model.getName()));
+            throw new ModelRegistryException(
+                String.format("More than one URI applies to model %s.  "
+                    + "Is this a superclass with multiple model subclasses?", model.getName()));
         }
     }
 

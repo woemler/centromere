@@ -21,7 +21,7 @@ import springfox.documentation.swagger.common.SwaggerPluginSupport;
 
 /**
  * Springfox plugin for adding {@link Model} query options to the auto-generated Swagger
- *   documentation.
+ * documentation.
  *
  * @author woemler
  * @since 0.4.1
@@ -31,10 +31,10 @@ public class ModelParameterBuilderPlugin implements OperationBuilderPlugin {
     private static final String FIND_METHOD = "find";
     private static final Logger LOGGER = LoggerFactory.getLogger(ModelParameterBuilderPlugin.class);
 
-    @Autowired 
+    @Autowired
     private TypeResolver typeResolver;
-    
-    @Autowired 
+
+    @Autowired
     private ModelResourceRegistry registry;
 
     @Override
@@ -44,8 +44,9 @@ public class ModelParameterBuilderPlugin implements OperationBuilderPlugin {
             Operation operation = context.operationBuilder().build();
             List<Parameter> parameters = operation.getParameters() != null
                 ? operation.getParameters() : new ArrayList<>();
-            for (Class<? extends Model<?>> model: registry.getRegisteredModels() ) {
-                for (QueryParameterDescriptor descriptor: QueryParameterUtil.getAvailableQueryParameters(model).values()) {
+            for (Class<? extends Model<?>> model : registry.getRegisteredModels()) {
+                for (QueryParameterDescriptor descriptor : QueryParameterUtil
+                    .getAvailableQueryParameters(model).values()) {
                     parameters.add(createParameterFromDescriptior(descriptor));
                 }
             }

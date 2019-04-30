@@ -36,7 +36,6 @@ public interface TokenOperations {
     /**
      * Generates a user authentication token and user-visible token details.
      *
-     * @param userDetails
      * @return token details object
      */
     TokenDetails createTokenAndDetails(UserDetails userDetails);

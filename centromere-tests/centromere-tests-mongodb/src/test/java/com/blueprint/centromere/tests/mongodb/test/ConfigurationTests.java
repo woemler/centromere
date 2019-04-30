@@ -39,15 +39,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 })
 public class ConfigurationTests {
 
-  @Autowired(required = false) private ModelRepositoryRegistry repositoryRegistry;
+    @Autowired(required = false)
+    private ModelRepositoryRegistry repositoryRegistry;
 
-  @Test
-  public void modelResourceTest() throws Exception {
-    Assert.assertNotNull(repositoryRegistry);
-    System.out.println(repositoryRegistry.getRegisteredModelRepositories().toString());
-    ModelRepository repository = repositoryRegistry.getRepositoryByModel(MongoGene.class);
-    Assert.assertNotNull(repository);
-    Assert.assertTrue(repository instanceof GeneRepository);
-  }
+    @Test
+    public void modelResourceTest() throws Exception {
+        Assert.assertNotNull(repositoryRegistry);
+        System.out.println(repositoryRegistry.getRegisteredModelRepositories().toString());
+        ModelRepository repository = repositoryRegistry.getRepositoryByModel(MongoGene.class);
+        Assert.assertNotNull(repository);
+        Assert.assertTrue(repository instanceof GeneRepository);
+    }
 
 }

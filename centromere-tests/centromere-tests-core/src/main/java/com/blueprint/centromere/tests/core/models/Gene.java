@@ -32,10 +32,10 @@ public abstract class Gene<I extends Serializable> implements Attributes, Model<
     private Integer entrezGeneId;
     private Integer taxId;
     private String chromosome;
-    @Ignored 
+    @Ignored
     private String chromosomeLocation;
     private String geneType;
-    @Ignored 
+    @Ignored
     private String description;
     private List<String> aliases = new ArrayList<>();
     private Map<String, String> attributes = new HashMap<>();

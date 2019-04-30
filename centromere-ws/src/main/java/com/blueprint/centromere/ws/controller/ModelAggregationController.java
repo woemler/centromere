@@ -66,19 +66,18 @@ public class ModelAggregationController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModelAggregationController.class);
 
-    @Autowired 
+    @Autowired
     private ModelResourceRegistry resourceRegistry;
-    
-    @Autowired 
+
+    @Autowired
     private ModelRepositoryRegistry repositoryRegistry;
 
     @Value("${centromere.web.api.root-url}")
     private String rootUrl;
 
     /**
-     * {@code GET /api/aggregate/{model}/distinct/{field}}
-     * Fetches the distinct values of the model attribute, {@code field}, which fulfill the given
-     *   query options.
+     * {@code GET /api/aggregate/{model}/distinct/{field}} Fetches the distinct values of the model
+     * attribute, {@code field}, which fulfill the given query options.
      *
      * @param field Name of the model attribute to retrieve unique values of.
      * @param request {@link HttpServletRequest}
@@ -93,9 +92,9 @@ public class ModelAggregationController {
     @RequestMapping(
         value = "/{uri}/distinct/{field}",
         method = RequestMethod.GET,
-        produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
+        produces = {ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
             ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
-            MediaType.TEXT_PLAIN_VALUE })
+            MediaType.TEXT_PLAIN_VALUE})
     public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope> findDistinct(
         @PathVariable("field") String field,
         @PathVariable("uri") String uri,
@@ -115,7 +114,8 @@ public class ModelAggregationController {
 
         BeanWrapper wrapper = new BeanWrapperImpl(model);
         if (!wrapper.isReadableProperty(field)) {
-            throw new InvalidParameterException(String.format("Requested field is not a valid model property: %s", field));
+            throw new InvalidParameterException(
+                String.format("Requested field is not a valid model property: %s", field));
         }
 
         ModelRepository<T, I> repository;
@@ -126,7 +126,8 @@ public class ModelAggregationController {
             throw new ResourceNotFoundException();
         }
 
-        List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromFindDistinctRequest(model, request);
+        List<QueryCriteria> queryCriterias = RequestUtils
+            .getQueryCriteriaFromFindDistinctRequest(model, request);
         Set<Object> distinct = repository.distinct(field, queryCriterias);
         ResponseEnvelope envelope = null;
 
@@ -148,9 +149,8 @@ public class ModelAggregationController {
     }
 
     /**
-     * {@code GET /api/aggregate/{model}/count}
-     * Fetches the count of records for the requested model, which fulfill the given
-     *   query options.
+     * {@code GET /api/aggregate/{model}/count} Fetches the count of records for the requested
+     * model, which fulfill the given query options.
      *
      * @param request {@link HttpServletRequest}
      * @return The count of records that satisfy the query.
@@ -164,9 +164,9 @@ public class ModelAggregationController {
     @RequestMapping(
         value = "/{uri}/count",
         method = RequestMethod.GET,
-        produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
+        produces = {ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
             ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
-            MediaType.TEXT_PLAIN_VALUE })
+            MediaType.TEXT_PLAIN_VALUE})
     public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope> count(
         @PathVariable("uri") String uri,
         HttpServletRequest request) {
@@ -192,7 +192,8 @@ public class ModelAggregationController {
             throw new ResourceNotFoundException();
         }
 
-        List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromFindDistinctRequest(model, request);
+        List<QueryCriteria> queryCriterias = RequestUtils
+            .getQueryCriteriaFromFindDistinctRequest(model, request);
         Long count = repository.count(queryCriterias);
         Map<String, Object> responseObject = Collections.singletonMap("count", count);
         ResponseEnvelope envelope;
@@ -212,8 +213,8 @@ public class ModelAggregationController {
     }
 
     /**
-     * {@code GET /api/aggregate/{model}/group/{field}}
-     * Fetches a collection of records, grouped by the requested field.
+     * {@code GET /api/aggregate/{model}/group/{field}} Fetches a collection of records, grouped by
+     * the requested field.
      *
      * @param field Name of the model attribute to group records by.
      * @param request {@link HttpServletRequest}
@@ -228,9 +229,9 @@ public class ModelAggregationController {
     @RequestMapping(
         value = "/{uri}/group/{field}",
         method = RequestMethod.GET,
-        produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
+        produces = {ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
             ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
-            MediaType.TEXT_PLAIN_VALUE })
+            MediaType.TEXT_PLAIN_VALUE})
     public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope> groupBy(
         @PathVariable("field") String field,
         @PathVariable("uri") String uri,
@@ -250,7 +251,8 @@ public class ModelAggregationController {
 
         BeanWrapper wrapper = new BeanWrapperImpl(model);
         if (!wrapper.isReadableProperty(field)) {
-            throw new InvalidParameterException(String.format("Requested field is not a valid model property: %s", field));
+            throw new InvalidParameterException(
+                String.format("Requested field is not a valid model property: %s", field));
         }
 
         ModelRepository<T, I> repository;
@@ -261,9 +263,10 @@ public class ModelAggregationController {
             throw new ResourceNotFoundException();
         }
 
-        List<QueryCriteria> queryCriterias = RequestUtils.getQueryCriteriaFromFindDistinctRequest(model, request);
+        List<QueryCriteria> queryCriterias = RequestUtils
+            .getQueryCriteriaFromFindDistinctRequest(model, request);
         Map<Object, List<T>> grouped = new LinkedHashMap<>();
-        for (T record: repository.find(queryCriterias)) {
+        for (T record : repository.find(queryCriterias)) {
             wrapper = new BeanWrapperImpl(record);
             Object fieldValue = wrapper.getPropertyValue(field);
             List<T> recordList = new ArrayList<>();

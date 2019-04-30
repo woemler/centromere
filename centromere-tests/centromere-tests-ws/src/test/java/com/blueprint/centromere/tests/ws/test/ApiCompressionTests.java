@@ -21,36 +21,37 @@ import org.springframework.test.context.junit4.SpringRunner;
 @AutoConfigureMockMvc(secure = false)
 public class ApiCompressionTests extends AbstractRepositoryTests {
 
-  //private static final String BASE_URL = "/api/gene";
+    //private static final String BASE_URL = "/api/gene";
 
-//  @Autowired
+    //  @Autowired
 //  private MockMvc mockMvc;
-  @Autowired private GeneRepository geneRepository;
+    @Autowired
+    private GeneRepository geneRepository;
 //  @Autowired private Environment environment;
 
-  @Before
-  public void doBefore() throws Exception {
-    geneRepository.deleteAll();
-    for (Integer i = 0; i < 20000; i++) {
-      Gene gene = (Gene) geneRepository.getModel().newInstance();
-      gene.setSymbol("Gene"+i.toString());
-      gene.setEntrezGeneId(i);
-      gene.addAlias("gene"+i.toString());
-      gene.setChromosome("X");
-      gene.setChromosomeLocation("xq1");
-      gene.setDescription("This is a test");
-      gene.setTaxId(9606);
-      gene.setGeneType("fake");
-      geneRepository.insert(gene);
+    @Before
+    public void doBefore() throws Exception {
+        geneRepository.deleteAll();
+        for (Integer i = 0; i < 20000; i++) {
+            Gene gene = (Gene) geneRepository.getModel().newInstance();
+            gene.setSymbol("Gene" + i.toString());
+            gene.setEntrezGeneId(i);
+            gene.addAlias("gene" + i.toString());
+            gene.setChromosome("X");
+            gene.setChromosomeLocation("xq1");
+            gene.setDescription("This is a test");
+            gene.setTaxId(9606);
+            gene.setGeneType("fake");
+            geneRepository.insert(gene);
+        }
     }
-  }
-  
-  @Test
-  public void placeholderTest() {
-    
-  }
 
-  // TODO: find way to enable compression in test.  Right now, doesn't seem to be happening
+    @Test
+    public void placeholderTest() {
+
+    }
+
+    // TODO: find way to enable compression in test.  Right now, doesn't seem to be happening
 //  @Test
 //  public void defaultCompressionTest() throws Exception {
 //

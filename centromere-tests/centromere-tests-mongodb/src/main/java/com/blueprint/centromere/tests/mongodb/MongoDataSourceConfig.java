@@ -32,7 +32,7 @@ import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 /**
  * @author woemler
  */
-@PropertySource({ "classpath:data-source.properties" })
+@PropertySource({"classpath:data-source.properties"})
 @Configuration
 public class MongoDataSourceConfig extends AbstractMongoConfiguration {
 

@@ -22,6 +22,7 @@ package com.blueprint.centromere.core.exceptions;
  * @author woemler
  */
 public class ConfigurationException extends CentromereException {
+
     public ConfigurationException() {
     }
 
