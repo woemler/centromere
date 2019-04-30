@@ -114,7 +114,7 @@
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
-  <groupId>com.blueprint.cbbi</groupId>
+  <groupId>com.blueprintmedicines.cbbi</groupId>
 
   <licenses>
     <license>
