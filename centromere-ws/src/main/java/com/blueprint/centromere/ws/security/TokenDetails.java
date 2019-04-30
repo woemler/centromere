@@ -37,8 +37,8 @@ public class TokenDetails {
     public TokenDetails(String token, String username, Date issueDate, Date expirationDate) {
         this.token = token;
         this.username = username;
-        this.issued = issueDate;
-        this.expires = expirationDate;
+        this.issued = new Date(issueDate.getTime());
+        this.expires = new Date(expirationDate.getTime());
     }
 
     public String getToken() {
@@ -58,18 +58,18 @@ public class TokenDetails {
     }
 
     public Date getIssued() {
-        return issued;
+        return new Date(issued.getTime());
     }
 
     public void setIssued(Date issued) {
-        this.issued = issued;
+        this.issued = new Date(issued.getTime());
     }
 
     public Date getExpires() {
-        return expires;
+        return new Date(expires.getTime());
     }
 
     public void setExpires(Date expires) {
-        this.expires = expires;
+        this.expires = new Date(expires.getTime());
     }
 }

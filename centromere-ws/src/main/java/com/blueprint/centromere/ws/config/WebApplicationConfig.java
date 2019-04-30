@@ -173,17 +173,16 @@ public class WebApplicationConfig {
 
             HttpServletRequest request = (HttpServletRequest) nativeWebRequest.getNativeRequest();
             Map<String, String[]> paramMap = request.getParameterMap();
-            if (!paramMap.containsKey(pageParameterName)
-                && !paramMap.containsKey(sizeParameterName)
-                && !paramMap.containsKey(sortParameterName)) {
-                return null;
-            }
 
             Integer page = 0;
             Integer size = defaultPageSize;
             Sort sort = null;
 
-            if (paramMap.containsKey(sortParameterName)
+            if (!paramMap.containsKey(pageParameterName)
+                && !paramMap.containsKey(sizeParameterName)
+                && !paramMap.containsKey(sortParameterName)) {
+                return PageRequest.of(page, size);
+            } else if (paramMap.containsKey(sortParameterName)
                 && paramMap.get(sortParameterName).length > 0
                 && !"".equals(paramMap.get(sortParameterName)[0].trim())) {
                 String sortParam = paramMap.get(sortParameterName)[0].trim();
