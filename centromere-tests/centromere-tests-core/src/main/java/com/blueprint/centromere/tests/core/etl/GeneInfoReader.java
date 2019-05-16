@@ -32,7 +32,7 @@ public class GeneInfoReader<T extends Gene<?>> extends StandardFileRecordReader<
         gene.setTaxId(Integer.parseInt(line.get(0)));
         gene.setEntrezGeneId(Integer.parseInt(line.get(1)));
         gene.setSymbol(line.get(2));
-        for (String alias: line.get(4).split("\\|")) {
+        for (String alias : line.get(4).split("\\|")) {
             if (!alias.replaceAll("-", "").equals("")) {
                 gene.addAlias(alias);
             }

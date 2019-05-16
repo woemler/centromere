@@ -27,8 +27,8 @@ import java.io.File;
 public interface TempFileWriter {
 
     /**
-     * Generates a temporary file to be written by the writer component.  Allows
-     *   the component and external objects to reference a temporary file.
+     * Generates a temporary file to be written by the writer component.  Allows the component and
+     * external objects to reference a temporary file.
      *
      * @param inputFile input file object
      * @return temporary file object

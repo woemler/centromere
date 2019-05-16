@@ -33,9 +33,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 /**
- * Registry bean for mapping input file data types to their appropriate
- *   {@link DataProcessor} beans.  Uses the {@link DataTypes} annotation of existing processor
- *   classes to identify valid beans.
+ * Registry bean for mapping input file data types to their appropriate {@link DataProcessor} beans.
+ * Uses the {@link DataTypes} annotation of existing processor classes to identify valid beans.
  *
  * @author woemler
  * @since 0.5.0
@@ -63,8 +62,9 @@ public class ModelProcessorBeanRegistry<T extends DataProcessor<?>>
     }
 
     /**
-     * Adds a mapping for the submitted {@link DataProcessor} bean, associating it with any annotated
-     *   data types (found in {@link DataTypes} annotations), and it's target {@link Model} type.
+     * Adds a mapping for the submitted {@link DataProcessor} bean, associating it with any
+     * annotated data types (found in {@link DataTypes} annotations), and it's target {@link Model}
+     * type.
      *
      * @param component data processor bean
      */
@@ -91,8 +91,10 @@ public class ModelProcessorBeanRegistry<T extends DataProcessor<?>>
                         dataTypeDescriptionMap.put(dataType, dataTypes.description().equals("")
                             ? "No description given." : dataTypes.description());
                         modelMap.put(dataType, model);
-                        LOGGER.debug(String.format("Registering DataProcessor bean %s for data type %s for "
-                            + "model %s", component.getClass().getName(), dataType, model.getName()));
+                        LOGGER.debug(
+                            String.format("Registering DataProcessor bean %s for data type %s for "
+                                    + "model %s", component.getClass().getName(), dataType,
+                                model.getName()));
                     }
                 } else {
                     LOGGER.warn(String.format("DataProcessor %s DataTypes annotation is empty.",
@@ -125,7 +127,7 @@ public class ModelProcessorBeanRegistry<T extends DataProcessor<?>>
 
     /**
      * For each bean in the context, adds it to the registry if it is a {@link DataProcessor}
-     *   instance.
+     * instance.
      *
      * @param bean bean to register
      * @param beanName name of the bean
@@ -136,29 +138,30 @@ public class ModelProcessorBeanRegistry<T extends DataProcessor<?>>
     public Object postProcessAfterInitialization(Object bean, String beanName)
         throws BeansException {
         LOGGER.debug(String.format("Checking bean: %s", beanName));
-        if (DataProcessor.class.isInstance(bean)) {
+        if (bean instanceof DataProcessor) {
             this.registerBean((T) bean);
         }
         return bean;
     }
 
     /**
-     * Scans the {@link ApplicationContext} for instances of {@link DataProcessor} beans and 
-     *   registers them.
+     * Scans the {@link ApplicationContext} for instances of {@link DataProcessor} beans and
+     * registers them.
      */
     @SuppressWarnings("unchecked")
     public void addProcessorBeans() {
         List<T> foundBeans = new ArrayList<>();
-        for (Map.Entry entry:
+        for (Map.Entry entry :
             applicationContext.getBeansOfType(DataProcessor.class, false, false).entrySet()) {
             T bean = (T) entry.getValue();
             if (bean != null && bean.getModel() != null) {
                 foundBeans.add(bean);
             } else {
-                LOGGER.warn(String.format("Found bean is null or has no set model: %s", entry.getKey()));
+                LOGGER.warn(
+                    String.format("Found bean is null or has no set model: %s", entry.getKey()));
             }
         }
-        for (T bean: foundBeans) {
+        for (T bean : foundBeans) {
             registerBean(bean);
             LOGGER.info(String.format("Registered DataProcessor bean %s for model %s",
                 bean.getClass().getName(), bean.getModel().getName()));
@@ -172,7 +175,7 @@ public class ModelProcessorBeanRegistry<T extends DataProcessor<?>>
 
     /**
      * Tests to see if the submitted {@link Model} has an associated {@link DataProcessor}
-     *   registered.
+     * registered.
      *
      * @param model model to check the registry for
      * @return true if the model exists in the registry.
@@ -190,7 +193,7 @@ public class ModelProcessorBeanRegistry<T extends DataProcessor<?>>
     @Override
     public Collection<T> getRegisteredDataProcessors() {
         Set<T> processors = new HashSet<>();
-        for (List<T> processor: modelProcessorMap.values()) {
+        for (List<T> processor : modelProcessorMap.values()) {
             processors.addAll(processor);
         }
         return new ArrayList<>(processors);
@@ -207,8 +210,8 @@ public class ModelProcessorBeanRegistry<T extends DataProcessor<?>>
     }
 
     /**
-     * Returns a list of {@link Model} types that have associated {@link DataProcessor} beans 
-     *   registered.
+     * Returns a list of {@link Model} types that have associated {@link DataProcessor} beans
+     * registered.
      *
      * @return list of models.
      */

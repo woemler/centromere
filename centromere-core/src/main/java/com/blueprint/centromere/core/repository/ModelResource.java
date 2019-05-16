@@ -22,13 +22,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * {@link ModelRepository} instances with this annotation are marked as being eligible for being 
- *   automatically exposed in REST web services as a 
- *   {@link com.blueprint.centromere.core.model.Model} resource. The {@link #value()} and 
- *   {@link #name()} attributes can be used interchangibly, to name the resource in API 
- *   documentation and generate a URI for accessing the resource. By setting the {@link #ignored()}
- *   value to {@code true}, the repository should not be exposed as a public REST resource, but a 
- *   repository bean should still be created.
+ * {@link ModelRepository} instances with this annotation are marked as being eligible for being
+ * automatically exposed in REST web services as a {@link com.blueprint.centromere.core.model.Model}
+ * resource. The {@link #value()} and {@link #name()} attributes can be used interchangibly, to name
+ * the resource in API documentation and generate a URI for accessing the resource. By setting the
+ * {@link #ignored()} value to {@code true}, the repository should not be exposed as a public REST
+ * resource, but a repository bean should still be created.
  *
  * @author woemler
  */
@@ -37,24 +36,18 @@ import java.lang.annotation.Target;
 public @interface ModelResource {
 
     /**
-     * Resource name and URI to be assigned in web services.  Will be used if {@link #name()} is 
-     *   empty.
-     *
-     * @return
+     * Resource name and URI to be assigned in web services.  Will be used if {@link #name()} is
+     * empty.
      */
     String value() default "";
 
     /**
      * Resource name and URI to be assigned in web services.
-     *
-     * @return
      */
     String name() default "";
 
     /**
      * When set to {@code true}, the repository should be ignored by web services.
-     *
-     * @return
      */
     boolean ignored() default false;
 

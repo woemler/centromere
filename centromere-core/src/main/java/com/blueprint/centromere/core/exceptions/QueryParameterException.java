@@ -17,8 +17,8 @@
 package com.blueprint.centromere.core.exceptions;
 
 /**
- * Generic exception to alert mishandling of query parameter generation, mapping, conversion, or 
- *   execution.
+ * Generic exception to alert mishandling of query parameter generation, mapping, conversion, or
+ * execution.
  *
  * @author woemler
  * @since 0.4.0

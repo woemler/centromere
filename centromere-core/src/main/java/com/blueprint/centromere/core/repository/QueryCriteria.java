@@ -18,8 +18,8 @@ package com.blueprint.centromere.core.repository;
 
 
 /**
- * Simple representation of a database query evaluation that can be passed to generic 
- * {@link ModelRepository} implementations.
+ * Simple representation of a database query evaluation that can be passed to generic {@link
+ * ModelRepository} implementations.
  *
  * @author woemler
  */
@@ -86,5 +86,5 @@ public class QueryCriteria {
             + ", evaluation=" + evaluation
             + '}';
     }
-    
+
 }

@@ -21,9 +21,9 @@ import java.util.List;
 
 /**
  * List of evaluations that all {@link ModelRepository} implementations should be able to support
- *   via {@link QueryCriteria} queries. Some evaluations are naturally restricted to certain data
- *   types. The evaluation suffixes are used to create dynamic query options by merging the 
- *   model field name and the appropriate evaluation suffix.
+ * via {@link QueryCriteria} queries. Some evaluations are naturally restricted to certain data
+ * types. The evaluation suffixes are used to create dynamic query options by merging the model
+ * field name and the appropriate evaluation suffix.
  *
  * @author woemler
  * @since 0.5.0
@@ -48,8 +48,7 @@ public enum Evaluation {
     IS_NULL,
     NOT_NULL,
     IS_TRUE,
-    IS_FALSE
-    ;
+    IS_FALSE;
 
     public static final String EQUALS_SUFFIX = "Equals";
     public static final String IN_SUFFIX = "In";
@@ -81,10 +80,9 @@ public enum Evaluation {
     );
 
     /**
-     * Determines the {@link Evaluation} to be used from the suffix of the query parameter. 
+     * Determines the {@link Evaluation} to be used from the suffix of the query parameter.
      *
      * @param suffix parameter suffix
-     * @return
      */
     public static Evaluation fromSuffix(String suffix) {
         if (EQUALS_SUFFIX.equals(suffix)) {

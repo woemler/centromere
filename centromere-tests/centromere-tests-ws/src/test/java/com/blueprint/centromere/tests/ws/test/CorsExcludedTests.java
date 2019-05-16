@@ -16,14 +16,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 @AutoConfigureMockMvc(secure = false)
 public class CorsExcludedTests {
 
-  //@Autowired private MockMvc mockMvc;
+    //@Autowired private MockMvc mockMvc;
 
-  @Test
-  public void placeholderTest() {
-    
-  }
-  
-  //TODO: Find way to mock cross-origin request. Right now, request is always successful.
+    @Test
+    public void placeholderTest() {
+
+    }
+
+    //TODO: Find way to mock cross-origin request. Right now, request is always successful.
 //  @Test
 //  public void corsDisabledTest() throws Exception {
 //    mockMvc.perform(options("/api/genes")
@@ -31,5 +31,5 @@ public class CorsExcludedTests {
 //        .header("Origin", "http://www.someurl.com"))
 //        .andExpect(status().is4xxClientError());
 //  }
-  
+
 }

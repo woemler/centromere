@@ -16,26 +16,27 @@ import springfox.documentation.swagger.common.SwaggerPluginSupport;
  */
 public class ResponseModelBuilderPlugin implements ModelBuilderPlugin {
 
-    @Autowired 
+    @Autowired
     private ModelResourceRegistry registry;
-    
-    @Autowired 
+
+    @Autowired
     private TypeResolver typeResolver;
-    
-    @Autowired 
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @Override
     public void apply(ModelContext modelContext) {
         ModelBuilder builder = modelContext.getBuilder();
-        for (Class<?> model: registry.getRegisteredModels()) {
+        for (Class<?> model : registry.getRegisteredModels()) {
             try {
                 builder
                     .type(typeResolver.resolve(model))
                     .name(model.getSimpleName())
                     .baseModel(model.getSimpleName())
                     .description(String.format("Response model for %s", model.getSimpleName()))
-                    .example(objectMapper.writeValueAsString(new BeanWrapperImpl(model).getWrappedInstance()))
+                    .example(objectMapper
+                        .writeValueAsString(new BeanWrapperImpl(model).getWrappedInstance()))
                     .id(model.getSimpleName())
                     .build();
             } catch (Exception e) {

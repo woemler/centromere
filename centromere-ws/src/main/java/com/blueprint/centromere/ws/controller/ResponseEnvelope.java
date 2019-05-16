@@ -16,14 +16,13 @@
 
 package com.blueprint.centromere.ws.controller;
 
-import com.blueprint.centromere.ws.config.FilteringJackson2HttpMessageConverter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Wrapper for GET request responses to allow for field filtering via 
- *   {@link FilteringJackson2HttpMessageConverter}
+ * Wrapper for GET request responses to allow for field filtering via {@link
+ * com.blueprint.centromere.ws.config.FilteringJackson2HttpMessageConverter}
  *
  * @author woemler
  */

@@ -27,7 +27,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString(callSuper = true)
 public class MongoDataSet extends DataSet<String> {
 
-    @Id 
+    @Id
     private String id;
 
 }

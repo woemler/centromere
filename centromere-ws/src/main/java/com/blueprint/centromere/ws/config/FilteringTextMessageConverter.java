@@ -19,6 +19,7 @@ package com.blueprint.centromere.ws.config;
 import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.ws.controller.FilterableResource;
 import com.blueprint.centromere.ws.controller.ResponseEnvelope;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -42,14 +43,14 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 
 /**
  * Message converter that takes web service response data and converts it to delimited-text in a
- *   tabular format.  Supports field filtering using {@link ResponseEnvelope} attributes.
+ * tabular format.  Supports field filtering using {@link ResponseEnvelope} attributes.
  *
  * @author woemler
  */
 public class FilteringTextMessageConverter extends AbstractHttpMessageConverter<Object> {
 
-    private String delimiter = "\t";
     private final MediaType mediaType;
+    private String delimiter = "\t";
 
     public FilteringTextMessageConverter(MediaType supportedMediaType, String delimiter) {
         super(supportedMediaType);
@@ -84,6 +85,7 @@ public class FilteringTextMessageConverter extends AbstractHttpMessageConverter<
     }
 
     @Override
+    @SuppressFBWarnings(value = "DM_DEFAULT_ENCODING", justification = "Default of UTF16 is fine.")
     protected void writeInternal(Object o, HttpOutputMessage httpOutputMessage)
         throws IOException, HttpMessageNotWritableException {
 
@@ -111,7 +113,7 @@ public class FilteringTextMessageConverter extends AbstractHttpMessageConverter<
         }
 
         // Iterate through the object collection
-        for (Object entity: (Collection<?>) obj) {
+        for (Object entity : (Collection<?>) obj) {
 
             String entityString;
             Class<?> currentClass;
@@ -185,7 +187,7 @@ public class FilteringTextMessageConverter extends AbstractHttpMessageConverter<
             showHeader = false;
 
         }
-        
+
         writer.close();
 
     }

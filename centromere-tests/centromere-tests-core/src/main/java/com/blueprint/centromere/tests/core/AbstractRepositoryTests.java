@@ -42,22 +42,22 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  */
 public abstract class AbstractRepositoryTests {
 
-    @Autowired 
+    @Autowired
     private GeneRepository geneRepository;
-    
-    @Autowired 
+
+    @Autowired
     private DataSetRepository dataSetRepository;
-    
-    @Autowired 
+
+    @Autowired
     private DataFileRepository dataFileRepository;
-    
-    @Autowired 
+
+    @Autowired
     private SampleRepository sampleRepository;
-    
-    @Autowired 
+
+    @Autowired
     private GeneExpressionRepository geneExpressionRepository;
-    
-    @Autowired 
+
+    @Autowired
     private UserRepository userRepository;
 
     @Before
@@ -223,7 +223,8 @@ public abstract class AbstractRepositoryTests {
 
         dataFileRepository.insert(dataFiles);
 
-        dataSetA.setDataFileIds(Arrays.asList(dataFileA.getId(), dataFileB.getId(), dataFileC.getId()));
+        dataSetA
+            .setDataFileIds(Arrays.asList(dataFileA.getId(), dataFileB.getId(), dataFileC.getId()));
         dataSetB.setDataFileIds(Arrays.asList(dataFileD.getId(), dataFileE.getId()));
         dataSetRepository.update(dataSetA);
         dataSetRepository.update(dataSetB);
@@ -290,7 +291,7 @@ public abstract class AbstractRepositoryTests {
         sampleRepository.insert(samples);
 
         List<Serializable> sampleIds = new ArrayList<>();
-        for (Sample sample: samples) {
+        for (Sample sample : samples) {
             sampleIds.add(sample.getId());
         }
 
@@ -301,7 +302,8 @@ public abstract class AbstractRepositoryTests {
 
         List<GeneExpression> data = new ArrayList<>();
 
-        GeneExpression geneExpression = (GeneExpression) geneExpressionRepository.getModel().newInstance();
+        GeneExpression geneExpression = (GeneExpression) geneExpressionRepository.getModel()
+            .newInstance();
         geneExpression.setSampleId(sampleA.getId());
         geneExpression.setGeneId(geneA.getId());
         geneExpression.setDataFileId(dataFileA.getId());

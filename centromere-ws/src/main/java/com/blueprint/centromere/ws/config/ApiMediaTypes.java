@@ -18,7 +18,8 @@ public final class ApiMediaTypes {
     public static final String APPLICATION_HAL_XML_VALUE = "application/hal+xml";
     public static final MediaType APPLICATION_HAL_XML = new MediaType("application", "hal+xml");
     public static final String TEXT_PLAIN_UTF8_VALUE = "text/plain; charset=utf-8";
-    public static final MediaType TEXT_PLAIN_UTF8 = new MediaType("text", "plain", Charset.forName("utf-8"));
+    public static final MediaType TEXT_PLAIN_UTF8 = new MediaType("text", "plain",
+        Charset.forName("utf-8"));
 
     public static final String[] ACCEPTED_MEDIA_TYPE_VALUES = {
         APPLICATION_HAL_JSON_VALUE, APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_JSON_VALUE,
@@ -65,7 +66,8 @@ public final class ApiMediaTypes {
 
     public static List<String> getAllResponseTypeValues() {
         return Arrays.asList(APPLICATION_HAL_JSON_VALUE, APPLICATION_HAL_XML_VALUE,
-            MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, TEXT_PLAIN_UTF8_VALUE);
+            MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE,
+            TEXT_PLAIN_UTF8_VALUE);
     }
 
     public static List<String> getAllAcceptTypeValues() {

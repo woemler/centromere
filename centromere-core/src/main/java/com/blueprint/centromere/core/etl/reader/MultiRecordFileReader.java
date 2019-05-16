@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Simple text file reader that parses multiple records from a single line.  The identification of 
- *   the records in each line is assumed to come from the header row, which is parsed and stored 
- *   when encountered in the {@code parseHeader} method.  The {@code readRecord} method can extract 
- *   multiple records from a single line and return them one-at-a-time, consistent with standard 
- *   record reader.
+ * Simple text file reader that parses multiple records from a single line.  The identification of
+ * the records in each line is assumed to come from the header row, which is parsed and stored when
+ * encountered in the {@code parseHeader} method.  The {@code readRecord} method can extract
+ * multiple records from a single line and return them one-at-a-time, consistent with standard
+ * record reader.
  *
  * @author woemler
  * @since 0.4.3
@@ -91,7 +91,7 @@ public abstract class MultiRecordFileReader<T extends Model<?>>
     }
 
     /**
-     * Extracts the column names from the header line in the file. 
+     * Extracts the column names from the header line in the file.
      *
      * @param line input line bits.
      */
@@ -110,8 +110,8 @@ public abstract class MultiRecordFileReader<T extends Model<?>>
     }
 
     /**
-     * Extracts multiple records from a single line of the text file.  If no valid records are found, 
-     *   an empty list should be returned. 
+     * Extracts multiple records from a single line of the text file.  If no valid records are
+     * found, an empty list should be returned.
      *
      * @param line input line bits
      * @return a list of model objects

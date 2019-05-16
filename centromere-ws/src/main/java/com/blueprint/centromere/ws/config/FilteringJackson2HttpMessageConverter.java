@@ -34,8 +34,8 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
 /**
- * Uses {@link ResponseEnvelope} to identify filterable entities and
- *   filters or includes fields based upon request options.
+ * Uses {@link ResponseEnvelope} to identify filterable entities and filters or includes fields
+ * based upon request options.
  *
  * @author woemler
  */
@@ -53,7 +53,8 @@ public class FilteringJackson2HttpMessageConverter extends
 
         ObjectMapper objectMapper = getObjectMapper();
         JsonEncoding encoding = this.getJsonEncoding(outputMessage.getHeaders().getContentType());
-        JsonGenerator jsonGenerator = objectMapper.getFactory().createGenerator(outputMessage.getBody(), encoding);
+        JsonGenerator jsonGenerator = objectMapper.getFactory()
+            .createGenerator(outputMessage.getBody(), encoding);
 
         try {
 
@@ -73,11 +74,13 @@ public class FilteringJackson2HttpMessageConverter extends
                         includedFields.add("content"); // Don't filter out the wrapped content.
                     }
                     filters = new SimpleFilterProvider()
-                        .addFilter("fieldFilter", SimpleBeanPropertyFilter.filterOutAllExcept(includedFields))
+                        .addFilter("fieldFilter",
+                            SimpleBeanPropertyFilter.filterOutAllExcept(includedFields))
                         .setFailOnUnknownId(false);
                 } else if (excludedFields != null && !excludedFields.isEmpty()) {
                     filters = new SimpleFilterProvider()
-                        .addFilter("fieldFilter", SimpleBeanPropertyFilter.serializeAllExcept(excludedFields))
+                        .addFilter("fieldFilter",
+                            SimpleBeanPropertyFilter.serializeAllExcept(excludedFields))
                         .setFailOnUnknownId(false);
                 } else {
                     filters = new SimpleFilterProvider()

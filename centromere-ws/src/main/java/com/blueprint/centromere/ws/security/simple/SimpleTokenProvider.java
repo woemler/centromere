@@ -18,6 +18,7 @@ package com.blueprint.centromere.ws.security.simple;
 
 import com.blueprint.centromere.ws.security.TokenDetails;
 import com.blueprint.centromere.ws.security.TokenOperations;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
@@ -27,8 +28,8 @@ import org.springframework.security.crypto.codec.Hex;
 import org.springframework.util.Assert;
 
 /**
- * Simple implementation of {@link TokenOperations} that
- *   creates a user authentication token from hashed credentials and authentication time stamps.
+ * Simple implementation of {@link TokenOperations} that creates a user authentication token from
+ * hashed credentials and authentication time stamps.
  *
  * @author woemler
  */
@@ -66,6 +67,7 @@ public class SimpleTokenProvider implements TokenOperations {
      * @param expires timestamp (in milliseconds) when the token expires.
      * @return string representation of the hash
      */
+    @SuppressFBWarnings(value = "DM_DEFAULT_ENCODING", justification = "Default of UTF16 is fine.")
     private String computeSignature(UserDetails userDetails, long expires) {
 
         StringBuilder signatureBuilder = new StringBuilder();
@@ -83,7 +85,6 @@ public class SimpleTokenProvider implements TokenOperations {
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("No MD5 algorithm available!");
         }
-
         return new String(Hex.encode(digest.digest(signatureBuilder.toString().getBytes())));
 
     }
@@ -121,8 +122,6 @@ public class SimpleTokenProvider implements TokenOperations {
 
     /**
      * Sets the lifespan of the token in a time period defined by days.
-     *
-     * @param days
      */
     public void setTokenLifespanDays(Long days) {
         Assert.notNull(days, "Number of days must not be null.");
@@ -134,8 +133,6 @@ public class SimpleTokenProvider implements TokenOperations {
 
     /**
      * Sets the lifespan of the token in a time period defined by hours.
-     *
-     * @param hours
      */
     public void setTokenLifespanHours(Long hours) {
         Assert.notNull(hours, "Number of hours must not be null.");
@@ -147,8 +144,6 @@ public class SimpleTokenProvider implements TokenOperations {
 
     /**
      * Sets the token lifespan.
-     *
-     * @param time
      */
     public void setTokenLifespan(Long time) {
         Assert.notNull(time, "Token lifespan must not be null");
@@ -157,9 +152,6 @@ public class SimpleTokenProvider implements TokenOperations {
 
     /**
      * Creates a {@link TokenDetails} object, based upon submitted {@link UserDetails}.
-     *
-     * @param userDetails
-     * @return
      */
     public TokenDetails createTokenAndDetails(UserDetails userDetails) {
         String token = this.createToken(userDetails);

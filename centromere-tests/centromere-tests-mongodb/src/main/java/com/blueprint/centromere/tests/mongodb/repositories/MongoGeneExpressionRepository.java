@@ -26,5 +26,5 @@ import com.blueprint.centromere.tests.mongodb.models.MongoGeneExpression;
 @ModelResource("geneexpression")
 public interface MongoGeneExpressionRepository extends
     GeneExpressionRepository<MongoGeneExpression, String> {
-  
+
 }

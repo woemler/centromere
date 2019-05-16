@@ -24,9 +24,9 @@ import java.io.File;
 import java.util.Map;
 
 /**
- * Core data import component interface.  Defines the API for handling the processing of a single 
- *   file. This API makes no assumptions about what the final state of the input data should be, 
- *   but rather provides a framework for steps in processing data.
+ * Core data import component interface.  Defines the API for handling the processing of a single
+ * file. This API makes no assumptions about what the final state of the input data should be, but
+ * rather provides a framework for steps in processing data.
  *
  * @author woemler
  * @since 0.6.0

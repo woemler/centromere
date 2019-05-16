@@ -22,14 +22,14 @@ import java.util.Collection;
 
 /**
  * Bean for registering associations between {@link Model} classes and their {@link ModelRepository}
- *   implementations, and for fetching the associated types and beans.
+ * implementations, and for fetching the associated types and beans.
  *
  * @author woemler
  */
 public interface ModelRepositoryRegistry {
 
     /**
-     * Tests whether the given class represents a registered {@link Model} resource. 
+     * Tests whether the given class represents a registered {@link Model} resource.
      *
      * @param type model type
      * @return true if model is registered
@@ -38,7 +38,7 @@ public interface ModelRepositoryRegistry {
 
     /**
      * Retrieves the {@link ModelRepository} instance associated with the registered {@link Model}
-     *   class.
+     * class.
      *
      * @param model model type
      * @return instance of the repository
@@ -48,8 +48,8 @@ public interface ModelRepositoryRegistry {
         throws ModelRegistryException;
 
     /**
-     * Retrieves a collection of all {@link ModelRepository} instances associated with all registered 
-     *   {@link Model} classes.
+     * Retrieves a collection of all {@link ModelRepository} instances associated with all
+     * registered {@link Model} classes.
      *
      * @return all registered repositories
      */

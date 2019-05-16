@@ -19,11 +19,10 @@ package com.blueprint.centromere.core.model;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.beans.BeanWrapper;
 
 /**
- * Utility methods used for data import classes that depend upon 
- *   {@link com.blueprint.centromere.core.model.Model} reflection.
+ * Utility methods used for data import classes that depend upon {@link
+ * com.blueprint.centromere.core.model.Model} reflection.
  *
  * @author woemler
  * @since 0.5.0
@@ -34,8 +33,8 @@ public final class ModelReflectionUtils {
     }
 
     /**
-     * Tests whether a given field is persistable.  Allows supplying a list of extra fields to be 
-     *   ignored.
+     * Tests whether a given field is persistable.  Allows supplying a list of extra fields to be
+     * ignored.
      *
      * @param field reflected field.
      * @param ignoredFields list of field names to ignore.
@@ -57,8 +56,8 @@ public final class ModelReflectionUtils {
     }
 
     /**
-     * Returns a list of field names used to access field values in a model wrapped with 
-     *   {@link BeanWrapper}. Allows specified fields to be skipped.
+     * Returns a list of field names used to access field values in a model wrapped with
+     * BeanWrapper. Allows specified fields to be skipped.
      *
      * @param model model class
      * @param ignoredFields field to be ignored
@@ -81,8 +80,7 @@ public final class ModelReflectionUtils {
     }
 
     /**
-     * Returns a list of field names used to access field values in a model wrapped with 
-     *   {@link BeanWrapper}.
+     * Returns a list of field names used to access field values in a model wrapped with BeanWrapper.
      *
      * @param model model class
      * @return list of fields
@@ -92,9 +90,9 @@ public final class ModelReflectionUtils {
     }
 
     /**
-     * Returns a collection of {@link Field} objects for all attributes of the requested type that 
-     *   are annotated with {@link Linked}, representing relationships between multiple 
-     *   {@link Model}.
+     * Returns a collection of {@link Field} objects for all attributes of the requested type that
+     * are annotated with {@link Linked}, representing relationships between multiple {@link
+     * Model}.
      *
      * @param model model to inspect
      * @return list of fields with annotations
@@ -103,7 +101,7 @@ public final class ModelReflectionUtils {
         List<Field> fields = new ArrayList<>();
         Class<?> currentClass = model;
         while (currentClass.getSuperclass() != null) {
-            for (Field field: currentClass.getDeclaredFields()) {
+            for (Field field : currentClass.getDeclaredFields()) {
                 if (field.isAnnotationPresent(Linked.class)) {
                     fields.add(field);
                 }
@@ -114,8 +112,8 @@ public final class ModelReflectionUtils {
     }
 
     /**
-     * Returns a list of {@link Field} objects with {@link Linked} annotations found present with 
-     *   matching relationship names.
+     * Returns a list of {@link Field} objects with {@link Linked} annotations found present with
+     * matching relationship names.
      *
      * @param model model to inspect
      * @param rel relationship name
@@ -123,7 +121,7 @@ public final class ModelReflectionUtils {
      */
     public static List<Field> getLinkedAnnotationsFromRelName(Class<?> model, String rel) {
         List<Field> list = new ArrayList<>();
-        for (Field field: getLinkedModelFields(model)) {
+        for (Field field : getLinkedModelFields(model)) {
             if (field.isAnnotationPresent(Linked.class)) {
                 Linked linked = field.getAnnotation(Linked.class);
                 if (rel.toLowerCase().equals(linked.rel().toLowerCase())) {
@@ -133,5 +131,5 @@ public final class ModelReflectionUtils {
         }
         return list;
     }
-    
+
 }

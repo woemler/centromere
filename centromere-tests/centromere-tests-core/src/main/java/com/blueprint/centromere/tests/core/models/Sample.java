@@ -27,8 +27,8 @@ import java.util.Map;
 import lombok.Data;
 
 /**
- * Model for representing biological samples in analyses.  It is presumed that a single sample can 
- *   be used in one or more analyses and be a part of one or more {@link DataSet} instances.
+ * Model for representing biological samples in analyses.  It is presumed that a single sample can
+ * be used in one or more analyses and be a part of one or more {@link DataSet} instances.
  *
  * @author woemler
  */
@@ -42,7 +42,7 @@ public abstract class Sample<I extends Serializable> implements Model<I>, Attrib
     private String gender;
     private String tissue;
     private String histology;
-    @Ignored 
+    @Ignored
     private String notes;
     private Map<String, String> attributes = new HashMap<>();
     private List<String> aliases = new ArrayList<>();
@@ -74,7 +74,7 @@ public abstract class Sample<I extends Serializable> implements Model<I>, Attrib
     }
 
     public void addAliases(Collection<String> aliases) {
-        for (String alias: aliases) {
+        for (String alias : aliases) {
             if (!this.aliases.contains(alias)) {
                 this.aliases.add(alias);
             }

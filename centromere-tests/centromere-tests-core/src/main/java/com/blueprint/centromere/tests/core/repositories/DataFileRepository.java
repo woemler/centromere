@@ -27,14 +27,15 @@ import org.springframework.data.repository.NoRepositoryBean;
  * @author woemler
  */
 @NoRepositoryBean
-public interface DataFileRepository<T extends DataFile<I>, I extends Serializable> extends ModelRepository<T, I> {
-    
+public interface DataFileRepository<T extends DataFile<I>, I extends Serializable> extends
+    ModelRepository<T, I> {
+
     Optional<T> findByFilePath(String filePath);
-    
+
     List<T> findByDataType(String dataType);
-    
+
     List<T> findByDataSetId(String dataSetId);
-    
+
     List<T> findByModel(String model);
-    
+
 }

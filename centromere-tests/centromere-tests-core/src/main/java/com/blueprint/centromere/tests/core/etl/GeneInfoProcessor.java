@@ -10,7 +10,8 @@ import org.springframework.validation.Validator;
  * @author woemler
  */
 @DataTypes({"gene_info"})
-public class GeneInfoProcessor<T extends Gene<I>, I extends Serializable> extends GenericDataImportProcessor<T> {
+public class GeneInfoProcessor<T extends Gene<I>, I extends Serializable> extends
+    GenericDataImportProcessor<T> {
 
     public GeneInfoProcessor(Class<T> model,
         GeneInfoReader<T> reader,

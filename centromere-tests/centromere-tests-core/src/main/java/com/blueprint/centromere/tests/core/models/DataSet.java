@@ -32,9 +32,9 @@ public abstract class DataSet<I extends Serializable> implements Model<I>, Attri
 
     private String name;
     private String source;
-    @Ignored 
+    @Ignored
     private String version;
-    @Ignored 
+    @Ignored
     private String description;
 
     @Linked(model = DataFile.class, rel = "dataFiles", field = "id")
@@ -100,7 +100,7 @@ public abstract class DataSet<I extends Serializable> implements Model<I>, Attri
     }
 
     public void addSampleIds(Collection<String> sampleIds) {
-        for (String sampleId: sampleIds) {
+        for (String sampleId : sampleIds) {
             if (!sampleIds.contains(sampleId)) {
                 sampleIds.add(sampleId);
             }
@@ -114,7 +114,7 @@ public abstract class DataSet<I extends Serializable> implements Model<I>, Attri
     }
 
     public void addDataFileIds(Collection<String> dataFileIds) {
-        for (String dataFileId: dataFileIds) {
+        for (String dataFileId : dataFileIds) {
             if (!dataFileIds.contains(dataFileId)) {
                 dataFileIds.add(dataFileId);
             }

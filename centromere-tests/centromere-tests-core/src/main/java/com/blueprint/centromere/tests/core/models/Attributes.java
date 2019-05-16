@@ -45,7 +45,6 @@ public interface Attributes {
      * Tests whether an attribute has been registered.
      *
      * @param name attribute name.
-     * @return
      */
     boolean hasAttribute(String name);
 

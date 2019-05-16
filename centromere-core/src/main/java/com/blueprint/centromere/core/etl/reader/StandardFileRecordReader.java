@@ -27,10 +27,10 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 
 /**
- * Standard text file reader that assumes that a single record is extractable from a single line.  
- *   Some lines may be skipped, if they pass the test implemented in {@code isSkippableLine}.  The
- *   code for extracting a single record from a line should be implemented in 
- *   {@code getRecordFromLine}, and should return null if an invalid record is present.
+ * Standard text file reader that assumes that a single record is extractable from a single line.
+ * Some lines may be skipped, if they pass the test implemented in {@code isSkippableLine}.  The
+ * code for extracting a single record from a line should be implemented in {@code
+ * getRecordFromLine}, and should return null if an invalid record is present.
  *
  * @author woemler
  * @since 0.4.3
@@ -94,8 +94,8 @@ public abstract class StandardFileRecordReader<T extends Model<?>>
     }
 
     /**
-     * Gets the value of the current lines specified column, converting the string to the target 
-     *   type.
+     * Gets the value of the current lines specified column, converting the string to the target
+     * type.
      *
      * @param line line bits
      * @param header column header
@@ -110,8 +110,8 @@ public abstract class StandardFileRecordReader<T extends Model<?>>
     }
 
     /**
-     * Gets the value of the current lines specified column, converting the string to the target 
-     *   type. Specifies case-sensitive header matching.
+     * Gets the value of the current lines specified column, converting the string to the target
+     * type. Specifies case-sensitive header matching.
      *
      * @param line line bits
      * @param header column header
@@ -129,8 +129,9 @@ public abstract class StandardFileRecordReader<T extends Model<?>>
                 + "in this file: %s", header));
         }
         if (line.size() <= index) {
-            throw new DataProcessingException(String.format("Header index is outside bounds of current "
-                + "line. Index = %d, line length = %d", index, line.size()));
+            throw new DataProcessingException(
+                String.format("Header index is outside bounds of current "
+                    + "line. Index = %d, line length = %d", index, line.size()));
         }
         if (!conversionService.canConvert(String.class, clazz)) {
             throw new DataProcessingException(String.format("Cannot convert string value to %s",
@@ -140,11 +141,11 @@ public abstract class StandardFileRecordReader<T extends Model<?>>
     }
 
     /**
-     * Gets the value of the current lines specified column, converting the string to the target 
-     *   type. Specifies case-sensitive header matching.
+     * Gets the value of the current lines specified column, converting the string to the target
+     * type. Specifies case-sensitive header matching.
      *
-     *  @param line line bits
-     *  @param header column header
+     * @param line line bits
+     * @param header column header
      * @return string column value
      * @throws DataProcessingException thrown if column header not found
      */
@@ -154,14 +155,14 @@ public abstract class StandardFileRecordReader<T extends Model<?>>
     }
 
     /**
-     * Given a column header name, will return the index position of the column, or null if the 
-     *   column is not present.
+     * Given a column header name, will return the index position of the column, or null if the
+     * column is not present.
      *
      * @param header header name
      * @return column index of header
      */
     protected Integer getColumnIndex(String header) {
-        for (Map.Entry<String, Integer> entry: headerMap.entrySet()) {
+        for (Map.Entry<String, Integer> entry : headerMap.entrySet()) {
             if (header.toLowerCase().equals(entry.getKey().toLowerCase())) {
                 return entry.getValue();
             }
@@ -170,8 +171,8 @@ public abstract class StandardFileRecordReader<T extends Model<?>>
     }
 
     /**
-     * Given a column header name, will return the index position of the column, or null if the 
-     *   column is not present.
+     * Given a column header name, will return the index position of the column, or null if the
+     * column is not present.
      *
      * @param header header name
      * @return column index of header
@@ -184,14 +185,14 @@ public abstract class StandardFileRecordReader<T extends Model<?>>
     }
 
     /**
-     * Given an index, corresponding to a column position, returns the header name for the column, 
-     *   or null if not present.
+     * Given an index, corresponding to a column position, returns the header name for the column,
+     * or null if not present.
      *
      * @param index column index
      * @return header name
      */
     protected String getColumnHeader(Integer index) {
-        for (Map.Entry<String, Integer> entry: headerMap.entrySet()) {
+        for (Map.Entry<String, Integer> entry : headerMap.entrySet()) {
             if (index.equals(entry.getValue())) {
                 return entry.getKey();
             }
@@ -221,8 +222,8 @@ public abstract class StandardFileRecordReader<T extends Model<?>>
     }
 
     /**
-     * Parses a line of text and returns a single model record.  Should return null if the line does 
-     *   not contain a valid record.
+     * Parses a line of text and returns a single model record.  Should return null if the line does
+     * not contain a valid record.
      *
      * @param line line bits
      * @return model object
@@ -256,5 +257,5 @@ public abstract class StandardFileRecordReader<T extends Model<?>>
     public Map<String, Integer> getHeaderMap() {
         return headerMap;
     }
-    
+
 }

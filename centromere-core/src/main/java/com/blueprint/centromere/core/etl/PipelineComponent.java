@@ -22,9 +22,9 @@ import java.util.Map;
 
 /**
  * Defines the basic methods that all data processing pipeline components must implement.  In short,
- *   every component should have methods that run before and after data processing occurs. These 
- *   methods should be aware of the file being processed (if any) and any arguments modulating the
- *   data processing.
+ * every component should have methods that run before and after data processing occurs. These
+ * methods should be aware of the file being processed (if any) and any arguments modulating the
+ * data processing.
  *
  * @author woemler
  */

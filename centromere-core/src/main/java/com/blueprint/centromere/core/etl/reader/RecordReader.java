@@ -21,7 +21,8 @@ import com.blueprint.centromere.core.exceptions.DataProcessingException;
 import com.blueprint.centromere.core.model.Model;
 
 /**
- * Data import component class.  Reads from a data source and returns {@link Model} class instances.
+ * Data import component class.  Reads from a data source and returns {@link Model} class
+ * instances.
  *
  * @author woemler
  */

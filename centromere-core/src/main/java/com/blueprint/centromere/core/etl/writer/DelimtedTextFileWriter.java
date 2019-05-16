@@ -21,8 +21,8 @@ import com.blueprint.centromere.core.model.Model;
 import com.blueprint.centromere.core.model.ModelReflectionUtils;
 import com.blueprint.centromere.core.model.ModelSupport;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +30,8 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 
 /**
- * Writes records to a character-delimited text file.  Can be used for file reformatting or temp 
- *   file preperation for utilities, such as MySQL Import.
+ * Writes records to a character-delimited text file.  Can be used for file reformatting or temp
+ * file preperation for utilities, such as MySQL Import.
  *
  * @author woemler
  * @since 0.5.0
@@ -66,12 +66,12 @@ public class DelimtedTextFileWriter<T extends Model<?>>
     @Override
     public void writeRecord(T record) throws DataProcessingException {
 
-        FileWriter writer = this.getWriter();
+        Writer writer = this.getWriter();
         StringBuilder stringBuilder = new StringBuilder();
 
         if (headerFlag) {
             boolean flag = false;
-            for (String headerName: columns) {
+            for (String headerName : columns) {
                 if (flag) {
                     stringBuilder.append(delimiter);
                 }
@@ -93,7 +93,7 @@ public class DelimtedTextFileWriter<T extends Model<?>>
         stringBuilder = new StringBuilder();
         BeanWrapper wrapper = new BeanWrapperImpl(record);
         boolean flag = false;
-        for (String column: fields) {
+        for (String column : fields) {
             Object value = wrapper.getPropertyValue(column);
             if (value == null) {
                 value = "null";

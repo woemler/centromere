@@ -23,10 +23,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks the annotated field in a {@link Model} class as representing a foreign-key relationship 
- *   within the source database. The {@link #model()} value indicates the linked model class, the
- *   {@link #field()} value indicates the field in the linked model class that is represented by
- *   this annotated field, and {@link #rel()} provides a name for this relationship.
+ * Marks the annotated field in a {@link Model} class as representing a foreign-key relationship
+ * within the source database. The {@link #model()} value indicates the linked model class, the
+ * {@link #field()} value indicates the field in the linked model class that is represented by this
+ * annotated field, and {@link #rel()} provides a name for this relationship.
  *
  * @author woemler
  */
@@ -44,7 +44,7 @@ public @interface Linked {
 
     /**
      * Field name in the source {@link Model} type that the annotated field references.  Used to
-     *   construct the query string options in the assembled link.
+     * construct the query string options in the assembled link.
      *
      * @return the linked field in the origin class
      */

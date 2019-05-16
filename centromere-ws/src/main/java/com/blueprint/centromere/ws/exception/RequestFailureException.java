@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
  * @author woemler
  */
 public class RequestFailureException extends RestException {
+
     public RequestFailureException(String message) {
         super(HttpStatus.BAD_REQUEST, 400, message);
     }

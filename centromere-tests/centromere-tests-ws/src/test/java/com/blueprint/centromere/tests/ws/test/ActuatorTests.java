@@ -29,10 +29,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 @AutoConfigureMockMvc(secure = false)
 public class ActuatorTests extends AbstractRepositoryTests {
 
-    @Autowired private MockMvc mockMvc;
-    @Autowired private Environment env;
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private Environment env;
 
-    @Autowired(required = false) private MongoHealthIndicator mongoHealthIndicator;
+    @Autowired(required = false)
+    private MongoHealthIndicator mongoHealthIndicator;
 
     @Test
     public void configTest() {
@@ -70,7 +73,8 @@ public class ActuatorTests extends AbstractRepositoryTests {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", hasKey("app")))
             .andExpect(jsonPath("$.app", hasKey("name")))
-            .andExpect(jsonPath("$.app.name", is(env.getRequiredProperty("centromere.web.api.name"))))
+            .andExpect(
+                jsonPath("$.app.name", is(env.getRequiredProperty("centromere.web.api.name"))))
             .andExpect(jsonPath("$", hasKey("api")))
             .andExpect(jsonPath("$", hasKey("contact")))
             .andExpect(jsonPath("$", hasKey("dependencies")))

@@ -23,8 +23,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a {@link Model} field as ignored when mapping query string options from HTTP requests
- *   and when documenting web services.
+ * Marks a {@link Model} field as ignored when mapping query string options from HTTP requests and
+ * when documenting web services.
  *
  * @author woemler
  * @since 0.4.2
@@ -36,8 +36,6 @@ public @interface Ignored {
 
     /**
      * Flag to indicate that the marked field should not be visible in API output.
-     *
-     * @return
      */
     boolean hidden() default false;
 

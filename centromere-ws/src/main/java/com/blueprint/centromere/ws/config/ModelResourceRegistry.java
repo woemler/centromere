@@ -22,7 +22,7 @@ import java.util.Collection;
 
 /**
  * Defines the API for a registry bean that performs mapping between web service request URIs and
- *   {@link Model} resources in the data warehouse.
+ * {@link Model} resources in the data warehouse.
  *
  * @author woemler
  */
@@ -49,7 +49,6 @@ public interface ModelResourceRegistry {
      *
      * @param uri model URI
      * @return model class
-     * @throws ModelRegistryException
      */
     Class<? extends Model<?>> getModelByUri(String uri) throws ModelRegistryException;
 
@@ -58,21 +57,16 @@ public interface ModelResourceRegistry {
      *
      * @param model target model class
      * @return registered URI
-     * @throws ModelRegistryException
      */
     String getUriByModel(Class<? extends Model<?>> model) throws ModelRegistryException;
 
     /**
      * Returns a collection of all registered models' URIs.
-     *
-     * @return
      */
     Collection<String> getRegisteredModelUris();
 
     /**
      * Returns a collection of every registered {@link Model}.
-     *
-     * @return
      */
     Collection<Class<? extends Model<?>>> getRegisteredModels();
 

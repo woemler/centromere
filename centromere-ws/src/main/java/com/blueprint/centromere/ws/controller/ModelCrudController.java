@@ -100,17 +100,17 @@ public class ModelCrudController {
     private String rootUrl;
 
     /**
-     * {@code GET /{id}}
-     * Fetches a single record by its primary I and returns it, or a {@code Not Found} exception if not.
+     * {@code GET /{id}} Fetches a single record by its primary I and returns it, or a {@code Not
+     * Found} exception if not.
      *
      * @param id primary I for the target record.
      * @return {@code T} instance
      */
     @ApiImplicitParams({
-        @ApiImplicitParam(name = ReservedRequestParameters.INCLUDED_FIELDS_PARAMETER, 
+        @ApiImplicitParam(name = ReservedRequestParameters.INCLUDED_FIELDS_PARAMETER,
             value = "List of fields to be included in response objects",
             dataType = "string", paramType = "query"),
-        @ApiImplicitParam(name = ReservedRequestParameters.EXCLUDED_FIELDS_PARAMETER, 
+        @ApiImplicitParam(name = ReservedRequestParameters.EXCLUDED_FIELDS_PARAMETER,
             value = "List of fields to be excluded from response objects",
             dataType = "string", paramType = "query")
     })
@@ -123,9 +123,9 @@ public class ModelCrudController {
     @RequestMapping(
         value = "/{uri}/{id}",
         method = RequestMethod.GET,
-        produces = { ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
+        produces = {ApiMediaTypes.APPLICATION_HAL_JSON_VALUE, MediaType.APPLICATION_JSON_VALUE,
             ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
-            MediaType.TEXT_PLAIN_VALUE })
+            MediaType.TEXT_PLAIN_VALUE})
     public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope> findById(
         @ApiParam(name = "id", value = "Model record primary id.") @PathVariable String id,
         @PathVariable String uri,
@@ -144,7 +144,8 @@ public class ModelCrudController {
             e.printStackTrace();
             throw new ResourceNotFoundException();
         }
-        if (RequestUtils.requestContainsNonDefaultParameters(RequestUtils.findOneParameters(), request.getParameterMap())) {
+        if (RequestUtils.requestContainsNonDefaultParameters(RequestUtils.findOneParameters(),
+            request.getParameterMap())) {
             throw new InvalidParameterException("Request contains invalid query string options.");
         }
         Set<String> includedFields = RequestUtils.getIncludedFieldsFromRequest(request);
@@ -165,38 +166,37 @@ public class ModelCrudController {
     }
 
     /**
-     * {@code GET /}
-     * Queries the repository using inputted query string paramters, defined within a annotated
-     *   {@link Model} classes.  Supports hypermedia, pagination, sorting, field
-     *   filtering, and field exclusion.
+     * {@code GET /} Queries the repository using inputted query string paramters, defined within a
+     * annotated {@link Model} classes.  Supports hypermedia, pagination, sorting, field filtering,
+     * and field exclusion.
      *
      * @param pagedResourcesAssembler {@link PagedResourcesAssembler}
      * @param request {@link HttpServletRequest}
      * @return a {@link List} of {@link Model} objects.
      */
     @ApiImplicitParams({
-        @ApiImplicitParam(name = ReservedRequestParameters.PAGE_PARAMETER, 
-            value = "Page number.", 
-            defaultValue = "0", 
+        @ApiImplicitParam(name = ReservedRequestParameters.PAGE_PARAMETER,
+            value = "Page number.",
+            defaultValue = "0",
             dataType = "int",
             paramType = "query"),
-        @ApiImplicitParam(name = ReservedRequestParameters.SIZE_PARAMETER, 
-            value = "Number of records per page.", 
+        @ApiImplicitParam(name = ReservedRequestParameters.SIZE_PARAMETER,
+            value = "Number of records per page.",
             defaultValue = "1000",
-            dataType = "int", 
+            dataType = "int",
             paramType = "query"),
-        @ApiImplicitParam(name = ReservedRequestParameters.SORT_PARAMETER, 
-            value = "Sort order field and direction.", 
+        @ApiImplicitParam(name = ReservedRequestParameters.SORT_PARAMETER,
+            value = "Sort order field and direction.",
             dataType = "string",
-            paramType = "query", 
+            paramType = "query",
             example = "name,asc"),
-        @ApiImplicitParam(name = ReservedRequestParameters.INCLUDED_FIELDS_PARAMETER, 
+        @ApiImplicitParam(name = ReservedRequestParameters.INCLUDED_FIELDS_PARAMETER,
             value = "List of fields to be included in response objects",
-            dataType = "string", 
+            dataType = "string",
             paramType = "query"),
-        @ApiImplicitParam(name = ReservedRequestParameters.EXCLUDED_FIELDS_PARAMETER, 
+        @ApiImplicitParam(name = ReservedRequestParameters.EXCLUDED_FIELDS_PARAMETER,
             value = "List of fields to be excluded from response objects",
-            dataType = "string", 
+            dataType = "string",
             paramType = "query")
     })
     @ApiResponses({
@@ -208,7 +208,7 @@ public class ModelCrudController {
     @RequestMapping(
         value = "/{uri}",
         method = RequestMethod.GET,
-        produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
+        produces = {MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
             ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
             MediaType.TEXT_PLAIN_VALUE})
     public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope> find(
@@ -245,15 +245,18 @@ public class ModelCrudController {
         ResponseEnvelope envelope;
         String mediaType = request.getHeader("Accept");
 
-        List<QueryCriteria> criterias = RequestUtils.getQueryCriteriaFromFindRequest(model, request);
+        List<QueryCriteria> criterias = RequestUtils
+            .getQueryCriteriaFromFindRequest(model, request);
 
         Link selfLink = new Link(rootUrl + "/search/" + uri +
             (request.getQueryString() != null ? "?" + request.getQueryString() : ""), "self");
-        
+
         if (RequestUtils.isPagedRequest(request)) {
 
             Page<T> page = repository.find(criterias, pageable);
-            LOGGER.info(String.format("Query returned %d paged records, out of %d total", page.getSize(), page.getTotalElements()));
+            LOGGER.info(String
+                .format("Query returned %d paged records, out of %d total", page.getSize(),
+                    page.getTotalElements()));
 
             if (ApiMediaTypes.isHalMediaType(mediaType)) {
 
@@ -268,7 +271,7 @@ public class ModelCrudController {
             }
 
         } else {
-            
+
             List<T> entities;
 
             if (RequestUtils.isSortableRequest(request)) {
@@ -294,9 +297,8 @@ public class ModelCrudController {
     }
 
     /**
-     * {@code POST /}
-     * Attempts to create a new record using the submitted entity. Throws an exception if the
-     *   entity already exists.
+     * {@code POST /} Attempts to create a new record using the submitted entity. Throws an
+     * exception if the entity already exists.
      *
      * @param entity entity representation to be persisted
      * @return updated representation of the submitted entity
@@ -310,7 +312,7 @@ public class ModelCrudController {
     @RequestMapping(
         value = "/{uri}",
         method = RequestMethod.POST,
-        produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
+        produces = {MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
             ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
             MediaType.TEXT_PLAIN_VALUE})
     public <T extends Model<I>, I extends Serializable> ResponseEntity<?> create(
@@ -357,9 +359,8 @@ public class ModelCrudController {
     }
 
     /**
-     * {@code PUT /{id}}
-     * Attempts to update an existing entity record, replacing it with the submitted entity. Throws
-     *   an exception if the target entity does not exist.
+     * {@code PUT /{id}} Attempts to update an existing entity record, replacing it with the
+     * submitted entity. Throws an exception if the target entity does not exist.
      *
      * @param entity entity representation to update.
      * @param id primary I of the target entity
@@ -374,7 +375,7 @@ public class ModelCrudController {
     @RequestMapping(
         value = "/{uri}/{id}",
         method = RequestMethod.PUT,
-        produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
+        produces = {MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
             ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
             MediaType.TEXT_PLAIN_VALUE})
     public <T extends Model<I>, I extends Serializable> ResponseEntity<?> update(
@@ -427,8 +428,7 @@ public class ModelCrudController {
     }
 
     /**
-     * {@code DELETE /{id}}
-     * Attempts to delete the an entity identified by the submitted primary I.
+     * {@code DELETE /{id}} Attempts to delete the an entity identified by the submitted primary I.
      *
      * @param id primary I of the target record.
      * @return {@link HttpStatus} indicating success or failure.
@@ -465,8 +465,8 @@ public class ModelCrudController {
 
 
     /**
-     * {@code GET /{uri}/{id}/{linked}}
-     * Fetches all data records associated with the queried {@link Model} record.
+     * {@code GET /{uri}/{id}/{linked}} Fetches all data records associated with the queried {@link
+     * Model} record.
      *
      * @param pagedResourcesAssembler {@link PagedResourcesAssembler}
      * @param request {@link HttpServletRequest}
@@ -506,7 +506,7 @@ public class ModelCrudController {
     @RequestMapping(
         value = "/{uri}/{id}/{meta}",
         method = RequestMethod.GET,
-        produces = { MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
+        produces = {MediaType.APPLICATION_JSON_VALUE, ApiMediaTypes.APPLICATION_HAL_JSON_VALUE,
             ApiMediaTypes.APPLICATION_HAL_XML_VALUE, MediaType.APPLICATION_XML_VALUE,
             MediaType.TEXT_PLAIN_VALUE})
     public <T extends Model<I>, I extends Serializable> ResponseEntity<ResponseEnvelope> findLinked(
@@ -544,11 +544,15 @@ public class ModelCrudController {
         T record = recordOptional.get();
 
         // Check that the requested relationship is valid
-        List<Field> annotatedFields = ModelReflectionUtils.getLinkedAnnotationsFromRelName(model, meta);
+        List<Field> annotatedFields = ModelReflectionUtils
+            .getLinkedAnnotationsFromRelName(model, meta);
         if (annotatedFields.isEmpty()) {
-            throw new InvalidParameterException(String.format("Requested model relationship is not found: %s", meta));
+            throw new InvalidParameterException(
+                String.format("Requested model relationship is not found: %s", meta));
         } else if (annotatedFields.size() > 1) {
-            throw new ModelDefinitionException("The requested model has more than one relationship defined withthe same 'rel' name: " + meta);
+            throw new ModelDefinitionException(
+                "The requested model has more than one relationship defined withthe same 'rel' name: "
+                    + meta);
         }
 
         // Get the model and repository instance for the linked model.
@@ -584,14 +588,18 @@ public class ModelCrudController {
         List<Object> foreignKeyValues;
         BeanWrapper wrapper = new BeanWrapperImpl(record);
         if (Collection.class.isAssignableFrom(foreignKeyField.getType())) {
-            foreignKeyValues = new ArrayList<>((Collection<?>) wrapper.getPropertyValue(foreignKeyField.getName()));
+            foreignKeyValues = new ArrayList<>(
+                (Collection<?>) wrapper.getPropertyValue(foreignKeyField.getName()));
         } else {
-            foreignKeyValues = Collections.singletonList(wrapper.getPropertyValue(foreignKeyField.getName()));
+            foreignKeyValues = Collections
+                .singletonList(wrapper.getPropertyValue(foreignKeyField.getName()));
         }
 
         // Generate the query
         List<QueryCriteria> criterias
-            = RequestUtils.getQueryCriteriaFromFindLinkedRequest(relModel, relFieldName, foreignKeyValues, request);
+            = RequestUtils
+            .getQueryCriteriaFromFindLinkedRequest(relModel, relFieldName, foreignKeyValues,
+                request);
 
         // Query and package the response
         Link selfLink = new Link(rootUrl + "/search/" + uri + "/" + id + "/" + meta +
@@ -614,11 +622,12 @@ public class ModelCrudController {
             }
 
         } else {
-            
+
             List<? extends Model<?>> entities;
 
             if (RequestUtils.isSortableRequest(request)) {
-                entities = (List<? extends Model<?>>) metaRepository.find(criterias, pageable.getSort());
+                entities = (List<? extends Model<?>>) metaRepository
+                    .find(criterias, pageable.getSort());
             } else {
                 entities = (List<? extends Model<?>>) metaRepository.find(criterias);
             }
@@ -694,7 +703,8 @@ public class ModelCrudController {
      * @param model Model type to interrogate to determine I type.
      * @return converted I object.
      */
-    protected <T extends Model<I>, I extends Serializable> I convertModelIdParameter(String param, Class<T> model) {
+    protected <T extends Model<I>, I extends Serializable> I convertModelIdParameter(String param,
+        Class<T> model) {
         try {
             Class<I> type = (Class<I>) model.getMethod("getId").getReturnType();
             if (conversionService.canConvert(String.class, type)) {
@@ -703,7 +713,8 @@ public class ModelCrudController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        throw new MalformedEntityException(String.format("Cannot convert I parameter to model I type: %s", param));
+        throw new MalformedEntityException(
+            String.format("Cannot convert I parameter to model I type: %s", param));
     }
 
     /**
@@ -711,7 +722,7 @@ public class ModelCrudController {
      *
      * @param object object to be converted.
      * @param type class the object should be converted to.
-     * @param <T>  generic type of the target class.
+     * @param <T> generic type of the target class.
      * @return converted object.
      */
     protected <T> T convertObjectToModel(Object object, Class<T> type) {
@@ -719,8 +730,9 @@ public class ModelCrudController {
         try {
             return objectMapper.convertValue(object, type);
         } catch (Exception e) {
-            throw new MalformedEntityException(String.format("Cannot convert object to model type %s: %s",
-                type.getName(), object.toString()));
+            throw new MalformedEntityException(
+                String.format("Cannot convert object to model type %s: %s",
+                    type.getName(), object.toString()));
         }
     }
 

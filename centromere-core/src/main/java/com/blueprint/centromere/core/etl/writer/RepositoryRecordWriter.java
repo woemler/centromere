@@ -29,18 +29,15 @@ import java.util.Map;
 
 /**
  * Simple implementation of {@link RecordWriter}, that writes all records directly to the database
- *   using a {@link ModelRepository} instance.  Can be configured to write using an
- *   insert, update, or upsert (save) operation.
+ * using a {@link ModelRepository} instance.  Can be configured to write using an insert, update, or
+ * upsert (save) operation.
  *
  * @author woemler
  */
 public class RepositoryRecordWriter<T extends Model<I>, I extends Serializable>
     implements RecordWriter<T> {
 
-    public enum WriteMode { INSERT, UPDATE, UPSERT }
-
     private final ModelRepository<T, I> repository;
-
     private Integer batchSize = 1;
     private WriteMode writeMode = WriteMode.INSERT;
     private List<T> records = new ArrayList<>();
@@ -74,8 +71,9 @@ public class RepositoryRecordWriter<T extends Model<I>, I extends Serializable>
     }
 
     /**
-     * Writes the input {@link Model} record to the target Repository implementation,
-     *   using the appropriate operation.
+     * Writes the input {@link Model} record to the target Repository implementation, using the
+     * appropriate operation.
+     *
      * @param entity object to write
      */
     @SuppressWarnings("unchecked")
@@ -97,7 +95,7 @@ public class RepositoryRecordWriter<T extends Model<I>, I extends Serializable>
         } else if (writeMode.equals(WriteMode.UPDATE)) {
             repository.update(records);
         } else {
-            for (T record: records) {
+            for (T record : records) {
                 if (record.getId() != null && repository.existsById(record.getId())) {
                     repository.update(record);
                 } else {
@@ -133,5 +131,11 @@ public class RepositoryRecordWriter<T extends Model<I>, I extends Serializable>
 
     public void setWriteMode(WriteMode writeMode) {
         this.writeMode = writeMode;
+    }
+
+    public enum WriteMode {
+        INSERT,
+        UPDATE,
+        UPSERT
     }
 }

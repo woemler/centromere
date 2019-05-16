@@ -25,16 +25,17 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks the annotated {@link Model} class as being eligible for field-filtering in REST web 
- *   services via JSON/XML serialization tools.
- * 
+ * Marks the annotated {@link Model} class as being eligible for field-filtering in REST web
+ * services via JSON/XML serialization tools.
+ *
  * @author woemler
  */
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @JacksonAnnotationsInside
-@JsonFilter("fieldFilter") 
+@JsonFilter("fieldFilter")
 @Inherited
 public @interface Filterable {
+
 }

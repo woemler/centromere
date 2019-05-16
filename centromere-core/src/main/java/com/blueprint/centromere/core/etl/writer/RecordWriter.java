@@ -22,7 +22,7 @@ import com.blueprint.centromere.core.model.Model;
 
 /**
  * Data import component class for writing imported {@link Model} records to a temporary file or
- *   repository implementation.
+ * repository implementation.
  *
  * @author woemler
  */

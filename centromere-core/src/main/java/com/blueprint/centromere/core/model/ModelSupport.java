@@ -17,8 +17,8 @@
 package com.blueprint.centromere.core.model;
 
 /**
- * Ensures that component classes that support {@link Model} classes have accessible type 
- *   definitions.
+ * Ensures that component classes that support {@link Model} classes have accessible type
+ * definitions.
  *
  * @author woemler
  * @since 0.4.1

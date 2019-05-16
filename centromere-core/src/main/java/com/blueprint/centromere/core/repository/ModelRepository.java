@@ -33,9 +33,9 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**
- * The base {@link Model} repository interface, as an extension of Spring Data's core 
- *   {@link PagingAndSortingRepository} interface. This interface should be implemented for each
- *   database technology to be used with Centromere.
+ * The base {@link Model} repository interface, as an extension of Spring Data's core {@link
+ * PagingAndSortingRepository} interface. This interface should be implemented for each database
+ * technology to be used with Centromere.
  *
  * @author woemler
  * @since 0.5.0
@@ -56,7 +56,7 @@ public interface ModelRepository<T extends Model<I>, I extends Serializable>
 
     /**
      * Searches for all records that satisfy the requested criteria, and returns them in the
-     *   requested order.
+     * requested order.
      *
      * @param queryCriterias {@link QueryCriteria}
      * @param sort {@link Sort}
@@ -66,7 +66,7 @@ public interface ModelRepository<T extends Model<I>, I extends Serializable>
 
     /**
      * Searches for all records that satisfy the requested criteria, and returns them as a paged
-     *   collection.
+     * collection.
      *
      * @param queryCriterias {@link QueryCriteria}
      * @param pageable {@link Pageable}
@@ -91,11 +91,12 @@ public interface ModelRepository<T extends Model<I>, I extends Serializable>
     default Set<Object> distinct(String field) {
         Sort sort = new Sort(Sort.Direction.ASC, field);
         HashSet<Object> distinct = new HashSet<>();
-        for (T obj: findAll(sort)) {
+        for (T obj : findAll(sort)) {
             BeanWrapper wrapper = new BeanWrapperImpl(obj);
             if (!wrapper.isReadableProperty(field)) {
-                throw new QueryParameterException(String.format("Submitted parameter is not valid entity "
-                    + "field: %s", field));
+                throw new QueryParameterException(
+                    String.format("Submitted parameter is not valid entity "
+                        + "field: %s", field));
             }
             distinct.add(wrapper.getPropertyValue(field));
         }
@@ -103,8 +104,8 @@ public interface ModelRepository<T extends Model<I>, I extends Serializable>
     }
 
     /**
-     * Returns a unsorted list of distinct values of the requested field, filtered using a 
-     *   {@link QueryCriteria} based query.
+     * Returns a unsorted list of distinct values of the requested field, filtered using a {@link
+     * QueryCriteria} based query.
      *
      * @param field Model field name.
      * @param criterias Query criteria to filter the field values by.
@@ -113,11 +114,12 @@ public interface ModelRepository<T extends Model<I>, I extends Serializable>
     default Set<Object> distinct(String field, Iterable<QueryCriteria> criterias) {
         HashSet<Object> distinct = new HashSet<>();
         Sort sort = new Sort(Sort.Direction.ASC, field);
-        for (T obj: find(criterias, sort)) {
+        for (T obj : find(criterias, sort)) {
             BeanWrapper wrapper = new BeanWrapperImpl(obj);
             if (!wrapper.isReadableProperty(field)) {
-                throw new QueryParameterException(String.format("Submitted parameter is not valid entity "
-                    + "field: %s", field));
+                throw new QueryParameterException(
+                    String.format("Submitted parameter is not valid entity "
+                        + "field: %s", field));
             }
             distinct.add(wrapper.getPropertyValue(field));
         }
