@@ -2,10 +2,11 @@
 
 #### [Introduction](#introduction-1)
 - [About](#about)
-- [Demo](#demo)
-- [License](#license)
 - [Requirements](#requirements)
+- [Building](#building)
 - [Maven Artifacts](#maven-artifacts)
+- [Contact](#contact)
+- [License](#license)
 
 #### [Getting Started](#getting-started-1)
 - [Data Models](#data-models)
@@ -35,9 +36,10 @@
 
 ## About
 
-Centromere is a set of tools for developing scalable data warehouses and RESTful web services.  It is designed to tackle the problems inherent in developing data warehouses for genomic data, where data structures can vary greatly and scale fast, and where use-cases must be flexible to accommodate shifting business needs.  Centromere is developed in Java using the open-source, enterprise-grade Spring Framework, and supports integration with multiple database technologies.  You can use Centromere to create a new data warehouse from scratch, or bootstrap one or more existing databases, and make your data available via a customizable REST API.
+Centromere is a set of tools for developing scalable data warehouses and RESTful web services.  It is designed to tackle the problems inherent in developing data warehouses for genomic data, where data structures can vary greatly and scale fast, and where use-cases must be flexible to accommodate shifting business needs.  Centromere is developed in Java using the open-source, enterprise-grade Spring Framework, is designed to support multiple database technologies (though currently, only MongoDB integration is configured).  You can use Centromere to create a new data warehouse from scratch, or bootstrap one or more existing databases, and make your data available via a customizable REST API.
 
 Here are a few ways Centromere can help make your data warehouse and REST API better:
+
 - Support classes for quickly creating data models and data access objects (DAOs).
 - Components for reading standard column- and row-based data files, and rapidly developing extract-transform-load (ETL) pipelines.
 - Spring Boot initializer for exposing your data repository as a REST web service with:
@@ -54,29 +56,43 @@ These are the current requirements for developing data warehouses with Centromer
 
 - Java JDK 8+
 - Maven 3
-- MongoDB 3+
+- MongoDB 3.6+
 
 \* Support for additional database technologies is coming soon. 
 
+## Building
+
+You can build the entire project using the supplied `build.sh` script:
+
+```bash
+./build.sh
+```
+
+This script will compile the project, run tests, generate reports and JavaDocs.
+
 ## Maven Artifacts
 
-Artifacts for Centromere release builds are available from the Maven Central Repository:
+There are currently no recommended release version of Centromere available from Maven Central repository, though this should hopefully change in the near future.
 
 ```xml
 COMING SOON
 ```
 
+## Contact
+
+For questions about Centromere, or if you are interested in contributing, 
+please contact:
+  - [Will Oemler](mailto:woemler@gmail.com)
+
 ## License
 
-Centromere is licensed under the Apache License, version 2.0:
+Copyright 2019 Blueprint Medicines
 
-> Copyright 2018 William Oemler, Blueprint Medicines
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-> Licensed under the Apache License, Version 2.0 (the "License");
-> you may not use this file except in compliance with the License.
-> You may obtain a copy of the License at
-
-> http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -85,6 +101,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 # Getting Started
+
+## Core Concepts
+
+A complete data warehouse implementation built with Centromere would contain three primary components, handling the core responsibilities of a data warehouse system:
+
+- The data model and database interface 
+- A data extract/transform/load (ETL) pipeline
+- Web services for exposing data to consumers in a database-agnostic manner
+
+The primary unit of data storage and transfer in Centromere is the `Model`, an interface that defines an object identifiable within the database by a primary key ID, and accessible through the web services via this ID. Data is moved through the ETL pipeline as one or more `Model` instances, written-to and read-from the database in this form, and returned via HTTP requests in the same format. While a single `Model` record could be written as multiple records in multiple tables in a SQL database, for consistency sake, a single `Model` object is considered an atomic unit within a Centromere application.
+
+Reading and writing from the database is handled by `ModelRepository` classes, an extension of Spring Data's `PagingAndSortingRepository`. As such, it is ensured that all `Model` instances can be written, read, updated, and deleted in the database. `ModelRepository` instances support all of the features that standard Spring Data repositories do, but with added features, such as a more robust query API.
 
 ### Data Models
 
